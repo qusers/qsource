@@ -4,12 +4,14 @@
 
 SUFFIX=.f90 .F90
 
-FC = mpiifort
+FC = ifort
+MPIFC = mpiifort
 FCFLAGS = -O0 -g -check uninit -traceback
 LD = $(FC)
+MPILD = $(MPIFC)
 LDFLAGS = -traceback
 
-QfepSource = qfep.f90 mpiglob.f90 nrgy.f90 misc.f90 parse.f90
+QfepSource = qfep.F90 mpiglob.f90 nrgy.f90 misc.f90 parse.f90
 
 QprepSource = q_prep.f90 topo.f90 misc.f90 mpiglob.f90 parse.f90 prefs.f90 prep.f90 prmfile.f90 index.f90 mask.f90 trj.f90 sizes.f90 avetr.f90
 
@@ -69,7 +71,7 @@ Qdum5: $(QdumObjects)
 	$(LD) $(LDFLAGS) -o $@ $(QdumObjects) $(FLIBS)
 
 Qdyn5p: $(QdynpObjects)
-	$(LD) $(LDFLAGS) -o $@ $(QdynpObjects) $(FLIBS)
+	$(MPILD) $(LDFLAGS) -o $@ $(QdynpObjects) $(FLIBS)
 
 # Some objects need special handling
 
@@ -77,10 +79,10 @@ md_dum.o: md.F90
 	$(FC) $(FCFLAGS) -DDUM -c $< -o $@
 
 md_mpi.o: md.F90
-	$(FC) $(FCFLAGS) -DUSE_MPI -c $< -o $@
+	$(MPIFC) $(FCFLAGS) -DUSE_MPI -c $< -o $@
 
 qdyn_mpi.o: qdyn.F90
-	$(FC) $(FCFLAGS) -DUSE_MPI -c $< -o $@
+	$(MPIFC) $(FCFLAGS) -DUSE_MPI -c $< -o $@
 
 # Include the fortran module deps
 include mod-deps
