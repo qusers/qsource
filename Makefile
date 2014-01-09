@@ -2,8 +2,10 @@
 # Qprep5/Qdyn5/Qdyn5p/Qfep5/Qdum5/Qcalc5
 # version 5.01, 2003-08-26
 
+SUFFIX=.f90 .F90
+
 FC = mpiifort
-FFLAGS = -O0 -g -check uninit -traceback
+FCFLAGS = -O0 -g -check uninit -traceback
 LD = $(FC)
 LDFLAGS = -traceback
 
@@ -13,22 +15,25 @@ QprepSource = q_prep.f90 topo.f90 misc.f90 mpiglob.f90 parse.f90 prefs.f90 prep.
 
 QcalcSource = calc_base.f90 calc_chemscore.f90 calc_fit.f90 calc_geom.f90 calc_pmfscore.f90 calc_com_ke.f90 calc_com.f90 calc_rdf.f90 calc_rms.f90 calc_rmsf.f90 calc_entropy.f90 calc_nb.f90 calc_xscore.f90 eigen.f90 index.f90 mask.f90 maskmanip.f90 misc.f90 mpiglob.f90 nrgy.f90 parse.f90 prmfile.f90 qatom.f90 qcalc.f90 sizes.f90 topo.f90 trj.f90
 
-QdynSource = md.f90 mask.f90 misc.f90 mpiglob.f90 nrgy.f90 prmfile.f90 qatom.f90 qdyn.f90 sizes.f90 topo.f90 trj.f90 index.f90
+QdynSource = md.F90 mask.f90 misc.f90 mpiglob.f90 nrgy.f90 prmfile.f90 qatom.f90 qdyn.F90 sizes.f90 topo.f90 trj.f90 index.f90
 
-QdumSource = md_dum.f90 mask.f90 misc.f90 mpiglob.f90 nrgy.f90 prmfile.f90 qatom.f90 qdyn.f90 sizes.f90 topo.f90 trj.f90 index.f90
+QdumSource = mask.f90 misc.f90 mpiglob.f90 nrgy.f90 prmfile.f90 qatom.f90 qdyn.F90 sizes.f90 topo.f90 trj.f90 index.f90
 
-QdynpSource = md_mpi.f90 mask.f90 misc.f90 mpiglob.f90 nrgy.f90 prmfile.f90 qatom.f90 qdyn_mpi.f90 sizes.f90 topo.f90 trj.f90 index.f90
+QdynpSource = mask.f90 misc.f90 mpiglob.f90 nrgy.f90 prmfile.f90 qatom.f90 sizes.f90 topo.f90 trj.f90 index.f90
 
 QfepObjects = $(QfepSource:.f90=.o)
 QprepObjects = $(QprepSource:.f90=.o)
 QcalcObjects = $(QcalcSource:.f90=.o)
 QdynObjects = $(QdynSource:.f90=.o)
-QdumObjects = $(QdumSource:.f90=.o)
-QdynpObjects = $(QdynpSource:.f90=.o)
+QdumObjects = $(QdumSource:.f90=.o) md_dum.o
+QdynpObjects = $(QdynpSource:.f90=.o) md_mpi.o qdyn_mpi.o
 
 PROGRAMS = Qfep5 Qdyn5p Qdyn5 Qprep5 Qcalc5 Qdum5
 
 %.o: %.f90
+	$(FC) $(FCFLAGS) -c $<
+
+%.o: %.F90
 	$(FC) $(FCFLAGS) -c $<
 
 ###########################################################
@@ -40,7 +45,7 @@ PROGRAMS = Qfep5 Qdyn5p Qdyn5 Qprep5 Qcalc5 Qdum5
 all:	$(PROGRAMS)
 
 clean:
-	rm -f *.o *.F90 *.mod *.M *.kmo *.il $(PROGRAMS)
+	rm -f *.o *.mod *.M *.kmo *.il $(PROGRAMS)
 
 ###########################################################
 #
@@ -65,3 +70,23 @@ Qdum5: $(QdumObjects)
 
 Qdyn5p: $(QdynpObjects)
 	$(LD) $(LDFLAGS) -o $@ $(QdynpObjects) $(FLIBS)
+
+# Some objects need special handling
+
+md_dum.o: md.F90
+	$(FC) $(FCFLAGS) -DDUM -c $< -o $@
+
+md_mpi.o: md.F90
+	$(FC) $(FCFLAGS) -DUSE_MPI -c $< -o $@
+
+qdyn_mpi.o: qdyn.F90
+	$(FC) $(FCFLAGS) -DUSE_MPI -c $< -o $@
+
+# Include the fortran module deps
+include mod-deps
+
+# Add deps for the obejcts with special handliung
+md_mpi.o: mpiglob.o qatom.o sizes.o trj.o
+md_dum.o: mpiglob.o qatom.o sizes.o trj.o
+qdyn_mpi.o: md_mpi.o mpiglob.o
+
