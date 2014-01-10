@@ -6181,7 +6181,7 @@ type(tXDotSet) function ForceField_Get_Surface_Dot_Rxyz(bigR, x, y, z)
 	tmp_set%num_dot = 0
 
 	!do theta = 0,PI -1, theta_step
-	do i = 0,PI/theta_step
+	do i = 0,int(PI/theta_step)
 		theta = theta_step*i
 
 		r=bigR*sin(theta) 
@@ -6189,7 +6189,7 @@ type(tXDotSet) function ForceField_Get_Surface_Dot_Rxyz(bigR, x, y, z)
 		phi_step=2*PI/tmp
 
 !		do phi = 0,(2*PI) -1, phi_step
-		do j = 0,(2*PI)/phi_step
+		do j = 0,int((2*PI)/phi_step)
 			phi = phi_step*j
       tmp_dot%coor(0)=r*cos(phi) 
       tmp_dot%coor(1)=r*sin(phi) 
