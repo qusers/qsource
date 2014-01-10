@@ -786,7 +786,7 @@ subroutine XReadAtomTypeConversions(filename, chType)
 		count = 0
 		do
 			read(fp,'(a256)',iostat=filestat) buf
-			if(filestat) goto 10
+			if(filestat.ne.0) goto 10
 			if(trim(buf).eq.'') goto 2		! skip blank line
 			if(buf(1:1).eq.'#') goto 2		! skip REM
 		
@@ -794,7 +794,7 @@ subroutine XReadAtomTypeConversions(filename, chType)
 			if(trim(buf).eq.'{ligand atom type translations}') then
 				do
 					read(fp,'(a256)',iostat=filestat) buf
-					if(filestat) goto 10
+					if(filestat.ne.0) goto 10
 
 					buf = adjustl(trim(buf))
 					if(buf.eq.'') goto 3		! skip blank line
@@ -808,11 +808,11 @@ subroutine XReadAtomTypeConversions(filename, chType)
 					p = index(buf,'#')
 					buf = adjustl(buf(1:p-1))			! remove traling comment
 
-					if(mark) then									! read translation table
+					if(mark.ne.0) then									! read translation table
 						tmp(1) = ''
 						tmp(column) = ''
 						read(buf,*,iostat=filestat) tmp(1:column)
-						if(filestat) goto 10
+						if(filestat.ne.0) goto 10
 
 						if(buf(1:1).eq.'{') then
 						 goto 10
@@ -891,7 +891,7 @@ subroutine XReadResidueConversions(filename, chType)
 
 					num_residue = num_residue +1
 					! Make sure storage has been allocated
-					if(not(associated(residuetable))) allocate(residuetable(9))
+					if(.not. associated(residuetable)) allocate(residuetable(9))
 					
 					! Expand table if it's too small
 					if(num_residue>size(residuetable)) then			 
@@ -974,7 +974,7 @@ subroutine XPAtomNameConversions(filename, chType)
 											section(stackpointer) = ''
 											stackpointer = stackpointer -1
 
-											if(stackpointer.eq.0.and.mark) goto 3
+											if(stackpointer.eq.0.and.mark.ne.0) goto 3
 										end if
 									else														! beginning of section
 										stackpointer = stackpointer +1
@@ -993,7 +993,7 @@ subroutine XPAtomNameConversions(filename, chType)
 										end if
 									end if
 								else
-									if((mark).and.(current_res.ne.0)) then
+									if((mark.ne.0).and.(current_res.ne.0)) then
 										read(buf,*) name1, name2
 										call upcase(name1)
 										call upcase(name2)
@@ -1084,13 +1084,13 @@ subroutine XReadLib(filename)
 								goto 2															! skip comment
 							elseif(trim(buf(1:1)).eq.'!') then
 								goto 2															! skip comment
-							elseif(index(buf,'[atoms]')) then
+							elseif(index(buf,'[atoms]').ne.0) then
 								b_atomsection =	1										! set flag 
-							elseif(index(buf,'[').and.b_atomsection) then			! reach end of [atoms]-section
+							elseif(index(buf,'[').ne.0.and.b_atomsection.ne.0) then			! reach end of [atoms]-section
 								b_atomsection = 0
 								exit
 							else
-								if(b_atomsection) atom_count(count) = atom_count(count) +1	! if no rules triggered, this is an atom line
+								if(b_atomsection.ne.0) atom_count(count) = atom_count(count) +1	! if no rules triggered, this is an atom line
 							end if
 	2					end do
 					end if
@@ -1102,7 +1102,7 @@ subroutine XReadLib(filename)
 
 		rewind(fp) 
 
-		if(not(associated(patomnametable))) allocate(patomnametable(1:count))
+		if(.not. associated(patomnametable)) allocate(patomnametable(1:count))
 		
 		if(size(patomnametable)<num_patomrestype+count) then									! increase table size
 			allocate(tmp_table(1:num_patomrestype+count))
@@ -1154,14 +1154,14 @@ subroutine XReadLib(filename)
 								goto 4															! skip comment
 							elseif(trim(buf(1:1)).eq.'!') then
 								goto 4															! skip comment
-							elseif(index(buf,'[atoms]')) then
+							elseif(index(buf,'[atoms]').ne.0) then
 								b_atomsection =	1										! set flag
 								i = 0										
-							elseif(index(buf,'[').and.b_atomsection) then			! reached end of [atoms]-section
+							elseif(index(buf,'[').ne.0.and.b_atomsection.ne.0) then			! reached end of [atoms]-section
 								b_atomsection = 0
 								exit
 							else
-								if(b_atomsection) then
+								if(b_atomsection.ne.0) then
 									i = i +1														! read name information
 									read(buf(1:256),*,iostat=filestat) slask, &
 																										 patomnametable(num_patomrestype+count)%xname(i),&
@@ -1780,7 +1780,7 @@ subroutine xextract_cofactor(cf,cf_def,conumber,nAtoms,nBonds,coordinates,bonds)
 	deallocate(prt2cof)
 	return
 
-	if(not(associated(mask)).or.size(mask).eq.0) then
+	if(.not. associated(mask).or.size(mask).eq.0) then
 		write(*,'(a,a)') 'Fatal: No atoms match cofactor description ', trim(adjustl(cf_def))
 		stop
 	end if
@@ -2953,7 +2953,7 @@ subroutine Molecule_Add_Ring(m,r)
 	integer								:: i
 	type(tXRing),pointer	:: tmp(:)
 
-	if(not(associated(m%ring))) then
+	if(.not. associated(m%ring)) then
 		! Adding first ring to molecule, need to init pointer
 		allocate(m%ring(0:0),stat=err)
 		if(err.ne.0) write(*,'(a)') 'Fatal: Out of memory.'
@@ -3032,14 +3032,14 @@ integer function Molecule_Aromatic_Ring_Check_6(molecule,atom_path,bond_path)
 		else
 			mark2=0 
 		end if
-		if(mark1.and.mark2) then
+		if(mark1.ne.0.and.mark2.ne.0) then
 			mark=1
 			exit
 		else
 			goto 1 
 		end if
 1	end do
-	if(mark) then
+	if(mark.ne.0) then
 		Molecule_Aromatic_Ring_Check_6 = 0
 	else
 		Molecule_Aromatic_Ring_Check_6  = 1
@@ -3725,7 +3725,7 @@ real function Molecule_Count_Sulfonic_Acid(molecule,flag)
 
 			num = num +1  
 
-			if(flag) then
+			if(flag.ne.0) then
 				molecule%atom(i)%logp=molecule%atom(i)%logp+(LOGP_SULFONIC_ACID/2.0) 
 				molecule%atom(j)%logp=molecule%atom(j)%logp+(LOGP_SULFONIC_ACID/2.0) 
 			end if
@@ -3775,7 +3775,7 @@ real function Molecule_Count_Salicylic_Acid(molecule,flag)
 			if(Molecule_Connection_1_5_Check(molecule,(molecule%atom(i)%id), (molecule%atom(j)%id)).eq.0) goto 3 
 
 			num = num +1 
-			if(flag) then
+			if(flag.ne.0) then
 				molecule%atom(i)%logp=molecule%atom(i)%logp+((LOGP_SALICYLIC_ACID)/2.0) 
 				molecule%atom(j)%logp=molecule%atom(j)%logp+((LOGP_SALICYLIC_ACID)/2.0) 
 			end if
@@ -3822,7 +3822,7 @@ real function Molecule_Count_Amino_Acid(molecule,flag)
 			if(Molecule_Connection_1_4_Check(molecule,(molecule%atom(i)%id), (molecule%atom(j)%id)).eq.0) goto 3 
 
 			num = num +1 
-			if(flag) then
+			if(flag.ne.0) then
 				molecule%atom(i)%logp=molecule%atom(i)%logp+((LOGP_AMINO_ACID)/2.0) 
 				molecule%atom(j)%logp=molecule%atom(j)%logp+((LOGP_AMINO_ACID)/2.0)		
 			end if
@@ -3838,7 +3838,7 @@ real function Molecule_Count_Amino_Acid(molecule,flag)
 
 			num = num +1 
 
-			if(flag) then
+			if(flag.ne.0) then
 				molecule%atom(i)%logp=molecule%atom(i)%logp+((LOGP_AMINO_ACID)/2.0) 
 				molecule%atom(j)%logp=molecule%atom(j)%logp+((LOGP_AMINO_ACID)/2.0) 
 			end if
@@ -3885,7 +3885,7 @@ real function Molecule_Count_Acceptor_1_5_Pair(molecule,flag)
 
 			num = num +1 
 
-			if(flag) then
+			if(flag.ne.0) then
 				molecule%atom(i)%logp=molecule%atom(i)%logp+((LOGP_ACCEPTOR_PAIR)/2.0) 
 				molecule%atom(j)%logp=molecule%atom(j)%logp+((LOGP_ACCEPTOR_PAIR)/2.0) 
 			else 
@@ -3934,7 +3934,7 @@ real function Molecule_Count_O3_1_4_Pair(molecule,flag)
 
 		num=num+0.500 
 
-		if(flag) then
+		if(flag.ne.0) then
 			molecule%atom(i)%logp=molecule%atom(i)%logp+(LOGP_O3_PAIR/2.0) 
 		else 
 			goto 3 
@@ -3993,7 +3993,7 @@ real function Molecule_Count_Nar_1_4_Pair(molecule,flag)
 				if(Molecule_Connection_1_2_Check(molecule,(tmp1),(tmp3)).eq.1) then
 					if(Molecule_Connection_1_2_Check(molecule,(tmp2),(tmp4)).eq.1) then
 						num = num +1 
-						if(flag) then
+						if(flag.ne.0) then
 							molecule%atom(i)%logp=molecule%atom(i)%logp+((LOGP_NAR_PAIR)/2.0) 
 							molecule%atom(j)%logp=molecule%atom(j)%logp+((LOGP_NAR_PAIR)/2.0) 
 						end if
@@ -4003,7 +4003,7 @@ real function Molecule_Count_Nar_1_4_Pair(molecule,flag)
 				elseif(Molecule_Connection_1_2_Check(molecule,tmp1,tmp4).eq.1) then
 					if(Molecule_Connection_1_2_Check(molecule,tmp2,tmp3).eq.1) then
 						num = num +1 
-						if(flag) then
+						if(flag.ne.0) then
 							molecule%atom(i)%logp=molecule%atom(i)%logp+((LOGP_NAR_PAIR)/2.0) 
 							molecule%atom(j)%logp=molecule%atom(j)%logp+((LOGP_NAR_PAIR)/2.0) 
 						end if
@@ -4039,7 +4039,7 @@ real function Molecule_Count_Halogen_1_3_Pair(molecule,flag)
 
 			num1 = num1 +1 
 
-			if(flag) then
+			if(flag.ne.0) then
 				molecule%atom(i)%logp=molecule%atom(i)%logp+((LOGP_HALOGEN_PAIR)/2.0) 
 				molecule%atom(j)%logp=molecule%atom(j)%logp+((LOGP_HALOGEN_PAIR)/2.0) 
 			else 
@@ -4060,7 +4060,7 @@ real function Molecule_Count_Halogen_1_3_Pair(molecule,flag)
 
 			num2 = num2 +1 
 
-			if(flag) then
+			if(flag.ne.0) then
 				molecule%atom(i)%logp=molecule%atom(i)%logp+((LOGP_HALOGEN_PAIR)/2.0) 
 				molecule%atom(j)%logp=molecule%atom(j)%logp+((LOGP_HALOGEN_PAIR)/2.0) 
 			else 
@@ -4174,7 +4174,7 @@ real function Molecule_Count_Internal_HBond(molecule,flag)
 
 		num=num+0.500 
 
-		if(flag) then
+		if(flag.ne.0) then
 			molecule%atom(i)%logp=molecule%atom(i)%logp+(LOGP_INTERNAL_HBOND/2.0) 
 		else 
 			goto 3 
@@ -4198,7 +4198,7 @@ real function Molecule_Count_Hydrophobic_Carbon(molecule,flag)
 		if(Molecule_Hydrophobic_Neighbor_Check(molecule,molecule%atom(i)%id).eq.0) goto 1
 
 		num = num +1  
-		if(flag) then
+		if(flag.ne.0) then
 			molecule%atom(i)%logp=molecule%atom(i)%logp+(LOGP_HYDROPHOBIC_CARBON) 
 		end if
 1	end do
@@ -4977,7 +4977,7 @@ real function Ligand_Calculate_Binding_Score(ligand,input,protein)
 
 
 	! prepare for atomic binding score
-	if(not(associated(ligand%abs_inf))) then
+	if(.not. associated(ligand%abs_inf)) then
 		allocate(ligand%abs_inf(0:ligand%mol%num_atom -1),stat=err)	! create array of atomic binding score, one element for each atom in ligand
 		if(err.ne.0) write(*,'(a)') 'Fatal: Out of memory.'
 	end if
@@ -5737,18 +5737,18 @@ subroutine Ligand_Value_Atom(ligand,lite_run)
 	integer,optional									:: lite_run
 	integer														:: mark
 
-	if(not(present(lite_run))) mark = Molecule_ValueAtom(ligand%mol)
+	if(.not. present(lite_run)) mark = Molecule_ValueAtom(ligand%mol)
 
 	! now compute the H-bond root for each HB atom
 	call Ligand_Calculate_HB_Root(ligand)
 
 	! assign atomic logp values, which is needed by binding score
 	! atomic logp is not read from ATOM_DEF_XTOOL!
-	if(not(present(lite_run))) ligand%mol%logp = Molecule_Calculate_LogP(ligand%mol)
+	if(.not. present(lite_run)) ligand%mol%logp = Molecule_Calculate_LogP(ligand%mol)
 
 	! some other molecular properties
-	if(not(present(lite_run))) ligand%mol%num_hb_atom  = Molecule_Get_Num_HB_Atom(ligand%mol)
-	if(not(present(lite_run))) ligand%mol%num_rotor		= Molecule_Count_Rotor(ligand%mol)
+	if(.not. present(lite_run)) ligand%mol%num_hb_atom  = Molecule_Get_Num_HB_Atom(ligand%mol)
+	if(.not. present(lite_run)) ligand%mol%num_rotor		= Molecule_Count_Rotor(ligand%mol)
 end subroutine Ligand_Value_Atom
 
 subroutine Ligand_Calculate_HB_Root(lig)
@@ -5893,7 +5893,7 @@ atom_res_id=0
 			ligand%mol%bond(i) = ligand%mol%bond(i+1)
 			ligand%mol%bond(i+1) = tmp
 2		end do
-		if(not(mark)) exit
+		if(mark.eq.0) exit
 	end do
 
 	! Reset bond id
@@ -6514,7 +6514,7 @@ integer function ForceField_Assign_Patom_Parameters(atm,suppress_warnings)
 6		end do
 5 end do
 
-	if(not(present(suppress_warnings)).and.not(atm%iscofactor))then
+	if(.not. present(suppress_warnings) .and. atm%iscofactor .ne. 0)then
 		 write(*,'(a,a,a,a,a,a,a,a,a)') 'WARNING: No parameters for protein atom ', trim(atm%name), ' in residue nr. ', trim(adjustl(atm%res_id)), ' (', trim(atm%residue),'/',trim(atm%old_residue),'). This atom is ignored.'
 		 warn = warn +1
 	end if
@@ -7078,7 +7078,7 @@ subroutine Dot_PushBack(dots,numdot,newdot)
 	type(tXDot)	:: newdot
 	type(tXDot),allocatable	:: tmpdot(:)
 
-	if(associated(dots).eq.0) then			! need to init dot array
+	if(.not. associated(dots)) then			! need to init dot array
 		allocate(dots(16),stat=err)
 		if(err.ne.0) write(*,'(a)') 'Fatal: Out of memory.'
 	end if		
@@ -7511,7 +7511,7 @@ subroutine xprotein_translate(protein,nAtoms,coordinates,num_bond,bond)
 			protein%bond(i) = protein%bond(i+1)
 			protein%bond(i+1) = tmp
 2		end do
-		if(not(mark)) exit
+		if(mark.eq.0) exit
 	end do
 
 	! Reset bond id
@@ -7800,7 +7800,7 @@ subroutine Protein_Add_Ring(m,r)
 	integer								:: i,j
 	type(tXRing),pointer	:: tmp(:)
 
-	if(not(associated(m%ring))) then
+	if(.not. associated(m%ring)) then
 		! Adding first ring to molecule, need to init pointer
 		allocate(m%ring(0:0),stat=err)
 		if(err.ne.0) write(*,'(a)') 'Fatal: Out of memory.'
@@ -7843,7 +7843,7 @@ subroutine Protein_Value_Atom(protein,flag,lite_run)
 	integer														:: slask,i
 
 	! assign the parameters for all atoms, only done once
-	if(not(present(lite_run))) then
+	if(.not. present(lite_run)) then
 		do i=0, protein%num_atom -1
 			if(protein%atom(i)%iscofactor.eq.0) slask = ForceField_Assign_Patom_Parameters(protein%atom(i))
 		end do
@@ -8103,9 +8103,9 @@ subroutine Protein_Detect_Connections(protein,lite_run)
 			goto 8 
 		 elseif((protein%atom(j)%res_id.ne.protein%atom(i)%res_id)) then 
 			goto 8 
-		 elseif(index(protein%atom(j)%name,'S')) then 
+		 elseif(index(protein%atom(j)%name,'S').ne.0) then 
 			goto 8 
-		 elseif(index(protein%atom(j)%name,'P')) then 
+		 elseif(index(protein%atom(j)%name,'P').ne.0) then 
 			goto 8 
 		 end if
 
