@@ -2044,9 +2044,9 @@ call MPI_Address(constant_pressure, fdisp(18), ierr)
 call MPI_Address(ivolume_cycle, fdisp(19), ierr)
 ftype(37) = MPI_LOGICAL
 call MPI_Address(rigid_box_centre, fdisp(37), ierr)
-ftype(37) = MPI_LOGICAL
+ftype(39) = MPI_LOGICAL
 call MPI_Address(put_solvent_back_in_box, fdisp(39), ierr)
-ftype(37) = MPI_LOGICAL
+ftype(40) = MPI_LOGICAL
 call MPI_Address(put_solute_back_in_box, fdisp(40), ierr)
 
 ! xpcent            from TOPO, needed for listgeneration
