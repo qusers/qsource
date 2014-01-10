@@ -3258,7 +3258,7 @@ subroutine readparm(filnam)
 	end if
 	el14_scale = real(rdummy,8)
 	write(*,40) el14_scale
-40	format('Scaling of 1-4 electrostatics:',t32,f5.3)
+40	format('Scaling of 1-4 electrostatics:',t31,f6.3)
 
 	if(prm_get_logical_by_key('switch_atoms', ldummy)) then
 		if(ldummy) then 

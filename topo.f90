@@ -1017,8 +1017,8 @@ logical function topo_read(u, require_version, extrabonds)
 	return
 
 1100 write(*,1101) version, require_version
-1101 format('>>>>> ERROR: Incompatible topology version ',f4.2, &
-				' found. Version >= ',f4.2,' required.')
+1101 format('>>>>> ERROR: Incompatible topology version ',f5.2, &
+				' found. Version >= ',f5.2,' required.')
 	return
 end function topo_read
 
@@ -1194,15 +1194,15 @@ subroutine topo_save(name)
 		write(u, '(a)') 'R* normal:'
 		write(u, '(8(f7.4,1x))') (iaclib(i)%avdw(1), i=1, max_atyps)
 		write(u, '(a)') 'epsilon normal:'
-		write(u, '(8(f9.7,1x))') (iaclib(i)%bvdw(1), i=1, max_atyps)
+		write(u, '(8(f10.7,1x))') (iaclib(i)%bvdw(1), i=1, max_atyps)
 		write(u, '(a)') 'R* polar:'
 		write(u, '(8(f8.4,1x))') (iaclib(i)%avdw(2), i=1, max_atyps)
 		write(u, '(a)') 'epsilon polar:'
-		write(u, '(8(f9.7,1x))') (iaclib(i)%bvdw(2), i=1, max_atyps)
+		write(u, '(8(f10.7,1x))') (iaclib(i)%bvdw(2), i=1, max_atyps)
 		write(u, '(a)') 'R* 1-4:'
 		write(u, '(8(f8.4,1x))') (iaclib(i)%avdw(3), i=1, max_atyps)
 		write(u, '(a)') 'epsilon 1-4:'
-		write(u, '(8(f9.7,1x))') (iaclib(i)%bvdw(3), i=1, max_atyps)
+		write(u, '(8(f10.7,1x))') (iaclib(i)%bvdw(3), i=1, max_atyps)
 	ENDIF
 	write(*, 20) max_atyps
 

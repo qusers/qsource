@@ -15376,8 +15376,8 @@ write(*,'(80a)') '==============================================================
 
 22	format('type   st lambda',2A10)
 26	format('type   st lambda',6a10)
-32	format (a,T8,i2,1x,f6.4,2f10.2)
-36	format (a,T8,i2,1x,f6.4,6f10.2)
+32	format (a,T8,i2,f7.4,2f10.2)
+36	format (a,T8,i2,f7.4,6f10.2)
 37  format ('pair   Vwsum    Vwel    Vwvdw')
 38  format (3(i4,':Vel',i3,':Vvdw'))
 39  format (i2,f10.2,f8.2,f9.2)

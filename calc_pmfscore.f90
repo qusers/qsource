@@ -949,7 +949,7 @@ real function PMF_Score(lig,prot,inp)
 			m = int(r/resolution)																	! bin
 						
 			if(m<1) then
-				write(*,'(a,i6,a,a,a,a,a,i6,a,a,a,a,a,f5.3,a)') 'WARNING: Ligand atom ', i+1, ' (', trim(adjustl(lig%atom(i)%qtype_long)),',',trim(adjustl(lig%atom(i)%residue)), &
+				write(*,'(a,i6,a,a,a,a,a,i6,a,a,a,a,a,f6.3,a)') 'WARNING: Ligand atom ', i+1, ' (', trim(adjustl(lig%atom(i)%qtype_long)),',',trim(adjustl(lig%atom(i)%residue)), &
 																			') and protein atom ', j+1, ' (', trim(adjustl(prot%atom(j)%qtype_long)),',',trim(adjustl(prot%atom(j)%residue)), &
 																			') are too close (r = ', r,' A). Using r = 0.2 A.'
 				warn = warn +1

@@ -1614,7 +1614,7 @@ subroutine xscore_precalc
 			write(*,'(a)') 'Scoring initial configuration'
 			score = Ligand_Calculate_Binding_Score(ligand, input,protein)
 			call Ligand_Scoring_Stats(ligand)
-			write(*,'(a, t28,f6.1,  t36,f5.2, t43,f5.1, t52,f4.2, t57,f5.1, t65,f4.1, t73,f6.3)') 'Total score of topology', ligand%vdw,ligand%hb,ligand%hp,ligand%hm,ligand%hs,ligand%rt,ligand%bind_score
+			write(*,'(a, t28,f6.1,  t36,f5.2, t43,f5.1, t51,f5.2, t57,f5.1, t65,f4.1, t73,f6.3)') 'Total score of topology', ligand%vdw,ligand%hb,ligand%hp,ligand%hm,ligand%hs,ligand%rt,ligand%bind_score
 		end if
 
 end subroutine xscore_precalc
@@ -1911,7 +1911,7 @@ subroutine xscore_calc(iCalc, iFrame)	! calc topmost routine
 	if(input%show_abs.eq.'YES')		call Ligand_Scoring_Stats(ligand)
 	if(input%show_abs.eq.'QATOM') call Ligand_Scoring_Stats(ligand,input%qatom-1)
 
-	if(input%show_total.eq.'YES') write(*,'(t28,f6.1,  t36,f5.2, t43,f5.1, t52,f4.2, t57,f5.1, t65,f4.1, t73,f6.3)') ligand%vdw,ligand%hb,ligand%hp,ligand%hm,ligand%hs,ligand%rt,ligand%bind_score
+	if(input%show_total.eq.'YES') write(*,'(t28,f6.1,  t36,f5.2, t43,f5.1, t51,f5.2, t57,f5.1, t65,f4.1, t73,f6.3)') ligand%vdw,ligand%hb,ligand%hp,ligand%hm,ligand%hs,ligand%rt,ligand%bind_score
 	if(input%show_abs.eq.'YES')		write(*,'(a)') '------------------------------------------------------------------------------'
 end subroutine xscore_calc
 
@@ -1967,7 +1967,7 @@ subroutine xscore_mean
 	! output mean values
 	write(*,1)  'processed frames: ', nXScores, 'VDW',   'HB',    'HP',    'HM',      'HS',       'RT',			'SCORE'
 1	format(      t1,a,                t19,i4,		t31,a3,  t38,a2,  t46,a2,  t52,a2,   t60,a2,		 t67,a2,    t74,a5)
-	write(*,'(a, t28,f6.1,  t36,f4.1, t43,f5.1, t51,f3.1, t57,f5.1, t65,f4.1, t74,f5.2)') 'mean score', vdw,hb,hp,hm,hs,rt,score
+	write(*,'(a, t28,f6.1,  t36,f4.1, t43,f5.1, t50,f4.1, t57,f5.1, t65,f4.1, t74,f5.2)') 'mean score', vdw,hb,hp,hm,hs,rt,score
 
 end subroutine xscore_mean
 
@@ -4935,14 +4935,14 @@ subroutine Ligand_Scoring_Stats(ligand,iAtom)
 
 	if(present(iAtom)) then
 		i = iAtom
-		write(*,'(t81,i3, t85,a,   t28,f6.1,  t36,f5.2, t43,f5.2, t51,f5.2, t57,f5.2, t65,f4.1, t74,f5.3)') &
+		write(*,'(t81,i3, t85,a,   t28,f6.1,  t36,f5.2, t43,f5.2, t51,f5.2, t57,f5.2, t65,f4.1, t73,f6.3)') &
 							ligand%mol%atom(i)%id, ligand%mol%atom(i)%ttype,  ligand%abs_inf(i)%vdw,	ligand%abs_inf(i)%hb,		ligand%abs_inf(i)%hp, &
 							ligand%abs_inf(i)%hm,  ligand%abs_inf(i)%hs,		  ligand%abs_inf(i)%rt,		ligand%abs_inf(i)%score
 	else
 		write(*,'(t31,a3,  t38,a2,  t46,a2,  t52,a2,   t60,a2,		 t67,a2,   t74,a5)')  'VDW',   'HB',    'HP',    'HM',      'HS',       'RT',			'SCORE'
 		do i = 0,ligand%mol%num_atom -1
 		!	write(*,'(t28,f6.1,  t36,f4.1, t43,f5.1, t51,f3.1, t57,f5.1, t65,f4.1, t74,f5.2)')
-			write(*,'(t1,i3, t6,a,   t28,f6.1,  t36,f5.2, t43,f5.2, t51,f5.2, t57,f5.2, t65,f4.1, t74,f5.3)') &
+			write(*,'(t1,i3, t6,a,   t28,f6.1,  t36,f5.2, t43,f5.2, t51,f5.2, t57,f5.2, t65,f4.1, t73,f6.3)') &
 								ligand%mol%atom(i)%id, ligand%mol%atom(i)%ttype,  ligand%abs_inf(i)%vdw,	ligand%abs_inf(i)%hb,		ligand%abs_inf(i)%hp, &
 								ligand%abs_inf(i)%hm,  ligand%abs_inf(i)%hs,		  ligand%abs_inf(i)%rt,		ligand%abs_inf(i)%score
 			
@@ -7540,8 +7540,8 @@ subroutine Protein_Show_Atoms(protein)
 
 	write(*,'')
 	do i = 0,protein%num_atom -1 
-		write(*,'(t1,i4, t6,i2, t11,a, t18,a, t27,a, t34,a, t39,a, t45,a, t52,f5.2, t60,f3.1, t64,f3.1, t68,f3.1, t72,f3.1, t75,f4.1, &
-						  t80,f3.1, t85,a, t89,f4.1, t94,f3.1, t100,i1, t105,i1, t112,i1, t117,i1, t123,i1, t130,i4,t134,i4,t138,i4,t142,i4,t146,i4,t150,i4,t154,i4, &
+		write(*,'(t1,i4, t6,i2, t11,a, t18,a, t27,a, t34,a, t39,a, t45,a, t52,f5.2, t59,f4.1, t63,f4.1, t67,f4.1, t71,f4.1, t75,f4.1, &
+						  t79,f4.1, t85,a, t89,f4.1, t93,f4.1, t100,i1, t105,i1, t112,i1, t117,i1, t123,i1, t130,i4,t134,i4,t138,i4,t142,i4,t146,i4,t150,i4,t154,i4, &
 							t158,i4,t162,i4,t166,i4,t170,i4,t174,i4,t178,i4,t182,i4, &
 							t186,f5.1,t191,f5.1,t196,f5.1)') &
 
