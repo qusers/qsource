@@ -4807,17 +4807,23 @@ subroutine solvate_box_grid
 	!Fill box with water
  	!xmax+0.1 is needed for intel/windows. Otherwise the last loop step is skipped
 	waters_in_box = 0
-	do xgrid = xmin, xmax+0.1, solvent_grid
-		do ygrid = ymin, ymax+0.1, solvent_grid
-			do zgrid = zmin, zmax+0.1, solvent_grid
+	xgrid = xmin
+	do while (xgrid <= xmax + 0.1)
+		ygrid = ymin
+		do while (ygrid <= ymax + 0.1)
+			zgrid = zmin
+			do while (zgrid <= zmax + 0.1)
 				waters_in_box = waters_in_box + 1
 				xw(1,1,waters_in_box) = xgrid
 				xw(2,1,waters_in_box) = ygrid
 				xw(3,1,waters_in_box) = zgrid
 				!all the molecules inside are inside
 				keep(waters_in_box) = .true.
+				zgrid = zgrid + solvent_grid
 			end do
+			ygrid = ygrid + solvent_grid
 		end do
+		xgrid = xgrid + solvent_grid
 	end do
 
 	call add_solvent_to_topology(waters_in_sphere=waters_in_box, &
@@ -5186,20 +5192,27 @@ subroutine solvate_sphere_grid
 	!constuct water-only sphere
  	!xmax+0.1 is needed for intel/windows. Otherwise the last loop step is skipped
 	waters_in_sphere = 0
-	do xgrid = xmin, xmax+0.1, solvent_grid
-		do ygrid = ymin, ymax+0.1, solvent_grid
-			do zgrid = zmin, zmax+0.1, solvent_grid
-				if((xgrid-xwcent(1))**2 + (ygrid-xwcent(2))**2 &
-					+ (zgrid-xwcent(3))**2 > radius2) cycle
-				waters_in_sphere = waters_in_sphere + 1
-				!if not outside keep these coordinates
-				xw(1,1,waters_in_sphere) = xgrid
-				xw(2,1,waters_in_sphere) = ygrid
-				xw(3,1,waters_in_sphere) = zgrid
-				!all the molecules inside are inside
-				keep(waters_in_sphere) = .true.
+	xgrid = xmin
+	do while (xgrid <= xmax + 0.1)
+		ygrid = ymin
+		do while (ygrid <= ymax + 0.1)
+			zgrid = zmin
+			do while (zgrid <= zmax + 0.1)
+				if( .not. ((xgrid-xwcent(1))**2 + (ygrid-xwcent(2))**2 &
+					+ (zgrid-xwcent(3))**2 > radius2) ) then
+				    waters_in_sphere = waters_in_sphere + 1
+				    !if not outside keep these coordinates
+				    xw(1,1,waters_in_sphere) = xgrid
+				    xw(2,1,waters_in_sphere) = ygrid
+				    xw(3,1,waters_in_sphere) = zgrid
+				    !all the molecules inside are inside
+				    keep(waters_in_sphere) = .true.
+				endif
+				zgrid = zgrid + solvent_grid
 			end do
+			ygrid = ygrid + solvent_grid
 		end do
+		xgrid = xgrid + solvent_grid
 	end do
 
 	call add_solvent_to_topology(waters_in_sphere=waters_in_sphere, &
