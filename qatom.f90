@@ -449,7 +449,7 @@ logical function qatom_load_atoms(fep_file)
 			call upcase(res_str)
 			if(.not. (res_str == 'ALL')) then
 				write(*, '(a)', advance='no') ">>>>> ERROR: invalid syntax in fep file, &
-					section 'atoms': ",res_str
+					&section 'atoms': ",res_str
 				qatom_load_atoms = .false.
 				return
 			end if 
