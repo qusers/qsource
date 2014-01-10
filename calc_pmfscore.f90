@@ -286,7 +286,7 @@ subroutine PMFReadAtomTypeConversions(filename, chType)
 	character(len=12),allocatable		:: tmp(:)		
 
 	fp = freefile()
-	open(unit=fp,file=filename,err=999,action='READ',READONLY)
+	open(unit=fp,file=filename,err=999,action='READ')
 		do
 			! First, find the right section
 			read(fp,'(a256)',iostat=filestat) buf
@@ -430,7 +430,7 @@ subroutine pmfRead_Input
 	if(chInput.ne.'default') then
 		! Open file
 		fp = freefile()
-		open(unit=fp,file=chInput,err=999,action='READ',READONLY)
+		open(unit=fp,file=chInput,err=999,action='READ')
 			do
 				read(fp,'(a256)',iostat=filestat) buf
 
@@ -575,7 +575,7 @@ subroutine pmf_extract_rules(filename)
 	type(tPMFRule)					:: rule
 
 	fp = freefile()
-	open(unit=fp,file=filename,err=999,action='READ',READONLY)
+	open(unit=fp,file=filename,err=999,action='READ')
 
     cnt(:) = 0																							! reset counters
     do
@@ -687,7 +687,7 @@ subroutine pmfRead_Data(filename)
 	j = 1
 	fp = freefile()
 	write(*,'(a,a)') 'Reading pmf''s from ', adjustl(trim(filename))
-	open(unit=fp,file=filename,err=999,action='READ',READONLY)
+	open(unit=fp,file=filename,err=999,action='READ')
 		do i = 1,nProt
 			do j = 1,nLig
 				read(fp,'(a256)',iostat=filestat) buf
@@ -739,7 +739,7 @@ subroutine pmfRead_Names(filename)
 	j = 1
 	fp = freefile()
 	write(*,'(a,a)') 'Reading name translations from ', adjustl(trim(filename))
-	open(unit=fp,file=filename,err=999,action='READ',READONLY)
+	open(unit=fp,file=filename,err=999,action='READ')
 		count = 0
 		do
 			read(fp,'(a256)',iostat=filestat) buf

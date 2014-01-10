@@ -715,7 +715,7 @@ subroutine XReadAtomTypeConversions(filename, chType)
 	character(len=12),allocatable		:: tmp(:)		
 
 	fp = freefile()
-	open(unit=fp,file=filename,err=999,action='READ',READONLY)
+	open(unit=fp,file=filename,err=999,action='READ')
 		do
 			! First, find the right section
 			read(fp,'(a256)',iostat=filestat) buf
@@ -856,7 +856,7 @@ subroutine XReadResidueConversions(filename, chType)
 	type(RESIDUE_NAME_CONVERSION),pointer		:: tmp(:)		
 
 	fp = freefile()
-	open(unit=fp,file=filename,err=999,action='READ',READONLY)
+	open(unit=fp,file=filename,err=999,action='READ')
 		do
 			! First, find the right section
 			read(fp,'(a256)',iostat=filestat) buf
@@ -929,7 +929,7 @@ subroutine XPAtomNameConversions(filename, chType)
 	call locase(chType)
 
 	fp = freefile()
-	open(unit=fp,file=filename,err=999,action='READ',READONLY)
+	open(unit=fp,file=filename,err=999,action='READ')
 		do
 			! First, find the right section
 			read(fp,'(a256)',iostat=filestat) buf
@@ -1051,7 +1051,7 @@ subroutine XReadLib(filename)
 
 	fp = freefile()
 	count = 0
-	open(unit=fp,file=filename,err=999,action='READ',READONLY)
+	open(unit=fp,file=filename,err=999,action='READ')
 		do
 			read(fp,'(a256)',iostat=filestat) buf
 			if(filestat.eq.0) then
@@ -1228,7 +1228,7 @@ subroutine XReadInput()
 	if(chInput.ne.'default') then
 		! Open file
 		fp = freefile()
-		open(unit=fp,file=chInput,err=999,action='READ',READONLY)
+		open(unit=fp,file=chInput,err=999,action='READ')
 			do
 				read(fp,'(a256)',iostat=filestat) buf
 
@@ -5995,7 +5995,7 @@ subroutine ForceField_Read_SURFACE_DEF(filename)
 	character(len=256):: buf,head 
 
 	fp = freefile()
-	open(unit=fp,file=filename,err=999,action='READ',READONLY)
+	open(unit=fp,file=filename,err=999,action='READ')
 		! first, determine num_sdot_type 
     count=0 
 		do
@@ -6177,7 +6177,7 @@ subroutine ForceField_Read_RESIDUE_DEF(filename)
 	integer	:: filestat
 	
 	fp = freefile()
-	open(unit=fp,file=filename,err=999,action='READ',READONLY)
+	open(unit=fp,file=filename,err=999,action='READ')
 
     ! first, determine num_restype
     count=0 
@@ -6271,7 +6271,7 @@ subroutine ForceField_Read_ATOM_DEF(filename)
 	integer							:: slask
 	
 	fp = freefile()
-	open(unit=fp,file=filename,err=999,action='READ',READONLY)
+	open(unit=fp,file=filename,err=999,action='READ')
 	
 		! first, determine num_atomtype
     count=0 
@@ -6333,7 +6333,7 @@ subroutine ForceField_Read_XATOM_DEF(filename)
 	character(len=4)		:: slask2
 
 	fp = freefile()
-	open(unit=fp,file=filename,err=999,action='READ',READONLY)
+	open(unit=fp,file=filename,err=999,action='READ')
 	
 		! first, determine num_xatomtype
     count=0 
