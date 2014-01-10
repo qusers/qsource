@@ -418,7 +418,6 @@ character(*), optional		:: cause
 integer						:: i
 ! flush stuff
 integer(4), parameter			:: stdout_unit = 6
-external flush
 
 if (nodeid .eq. 0) then
         write(*,*)
@@ -2700,12 +2699,8 @@ integer						::	mask_rows
 !  nrstr_dist, [rstdis] (allocating memory for rstdis)
 !  nrstr_wall, [rstwal] (allocating memory for rstwal)
 
-! external definition of iargc
-integer(4) iargc
-external iargc
-
 ! read name of input file from the command line
-num_args = iargc()
+num_args = command_argument_count()
 if (num_args .lt. 1) call die('no input file specified on the command line')
 #if defined(CRAY)
 call pxfgetarg(num_args, infilename, 200, i)
