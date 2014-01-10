@@ -2151,7 +2151,7 @@ subroutine Molecule_Show_Atoms(mol)
 	write(*,'')
 	do i = 0,mol%num_atom -1
 		write(*,'(i4, 2x, i5, 3x, i1, t20, a, t27, a, t36, a, t42, a, t47, a, t55, a, t59, f5.2, 6(1x,f4.1), &
-					2x, a, t96, 5(4x,i2), 1x, 14(1x,i3), 3(1x,f5.1))'), &
+					& 2x, a, t96, 5(4x,i2), 1x, 14(1x,i3), 3(1x,f5.1))'), &
 
 			mol%atom(i)%id, &
 			mol%atom(i)%topindex, &
@@ -7541,9 +7541,9 @@ subroutine Protein_Show_Atoms(protein)
 	write(*,'')
 	do i = 0,protein%num_atom -1 
 		write(*,'(t1,i4, t6,i2, t11,a, t18,a, t27,a, t34,a, t39,a, t45,a, t52,f5.2, t59,f4.1, t63,f4.1, t67,f4.1, t71,f4.1, t75,f4.1, &
-						  t79,f4.1, t85,a, t89,f4.1, t93,f4.1, t100,i1, t105,i1, t112,i1, t117,i1, t123,i1, t130,i4,t134,i4,t138,i4,t142,i4,t146,i4,t150,i4,t154,i4, &
-							t158,i4,t162,i4,t166,i4,t170,i4,t174,i4,t178,i4,t182,i4, &
-							t186,f5.1,t191,f5.1,t196,f5.1)') &
+						  & t79,f4.1, t85,a, t89,f4.1, t93,f4.1, t100,i1, t105,i1, t112,i1, t117,i1, t123,i1, t130,i4,t134,i4,t138,i4,t142,i4,t146,i4,t150,i4,t154,i4, &
+							& t158,i4,t162,i4,t166,i4,t170,i4,t174,i4,t178,i4,t182,i4, &
+							& t186,f5.1,t191,f5.1,t196,f5.1)') &
 
 			protein%atom(i)%id+1, &
 			protein%atom(i)%valid, &
