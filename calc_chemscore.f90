@@ -165,7 +165,7 @@ module CALC_CHEMSCORE
 	integer, private			::	bDoTopcalc		! boolean flag
 	integer, private			::	iRestartCalc=-1	! flag to indicate if doing calcs on restart file or not
 
-	integer, private			::	bUseXIN	= 0		! boolean flag to indicate use of xin instead of xtop
+	logical, private			::	bUseXIN	= .false.		! boolean flag to indicate use of xin instead of xtop
 
 	integer, private			:: warn						! flag to indicate if any warnings were displayed
 
