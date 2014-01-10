@@ -11,23 +11,26 @@ LD = $(FC)
 MPILD = $(MPIFC)
 LDFLAGS = -traceback
 
-QfepSource = qfep.F90 mpiglob.f90 nrgy.f90 misc.f90 parse.f90
+QfepSource = mpiglob.f90 nrgy.f90 misc.f90 parse.f90
+QfepFSource = qfep.F90
 
 QprepSource = q_prep.f90 topo.f90 misc.f90 mpiglob.f90 parse.f90 prefs.f90 prep.f90 prmfile.f90 index.f90 mask.f90 trj.f90 sizes.f90 avetr.f90 maskmanip.f90
 
 QcalcSource = calc_base.f90 calc_chemscore.f90 calc_fit.f90 calc_geom.f90 calc_pmfscore.f90 calc_com_ke.f90 calc_com.f90 calc_rdf.f90 calc_rms.f90 calc_rmsf.f90 calc_entropy.f90 calc_nb.f90 calc_xscore.f90 eigen.f90 index.f90 mask.f90 maskmanip.f90 misc.f90 mpiglob.f90 nrgy.f90 parse.f90 prmfile.f90 qatom.f90 qcalc.f90 sizes.f90 topo.f90 trj.f90
 
-QdynSource = md.F90 mask.f90 misc.f90 mpiglob.f90 nrgy.f90 prmfile.f90 qatom.f90 qdyn.F90 sizes.f90 topo.f90 trj.f90 index.f90
+QdynFSource = md.F90 qdyn.F90
+QdynSource = mask.f90 misc.f90 mpiglob.f90 nrgy.f90 prmfile.f90 qatom.f90 sizes.f90 topo.f90 trj.f90 index.f90
 
-QdumSource = mask.f90 misc.f90 mpiglob.f90 nrgy.f90 prmfile.f90 qatom.f90 qdyn.F90 sizes.f90 topo.f90 trj.f90 index.f90
+QdumFSource = qdyn.F90
+QdumSource = mask.f90 misc.f90 mpiglob.f90 nrgy.f90 prmfile.f90 qatom.f90 sizes.f90 topo.f90 trj.f90 index.f90
 
 QdynpSource = mask.f90 misc.f90 mpiglob.f90 nrgy.f90 prmfile.f90 qatom.f90 sizes.f90 topo.f90 trj.f90 index.f90
 
-QfepObjects = $(QfepSource:.f90=.o)
+QfepObjects = $(QfepSource:.f90=.o) $(QfepFSource:.F90=.o)
 QprepObjects = $(QprepSource:.f90=.o)
 QcalcObjects = $(QcalcSource:.f90=.o)
-QdynObjects = $(QdynSource:.f90=.o)
-QdumObjects = $(QdumSource:.f90=.o) md_dum.o
+QdynObjects = $(QdynSource:.f90=.o) $(QdynFSource:.F90=.o)
+QdumObjects = $(QdumSource:.f90=.o) $(QdumFSource:.F90=.o) md_dum.o
 QdynpObjects = $(QdynpSource:.f90=.o) md_mpi.o qdyn_mpi.o
 
 PROGRAMS = Qfep5 Qdyn5p Qdyn5 Qprep5 Qcalc5 Qdum5
