@@ -339,7 +339,8 @@ end subroutine COM_KE_heading
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 !                                                                       
         !implicit double precision (A-H, O-Z)
-        double precision                :: A,B,C,D,E,F,G,H,O,P,Q,R,S,T,U,V,W,X,Y,Z, anorm, anrmx, thr, sinx, sinx2, cosx, cosx2, sincs
+        double precision :: A,B,C,D,E,F,G,H,O,P,Q,R,S,T,U,V,W,X,Y,Z
+	double precision :: anorm, anrmx, thr, sinx, sinx2, cosx, cosx2, sincs
 
 
         !implicit integer (I-N)
