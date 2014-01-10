@@ -244,16 +244,20 @@ subroutine COM_KE_calc(i)
 
 
 	do j= 1,3
-		ang_momentum(i,j)%x = sum(rad_vec(i,j)%y*velocity(i)%z*coords_mass(i)%mass - rad_vec(i,j)%z*velocity(i)%y*coords_mass(i)%mass)
-		ang_momentum(i,j)%y = sum(rad_vec(i,j)%z*velocity(i)%x*coords_mass(i)%mass - rad_vec(i,j)%x*velocity(i)%z*coords_mass(i)%mass)
-		ang_momentum(i,j)%z = sum(rad_vec(i,j)%x*velocity(i)%y*coords_mass(i)%mass - rad_vec(i,j)%y*velocity(i)%x*coords_mass(i)%mass)
+		ang_momentum(i,j)%x = sum(rad_vec(i,j)%y*velocity(i)%z*coords_mass(i)%mass - &
+		rad_vec(i,j)%z*velocity(i)%y*coords_mass(i)%mass)
+		ang_momentum(i,j)%y = sum(rad_vec(i,j)%z*velocity(i)%x*coords_mass(i)%mass - &
+		rad_vec(i,j)%x*velocity(i)%z*coords_mass(i)%mass)
+		ang_momentum(i,j)%z = sum(rad_vec(i,j)%x*velocity(i)%y*coords_mass(i)%mass - &
+		rad_vec(i,j)%y*velocity(i)%x*coords_mass(i)%mass)
 !		write (*,'(3f23.15)') ang_momentum(i,j)%x,ang_momentum(i,j)%y,ang_momentum(i,j)%z
 	end do
 
 	tot_KE_rot = 0
 	!Rotational kinetic energy = Lj^2/(2Ij)
 	do j=1,3
-		KE_rot(i,j) = ((ang_momentum(i,j)%x)**2+(ang_momentum(i,j)%y)**2+(ang_momentum(i,j)%z)**2)/(2*eigen_stuff(i)%evalue(j))*conversion_factor
+		KE_rot(i,j) = ((ang_momentum(i,j)%x)**2+(ang_momentum(i,j)%y)**2+ &
+		(ang_momentum(i,j)%z)**2)/(2*eigen_stuff(i)%evalue(j))*conversion_factor
 		tot_KE_rot = tot_KE_rot + KE_rot(i,j)
 	end do
 	
@@ -261,7 +265,9 @@ subroutine COM_KE_calc(i)
 	
 	
 !	calculate the kinetic energy
-	KE = 0.5 * tot_mass(i) * ((prev_mass_ave(i)%x-mass_ave(i)%x)**2+(prev_mass_ave(i)%y-mass_ave(i)%y)**2+(prev_mass_ave(i)%z-mass_ave(i)%z)**2) / frame_length**2 * conversion_factor
+	KE = 0.5 * tot_mass(i) * ((prev_mass_ave(i)%x-mass_ave(i)%x)**2+ &
+	    (prev_mass_ave(i)%y-mass_ave(i)%y)**2+(prev_mass_ave(i)%z- &
+	    mass_ave(i)%z)**2) / frame_length**2 * conversion_factor
 
 
 	
