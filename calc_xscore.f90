@@ -831,10 +831,16 @@ subroutine XReadAtomTypeConversions(filename, chType)
 		if(atomtypetable(i)%other.eq.'.') cycle
 		do j = i,size(atomtypetable)
 			if(atomtypetable(j)%other.eq.'.') cycle
-			if(trim(atomtypetable(i)%other).eq.trim(atomtypetable(j)%other).and.trim(atomtypetable(i)%xscore).ne.trim(atomtypetable(j)%xscore)) then
-				write(*,'(a,a,a,a,a,a,a,a)') 'Fatal: Ambiguous entries in type translation matrix (file ', trim(adjustl(filename)), '). ', &
-					trim(adjustl(atomtypetable(j)%other)), ' maps to both ', adjustl(trim(atomtypetable(i)%xscore)), ' and ', &
-					adjustl(trim(atomtypetable(j)%xscore))
+			if(trim(atomtypetable(i)%other).eq.trim(atomtypetable(j)%other) &
+			.and.trim(atomtypetable(i)%xscore).ne.trim(atomtypetable(j)%xscore)) then
+				write(*,'(a,a,a,a,a,a,a,a)') &
+				'Fatal: Ambiguous entries in type translation matrix (file ', &
+				trim(adjustl(filename)), '). ', &
+				trim(adjustl(atomtypetable(j)%other)), &
+				' maps to both ', &
+				adjustl(trim(atomtypetable(i)%xscore)), &
+				' and ', &
+				adjustl(trim(atomtypetable(j)%xscore))
 				stop
 			end if
 		end do
@@ -1518,7 +1524,11 @@ subroutine xscore_precalc
 				end if
 			end do
 			if(j>0) then
-				write(*,'(a,i5,a,i5,a,a,a)') 'WARNING: ', j, ' atoms (out of ', ligand%mol%num_atom, ') in ', adjustl(trim(ligand%mol%name)), ' (ligand) will be ignored. Note that nonpolar hydrogens are automatically ignored.'
+				write(*,'(a,i5,a,i5,a,a,a)') &
+				'WARNING: ', j, ' atoms (out of ', &
+				ligand%mol%num_atom, ') in ', &
+				adjustl(trim(ligand%mol%name)), &
+				' (ligand) will be ignored. Note that nonpolar hydrogens are automatically ignored.'
 				warn = warn +1
 			end if
 			if(adjustl(trim(input%show_ligand)).eq.'YES') call Molecule_Show_Contents(ligand%mol)
@@ -1572,7 +1582,9 @@ subroutine xscore_precalc
 					cofactor(i)%mol%atom(j)%type2 = cofactor(i)%mol%atom(j)%ttype
 					cofactor(i)%mol%atom(j)%ttype = XTranslateAtomType(cofactor(i)%mol%atom(j)%ttype)
 				end do
-				write(*,'(a,i4,a,i4,a,a)') 'Translated ', cofactor(i)%mol%num_atom, ' atoms and ', cofactor(i)%mol%num_bond, ' bonds to cofactor ', cofactor_def(i)
+				write(*,'(a,i4,a,i4,a,a)') 'Translated ', &
+				cofactor(i)%mol%num_atom, ' atoms and ', &
+				cofactor(i)%mol%num_bond, ' bonds to cofactor ', cofactor_def(i)
 
 				call Ligand_Value_Atom(cofactor(i))
 				if(adjustl(trim(input%show_cofactor)).eq.'YES') call Molecule_Show_Contents(cofactor(i)%mol)
@@ -1595,12 +1607,25 @@ subroutine xscore_precalc
 			j = 0
 			do i = 0,protein%num_atom -1
 				if(protein%atom(i)%valid.eq.0) then
-					if(protein%atom(i)%xtype.ne.'H' .and. protein%atom(i)%xtype.ne.'Un') write(*,'(a,i6,a,a,a,a,a)') 'WARNING: Atom ', protein%atom(i)%id, ' (', trim(adjustl(protein%atom(i)%xtype)),') in residue ', trim(adjustl(protein%atom(i)%residue)), ' will be ignored.'
+					if(protein%atom(i)%xtype.ne.'H' .and. &
+					protein%atom(i)%xtype.ne.'Un') then
+					    write(*,'(a,i6,a,a,a,a,a)') &
+					    'WARNING: Atom ', &
+					    protein%atom(i)%id, ' (', &
+					    trim(adjustl(protein%atom(i)%xtype)), &
+					    ') in residue ', &
+					    trim(adjustl(protein%atom(i)%residue)), &
+					    ' will be ignored.'
+					endif
 					j = j +1
 				end if
 			end do
 			if(j>0) then
-				write(*,'(a,i4,a,i4,a,a,a)') 'WARNING: ', j, ' atoms (out of ', protein%num_atom, ') in ', adjustl(trim(protein%name)), ' (protein) will be ignored. Note that nonpolar hydrogens are automatically ignored.'
+				write(*,'(a,i4,a,i4,a,a,a)') &
+				'WARNING: ', j, ' atoms (out of ', &
+				protein%num_atom, ') in ', &
+				adjustl(trim(protein%name)), &
+				' (protein) will be ignored. Note that nonpolar hydrogens are automatically ignored.'
 				warn = warn +1
 			end if
 			if(adjustl(trim(input%show_protein)).eq.'YES') call Protein_Show_Contents(protein)
@@ -1614,7 +1639,9 @@ subroutine xscore_precalc
 			write(*,'(a)') 'Scoring initial configuration'
 			score = Ligand_Calculate_Binding_Score(ligand, input,protein)
 			call Ligand_Scoring_Stats(ligand)
-			write(*,'(a, t28,f6.1,  t36,f5.2, t43,f5.1, t51,f5.2, t57,f5.1, t65,f4.1, t73,f6.3)') 'Total score of topology', ligand%vdw,ligand%hb,ligand%hp,ligand%hm,ligand%hs,ligand%rt,ligand%bind_score
+			write(*,'(a, t28,f6.1,  t36,f5.2, t43,f5.1, t51,f5.2, t57,f5.1, t65,f4.1, t73,f6.3)') &
+			'Total score of topology', ligand%vdw,ligand%hb, &
+			ligand%hp,ligand%hm,ligand%hs,ligand%rt,ligand%bind_score
 		end if
 
 end subroutine xscore_precalc
@@ -1732,7 +1759,8 @@ subroutine xextract_cofactor(cf,cf_def,conumber,nAtoms,nBonds,coordinates,bonds)
 		count = 0
 		do i = 0,protein%num_bond -1
 !			write(*,*) i, protein%bond(i)%atom_1-1, protein%bond(i)%atom_2-1, size(protein%atom)
-			if(protein%atom(protein%bond(i)%atom_1-1)%iscofactor.eq.conumber.and.protein%atom(protein%bond(i)%atom_2-1)%iscofactor.eq.conumber) then
+			if(protein%atom(protein%bond(i)%atom_1-1)%iscofactor.eq.conumber.and. &
+			protein%atom(protein%bond(i)%atom_2-1)%iscofactor.eq.conumber) then
 				count = count +1
 			end if
 		end do
@@ -1744,7 +1772,8 @@ subroutine xextract_cofactor(cf,cf_def,conumber,nAtoms,nBonds,coordinates,bonds)
 		! No need to copy bonds later since they are never removed from protein
 		count = 0
 		do i = 0,protein%num_bond -1
-			if(protein%atom(protein%bond(i)%atom_1-1)%iscofactor.eq.conumber.and.protein%atom(protein%bond(i)%atom_2-1)%iscofactor.eq.conumber) then
+			if(protein%atom(protein%bond(i)%atom_1-1)%iscofactor.eq.conumber.and. &
+			protein%atom(protein%bond(i)%atom_2-1)%iscofactor.eq.conumber) then
 				cf%mol%bond(count)%id				= count
 				cf%mol%bond(count)%valid		= 1
 				cf%mol%bond(count)%atom_1		= prt2cof(protein%bond(i)%atom_1-1) +1
@@ -1911,7 +1940,11 @@ subroutine xscore_calc(iCalc, iFrame)	! calc topmost routine
 	if(input%show_abs.eq.'YES')		call Ligand_Scoring_Stats(ligand)
 	if(input%show_abs.eq.'QATOM') call Ligand_Scoring_Stats(ligand,input%qatom-1)
 
-	if(input%show_total.eq.'YES') write(*,'(t28,f6.1,  t36,f5.2, t43,f5.1, t51,f5.2, t57,f5.1, t65,f4.1, t73,f6.3)') ligand%vdw,ligand%hb,ligand%hp,ligand%hm,ligand%hs,ligand%rt,ligand%bind_score
+	if(input%show_total.eq.'YES') then
+	    write(*,'(t28,f6.1,  t36,f5.2, t43,f5.1, t51,f5.2, t57,f5.1, t65,f4.1, t73,f6.3)') &
+		ligand%vdw,ligand%hb,ligand%hp,ligand%hm,ligand%hs,ligand%rt, &
+		ligand%bind_score
+	endif
 	if(input%show_abs.eq.'YES')		write(*,'(a)') '------------------------------------------------------------------------------'
 end subroutine xscore_calc
 
@@ -1965,8 +1998,9 @@ subroutine xscore_mean
 
 
 	! output mean values
-	write(*,1)  'processed frames: ', nXScores, 'VDW',   'HB',    'HP',    'HM',      'HS',       'RT',			'SCORE'
-1	format(      t1,a,                t19,i4,		t31,a3,  t38,a2,  t46,a2,  t52,a2,   t60,a2,		 t67,a2,    t74,a5)
+	write(*,1)  'processed frames: ', nXScores, 'VDW',   'HB',    'HP', &
+	    'HM',      'HS',       'RT',			'SCORE'
+1	format(      t1,a,                t19,i4, t31,a3,  t38,a2,  t46,a2,  t52,a2,   t60,a2, t67,a2,    t74,a5)
 	write(*,'(a, t28,f6.1,  t36,f4.1, t43,f5.1, t50,f4.1, t57,f5.1, t65,f4.1, t74,f5.2)') 'mean score', vdw,hb,hp,hm,hs,rt,score
 
 end subroutine xscore_mean
@@ -1975,7 +2009,7 @@ subroutine xscore_heading(i)
 	integer, intent(in)		:: i
 
 	write(*,1)  'VDW',   'HB',    'HP',    'HM',      'HS',       'RT',			'SCORE'
-1	format(      t31,a3,  t38,a2,  t46,a2,  t52,a2,   t60,a2,		 t67,a2,   t74,a5)
+1	format(      t31,a3,  t38,a2,  t46,a2,  t52,a2,   t60,a2, t67,a2,   t74,a5)
 end subroutine xscore_heading
 
 ! ==========================================================================================================================================
@@ -2146,12 +2180,14 @@ subroutine Molecule_Show_Atoms(mol)
 	integer ::  i 
 
 	write(*,'(a,i5)') 'Total number of atoms in this molecule = ',mol%num_atom
-	write(*,'(t1,a)') ' ID  topoID  vld. type   xtype   type2   res r_id  name   weight  r   eps   q   XR  logp solv hb  ring origin part #neib #nonh  neib[0..6].................  bond[0..6]................  hb root[0..2]'
+	write(*,'(t1,a)') ' ID  topoID  vld. type   xtype   type2   res r_id  &
+	    &name   weight  r   eps   q   XR  logp solv hb  ring origin part &
+	    &#neib #nonh  neib[0..6].................  bond[0..6]................  hb root[0..2]'
 
 	write(*,'()')
 	do i = 0,mol%num_atom -1
 		write(*,'(i4, 2x, i5, 3x, i1, t20, a, t27, a, t36, a, t42, a, t47, a, t55, a, t59, f5.2, 6(1x,f4.1), &
-					& 2x, a, t96, 5(4x,i2), 1x, 14(1x,i3), 3(1x,f5.1))'), &
+			& 2x, a, t96, 5(4x,i2), 1x, 14(1x,i3), 3(1x,f5.1))'), &
 
 			mol%atom(i)%id, &
 			mol%atom(i)%topindex, &
@@ -2177,8 +2213,14 @@ subroutine Molecule_Show_Atoms(mol)
 			mol%atom(i)%part,&
 			mol%atom(i)%num_neib,&
 			mol%atom(i)%num_nonh,&
-			mol%atom(i)%neib(0),mol%atom(i)%neib(1),mol%atom(i)%neib(2),mol%atom(i)%neib(3),mol%atom(i)%neib(4),mol%atom(i)%neib(5),mol%atom(i)%neib(6), &
-			mol%atom(i)%bond(0),mol%atom(i)%bond(1),mol%atom(i)%bond(2),mol%atom(i)%bond(3),mol%atom(i)%bond(4),mol%atom(i)%bond(5),mol%atom(i)%bond(6), &
+			mol%atom(i)%neib(0),mol%atom(i)%neib(1),&
+			mol%atom(i)%neib(2),mol%atom(i)%neib(3),&
+			mol%atom(i)%neib(4),mol%atom(i)%neib(5),&
+			mol%atom(i)%neib(6), &
+			mol%atom(i)%bond(0),mol%atom(i)%bond(1),&
+			mol%atom(i)%bond(2),mol%atom(i)%bond(3),&
+			mol%atom(i)%bond(4),mol%atom(i)%bond(5),&
+			mol%atom(i)%bond(6), &
 			mol%atom(i)%root(0),mol%atom(i)%root(1),mol%atom(i)%root(2)
 	end do
 end subroutine Molecule_Show_Atoms
@@ -3099,14 +3141,16 @@ integer function Molecule_Aromatic_Ring_Check_5(molecule,atom_path, bond_path)
 	mark=0 
 	do i = 0,4 -1 
 !		write(*,*) i, pi_path(i), '  ', adjustl(trim(molecule%bond(bond_path(i)-1)%ttype)),'  ',adjustl(trim(molecule%bond(bond_path(i)-1)%ttype))
-		if((adjustl(trim(molecule%bond(bond_path(i)-1)%ttype)).eq.'1').or.(adjustl(trim(molecule%bond(bond_path(i)-1)%ttype)).eq.'am')) then
+		if((adjustl(trim(molecule%bond(bond_path(i)-1)%ttype)).eq.'1') &
+		.or.(adjustl(trim(molecule%bond(bond_path(i)-1)%ttype)).eq.'am')) then
 			mark1=1 
 		else
 			mark1=0
 		end if
 
 !		write(*,*) i+1, pi_path(i+1),'  ',adjustl(trim(molecule%bond(bond_path(i+1)-1)%ttype)),'  ',adjustl(trim(molecule%bond(bond_path(i+1)-1)%ttype))
-		if((adjustl(trim(molecule%bond(bond_path(i+1)-1)%ttype)).eq.'1').or.(adjustl(trim(molecule%bond(bond_path(i+1)-1)%ttype)).eq.'am')) then
+		if((adjustl(trim(molecule%bond(bond_path(i+1)-1)%ttype)).eq.'1') &
+		.or.(adjustl(trim(molecule%bond(bond_path(i+1)-1)%ttype)).eq.'am')) then
 			mark2=1 
 		else
 			mark2=0 
@@ -4939,12 +4983,17 @@ subroutine Ligand_Scoring_Stats(ligand,iAtom)
 							ligand%mol%atom(i)%id, ligand%mol%atom(i)%ttype,  ligand%abs_inf(i)%vdw,	ligand%abs_inf(i)%hb,		ligand%abs_inf(i)%hp, &
 							ligand%abs_inf(i)%hm,  ligand%abs_inf(i)%hs,		  ligand%abs_inf(i)%rt,		ligand%abs_inf(i)%score
 	else
-		write(*,'(t31,a3,  t38,a2,  t46,a2,  t52,a2,   t60,a2,		 t67,a2,   t74,a5)')  'VDW',   'HB',    'HP',    'HM',      'HS',       'RT',			'SCORE'
+		write(*,'(t31,a3,  t38,a2,  t46,a2,  t52,a2,   t60,a2,&
+		    t67,a2,   t74,a5)')  'VDW',   'HB',    'HP',    'HM', &
+		    'HS',       'RT',			'SCORE'
 		do i = 0,ligand%mol%num_atom -1
 		!	write(*,'(t28,f6.1,  t36,f4.1, t43,f5.1, t51,f3.1, t57,f5.1, t65,f4.1, t74,f5.2)')
 			write(*,'(t1,i3, t6,a,   t28,f6.1,  t36,f5.2, t43,f5.2, t51,f5.2, t57,f5.2, t65,f4.1, t73,f6.3)') &
-								ligand%mol%atom(i)%id, ligand%mol%atom(i)%ttype,  ligand%abs_inf(i)%vdw,	ligand%abs_inf(i)%hb,		ligand%abs_inf(i)%hp, &
-								ligand%abs_inf(i)%hm,  ligand%abs_inf(i)%hs,		  ligand%abs_inf(i)%rt,		ligand%abs_inf(i)%score
+			    ligand%mol%atom(i)%id, ligand%mol%atom(i)%ttype, &
+			    ligand%abs_inf(i)%vdw, ligand%abs_inf(i)%hb, &
+			    ligand%abs_inf(i)%hp, &
+			    ligand%abs_inf(i)%hm, ligand%abs_inf(i)%hs,	&
+			    ligand%abs_inf(i)%rt, ligand%abs_inf(i)%score
 			
 			vdw		= vdw		+ ligand%abs_inf(i)%vdw
 			hb		= hb		+ ligand%abs_inf(i)%hb
@@ -6515,7 +6564,11 @@ integer function ForceField_Assign_Patom_Parameters(atm,suppress_warnings)
 5 end do
 
 	if(.not. present(suppress_warnings) .and. atm%iscofactor .ne. 0)then
-		 write(*,'(a,a,a,a,a,a,a,a,a)') 'WARNING: No parameters for protein atom ', trim(atm%name), ' in residue nr. ', trim(adjustl(atm%res_id)), ' (', trim(atm%residue),'/',trim(atm%old_residue),'). This atom is ignored.'
+		 write(*,'(a,a,a,a,a,a,a,a,a)') &
+		    'WARNING: No parameters for protein atom ', &
+		    trim(atm%name), ' in residue nr. ', &
+		    trim(adjustl(atm%res_id)), ' (', trim(atm%residue),'/', &
+		    trim(atm%old_residue),'). This atom is ignored.'
 		 warn = warn +1
 	end if
 	atm%valid=0
@@ -7475,7 +7528,8 @@ subroutine xprotein_translate(protein,nAtoms,coordinates,num_bond,bond)
 	! Count protein bonds
 	protein%num_bond = 0
 	do i = 1,num_bond
-		if(((bond(i)%i<=nAtoms).and.(bond(i)%j<=nAtoms)).and.(iqatom(bond(i)%i).eq.0.and.iqatom(bond(i)%j).eq.0)) protein%num_bond = protein%num_bond +1
+		if(((bond(i)%i<=nAtoms).and.(bond(i)%j<=nAtoms)).and. &
+		(iqatom(bond(i)%i).eq.0.and.iqatom(bond(i)%j).eq.0)) protein%num_bond = protein%num_bond +1
 	end do
 	
 	allocate(protein%bond(0:protein%num_bond-1))
@@ -7536,14 +7590,19 @@ subroutine Protein_Show_Atoms(protein)
 	integer ::  i 
 
 	write(*,*) 'Total number of atoms in this molecule = ',protein%num_atom
-	write(*,'(t1,a)') 'id  vld.  type   xtype   type2   res  r_id  name   weight  r   eps  q  XR logp solv hb  occ. bfct  ring origin part   #neib #nonh  neib[0..6]                  bond[0..6]                 hb root[0..2]'
+	write(*,'(t1,a)') 'id  vld.  type   xtype   type2   res  r_id  name   &
+	    &weight  r   eps  q  XR logp solv hb  occ. bfct  ring origin &
+	    &part   #neib #nonh  neib[0..6]                  bond[0..6]                 hb root[0..2]'
 
 	write(*,'()')
 	do i = 0,protein%num_atom -1 
-		write(*,'(t1,i4, t6,i2, t11,a, t18,a, t27,a, t34,a, t39,a, t45,a, t52,f5.2, t59,f4.1, t63,f4.1, t67,f4.1, t71,f4.1, t75,f4.1, &
-						  & t79,f4.1, t85,a, t89,f4.1, t93,f4.1, t100,i1, t105,i1, t112,i1, t117,i1, t123,i1, t130,i4,t134,i4,t138,i4,t142,i4,t146,i4,t150,i4,t154,i4, &
-							& t158,i4,t162,i4,t166,i4,t170,i4,t174,i4,t178,i4,t182,i4, &
-							& t186,f5.1,t191,f5.1,t196,f5.1)') &
+		write(*,'(t1,i4, t6,i2, t11,a, t18,a, t27,a, t34,a, t39,a, &
+		    &t45,a, t52,f5.2, t59,f4.1, t63,f4.1, t67,f4.1, t71,f4.1, &
+		    &t75,f4.1, t79,f4.1, t85,a, t89,f4.1, t93,f4.1, t100,i1, &
+		    &t105,i1, t112,i1, t117,i1, t123,i1, t130,i4,t134,i4,t138, &
+		    &i4,t142,i4,t146,i4,t150,i4,t154,i4, t158,i4,t162,i4,t166, &
+		    &i4,t170,i4,t174,i4,t178,i4,t182,i4, t186,f5.1,t191,f5.1, &
+		    &t196,f5.1)') &
 
 			protein%atom(i)%id+1, &
 			protein%atom(i)%valid, &
@@ -7568,8 +7627,14 @@ subroutine Protein_Show_Atoms(protein)
 			protein%atom(i)%part,&
 			protein%atom(i)%num_neib,&
 			protein%atom(i)%num_nonh,&
-			protein%atom(i)%neib(0),protein%atom(i)%neib(1),protein%atom(i)%neib(2),protein%atom(i)%neib(3),protein%atom(i)%neib(4),protein%atom(i)%neib(5),protein%atom(i)%neib(6), &
-			protein%atom(i)%bond(0),protein%atom(i)%bond(1),protein%atom(i)%bond(2),protein%atom(i)%bond(3),protein%atom(i)%bond(4),protein%atom(i)%bond(5),protein%atom(i)%bond(6), &
+			protein%atom(i)%neib(0),protein%atom(i)%neib(1), &
+			protein%atom(i)%neib(2),protein%atom(i)%neib(3), &
+			protein%atom(i)%neib(4),protein%atom(i)%neib(5), &
+			protein%atom(i)%neib(6), &
+			protein%atom(i)%bond(0),protein%atom(i)%bond(1), &
+			protein%atom(i)%bond(2),protein%atom(i)%bond(3), &
+			protein%atom(i)%bond(4),protein%atom(i)%bond(5), &
+			protein%atom(i)%bond(6), &
 			protein%atom(i)%root(0),protein%atom(i)%root(1),protein%atom(i)%root(2)
 	end do
 end subroutine Protein_Show_Atoms

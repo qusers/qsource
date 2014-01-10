@@ -224,8 +224,11 @@ subroutine COM_KE_calc(i)
 	!vector of dot_product(principal axis,atom coordinate)
 
 	do j=1,3
-		dp_vect(i)%dp = eigen_stuff(i)%evector(1,j) * rel_coords(i)%x + eigen_stuff(i)%evector(2,j) * rel_coords(i)%y + eigen_stuff(i)%evector(3,j) * rel_coords(i)%z
-		
+		dp_vect(i)%dp = eigen_stuff(i)%evector(1,j) * &
+		    rel_coords(i)%x + eigen_stuff(i)%evector(2,j) * &
+		    rel_coords(i)%y + eigen_stuff(i)%evector(3,j) * &
+		    rel_coords(i)%z
+
 		rad_vec(i,j)%x = rel_coords(i)%x - dp_vect(i)%dp*eigen_stuff(i)%evector(1,j)
 		rad_vec(i,j)%y = rel_coords(i)%y - dp_vect(i)%dp*eigen_stuff(i)%evector(2,j)
 		rad_vec(i,j)%z = rel_coords(i)%z - dp_vect(i)%dp*eigen_stuff(i)%evector(3,j)
