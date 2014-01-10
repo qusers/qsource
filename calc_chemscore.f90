@@ -1212,6 +1212,8 @@ real function angle(a,b,c)
 	integer					:: a,b,c	!parameters
 
 	real					::ab_sq,bc_sq,ca_sq, scp !local variables
+	real, parameter :: pi = 4.0*atan(1.0)
+
 	ab_sq = distsq(a,b)
 	bc_sq = distsq(b,c)
 	ca_sq = distsq(c,a)
@@ -1221,7 +1223,7 @@ real function angle(a,b,c)
     if ( scp >  1.0 ) scp =  1.0
     if ( scp < -1.0 ) scp = -1.0
 
-	angle = acosd(scp)
+	angle = acos(scp)*180.0/pi
 end function angle
 
 real function dist (a,b)
