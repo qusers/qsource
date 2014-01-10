@@ -357,7 +357,7 @@ subroutine PMFReadAtomTypeConversions(filename, chType)
 		count = 0
 		do
 			read(fp,'(a256)',iostat=filestat) buf
-			if(filestat) goto 10
+			if(filestat.ne.0) goto 10
 			if(trim(buf).eq.'') goto 2		! skip blank line
 			if(buf(1:1).eq.'#') goto 2		! skip REM
 		
@@ -365,7 +365,7 @@ subroutine PMFReadAtomTypeConversions(filename, chType)
 			if(trim(buf).eq.'{ligand atom type translations}') then
 				do
 					read(fp,'(a256)',iostat=filestat) buf
-					if(filestat) goto 10
+					if(filestat.ne.0) goto 10
 
 					buf = adjustl(trim(buf))
 					if(buf.eq.'') goto 3		! skip blank line
@@ -383,7 +383,7 @@ subroutine PMFReadAtomTypeConversions(filename, chType)
 						tmp(1) = ''
 						tmp(column) = ''
 						read(buf,*,iostat=filestat) tmp(1:column)
-						if(filestat) goto 10
+						if(filestat.ne.0) goto 10
 
 						if(buf(1:1).eq.'{') then
 						 goto 10
