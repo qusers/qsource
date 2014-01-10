@@ -110,10 +110,12 @@ integer function COM_KE_add(desc)
 
 	allocate(coords(Nmasks)%xyz(3*ats), prev_coords(Nmasks)%xyz(3*ats))
 	allocate(coords_mass(Nmasks)%x(ats), coords_mass(Nmasks)%y(ats), coords_mass(Nmasks)%z(ats), coords_mass(Nmasks)%mass(ats))
-	allocate(prev_coords_mass(Nmasks)%x(ats), prev_coords_mass(Nmasks)%y(ats), prev_coords_mass(Nmasks)%z(ats), prev_coords_mass(Nmasks)%mass(ats))
+	allocate(prev_coords_mass(Nmasks)%x(ats), prev_coords_mass(Nmasks)%y(ats))
+	allocate(prev_coords_mass(Nmasks)%z(ats), prev_coords_mass(Nmasks)%mass(ats))
 	allocate(velocity(Nmasks)%x(ats), velocity(Nmasks)%y(ats), velocity(Nmasks)%z(ats))
 	allocate(rel_coords(Nmasks)%x(ats), rel_coords(Nmasks)%y(ats), rel_coords(Nmasks)%z(ats))
-	allocate(dp_vect(Nmasks)%dp(ats) ,prev_rel_coords(Nmasks)%x(ats), prev_rel_coords(Nmasks)%y(ats), prev_rel_coords(Nmasks)%z(ats))
+	allocate(dp_vect(Nmasks)%dp(ats) ,prev_rel_coords(Nmasks)%x(ats))
+	allocate(prev_rel_coords(Nmasks)%y(ats), prev_rel_coords(Nmasks)%z(ats))
 
 	do j=1,3
 		allocate(rad_vec(Nmasks,j)%x(ats),rad_vec(Nmasks,j)%y(ats),rad_vec(Nmasks,j)%z(ats))
