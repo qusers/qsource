@@ -539,7 +539,7 @@ subroutine prompt (outtxt)
 	integer, parameter			::	f=6
 	!write (f2,'($,a)') outtxt
 #endif
-write (f,'($,a)') outtxt	     
+write (f,'(a,$)') outtxt	     
 end subroutine prompt
 
 !------------------------------
