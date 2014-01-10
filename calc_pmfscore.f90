@@ -254,7 +254,7 @@ module CALC_PMF
 	real, dimension(34,16,60)								:: pmfdata																! (ligand type, protein type, bin)
 	character(len=2),dimension(2,34)				:: pmftype
 
-	parameter																	 nProt = 16, nLig = 34
+	integer, parameter :: nProt = 16, nLig = 34
 
   data pmftype(1,:) / 'CF','CP','cF','cP','C3','CW','CO','CN','NC','NP', &					! ligand atom types
 											'NA','ND','NR','N0','NS','OC','OA','OE','OR','OS', &
