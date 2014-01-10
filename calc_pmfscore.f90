@@ -379,7 +379,7 @@ subroutine PMFReadAtomTypeConversions(filename, chType)
 					p = index(buf,'#')
 					buf = adjustl(buf(1:p-1))			! remove traling comment
 
-					if(mark) then									! read translation table
+					if(mark.ne.0) then									! read translation table
 						tmp(1) = ''
 						tmp(column) = ''
 						read(buf,*,iostat=filestat) tmp(1:column)
@@ -1120,7 +1120,7 @@ subroutine pmfprotein_translate(protein,nAtoms,coordinates,bond,num_bond,transfe
 			protein%bond(i) = protein%bond(i+1)
 			protein%bond(i+1) = tmp
 2		end do
-		if(not(mark)) exit
+		if(mark.eq.0) exit
 	end do
 
 	! Reset bond id
@@ -1228,7 +1228,7 @@ subroutine pmfLigand_Translate(ligand,nAtoms,nBonds,aQ,aB,offset)
 			ligand%bond(i) = ligand%bond(i+1)
 			ligand%bond(i+1) = tmp
 2		end do
-		if(not(mark)) exit
+		if(mark.eq.0) exit
 	end do
 
 	! Reset bond id
