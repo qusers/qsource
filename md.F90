@@ -512,7 +512,7 @@ subroutine allocate_mpi
 
 if(nodeid .eq. 0) then
  allocate(mpi_status(MPI_STATUS_SIZE,numnodes-1), & 
-         request_recv(numnodes-1), &
+         request_recv(numnodes-1,3), &
          d_recv(natom*3,numnodes-1), &
          E_recv(numnodes-1), &
          EQ_recv(nstates,numnodes-1), &
@@ -13371,7 +13371,9 @@ end if
 
 if (nodeid .eq. 0) then 
 #if (USE_MPI)
-call MPI_WaitAll(numnodes-1,request_recv,mpi_status,ierr)
+do i = 1, 3
+    call MPI_WaitAll(numnodes-1,request_recv(1,i),mpi_status,ierr)
+end do
 
 !Forces and energies are summarised
 do i=1,numnodes-1
@@ -15870,7 +15872,9 @@ end if
 
 if (nodeid .eq. 0) then 
 #if (USE_MPI)
-call MPI_WaitAll((numnodes-1),request_recv,mpi_status,ierr)
+do i = 1, 3
+    call MPI_WaitAll((numnodes-1),request_recv(1,i),mpi_status,ierr)
+end do
 
 !Forces and energies are summarised
 do i=1,numnodes-1
@@ -15922,56 +15926,34 @@ end subroutine new_potential
 subroutine gather_nonbond()
 
 integer,parameter                       :: vars=3
-integer,dimension(numnodes-1)           :: tag
-integer,dimension(vars)	                :: blockcnt, fdisp, ftype,base
+integer,dimension(3,numnodes-1)         :: tag
+integer,dimension(vars)	                :: blockcnt, ftype
+integer(kind=8), dimension(vars)	:: fdisp, base
 integer                                 :: mpitype_package,mpitype_send
 integer                                 :: i,istate
 
 do i=1,numnodes-1
-tag(i)=100+i
+tag(1,i)=numnodes*100+i
+tag(2,i)=numnodes*200+i
+tag(3,i)=numnodes*300+i
 end do
 
-  blockcnt(1)=natom*3
-  blockcnt(2)=2*3+1
-  blockcnt(3)=4*nstates
-
 if (nodeid .eq. 0) then        !master
-  ftype(:) = MPI_REAL8
-  call MPI_Address(d_recv, base(1), ierr)
-  call MPI_Address(E_recv, base(2), ierr)
-  call MPI_Address(EQ_recv, base(3), ierr)
 
-
+! Post receives for each of the d/E/EQ_recv structures
+! E/EQ_Recv should really be handled with MPI_Type_create_struct
+! and d_recv's type should be handled correctly (it's KIND=wp8)
+! should preferably use size(d_recv, 1) for count
 do i = 1,numnodes-1
-  !Move fdisp to the begining of the corresponding column
-  fdisp(1)=base(1) + ((i-1)*blockcnt(1))*8
-  fdisp(2)=base(2) + ((i-1)*blockcnt(2))*8
-  fdisp(3)=base(3) + ((i-1)*blockcnt(3))*8
-  
-  !Make fdisp relative to base(1)  (i.e. relative to d_recv) solves some MPI implementation bugs
-  fdisp(1) = fdisp(1) - base(1)
-  fdisp(2) = fdisp(2) - base(1)
-  fdisp(3) = fdisp(3) - base(1)
-
-  call MPI_Type_struct(vars, blockcnt, fdisp, ftype, mpitype_package, ierr)
-  if (ierr .ne. 0) call die('gather_nonbond/MPI_Type_struct')
-
-  call MPI_Type_commit(mpitype_package, ierr)
-  if (ierr .ne. 0) call die('gather_nonbond/MPI_Type_commit')
-
-
-!  Commented out because of MPI implementation bugs with MPI_BOTTOM
-!  call MPI_IRecv(MPI_BOTTOM,1,mpitype_package,i,tag(i),MPI_COMM_WORLD, &
-!       request_recv(i),ierr)
-
-!  Below should work on most MPI implementations. Note: We're not just receiving d_recv... addresses are relative to d_recv
-  call MPI_IRecv(d_recv,1,mpitype_package,i,tag(i),MPI_COMM_WORLD, &
-       request_recv(i),ierr)
-
-  if (ierr .ne. 0) call die('gather_nonbond/MPI_Recv')
-
-  call MPI_Type_free(mpitype_package, ierr)
-  if (ierr .ne. 0) call die('gather_nonbond/MPI_Type_free')
+  call MPI_IRecv(d_recv(1,i), natom*3, MPI_REAL8, i, tag(1,i), MPI_COMM_WORLD, &
+       request_recv(i,1),ierr)
+  if (ierr .ne. 0) call die('gather_nonbond/MPI_IRecv d_recv')
+  call MPI_IRecv(E_recv(i), 3*2+1, MPI_REAL8, i, tag(2,i), MPI_COMM_WORLD, &
+       request_recv(i,2),ierr)
+  if (ierr .ne. 0) call die('gather_nonbond/MPI_IRecv E_recv')
+  call MPI_IRecv(EQ_recv(1,i), nstates*2*2, MPI_REAL8, i, tag(3,i), MPI_COMM_WORLD, &
+       request_recv(i,3),ierr)
+  if (ierr .ne. 0) call die('gather_nonbond/MPI_IRecv EQ_recv')
 end do
 
 else                  !slave nodes
@@ -15987,32 +15969,14 @@ EQ_send(1:nstates)%qp%vdw = EQ(1:nstates)%qp%vdw
 EQ_send(1:nstates)%qw%el  = EQ(1:nstates)%qw%el
 EQ_send(1:nstates)%qw%vdw = EQ(1:nstates)%qw%vdw
 
-ftype(:) = MPI_REAL8
-call MPI_Address(d, fdisp(1), ierr)
-call MPI_Address(E_send, fdisp(2), ierr)
-call MPI_Address(EQ_send, fdisp(3), ierr)
+! See comments above on the IRecv part
+call MPI_Send(d, natom*3, MPI_REAL8, 0, tag(1,nodeid), MPI_COMM_WORLD,ierr) 
+if (ierr .ne. 0) call die('gather_nonbond/Send d')
+call MPI_Send(E_send, 3*2+1, MPI_REAL8, 0, tag(2,nodeid), MPI_COMM_WORLD,ierr) 
+if (ierr .ne. 0) call die('gather_nonbond/Send E_send')
+call MPI_Send(EQ_send, nstates*2*2, MPI_REAL8, 0, tag(3,nodeid), MPI_COMM_WORLD,ierr) 
+if (ierr .ne. 0) call die('gather_nonbond/Send EQ_send')
 
-!Make fdisp relative to fdisp(1)  (i.e. relative to d) solves some MPI implementation bugs
-  fdisp(2) = fdisp(2) - fdisp(1)
-  fdisp(3) = fdisp(3) - fdisp(1)
-  fdisp(1) = 0
-
-call MPI_Type_struct(vars, blockcnt, fdisp, ftype, mpitype_package, ierr)
-if (ierr .ne. 0) call die('gather_nonbond/MPI_Type_struct')
-
-call MPI_Type_commit(mpitype_package, ierr)
-if (ierr .ne. 0) call die('gather_nonbond/MPI_Type_commit')
-
-!  Commented out because of MPI implementation bugs with MPI_BOTTOM
-!call MPI_Send(MPI_BOTTOM,1,mpitype_package,0,tag(nodeid),MPI_COMM_WORLD,ierr) 
-!if (ierr .ne. 0) call die('gather_nonbond/SSend')
-
-!  Below should work on most MPI implementations. Note: We're not just receiving d... addresses are relative to d
-call MPI_Send(d,1,mpitype_package,0,tag(nodeid),MPI_COMM_WORLD,ierr) 
-if (ierr .ne. 0) call die('gather_nonbond/SSend')
-
-call MPI_Type_free(mpitype_package, ierr)
-if (ierr .ne. 0) call die('gather_nonbond/MPI_Type_free')
 end if
 end subroutine gather_nonbond
 
