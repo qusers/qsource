@@ -2174,8 +2174,8 @@ blockcnt(4) = 9					! real(8) phi2(9)
 fdisp(4) = 3*8 + 8 + 3*8
 blockcnt(5) = 27				! real(8) phi3(27)
 fdisp(5) = 3*8 + 8 + 3*8 + 9*8
-call MPI_Type_struct(5, blockcnt, fdisp, ftype, mpitype_batch, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Type_struct')
+call MPI_Type_create_struct(5, blockcnt, fdisp, ftype, mpitype_batch, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Type_create_struct')
 call MPI_Type_commit(mpitype_batch, ierr)
 if (ierr .ne. 0) call die('init_nodes/MPI_Type_commit')
 call MPI_Bcast(lrf, ncgp, mpitype_batch, 0, MPI_COMM_WORLD, ierr)
@@ -2229,8 +2229,8 @@ blockcnt(:) = 1
 fdisp(1) = 0				! integer(AI) iswitch
 fdisp(2) = AI				! integer(AI) first
 fdisp(3) = AI + AI			! integer(AI) last
-call MPI_Type_struct(3, blockcnt, fdisp, ftype, mpitype_batch, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Type_struct')
+call MPI_Type_create_struct(3, blockcnt, fdisp, ftype, mpitype_batch, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Type_create_struct')
 call MPI_Type_commit(mpitype_batch, ierr)
 if (ierr .ne. 0) call die('init_nodes/MPI_Type_commit')
 call MPI_Bcast(cgp, ncgp, mpitype_batch, 0, MPI_COMM_WORLD, ierr)
@@ -2246,8 +2246,8 @@ blockcnt(2) = nljtyp				! real(8) avdw(nljtyp)
 fdisp(2) = 8
 blockcnt(3) = nljtyp				! real(8) bvdw(nljtyp)
 fdisp(3) = 8 + 8*nljtyp
-call MPI_Type_struct(3, blockcnt, fdisp, ftype, mpitype_batch, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Type_struct')
+call MPI_Type_create_struct(3, blockcnt, fdisp, ftype, mpitype_batch, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Type_create_struct')
 call MPI_Type_commit(mpitype_batch, ierr)
 if (ierr .ne. 0) call die('init_nodes/MPI_Type_commit')
 call MPI_Bcast(iaclib, max_atyps, mpitype_batch, 0, MPI_COMM_WORLD, ierr)
