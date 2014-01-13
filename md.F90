@@ -14456,8 +14456,8 @@ if(exclude_bonded) then
                 ('Eliminating torsions & impropers for excluded atoms', '-')
 end if
 
-10	format('Reduced number of ',a,t31,'from ',i5,' to ')
-12	format(i5)
+10	format('Reduced number of ',a,t31,'from ',i8,' to ')
+12	format(i8)
 
 i = 1
 removed = 0
