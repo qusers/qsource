@@ -13616,7 +13616,7 @@ subroutine make_shell
    end if
 	end do
 	write(*,105) nshellats, rexcl_i, rexcl_o
-105	format('Found   ',i6,' solute atoms in the restrained shell region (',f6.2,' to ',f6.2,'Å)')
+105	format('Found   ',i6,' solute atoms in the restrained shell region (',f6.2,' to ',f6.2,')')
 end subroutine make_shell
 
 !------------------------------------------------------------------------
