@@ -2110,26 +2110,19 @@ winv=maxint
 end if
 
 !Broadcast iqatom
-!Use mpi_create_type here too!  (TINY)
-call MPI_Bcast(iqatom, natom, MPI_INTEGER2, 0, MPI_COMM_WORLD, ierr)
+call MPI_Bcast(iqatom, natom, MPI_INTEGER2, 0, MPI_COMM_WORLD, ierr) !(TINY)
 if (ierr .ne. 0) call die('init_nodes/MPI_Bcast iqatom')
 
 !Broadcast ljcod
-call MPI_Type_contiguous(max_atyp, MPI_INTEGER, mpitype_batch, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Type_contiguous')
-call MPI_Type_commit(mpitype_batch, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Type_commit')
-call MPI_Bcast(ljcod, max_atyp, mpitype_batch, 0, MPI_COMM_WORLD, ierr)
+call MPI_Bcast(ljcod, size(ljcod), MPI_INTEGER, MPI_COMM_WORLD, ierr)
 if (ierr .ne. 0) call die('init_nodes/MPI_Bcast ljcod')
-call MPI_Type_free(mpitype_batch, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Type_free')
 
 !Broadcast qconn(nstates,nat_solute, nqat)
 if (nodeid .ne. 0) then
 allocate(qconn(nstates,nat_solute, nqat),stat=alloc_status)
 call check_alloc('qconn')
 end if
-call MPI_Bcast(qconn, nstates*nat_solute*nqat, MPI_INTEGER2, 0, MPI_COMM_WORLD, ierr)
+call MPI_Bcast(qconn, size(qconn), MPI_INTEGER2, 0, MPI_COMM_WORLD, ierr) ! (TINY)
 if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qconn')
 
 
@@ -2231,7 +2224,7 @@ call MPI_Bcast(cgpatom, natom, MPI_INTEGER4, 0, MPI_COMM_WORLD, ierr) !(AI)
 if (ierr .ne. 0) call die('init_nodes/MPI_Bcast cgpatom')
 
 ! cgp
-!Use mpi_create_type here too
+!Use MPI_Type_create_struct here too
 ftype(:) = MPI_INTEGER4 !(AI)
 blockcnt(:) = 1
 fdisp(1) = 0				! integer(AI) iswitch
@@ -2264,30 +2257,16 @@ call MPI_Type_free(mpitype_batch, ierr)
 if (ierr .ne. 0) call die('init_nodes/MPI_Type_free')
 
 ! list14 and listex share the same format: logical listxx(max_nbr_range,max_atom)
-call MPI_Type_contiguous(max_nbr_range, MPI_LOGICAL, mpitype_batch, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Type_contiguous')
-call MPI_Type_commit(mpitype_batch, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Type_commit')
-call MPI_Bcast(list14, max_atom, mpitype_batch, 0, MPI_COMM_WORLD, ierr)
+call MPI_Bcast(list14, size(list14), MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
 if (ierr .ne. 0) call die('init_nodes/MPI_Bcast list14')
-call MPI_Bcast(listex, max_atom, mpitype_batch, 0, MPI_COMM_WORLD, ierr)
+call MPI_Bcast(listex, size(listex), MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
 if (ierr .ne. 0) call die('init_nodes/MPI_Bcast listex')
-call MPI_Type_free(mpitype_batch, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Type_free')
 
 ! list14long and listexlong share the same format: integer(AI) listxxlong(2,max_nxxlong)
-!Use mpi_create_type here too (AI)
-!Not tested for right result
-call MPI_Type_contiguous(2, MPI_INTEGER4, mpitype_batch, ierr) !(AI)
-if (ierr .ne. 0) call die('init_nodes/MPI_Type_contiguous')
-call MPI_Type_commit(mpitype_batch, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Type_commit')
-call MPI_Bcast(list14long, n14long, mpitype_batch, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast list14')
-call MPI_Bcast(listexlong, nexlong, mpitype_batch, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast listex')
-call MPI_Type_free(mpitype_batch, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Type_free')
+call MPI_Bcast(list14long, size(list14long), MPI_INTEGER4, 0, MPI_COMM_WORLD, ierr) !(AI)
+if (ierr .ne. 0) call die('init_nodes/MPI_Bcast list14long')
+call MPI_Bcast(listexlong, size(listexlong), MPI_INTEGER4, 0, MPI_COMM_WORLD, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Bcast listexlong')
 
 ! --- data from the QATOM module ---
 
@@ -2307,57 +2286,29 @@ call check_alloc('Q-atom arrays')
 end if
 
 !Broadcast sc_lookup(nqat,natyps+nqat,nstates)
-call MPI_Type_contiguous(nqat, MPI_REAL8, mpitype_batch, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Type_contiguous')
-call MPI_Type_contiguous(natyps + nqat, mpitype_batch, mpitype_batch2, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Type_contiguous')
-call MPI_Type_commit(mpitype_batch2, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Type_commit')
-call MPI_Bcast(sc_lookup, nstates, mpitype_batch2, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qconn')
-call MPI_Type_free(mpitype_batch2, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Type_free')
-
+call MPI_Bcast(sc_lookup, size(sc_lookup), MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Bcast sc_lookup')
 
 ! integer(AI) ::  iqseq(nqat)
 !Change to mpi_type_create  (AI)
 call MPI_Bcast(iqseq, nqat, MPI_INTEGER4, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qatom data batch 2')
+if (ierr .ne. 0) call die('init_nodes/MPI_Bcast iqseq')
 
 !  integer ::  qiac(nqat,nstates)
-call MPI_Type_contiguous(nqat, MPI_INTEGER, mpitype_batch, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Type_contiguous')
-call MPI_Type_commit(mpitype_batch, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Type_commit')
-call MPI_Bcast(qiac, nstates, mpitype_batch, 0, MPI_COMM_WORLD, ierr)
+call MPI_Bcast(qiac, size(qiac), MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
 if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qiac')
-call MPI_Type_free(mpitype_batch, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Type_free')
 
 ! real(4) ::  qcrg(nqat,nstates)
-call MPI_Type_contiguous(nqat, MPI_REAL4, mpitype_batch, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Type_contiguous')
-call MPI_Type_commit(mpitype_batch, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Type_commit')
-call MPI_Bcast(qcrg, nstates, mpitype_batch, 0, MPI_COMM_WORLD, ierr)
+call MPI_Bcast(qcrg, size(qcrg), MPI_REAL4, 0, MPI_COMM_WORLD, ierr)
 if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qcrg')
-call MPI_Type_free(mpitype_batch, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Type_free')
-
 
 if(qvdw_flag) then
 !MN20030409-> Havn't tried with qvdw_flag == .true.
 ! qavdw and qbvdw share the same format: real(8) qxvdw(nqlib,nljtyp)
-call MPI_Type_contiguous(nqlib, MPI_REAL8, mpitype_batch, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Type_contiguous')
-call MPI_Type_commit(mpitype_batch, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Type_commit')
-call MPI_Bcast(qavdw, nljtyp, mpitype_batch, 0, MPI_COMM_WORLD, ierr)
+call MPI_Bcast(qavdw, size(qavdw), MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
 if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qavdw')
-call MPI_Bcast(qbvdw, nljtyp, mpitype_batch, 0, MPI_COMM_WORLD, ierr)
+call MPI_Bcast(qbvdw, size(qbvdw), MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
 if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qbvdw')
-call MPI_Type_free(mpitype_batch, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Type_free')
 end if
 
 if (nstates .gt. 0) then
