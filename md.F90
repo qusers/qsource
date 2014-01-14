@@ -2263,9 +2263,9 @@ call MPI_Bcast(listex, size(listex), MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
 if (ierr .ne. 0) call die('init_nodes/MPI_Bcast listex')
 
 ! list14long and listexlong share the same format: integer(AI) listxxlong(2,max_nxxlong)
-call MPI_Bcast(list14long, size(list14long), MPI_INTEGER4, 0, MPI_COMM_WORLD, ierr) !(AI)
+call MPI_Bcast(list14long, 2*n14long, MPI_INTEGER4, 0, MPI_COMM_WORLD, ierr) !(AI)
 if (ierr .ne. 0) call die('init_nodes/MPI_Bcast list14long')
-call MPI_Bcast(listexlong, size(listexlong), MPI_INTEGER4, 0, MPI_COMM_WORLD, ierr)
+call MPI_Bcast(listexlong, 2*nexlong, MPI_INTEGER4, 0, MPI_COMM_WORLD, ierr)
 if (ierr .ne. 0) call die('init_nodes/MPI_Bcast listexlong')
 
 ! --- data from the QATOM module ---
