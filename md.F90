@@ -2114,7 +2114,7 @@ call MPI_Bcast(iqatom, natom, MPI_INTEGER2, 0, MPI_COMM_WORLD, ierr) !(TINY)
 if (ierr .ne. 0) call die('init_nodes/MPI_Bcast iqatom')
 
 !Broadcast ljcod
-call MPI_Bcast(ljcod, size(ljcod), MPI_INTEGER, MPI_COMM_WORLD, ierr)
+call MPI_Bcast(ljcod, size(ljcod), MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
 if (ierr .ne. 0) call die('init_nodes/MPI_Bcast ljcod')
 
 !Broadcast qconn(nstates,nat_solute, nqat)
