@@ -1267,6 +1267,10 @@ end if   !if (nodeid .eq. 0)
 ! distribute assignments to the nodes
 #if defined (USE_MPI)
 if (numnodes .gt. 1) then
+    if (nodeid .ne. 0) then
+	! Dummy allocation to avoid runtime errors when using pointer checking
+	allocate(node_assignment(1),stat=alloc_status)
+    endif 
 ! register data types
 call MPI_Type_contiguous(3, MPI_INTEGER, mpitype_pair_assignment, ierr)
 if (ierr .ne. 0) call die('failure while creating custom MPI data type')
@@ -1286,6 +1290,10 @@ if (ierr .ne. 0) call die('failure while sending node assignments')
 ! free data type
 call MPI_Type_free(mpitype_node_assignment, ierr)
 call MPI_Type_free(mpitype_pair_assignment, ierr)
+
+    if (nodeid .ne. 0) then
+	deallocate(node_assignment)
+    endif 
 end if
 #endif
 
