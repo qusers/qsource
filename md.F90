@@ -2038,10 +2038,10 @@ if (ierr .ne. 0) call die('init_nodes/MPI_Bcast xpcent')
 
 !**MN-> Behövs om shake ska parallelliseras
 ! shake/temperature parameters
-!call MPI_Address(shake_constraints, fdisp(17), ierr)  !bara i init_shake & md_run
-!call MPI_Address(shake_molecules, fdisp(18), ierr)    !bara i div init_
-!call MPI_Address(Ndegf, fdisp(19), ierr)    !bara i div init_
-!call MPI_Address(Ndegfree, fdisp(20), ierr)    !bara i div init_
+!call MPI_Bcast(shake_constraints, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)  !bara i init_shake & md_run
+!call MPI_Bcast(shake_molecules, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)    !bara i div init_
+!call MPI_Bcast(Ndegf, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)    !bara i div init_
+!call MPI_Bcast(Ndegfree, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)    !bara i div init_
 
 ! a bunch of vars from the TOPO module
 call MPI_Bcast(nat_solute, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
