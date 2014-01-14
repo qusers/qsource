@@ -1060,7 +1060,8 @@ integer                                 :: master_sum
 !!!!Tmp vars för allokering
 integer,parameter :: vars = 5
 integer :: mpi_batch, i_loop
-integer :: blockcnt(vars),type(vars),disp(vars)
+integer :: blockcnt(vars),type(vars)
+integer(kind=8) :: disp(vars)
 !!!
 
 
@@ -1305,37 +1306,11 @@ end if
 end if
 
 #if defined (USE_MPI)
-blockcnt(:) = 1
-type(:) = MPI_INTEGER
-call MPI_Address(totnbpp, disp(1), ierr)
-call MPI_Address(totnbpw, disp(2), ierr)
-call MPI_Address(totnbqp, disp(3), ierr)
-call MPI_Address(totnbqw, disp(4), ierr)
-call MPI_Address(totnbww, disp(5), ierr)
-
-
-!create relative addresses (to circumvent MPI implementation bug)
-do i_loop=2,5
-	disp(i_loop) = disp(i_loop) - disp(1)
-end do
-disp(1) = 0
-
-call MPI_Type_struct(vars, blockcnt, disp, type, mpi_batch, ierr)
-if (ierr .ne. 0) call die('MPI_Type_struct')
-call MPI_Type_commit(mpi_batch, ierr)
-if (ierr .ne. 0) call die('MPI_Type_commit')
-
-!commented out because of MPI implementation bug
-!call MPI_Bcast(MPI_BOTTOM, 1, mpi_batch, 0, MPI_COMM_WORLD, ierr)
-!if (ierr .ne. 0) call die('MPI_Bcast batch 1')
-
-!alternate bcast because of MPI implementation bug
-call MPI_Bcast(totnbpp, 1, mpi_batch, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('MPI_Bcast batch 1')
-
-
-call MPI_Type_free(mpi_batch, ierr)
-if (ierr .ne. 0) call die('MPI_Type_free')
+call MPI_Bcast(totnbpp, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+call MPI_Bcast(totnbpw, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+call MPI_Bcast(totnbqp, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+call MPI_Bcast(totnbqw, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+call MPI_Bcast(totnbww, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
 #endif
 
 ! allocate
@@ -1963,8 +1938,8 @@ integer, parameter                      ::maxint=2147483647
 real(kind=wp8), parameter                        ::maxreal=1E35
 integer  :: MPI_AI_INTEGER, MPI_TINY_INTEGER, i_loop
 
-external MPI_Address
-external MPI_Bcast
+!external MPI_Address
+!external MPI_Bcast
 
 !**********
 !2002-11-28 
@@ -2239,44 +2214,13 @@ if (ierr .ne. 0) call die('init_nodes/MPI_Bcast excl')
 call MPI_Bcast(istart_mol, nmol+1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
 if (ierr .ne. 0) call die('init_nodes/MPI_Bcast istart_mol')
 
-! bake iac, crg and cgpatom into one big packet
-!blockcnt(1) = nat_pro
-!ftype(1) = MPI_REAL8
-!call MPI_Address(xtop, fdisp(1), ierr)
-blockcnt(1) = natom
-!Use mpi_create_type here too
-ftype(1) = MPI_INTEGER2  !(TINY)
-call MPI_Address(iac, fdisp(1), ierr)
-blockcnt(2) = natom
-ftype(2) = MPI_REAL
-call MPI_Address(crg, fdisp(2), ierr)
-blockcnt(3) = natom
-!Use mpi_create_type here too
-ftype(3) = MPI_INTEGER4   !(AI)
-call MPI_Address(cgpatom, fdisp(3), ierr)
-
-! create relative addresses to circumvent MPI implementation bug
-do i_loop=2,3
-	fdisp(i_loop) = fdisp(i_loop) - fdisp(1)
-end do
-fdisp(1) = 0
-
-call MPI_Type_struct(3, blockcnt, fdisp, ftype, mpitype_batch, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Type_struct')
-call MPI_Type_commit(mpitype_batch, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Type_commit')
-
-! commented out to circumvent MPI implementation bug
-!call MPI_Bcast(MPI_BOTTOM, 1, mpitype_batch, 0, MPI_COMM_WORLD, ierr)
-!if (ierr .ne. 0) call die('init_nodes/MPI_Bcast topo data')
-
-! alternate bcast to circumvent MPI implementation bug
-call MPI_Bcast(iac, 1, mpitype_batch, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast topo data')
-
-
-call MPI_Type_free(mpitype_batch, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Type_free')
+! Bcast iac, crg and cgpatom 
+call MPI_Bcast(iac, natom, MPI_INTEGER2, 0, MPI_COMM_WORLD, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Bcast iac')
+call MPI_Bcast(crg, natom, MPI_REAL, 0, MPI_COMM_WORLD, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Bcast crg')
+call MPI_Bcast(cgpatom, natom, MPI_INTEGER4, 0, MPI_COMM_WORLD, ierr) !(AI)
+if (ierr .ne. 0) call die('init_nodes/MPI_Bcast cgpatom')
 
 ! cgp
 !Use mpi_create_type here too
