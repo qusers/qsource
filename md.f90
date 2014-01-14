@@ -14906,6 +14906,7 @@ do iw = ncgp_solute + 1, ncgp
                   dv = -2.*Dwmz*awmz*(fexp-fexp*fexp)/b
                 else
                   dv = 0
+                  erst = 0
                 end if
         end if
 
