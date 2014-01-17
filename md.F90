@@ -1061,7 +1061,7 @@ integer                                 :: master_sum
 integer,parameter :: vars = 5
 integer :: mpi_batch, i_loop
 integer :: blockcnt(vars),type(vars)
-integer(kind=8) :: disp(vars)
+integer(kind=MPI_ADDRESS_KIND) :: disp(vars)
 !!!
 
 
@@ -1938,7 +1938,7 @@ subroutine init_nodes
 
 integer, parameter			:: vars = 40    !increment this var when adding data to broadcast in batch 1
 integer			   	:: blockcnt(vars), ftype(vars) 
-integer(kind=8)			   	:: fdisp(vars)
+integer(kind=MPI_ADDRESS_KIND)			   	:: fdisp(vars)
 integer					:: mpitype_batch,mpitype_batch2
 integer					:: nat3
 real(kind=wp8), allocatable		:: temp_lambda(:)
@@ -15831,7 +15831,7 @@ subroutine gather_nonbond()
 integer,parameter                       :: vars=3
 integer,dimension(3,numnodes-1)         :: tag
 integer,dimension(vars)	                :: blockcnt, ftype
-integer(kind=8), dimension(vars)	:: fdisp, base
+integer(kind=MPI_ADDRESS_KIND), dimension(vars)	:: fdisp, base
 integer                                 :: mpitype_package,mpitype_send
 integer                                 :: i,istate
 
