@@ -1059,9 +1059,7 @@ real                                   :: percent
 integer                                 :: master_sum
 !!!!Tmp vars för allokering
 integer,parameter :: vars = 5
-integer :: mpi_batch, i_loop
-integer :: blockcnt(vars),type(vars)
-integer(kind=MPI_ADDRESS_KIND) :: disp(vars)
+integer :: i_loop
 !!!
 
 
