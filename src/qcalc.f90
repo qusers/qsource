@@ -336,7 +336,7 @@ logical function get_coordfile(cf, fn, frames)
 	
 	do 
 		read(*,'(a)', iostat=filestat) cf
-  if(filestat .ne.0) exit !EOF on input
+		if(filestat /= 0) exit !EOF on input
 		if(cf == 'end' .or. cf == 'END' .or. cf == '.') exit
 		if(cf == 'mean' .or. cf == 'MEAN') then
 			call make_mean_all
@@ -361,7 +361,7 @@ logical function get_coordfile(cf, fn, frames)
 		fn = freefile()
 		open(unit=fn, file=cf, status='old', action='read', form='unformatted', &
 			iostat=filestat)
-  if(filestat .ne. 0) then
+		if(filestat /= 0) then
 			write(*,900) trim(cf)
 900			format('>>>>> ERROR: failed to open ',a)
 			cycle
@@ -401,7 +401,7 @@ logical function load_restart(fn)
 	load_restart = .false.
 	rewind(fn)
 	read(fn, iostat=filestat) nat3
- if(filestat .ne. 0) then
+	if(filestat > 0) then
 		write(*,900) 
 900		format('>>>>> ERROR: Coordinate file read failure.')
 	elseif(filestat < 0) then
@@ -409,7 +409,7 @@ logical function load_restart(fn)
 	elseif(nat3 == 3) then
 		!We found a polarisation restraint data record in a restart file
 		!do nothing
- elseif(nat3 .ne. 3*nat_pro) then
+	elseif(nat3 /= 3*nat_pro) then
 		write(*,910) nat3/3
 910		format('>>>>> ERROR: Wrong number of atoms in coordinate file:',i5)
 	else
@@ -465,7 +465,7 @@ subroutine add_calcs
 		write(*,'(a)', advance='no') 'Qcalc> '
 		read(*,*) input
 		read(input, '(i5)', iostat=readstat) kind
-  if(readstat .eq. 0) then !got numeric input
+		if(readstat == 0) then !got numeric input
 			if(kind < 1 .or. kind > Nkinds) then
 				write(*,900) kind
 900				format('>>>>> ERROR: Command number ',i2,' is not available.')
@@ -481,7 +481,7 @@ subroutine add_calcs
 				cycle
 			end if
 			do kind = 1, Nkinds
-    if(cdef(kind)%key .eq. input) exit
+				if(cdef(kind)%key == input) exit
 			end do
 			if(kind > Nkinds) then
 				write(*,910) trim(input)
@@ -571,7 +571,7 @@ subroutine add_a_calc(kind)
 		!add more calls to add routines here...
     end select
 
- if(calcs(Ncalcs)%i .eq. 0) then !add failed
+	if(calcs(Ncalcs)%i == 0) then !add failed
 		!remove the empty entry
 		Ncalcs = Ncalcs - 1
 	else !successful

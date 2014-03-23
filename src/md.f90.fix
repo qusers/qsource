@@ -179,7 +179,7 @@ character(len=200)			::	xwat_file
 
 ! --- Restraints
 integer						::	implicit_rstr_from_file
-integer						::	nrstr_seq, nrstr_pos, nrstr_dist, nrstr_angl, nrstr_wall
+integer						::	nrstr_seq, nrstr_pos, nrstr_dist, nrstr_wall
 
 
 type RSTRSEQ_TYPE
@@ -207,15 +207,6 @@ type RSTRDIS_TYPE
 end type RSTRDIS_TYPE
 
 
-type RSTRANG_TYPE
-        integer(AI)                             ::      i,j,k
-        integer(TINY)                   ::      ipsi
-        real(8)                                 ::      fk
-        real(8)                                 ::      ang
-!        character(len=20)       ::  itext,jtext,ktext
-end type RSTRANG_TYPE
-
-
 type RSTRWAL_TYPE
 
         integer(AI)				::	i,j
@@ -227,7 +218,6 @@ end type RSTRWAL_TYPE
 type(RSTRSEQ_TYPE), allocatable::	rstseq(:)
 type(RSTRPOS_TYPE), allocatable::	rstpos(:)
 type(RSTRDIS_TYPE), allocatable::	rstdis(:)
-type(RSTRANG_TYPE), allocatable::       rstang(:)
 type(RSTRWAL_TYPE), allocatable::	rstwal(:)
 
 
@@ -429,9 +419,8 @@ character(*), optional		:: cause
 ! local vars
 integer						:: i
 ! flush stuff
-integer(4), parameter   :: stdout_unit = 6
-! external flush disabled for gfortran
-! external flush
+integer(4), parameter			:: stdout_unit = 6
+external flush
 
 if (nodeid .eq. 0) then
         write(*,*)
@@ -603,7 +592,6 @@ deallocate(iwhich_cgp, lrf, stat=alloc_status)
 deallocate(rstseq, stat=alloc_status)
 deallocate(rstpos, stat=alloc_status)
 deallocate(rstdis, stat=alloc_status)
-deallocate(rstang, stat=alloc_status)
 deallocate(rstwal, stat=alloc_status)
 
 #if defined (USE_MPI)
@@ -1981,7 +1969,7 @@ integer					:: nat3
 real(kind=wp8), allocatable		:: temp_lambda(:)
 integer, parameter                      ::maxint=2147483647
 real(kind=wp8), parameter                        ::maxreal=1E35
-integer  :: MPI_AI_INTEGER, MPI_TINY_INTEGER, i_loop
+integer  :: MPI_AI_INTEGER, MPI_TINY_INTEGER, i_loop, nljtyp3
 
 external MPI_Get_Address  
 external MPI_Bcast
@@ -2005,12 +1993,9 @@ external MPI_Bcast
 !To check the size in bytes of the new types use
 !call MPI_SizeOf(MPI_AI_INTEGER,size,ierr)
 !call MPI_SizeOf(MPI_TINY_INTEGER,size,ierr)
-<<<<<<< HEAD:src/v5original/md.f90
 !***************************
-=======
-!***************************
->>>>>>> paul_local:md.F90
 
+nljtyp3=3
 
 if (nodeid .eq. 0) call centered_heading('Distributing data to slave nodes', '-')
 
@@ -2018,7 +2003,6 @@ if (nodeid .eq. 0) call centered_heading('Distributing data to slave nodes', '-'
 
 if (nodeid .eq. 0) write (*,'(80a)') 'MD data, first batch'
 
-<<<<<<< HEAD:src/v5original/md.f90
 ! initialise custom MPI data type; default is an integer scalar
 ! The variables below are sorted in modular order.
 ! Make sure to add next variable to the right module and 
@@ -2027,9 +2011,6 @@ blockcnt(:) = 1
 ftype(:) = MPI_INTEGER
 
 
-=======
-! Broadcast some initial variables
->>>>>>> paul_local:md.F90
 
 ! run control constants: natom, nwat, nsteps, NBmethod, NBcycle
 call MPI_Get_Address  (natom, fdisp(1), ierr)
@@ -2127,16 +2108,11 @@ call MPI_Get_Address (put_solute_back_in_box, fdisp(40), ierr)
 !call MPI_Bcast(put_solute_back_in_box, blockcnt(40), ftype(40),0, MPI_COMM_WORLD,ierr)
 
 ! xpcent            from TOPO, needed for listgeneration
-<<<<<<< HEAD:src/v5original/md.f90
 ftype(20) = MPI_REAL8
 blockcnt(20) = 3
 call MPI_Get_Address (xpcent, fdisp(20), ierr)
 !call MPI_Bcast(xpcent, blockcnt(20), ftype(20),0, MPI_COMM_WORLD,ierr)
 
-=======
-call MPI_Bcast(xpcent, 3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast xpcent')
->>>>>>> paul_local:md.F90
 
 !**MN-> Behövs om shake ska parallelliseras
 ! shake/temperature parameters
@@ -2814,12 +2790,11 @@ integer						::	mask_rows
 !  nrstr_seq, [rstseq] (allocating memory for rstseq)
 !  nrstr_pos, [rstpos] (allocating memory for rstpos)
 !  nrstr_dist, [rstdis] (allocating memory for rstdis)
-!  nrstr_angl, [rstang] (allocating memory for rstang)
 !  nrstr_wall, [rstwal] (allocating memory for rstwal)
 
-! external definition of iargc disabled for gfortran
-!integer(4) iargc
-!external iargc
+! external definition of iargc
+integer(4) iargc
+external iargc
 
 ! read name of input file from the command line
 num_args = iargc()
@@ -3454,53 +3429,18 @@ if ( nrstr_dist .gt. 0 ) then
 132		format (i6,1x,i6,3f8.2,i8)
 end if
 
-! --- nrstr_angl, [rstang]
-nrstr_angl = prm_count('angle_restraints')
-135     format (/,'No. of angle restraints =',i10)
-if ( nrstr_angl .gt. 0 ) then
-        write (*,135) nrstr_angl
-        ! allocate memory for rstang
-        allocate(rstang(nrstr_angl), stat=alloc_status)
-        call check_alloc('restraint list')
-        write (*,140)
-140             format ('atom_i atom_j atom_k   angle   fc        state')
-        do i=1,nrstr_angl
-                yes=prm_get_line(text)
-                ! read rstang(i)
-                !if(scan(text, ':') > 0) then !got res:atnr
-                  !Store in i&j as res:atnr and assign atom nr after topology is
-                  !read (prep_coord)
-                !  read(text,*, iostat=fstat) rstang(i)%itext,rstang(i)%jtext,rstang(i)%ktext,&
-                !     rstang(i)%ang, rstang(i)%fk, rstang(i)%ipsi
-                !else !Plain numbers
-                  read(text,*, iostat=fstat) rstang(i)%i,rstang(i)%j,rstang(i)%k,&
-                        rstang(i)%ang, rstang(i)%fk, rstang(i)%ipsi
-                 ! rstang(i)%itext = 'nil'
-                 ! rstang(i)%jtext = 'nil'
-                 ! rstang(i)%ktext = 'nil'
-                !end if
-                if(fstat /= 0) then
-                  write(*,'(a)') '>>> ERROR: Invalid angle restraint data.'
-                  initialize = .false.
-                  exit
-                end if
-                write (*,142) rstang(i)%i,rstang(i)%j,rstang(i)%k,rstang(i)%ang,rstang(i)%fk, &
-                        rstang(i)%ipsi
-        end do
-142             format (i6,1x,i6,1x,i6,2f8.2,i8)
-end if
 
 if (.not. box )then
 ! --- nrstr_wall, [rstwal]
 nrstr_wall = prm_count('wall_restraints')
-145 format (/,'No. of wall sequence restraints=',i10)
+135 format (/,'No. of wall sequence restraints=',i10)
 if ( nrstr_wall .gt. 0) then
-        write (*,145) nrstr_wall
+        write (*,135) nrstr_wall
         ! allocate memory for rstwal
         allocate(rstwal(nrstr_wall), stat=alloc_status)
         call check_alloc('restraint list')
-        write (*,150)
-150		format ('atom_i atom_j   dist.      fc  aMorse  dMorse  H-flag')
+        write (*,140)
+140		format ('atom_i atom_j   dist.      fc  aMorse  dMorse  H-flag')
         do i=1,nrstr_wall
                 ! read rstwal(:)
                 yes = prm_get_line(text)
@@ -3511,9 +3451,9 @@ if ( nrstr_wall .gt. 0) then
                         initialize = .false.
                         exit
                 end if
-                write (*,152) rstwal(i)     
+                write (*,142) rstwal(i)     
         end do
-152		format (i6,1x,i6,4f8.2,i8)
+142		format (i6,1x,i6,4f8.2,i8)
 end if
 end if
 
@@ -3563,7 +3503,6 @@ real(8)						::	rjunk
 !  nrstr_seq, [rstseq] (allocating memory for rstseq)
 !  nrstr_pos, [rstpos] (allocating memory for rstpos)
 !  nrstr_dist, [rstdis] (allocating memory for rstdis)
-!  nrstr_angl, [rstang] (allocating memory for resang)
 !  nrstr_wall, [rstwal] (allocating memory for rstwal)
 
 
@@ -3852,48 +3791,27 @@ write (*,132) rstdis(i)%i,rstdis(i)%j,rstdis(i)%d1,rstdis(i)%fk, &
 end do
 132 format (i6,1x,i6,2f8.2,i8)
 
-! --- nrstr_ang, [rstang]
-read (fu,*) nrstr_angl
-write (*,135) nrstr_angl
-135 format ('No. angle rstrs =',i10)
-if ( nrstr_angl .gt. 0 ) then
-! allocate memory for rstang
-allocate(rstang(nrstr_angl), stat=alloc_status)
-call check_alloc('restraint list')
-write (*,140)
-end if
-140 format ('atom_i atom_j atom_k   angle      fc  istate')
-do i=1,nrstr_angl
-! read rstang(i)
-read (fu,*) rstang(i)%i,rstang(i)%j,rstang(i)%k,rstang(i)%ang, &
-  rstang(i)%fk,rstang(i)%ipsi
-write (*,142) rstang(i)%i,rstang(i)%j,rstang(i)%k,rstang(i)%ang, &
-  rstang(i)%fk,rstang(i)%ipsi
-end do
-142 format (i6,1x,i6,1x,i6,2f8.2,i8)
-
-
 ! --- nrstr_wall, [rstwal]
 read (fu,*) nrstr_wall
-write (*,145) nrstr_wall
-145 format ('No. wall seq. rstrs=',i10)
+write (*,135) nrstr_wall
+135 format ('No. wall seq. rstrs=',i10)
 if ( nrstr_wall .gt. 0) then
 
 
 ! allocate memory for rstwal
 allocate(rstwal(nrstr_wall), stat=alloc_status)
 call check_alloc('restraint list')
-write (*,150)
+write (*,140)
 end if
-150 format ('atom_i atom_j   dist.      fc  H-flag')
+140 format ('atom_i atom_j   dist.      fc  H-flag')
 do i=1,nrstr_wall
 ! read rstwal(:)
 read (fu,*) rstwal(i)%i,rstwal(i)%j,rstwal(i)%d,rstwal(i)%fk, &
   rstwal(i)%ih
-write (*,152) rstwal(i)%i,rstwal(i)%j,rstwal(i)%d,rstwal(i)%fk, &
+write (*,142) rstwal(i)%i,rstwal(i)%j,rstwal(i)%d,rstwal(i)%fk, &
   rstwal(i)%ih     
 end do
-152 format (i6,1x,i6,2f8.2,i8)
+142 format (i6,1x,i6,2f8.2,i8)
 
 read (fu,'(a80)') text
 write (*,157) 
@@ -4258,6 +4176,8 @@ end if
 #ifndef DUM
 do istep = 0, nsteps-1
 #endif
+!change volume
+
         if ( mod(istep, NBcycle) .eq. 0 ) then
 
 
@@ -4318,6 +4238,14 @@ do istep = 0, nsteps-1
 #endif
 
 
+
+		! do MC_volume step here, after NBupdate for consistency with LRFs and such.
+		! Implies a limitation in the volume_update interval, i.e. mod(volume_update,nb_update)=0
+				if( use_PBC .and. constant_pressure) then
+				   if( mod(istep, ivolume_cycle)==0 .and. istep>0 ) then
+					  call MC_volume
+				   end if
+				end if
 
         end if ! every NBcycle steps
 
@@ -4405,12 +4333,6 @@ profile(12)%time = profile(12)%time + rtime() - start_loop_time2
 end if !if(nodeid .eq. 0)
 
 
-!change volume
-if( use_PBC .and. constant_pressure) then
-   if( mod(istep, ivolume_cycle)==0 .and. istep>0 ) then
-      call MC_volume
-   end if
-end if
 
 #if defined(USE_MPI)
 call MPI_Bcast(x, nat3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
@@ -13218,14 +13140,14 @@ end subroutine offdiag
 !-----------------------------------------------------------------------
 subroutine p_restrain
 ! *** Local variables
-integer						::	ir,i,j,k,i3,j3,k3,istate, n_ctr
-real(8)						::	fk,r2,erst,Edum,x2,y2,z2,wgt,b,db,dv, totmass, theta,rij,r2ij,rjk,r2jk, scp,f1
-real(8)						::	dr(3), dr2(3), ctr(3), di(3), dk(3)
+integer						::	ir,i,j,k,i3,j3,istate, n_ctr
+real(8)						::	fk,r2,erst,Edum,x2,y2,z2,wgt,b,db,dv, totmass
+real(8)						::	dr(3), ctr(3)
 real(8)						::	fexp
 
 ! global variables used:
 !  E, nstates, EQ, nrstr_seq, rstseq, heavy, x, xtop, d, nrstr_pos, rstpos, nrstr_dist, 
-!  rstdis, nrstr_angl, rstang, nrstr_wall, rstwal, xwcent
+!  rstdis, nrstr_wall, rstwal, xwcent
 
 ! sequence restraints (independent of Q-state)
 do ir = 1, nrstr_seq
@@ -13415,106 +13337,6 @@ EQ(istate)%restraint = EQ(istate)%restraint + Edum
 end if
 end do
 
-! atom-atom-atom angle restraints (Q-state dependent)
-do ir = 1, nrstr_angl
-
-istate = rstang(ir)%ipsi
-i      = rstang(ir)%i
-j      = rstang(ir)%j
-k      = rstang(ir)%k
-i3     = i*3-3
-j3     = j*3-3
-k3     = k*3-3
-
-! distance from atom i to atom j
-dr(1)  = x(i3+1) - x(j3+1)
-dr(2)  = x(i3+2) - x(j3+2)
-dr(3)  = x(i3+3) - x(j3+3)
-
-! distance from atom k to atom j
-dr2(1) = x(k3+1) - x(j3+1)
-dr2(2) = x(k3+2) - x(j3+2)
-dr2(3) = x(k3+3) - x(j3+3)
-
-! if PBC then adjust lengths according to periodicity - MA
-if( use_PBC ) then
-        dr(1) = dr(1) - boxlength(1)*nint( dr(1)*inv_boxl(1) )
-        dr(2) = dr(2) - boxlength(2)*nint( dr(2)*inv_boxl(2) )
-        dr(3) = dr(3) - boxlength(3)*nint( dr(3)*inv_boxl(3) )
-
-        dr2(1) = dr2(1) - boxlength(1)*nint( dr2(1)*inv_boxl(1) )
-        dr2(2) = dr2(2) - boxlength(2)*nint( dr2(2)*inv_boxl(2) )
-        dr2(3) = dr2(3) - boxlength(3)*nint( dr2(3)*inv_boxl(3) )
-
-end if
-
-if ( istate .ne. 0 ) then
-wgt = EQ(istate)%lambda
-else
-wgt = 1.0
-end if
-
-! square distances from the triangle formed by the atoms i, j and k
-r2ij = dr(1)**2 + dr(2)**2 + dr(3)**2
-r2jk = dr2(1)**2 + dr2(2)**2 + dr2(3)**2
-
-rij  = sqrt ( r2ij )
-rjk  = sqrt ( r2jk )
-
-! calculate the scalar product (scp) and the angle theta from it
-scp = ( dr(1)*dr2(1) + dr(2)*dr2(2) + dr(3)*dr2(3) )
-scp = scp / ( rij*rjk )
-
-! criteria inserted on the real angle force calculations to ensure no weird scp.
-if ( scp .gt.  1.0 ) scp =  1.0
-if ( scp .lt. -1.0 ) scp = -1.0
-
-theta = acos(scp)
-db    = theta - (rstang(ir)%ang)*deg2rad
-
-! dv is the force to be added in module
-Edum   = 0.5*rstang(ir)%fk*db**2
-dv     = wgt*rstang(ir)%fk*db
-
-! calculate sin(theta) to use in forces
-f1 = sin ( theta )
-if ( abs(f1) .lt. 1.e-12 ) then
-        ! avoid division by zero
-        f1 = -1.e12
-else
-        f1 =  -1.0 / f1
-end if
-
-        ! calculate di and dk
-di(1) = f1 * ( dr2(1) / ( rij * rjk ) - scp * dr(1) / r2ij )
-di(2) = f1 * ( dr2(2) / ( rij * rjk ) - scp * dr(2) / r2ij )
-di(3) = f1 * ( dr2(3) / ( rij * rjk ) - scp * dr(3) / r2ij )
-dk(1) = f1 * ( dr(1) / ( rij * rjk ) - scp * dr2(1) / r2jk )
-dk(2) = f1 * ( dr(2) / ( rij * rjk ) - scp * dr2(2) / r2jk )
-dk(3) = f1 * ( dr(3) / ( rij * rjk ) - scp * dr2(3) / r2jk )
-
-        ! update d
-d(i3+1) = d(i3+1) + dv*di(1)
-d(i3+2) = d(i3+2) + dv*di(2)
-d(i3+3) = d(i3+3) + dv*di(3)
-d(k3+1) = d(k3+1) + dv*dk(1)
-d(k3+2) = d(k3+2) + dv*dk(2)
-d(k3+3) = d(k3+3) + dv*dk(3)
-d(j3+1) = d(j3+1) - dv*( di(1) + dk(1) )
-d(j3+2) = d(j3+2) - dv*( di(2) + dk(2) )
-d(j3+3) = d(j3+3) - dv*( di(3) + dk(3) )
-
-
-if ( istate .eq. 0 ) then
-do k = 1, nstates
-EQ(k)%restraint = EQ(k)%restraint + Edum
-end do
-if ( nstates .eq. 0 ) E%restraint%protein = E%restraint%protein + Edum
-else
-EQ(istate)%restraint = EQ(istate)%restraint + Edum
-end if
-end do
-
 if( .not. use_PBC ) then
 ! extra half-harmonic wall restraints
 do ir = 1, nrstr_wall
@@ -13646,7 +13468,8 @@ start_loop_time1 = rtime()
 #endif
 call pot_energy_bonds
 #if defined (PROFILING)
-profile(8)%time = profile(8)%time + rtime() - start_loop_time1
+start_loop_time3 = rtime()
+profile(8)%time = profile(8)%time + start_loop_time3 - start_loop_time1
 #endif
 
 ! various restraints
@@ -13663,6 +13486,9 @@ if( .not. use_PBC ) then
         end if
 end if
 
+#if defined (PROFILING)
+profile(9)%time = profile(9)%time + rtime() - start_loop_time3
+#endif
 ! q-q nonbonded interactions
 if(.not. qq_use_library_charges) then
         if(ivdw_rule .eq. 1 ) then
@@ -13993,7 +13819,7 @@ subroutine make_shell
    end if
 	end do
 	write(*,105) nshellats, rexcl_i, rexcl_o
-105	format('Found   ',i6,' solute atoms in the restrained shell region (',f6.2,' to ',f6.2,')')
+105	format('Found   ',i6,' solute atoms in the restrained shell region (',f6.2,' to ',f6.2,'Å)')
 end subroutine make_shell
 
 !------------------------------------------------------------------------
@@ -16095,7 +15921,7 @@ end if
 call MPI_Bcast(x, natom*3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
 if (ierr .ne. 0) call die('MC_volume/MPI_Bcast x')
 call MPI_Bcast(xx, natom*3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast x')
+if (ierr .ne. 0) call die('MC_volume/MPI_Bcast x')
 call MPI_Bcast(boxlength, 3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
 call MPI_Bcast(inv_boxl, 3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
 #endif

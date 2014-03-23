@@ -13,7 +13,7 @@ implicit none
 	character(*), parameter			::	MODULE_VERSION = '5.01'
 	character(*), parameter			::	MODULE_DATE = '2003-06-03'
 
-	integer,parameter ::mxpts=200000,mxbin=100,mxstates=4
+	integer,parameter ::mxpts=500000,mxbin=100,mxstates=4
 	character(80)      ::filnam, line
 	integer           ::i,j,ifile,ipt,istate,ibin,nfiles,nstates,ERR, &
 	                      nskip,nbins,nmin,idum,noffd,nnoffd,offel
@@ -23,9 +23,9 @@ implicit none
 	real(8) ::rt,gapmin,gapmax,sum,dv,gaprange, &
 			xint,dvg,veff1,veff2,dGa,dGb,dGg,alpha_B,scale_Hij, &
 			veff,min	  		
-	real(8),dimension(mxbin)              ::sumg,sumg2,avdvg,avc1,avc2,avr
+	real(8),dimension(mxbin)              ::sumg,sumg2,avdvg,avc11,avc22,avc1,avc2,avr
 										  
-	real(8),dimension(mxbin,4)            ::binsum
+	real(8),dimension(mxbin,6)            ::binsum
 	integer,dimension(mxbin)              ::nbinpts,ptsum
 
 	type(Q_ENERGIES), dimension(mxstates)	:: EQ 	
@@ -40,16 +40,15 @@ implicit none
 		integer					::	npts
 		real(8)					::	lambda(mxstates)
 		real(8), pointer		::	v(:,:), r(:,:) !indices are state, point
-		real(8), pointer		::	vg(:), gap(:), c1(:), c2(:) !index is point
+		real(8), pointer		::	vg(:), gap(:), c11(:), c22(:), c1(:),c2(:) !index is point
 	end type FEP_DATA_TYPE
 	type(FEP_DATA_TYPE), allocatable	::	FEP(:) !index is file
 	type(FEP_DATA_TYPE)				::	FEPtmp !temporary storage for one file
 
 	real(8),dimension(mxstates,mxbin)     ::avdvv,sumv,sumv2 
 
-	integer								::	f,gas=0,error,dummyno !!!!!!!!!masoud
-	real								::	dummy
-	character(100)							::	iline !!!!!!! masoud
+	integer								::	f
+
 	!header
 	write(*,100) MODULE_VERSION,  MODULE_DATE
 	write(*,*)
@@ -78,33 +77,11 @@ implicit none
 	end if
 
 	! Continue to read input
-	call prompt ('--> Give kT & no, of pts to skip   & calculation mode: ')
-	read(*,'(a)') iline
-
-	!!!!!!!!!!!!!!  masoud reading an extra option for just calculating QQ energies
-	!print*, iline
-	do i=1,4
-		read (iline,*,iostat=error)(dummy,j=1,i)
-!		print*, error,"***",i,dummy
-		if (error .ne. 0) then
-			dummyno=i-1
-			exit
-		endif
-	enddo
-	if (dummyno .eq. 2) then
-		read (iline,*) rt,nskip
-	elseif (dummyno .eq. 3) then
-		read (iline,*) rt,nskip,gas
-	else
-		print*, "not correct argumets for KT, data points to skip or calculation mode"
-		stop
-	end if
-	!!!!!!!!!!!!!!  masoud
-
-!	read (*,*) rt,nskip
-	write (*,3) rt,nskip,gas
+	call prompt ('--> Give kT & no, of pts to skip: ')
+	read (*,*) rt,nskip
+	write (*,3) rt,nskip
 3	format('# kT                              =',f6.3,/, &
-		   '# Number of data points to skip   =',i6,/, '# Only QQ interactions will be considered   = ',i3)
+		   '# Number of data points to skip   =',i6)
 
 	call prompt ('--> Give number of gap-bins: ')
 	read (*,*) nbins
@@ -154,7 +131,7 @@ implicit none
 	!allocate large arrays
 	allocate(FEP(nfiles), FEPtmp%v(nstates,mxpts), FEPtmp%r(nstates,mxpts), &
 		FEPtmp%vg(mxpts), FEPtmp%gap(mxpts), &
-		FEPtmp%c1(mxpts), FEPtmp%c2(mxpts), &
+		FEPtmp%c11(mxpts), FEPtmp%c22(mxpts),FEPtmp%c1(mxpts), FEPtmp%c2(mxpts), &
 		dgf(0:nfiles+1),dgr(0:nfiles+1), &
 		dgfsum(0:nfiles+1),dgrsum(0:nfiles+1),dG(0:nfiles+1), &
 		STAT=ERR)
@@ -171,6 +148,8 @@ implicit none
 	gapmin=999.
 	gapmax=-999.
 	f = freefile()
+	FEPtmp%c11(:) = 0.
+	FEPtmp%c22(:) = 0.
 	FEPtmp%c1(:) = 0.
 	FEPtmp%c2(:) = 0.
 
@@ -221,21 +200,9 @@ implicit none
 		FEPtmp%gap(:) = 0.
 		do while(get_ene(f, EQ(:), offd, nstates, nnoffd) == 0) !keep reading till EOF
 			ipt = ipt + 1
-	!!!!!!!!!!!!!!  masoud
-!if the gas flag is > 0 then total energy will be just q (bonded), qq(nonbonded) and restraint
-			if (gas .gt. 0 ) then
-			do i=1,nstates
-			EQ(i)%total=EQ(i)%q%bond+EQ(i)%q%angle+EQ(i)%q%torsion+EQ(i)%q%improper+EQ(i)%qq%el+EQ(i)%qq%vdw+EQ(i)%restraint
-!			print*, EQ(i)%total, EQ(i)%q,EQ(i)%qq,EQ(i)%restraint
-!			print*, "''''''''''"
-!			if (ipt > 10 ) stop
-			end do
-			end if
-	!!!!!!!!!!!!!!   masoud
 			if(ipt > nskip) then
 				avEQ(:) = avEQ(:) + EQ(:) !use Qenergies + operator 
 			end if
-
 
 !-------------------------------------------
 ! Correct H_ii with alfa, and modify H_ij...
@@ -281,8 +248,10 @@ implicit none
 				FEPtmp%vg(ipt)=0.5*(EQ(1)%total+EQ(2)%total)-  &
 					0.5*sqrt( (EQ(1)%total-EQ(2)%total)**2 + 4.*Hij(1,2)**2 )
 				if(nnoffd > 0) then
-					FEPtmp%c1(ipt)=1./(1.+((FEPtmp%vg(ipt)-EQ(1)%total)/Hij(1,2))**2)
-					FEPtmp%c2(ipt)=1-FEPtmp%c1(ipt)
+					FEPtmp%c11(ipt)=1./(1.+((FEPtmp%vg(ipt)-EQ(1)%total)/Hij(1,2))**2)
+					FEPtmp%c22(ipt)=1-FEPtmp%c11(ipt)
+					FEPtmp%c1(ipt)=sqrt(FEPtmp%c11(ipt))
+					FEPtmp%c2(ipt)=sqrt(FEPtmp%c22(ipt))
 				end if
 			else 
 				call tred2(Hij,nstates,nstates,d,e)
@@ -307,6 +276,8 @@ implicit none
 		allocate(FEP(ifile)%v(nstates, FEP(ifile)%npts), &
 			FEP(ifile)%vg(FEP(ifile)%npts), &
 			FEP(ifile)%gap(FEP(ifile)%npts), &
+			FEP(ifile)%c11(FEP(ifile)%npts), &
+			FEP(ifile)%c22(FEP(ifile)%npts), &
 			FEP(ifile)%c1(FEP(ifile)%npts), &
 			FEP(ifile)%c2(FEP(ifile)%npts), &
 			STAT=ERR)
@@ -316,6 +287,8 @@ implicit none
 		FEP(ifile)%v(:,:) = FEPtmp%v(1:nstates, 1:FEP(ifile)%npts)
 		FEP(ifile)%vg(:) = FEPtmp%vg(1:FEP(ifile)%npts)
 		FEP(ifile)%gap(:) = FEPtmp%gap(1:FEP(ifile)%npts)
+		FEP(ifile)%c11(:) = FEPtmp%c11(1:FEP(ifile)%npts)
+		FEP(ifile)%c22(:) = FEPtmp%c22(1:FEP(ifile)%npts)
 		FEP(ifile)%c1(:) = FEPtmp%c1(1:FEP(ifile)%npts)
 		FEP(ifile)%c2(:) = FEPtmp%c2(1:FEP(ifile)%npts)
 		if(nnoffd > 0) then 
@@ -347,7 +320,7 @@ implicit none
 			avEQ(istate)%qw%el,avEQ(istate)%qw%vdw,avEQ(istate)%restraint
 
 		end do
-17	format(a,t23,i2,1x,i6,f9.6,14f8.2)
+17	format(a,t23,i2,1x,i6,1x,f8.6,14f8.2)
 	end do  !ifile
 
 	if(nfiles > 1) then !the following is meaningless for a single file
@@ -415,7 +388,7 @@ implicit none
                FEP(ifile)%lambda(1),dgf(ifile-1),dgfsum(ifile), &
                              dgr(ifile+1),dgrsum(ifile),dG(ifile)
         end do
-23		format(2x,f9.6,5f9.3)
+23		format(3x,f8.6,5f9.3)
 
 		write (*,*)
 		write (*,'(a,f9.2)') '# Min energy-gap is: ',gapmin
@@ -431,7 +404,7 @@ implicit none
 		write(*,25)
 24		format('# Part 2: Reaction free energy summary:')
 25		format('# Lambda(1)  bin Energy gap      dGa     dGb     dGg    # pts    c1**2    c2**2')
-26		format(2x,f9.6,i5,2x,4f9.2,2x,i5,2f9.3)
+26		format(3x,f8.6,i5,2x,4f9.2,2x,i5,2f9.3)
 		gaprange=gapmax-gapmin      !Range of reaction coordinate
 		xint=gaprange/real(nbins)   !Divide R.C. into bins
 		do ifile=1,nfiles         
@@ -439,8 +412,10 @@ implicit none
 			avdvg=0.
 			sumv=0.
 			sumg=0.
-		    avc1=0.
-            avc2=0.
+			avc11=0.
+			avc22=0.
+			avc1=0.
+			avc2=0.
 			avr=0.
 			dvv=0.
 			dvg=0.
@@ -456,19 +431,23 @@ implicit none
 				dvg=FEP(ifile)%vg(ipt)-veff
 				avdvv(:,ibin)=avdvv(:,ibin)+dvv(:)
 				avdvg(ibin)=avdvg(ibin)+dvg
-	         	avc1(ibin)=avc1(ibin)+FEP(ifile)%c1(ipt)
-                avc2(ibin)=avc2(ibin)+FEP(ifile)%c2(ipt)
+				avc11(ibin)=avc11(ibin)+FEP(ifile)%c11(ipt)
+				avc22(ibin)=avc22(ibin)+FEP(ifile)%c22(ipt)
+				avc1(ibin)=avc1(ibin)+FEP(ifile)%c1(ipt)
+				avc2(ibin)=avc2(ibin)+FEP(ifile)%c2(ipt)
 				!Only gives first r_xy distance
 				if(nnoffd > 0)	avr(ibin)=avr(ibin)+FEP(ifile)%r(1,ipt)		 
 				nbinpts(ibin)=nbinpts(ibin)+1
 			end do          !ipt
 			do ibin=1,nbins
 				if ( nbinpts(ibin) .ne. 0 ) then
-                    avc1(ibin)=avc1(ibin)/real(nbinpts(ibin))
-                    avc2(ibin)=avc2(ibin)/real(nbinpts(ibin))
-					avr(ibin)=avr(ibin)/real(nbinpts(ibin))				
-					avdvv(:,ibin)=avdvv(:,ibin)/nbinpts(ibin)
-					avdvg(ibin)=avdvg(ibin)/nbinpts(ibin)
+				   avc11(ibin)=avc11(ibin)/real(nbinpts(ibin))
+				   avc22(ibin)=avc22(ibin)/real(nbinpts(ibin))
+				   avc1(ibin)=avc1(ibin)/real(nbinpts(ibin))
+				   avc2(ibin)=avc2(ibin)/real(nbinpts(ibin))
+				   avr(ibin)=avr(ibin)/real(nbinpts(ibin))				
+				   avdvv(:,ibin)=avdvv(:,ibin)/nbinpts(ibin)
+				   avdvg(ibin)=avdvg(ibin)/nbinpts(ibin)
 
 				end if 
 			end do !ibin
@@ -489,11 +468,13 @@ implicit none
 
 			do ibin=1,nbins
 				if (nbinpts(ibin).ge.nmin) then
-				    binsum(ibin,2)=binsum(ibin,2)+avc1(ibin)*nbinpts(ibin)
-					binsum(ibin,3)=binsum(ibin,3)+avc2(ibin)*nbinpts(ibin)
-					binsum(ibin,4)=binsum(ibin,4)+avr(ibin)*nbinpts(ibin)  !Bin-averaged r_xy
-					sumv(:,ibin)=sumv(:,ibin)/real(nbinpts(ibin)) 
-					sumg(ibin)=sumg(ibin)/real(nbinpts(ibin))
+				   binsum(ibin,2)=binsum(ibin,2)+avc11(ibin)*nbinpts(ibin)
+				   binsum(ibin,3)=binsum(ibin,3)+avc22(ibin)*nbinpts(ibin)
+				   binsum(ibin,4)=binsum(ibin,4)+avc1(ibin)*nbinpts(ibin)
+				   binsum(ibin,5)=binsum(ibin,5)+avc2(ibin)*nbinpts(ibin)
+				   binsum(ibin,6)=binsum(ibin,6)+avr(ibin)*nbinpts(ibin) !Bin-averaged r_xy
+				   sumv(:,ibin)=sumv(:,ibin)/real(nbinpts(ibin)) 
+				   sumg(ibin)=sumg(ibin)/real(nbinpts(ibin))
 
 			    	ptsum(ibin)=ptsum(ibin)+nbinpts(ibin)
 
@@ -510,7 +491,7 @@ implicit none
 
 					write (*,26) FEP(ifile)%lambda(1),ibin, &
 						gapmin+real(ibin)*xint-xint/2., dGv(1),dGv(2),dGg, &
-						int(nbinpts(ibin)),avc1(ibin),avc2(ibin) 
+						int(nbinpts(ibin)),avc11(ibin),avc22(ibin) 
 				end if
 			end do  !ibin
 		end do      !ifile
@@ -520,22 +501,24 @@ write(*,27)
 write(*,28)
 
 27		format('# Part 3: Bin-averaged summary:')
-28		format('# bin  energy gap  <dGg> <dGg norm> pts  <c1**2> <c2**2> <r_xy>')
+28		format('# bin  energy gap  <dGg> <dGg norm> pts  <c1**2> <c2**2>  <|c1|> <|c2|>  <r_xy>')
 
 	do ibin=1,nbins
 	if (ptsum(ibin).ge.nmin) then
 	binsum(ibin,1)=binsum(ibin,1)/real(ptsum(ibin)) ! Bin-averaged reaction free energy
  	binsum(ibin,2)=binsum(ibin,2)/real(ptsum(ibin)) ! Bin-averaged c1**2
  	binsum(ibin,3)=binsum(ibin,3)/real(ptsum(ibin)) ! Bin-averaged c2**2
-	binsum(ibin,4)=binsum(ibin,4)/real(ptsum(ibin)) ! Bin-averaged r_xy
+ 	binsum(ibin,4)=binsum(ibin,4)/real(ptsum(ibin)) ! Bin-averaged c1
+ 	binsum(ibin,5)=binsum(ibin,5)/real(ptsum(ibin)) ! Bin-averaged c2
+	binsum(ibin,6)=binsum(ibin,6)/real(ptsum(ibin)) ! Bin-averaged r_xy
 	end if
  	end do
  	min=MINVAL(binsum(:,1))
  	do ibin=1,nbins
 		if (ptsum(ibin).ge.nmin) then
- 29		format(i4,1x,3f9.2,2x,i5,3f8.3,4f8.2)
+ 29		format(i4,1x,3f9.2,2x,i5,4f8.3,4f8.2)
  		write(*,29) ibin,gapmin+real(ibin)*xint-xint/2.,binsum(ibin,1),  &
- 		binsum(ibin,1)-min,int(ptsum(ibin)),binsum(ibin,2),binsum(ibin,3),binsum(ibin,4)
+ 		binsum(ibin,1)-min,int(ptsum(ibin)),binsum(ibin,2),binsum(ibin,3),binsum(ibin,4),binsum(ibin,5),binsum(ibin,6)
         end if
 	end do !ibin
 	end if !nfiles >1
@@ -543,7 +526,7 @@ write(*,28)
 	!clean up
 	do ifile=1,nfiles
 		deallocate(FEP(ifile)%v, FEP(ifile)%vg, FEP(ifile)%gap, &
-		FEP(ifile)%c1, FEP(ifile)%c2)
+		FEP(ifile)%c11, FEP(ifile)%c22,FEP(ifile)%c1, FEP(ifile)%c2)
 		if(nnoffd > 0) deallocate(FEP(ifile)%r)
 	end do
 	deallocate(FEP)
@@ -574,7 +557,7 @@ subroutine prompt (outtxt)
 	integer, parameter			::	f=6
 	!write (f2,'($,a)') outtxt
 #endif
-write (f,'(a,$)') outtxt	     
+write (f,'($,a)') outtxt	     
 end subroutine prompt
 
 !------------------------------

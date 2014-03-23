@@ -116,13 +116,12 @@ integer						::	ivolume_cycle
 ! --- Protein boundary
 logical						::	exclude_bonded
 real(8)						::	fk_pshell
-real(8)      :: fk_fix    = 200.0
+real(8), parameter			::	fk_fix				= 200.0
 
 ! --- Water sphere
 real(8)						::	Dwmz, awmz, rwat_in
 real(8)						::	fkwpol
 logical						::	wpol_restr, wpol_Born
-logical      :: freeze
 real(8)						::	fk_wsphere, crgtot, crgQtot
 integer(AI), allocatable	::	list_sh(:,:), nsort(:,:)
 real(8),  allocatable		::	theta(:), theta0(:), tdum(:)
@@ -143,14 +142,13 @@ type(SHELL_TYPE), allocatable::	wshell(:)
 integer, parameter			::	itdis_update		= 100
 real,  parameter			::	wpolr_layer			= 3.0001
 real, parameter				::	drout				= 0.5
-real(8), parameter			::	tau_T_default		= 100.
+real(8), parameter			::	tau_T_default		= 10.
 real(8), parameter			::	rcpp_default		= 10.
 real(8), parameter			::	rcww_default		= 10.
 real(8), parameter			::	rcpw_default		= 10.
 real(8), parameter			::	rcq_default			= 99.
 real(8), parameter			::	rcLRF_default		= 99.
 !recxl_i is set to rexcl_o * shell_default
-real(8), parameter   :: fk_fix_default = 200.
 real(8), parameter			::	shell_default		= 0.85
 real(8), parameter			::	fk_pshell_default	= 10.
 integer, parameter			::	itrj_cycle_default	= 100
@@ -181,7 +179,7 @@ character(len=200)			::	xwat_file
 
 ! --- Restraints
 integer						::	implicit_rstr_from_file
-integer      :: nrstr_seq, nrstr_pos, nrstr_dist, nrstr_angl, nrstr_wall
+integer						::	nrstr_seq, nrstr_pos, nrstr_dist, nrstr_wall
 
 
 type RSTRSEQ_TYPE
@@ -208,13 +206,6 @@ type RSTRDIS_TYPE
         character(len=20)       ::  itext,jtext
 end type RSTRDIS_TYPE
 
-type RSTRANG_TYPE 
-        integer(AI)    :: i,j,k
-        integer(TINY)  :: ipsi
-        real(8)        :: fk
-        real(8)        :: ang
-!       character(len=20)       ::  itext,jtext,ktext
-end type RSTRANG_TYPE                                                                                                
 
 type RSTRWAL_TYPE
 
@@ -227,7 +218,6 @@ end type RSTRWAL_TYPE
 type(RSTRSEQ_TYPE), allocatable::	rstseq(:)
 type(RSTRPOS_TYPE), allocatable::	rstpos(:)
 type(RSTRDIS_TYPE), allocatable::	rstdis(:)
-type(RSTRANG_TYPE), allocatable:: rstang(:)
 type(RSTRWAL_TYPE), allocatable::	rstwal(:)
 
 
@@ -430,8 +420,7 @@ character(*), optional		:: cause
 integer						:: i
 ! flush stuff
 integer(4), parameter			:: stdout_unit = 6
-! external flush disabled for gfortran
-! external flush
+external flush
 
 if (nodeid .eq. 0) then
         write(*,*)
@@ -526,7 +515,7 @@ subroutine allocate_mpi
 
 if(nodeid .eq. 0) then
  allocate(mpi_status(MPI_STATUS_SIZE,numnodes-1), & 
-         request_recv(numnodes-1,3), &
+         request_recv(numnodes-1), &
          d_recv(natom*3,numnodes-1), &
          E_recv(numnodes-1), &
          EQ_recv(nstates,numnodes-1), &
@@ -603,7 +592,6 @@ deallocate(iwhich_cgp, lrf, stat=alloc_status)
 deallocate(rstseq, stat=alloc_status)
 deallocate(rstpos, stat=alloc_status)
 deallocate(rstdis, stat=alloc_status)
-deallocate(rstang, stat=alloc_status)
 deallocate(rstwal, stat=alloc_status)
 
 #if defined (USE_MPI)
@@ -864,6 +852,9 @@ j3=j*3-3
 k3=k*3-3
 rji(1) = x(i3+1) - x(j3+1)
 rji(2) = x(i3+2) - x(j3+2)
+
+
+
 rji(3) = x(i3+3) - x(j3+3)
 rjk(1) = x(k3+1) - x(j3+1)
 rjk(2) = x(k3+2) - x(j3+2)
@@ -1074,9 +1065,9 @@ real                                    :: percent
 integer                                 :: master_sum
 !!!!Tmp vars för allokering
 integer,parameter			:: vars = 5
-integer     :: mpi_batch, i_loop
-integer     :: blockcnt(vars),type(vars)
-integer(8)  :: disp(vars)
+integer 				:: mpi_batch, i_loop
+integer 				:: blockcnt(vars),type(vars)
+integer(8)		:: disp(vars)
 !!!
 
 
@@ -1283,10 +1274,6 @@ end if   !if (nodeid .eq. 0)
 ! distribute assignments to the nodes
 #if defined (USE_MPI)
 if (numnodes .gt. 1) then
-    if (nodeid .ne. 0) then
-	! Dummy allocation to avoid runtime errors when using pointer checking
-	allocate(node_assignment(1),stat=alloc_status)
-    endif 
 ! register data types
 call MPI_Type_contiguous(3, MPI_INTEGER, mpitype_pair_assignment, ierr)
 if (ierr .ne. 0) call die('failure while creating custom MPI data type')
@@ -1306,9 +1293,6 @@ if (ierr .ne. 0) call die('failure while sending node assignments')
 ! free data type
 call MPI_Type_free(mpitype_node_assignment, ierr)
 call MPI_Type_free(mpitype_pair_assignment, ierr)
-    if (nodeid .ne. 0) then
-	deallocate(node_assignment)
-    endif 
 end if
 #endif
 
@@ -1331,11 +1315,35 @@ end if
 #if defined (USE_MPI)
 blockcnt(:) = 1
 type(:) = MPI_INTEGER
-call MPI_Bcast(totnbpp, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-call MPI_Bcast(totnbpw, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-call MPI_Bcast(totnbqp, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-call MPI_Bcast(totnbqw, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-call MPI_Bcast(totnbww, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+call MPI_Get_Address  (totnbpp, disp(1), ierr)
+call MPI_Get_Address  (totnbpw, disp(2), ierr)
+call MPI_Get_Address  (totnbqp, disp(3), ierr)
+call MPI_Get_Address  (totnbqw, disp(4), ierr)
+call MPI_Get_Address  (totnbww, disp(5), ierr)
+
+
+!create relative addresses (to circumvent MPI implementation bug)
+do i_loop=2,5
+	disp(i_loop) = disp(i_loop) - disp(1)
+end do
+disp(1) = 0
+
+call MPI_Type_create_struct(vars, blockcnt, disp, type, mpi_batch, ierr)
+if (ierr .ne. 0) call die('MPI_Type_create_struct')
+call MPI_Type_commit(mpi_batch, ierr)
+if (ierr .ne. 0) call die('MPI_Type_commit')
+
+!commented out because of MPI implementation bug
+!call MPI_Bcast(MPI_BOTTOM, 1, mpi_batch, 0, MPI_COMM_WORLD, ierr)
+!if (ierr .ne. 0) call die('MPI_Bcast batch 1')
+
+!alternate bcast because of MPI implementation bug
+call MPI_Bcast(totnbpp, 1, mpi_batch, 0, MPI_COMM_WORLD, ierr)
+if (ierr .ne. 0) call die('MPI_Bcast batch 1')
+
+
+call MPI_Type_free(mpi_batch, ierr)
+if (ierr .ne. 0) call die('MPI_Type_free')
 #endif
 
 ! allocate
@@ -1451,22 +1459,12 @@ real(8)						::	dr(3)
 do i = 1, nat_pro
 if (excl(i) .or. shell(i)) then
   ! decide which fk to use
-  i3 = i*3 - 3
 if ( excl(i) ) then 
     fk = fk_fix
-    if ( freeze ) then
-       v(i3+1)=0
-       v(i3+2)=0
-       v(i3+3)=0
-       x(i3+1)=xtop(i3+1)
-       x(i3+2)=xtop(i3+2)
-       x(i3+3)=xtop(i3+3)
-       fk = 0
-    endif
   else
 fk = fk_pshell
   end if
-!i3 = i*3-3
+i3 = i*3-3
 
   ! calculate drift from topology
 dr(1)   = x(i3+1) - xtop(i3+1)
@@ -1965,16 +1963,16 @@ subroutine init_nodes
 
 integer, parameter			:: vars = 40    !increment this var when adding data to broadcast in batch 1
 integer				   	:: blockcnt(vars), ftype(vars)
-integer(kind=MPI_ADDRESS_KIND)			   	:: fdisp(vars)
+integer(8)		:: fdisp(vars)
 integer					:: mpitype_batch,mpitype_batch2
 integer					:: nat3
 real(kind=wp8), allocatable		:: temp_lambda(:)
 integer, parameter                      ::maxint=2147483647
 real(kind=wp8), parameter                        ::maxreal=1E35
-integer  :: MPI_AI_INTEGER, MPI_TINY_INTEGER, i_loop
+integer  :: MPI_AI_INTEGER, MPI_TINY_INTEGER, i_loop, nljtyp3
 
-!external MPI_Address
-!external MPI_Bcast
+external MPI_Get_Address  
+external MPI_Bcast
 
 !**********
 !2002-11-28 
@@ -1990,17 +1988,16 @@ integer  :: MPI_AI_INTEGER, MPI_TINY_INTEGER, i_loop
 !external MPI_SizeOf
 
 !Define data types
-! This is wrong, the 1:st param is "Precision, in decimal digits", not bits
 !call MPI_Type_Create_F90_Integer((8*AI-1),MPI_AI_INTEGER,ierr)
 !call MPI_Type_Create_F90_Integer((8*TINY-1),MPI_TINY_INTEGER,ierr)
 !To check the size in bytes of the new types use
 !call MPI_SizeOf(MPI_AI_INTEGER,size,ierr)
 !call MPI_SizeOf(MPI_TINY_INTEGER,size,ierr)
+!***************************
 
-
+nljtyp3=3
 
 if (nodeid .eq. 0) call centered_heading('Distributing data to slave nodes', '-')
-!***************************
 
 ! --- mandatory data, first batch ---
 
@@ -2013,110 +2010,196 @@ if (nodeid .eq. 0) write (*,'(80a)') 'MD data, first batch'
 blockcnt(:) = 1
 ftype(:) = MPI_INTEGER
 
+
+
 ! run control constants: natom, nwat, nsteps, NBmethod, NBcycle
-call MPI_Bcast(natom, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast natom')
-call MPI_Bcast(nwat, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast nwat')
-call MPI_Bcast(nsteps, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast nsteps')
-call MPI_Bcast(use_LRF, 1, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast use_LRF')
-call MPI_Bcast(NBcycle, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast NBcycle')
+call MPI_Get_Address  (natom, fdisp(1), ierr)
+!call MPI_Bcast(natom, blockcnt(1), ftype(1),0, MPI_COMM_WORLD,ierr)
+
+
+call MPI_Get_Address  (nwat, fdisp(2), ierr)
+!call MPI_Bcast(nwat, blockcnt(2), ftype(2),0, MPI_COMM_WORLD,ierr)
+
+call MPI_Get_Address  (nsteps, fdisp(3), ierr)
+!call MPI_Bcast(nsteps, blockcnt(3), ftype(3),0, MPI_COMM_WORLD,ierr)
+
+ftype(4) = MPI_LOGICAL
+ call MPI_Get_Address  (use_LRF, fdisp(4), ierr)
+!call MPI_Bcast(use_LRF, blockcnt(4), ftype(4),0, MPI_COMM_WORLD,ierr)
+
+call MPI_Get_Address  (NBcycle, fdisp(5), ierr)
+!call MPI_Bcast(NBcycle, blockcnt(5), ftype(5),0, MPI_COMM_WORLD,ierr)
 
 
 
 ! water parameters: crg_ow, crg_hw (used by nonbond_ww)
-call MPI_Bcast(crg_ow, 1, MPI_REAL4, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast crg_ow')
-call MPI_Bcast(crg_hw, 1, MPI_REAL4, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast crg_hw')
+ftype(6) = MPI_REAL4
+call MPI_Get_Address  (crg_ow, fdisp(6), ierr)
+!call MPI_Bcast(crg_ow, blockcnt(6), ftype(6),0, MPI_COMM_WORLD,ierr)
+
+ftype(7) = MPI_REAL4
+call MPI_Get_Address  (crg_hw, fdisp(7), ierr)
+!call MPI_Bcast(crg_hw, blockcnt(7), ftype(7),0, MPI_COMM_WORLD,ierr)
 
 ! cutoffs: Rcpp, Rcww, Rcpw, Rcq, RcLRF (used by pair list generating functions)
-call MPI_Bcast(Rcpp, 1, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast Rcpp')
-call MPI_Bcast(Rcww, 1, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast Rcww')
-call MPI_Bcast(Rcpw, 1, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast Rcpw')
-call MPI_Bcast(Rcq, 1, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast Rcq')
-call MPI_Bcast(RcLRF, 1, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast RcLRF')
+ftype(8) = MPI_REAL8
+call MPI_Get_Address  (Rcpp, fdisp(8), ierr)
+!call MPI_Bcast(Rcpp, blockcnt(8), ftype(8),0, MPI_COMM_WORLD,ierr)
+
+ftype(9) = MPI_REAL8
+call MPI_Get_Address  (Rcww, fdisp(9), ierr)
+!call MPI_Bcast(Rcww, blockcnt(9), ftype(9),0, MPI_COMM_WORLD,ierr)
+
+ftype(10) = MPI_REAL8
+call MPI_Get_Address  (Rcpw, fdisp(10), ierr)
+!call MPI_Bcast(Rcpw, blockcnt(10), ftype(10),0, MPI_COMM_WORLD,ierr)
+
+ftype(11) = MPI_REAL8
+call MPI_Get_Address  (Rcq, fdisp(11), ierr)
+!call MPI_Bcast(Rcq, blockcnt(11), ftype(11),0, MPI_COMM_WORLD,ierr)
+
+ftype(12) = MPI_REAL8
+call MPI_Get_Address  (RcLRF, fdisp(12), ierr)
+!call MPI_Bcast(RcLRF, blockcnt(12), ftype(12),0, MPI_COMM_WORLD,ierr)
 
 
 
 
 !Periodic Boudary Condition
-call MPI_Bcast(use_PBC, 1, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast use_PBC')
-call MPI_Bcast(boxcentre, 3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast boxcentre')
-call MPI_Bcast(boxlength, 3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast boxlength')
-call MPI_Bcast(inv_boxl, 3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast inv_boxl')
-call MPI_Bcast(qswitch, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qswitch')
-call MPI_Bcast(constant_pressure, 1, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast constant_pressure')
-call MPI_Bcast(ivolume_cycle, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast ivolume_cycle')
-call MPI_Bcast(rigid_box_centre, 1, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast rigid_box_centre')
-call MPI_Bcast(put_solvent_back_in_box, 1, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast put_solvent_back_in_box')
-call MPI_Bcast(put_solute_back_in_box, 1, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast put_solute_back_in_box')
+ftype(13) = MPI_LOGICAL
+call MPI_Get_Address (use_PBC, fdisp(13), ierr)
+!call MPI_Bcast(use_PBC, blockcnt(13), ftype(13),0, MPI_COMM_WORLD,ierr)
+
+ftype(14) = MPI_REAL8
+blockcnt(14) = 3
+call MPI_Get_Address (boxcentre, fdisp(14), ierr)
+!call MPI_Bcast(boxcentre, blockcnt(14), ftype(14),0, MPI_COMM_WORLD,ierr)
+
+ftype(15) = MPI_REAL8
+blockcnt(15) = 3
+call MPI_Get_Address (boxlength, fdisp(15), ierr)
+!call MPI_Bcast(boxlength, blockcnt(15), ftype(15),0, MPI_COMM_WORLD,ierr)
+
+ftype(16) = MPI_REAL8
+blockcnt(16) = 3
+call MPI_Get_Address (inv_boxl, fdisp(16), ierr)
+!call MPI_Bcast(inv_boxl, blockcnt(16), ftype(16),0, MPI_COMM_WORLD,ierr)
+
+call MPI_Get_Address (qswitch, fdisp(17), ierr)
+!call MPI_Bcast(qswitch, blockcnt(17), ftype(17),0, MPI_COMM_WORLD,ierr)
+
+ftype(18) = MPI_LOGICAL
+call MPI_Get_Address (constant_pressure, fdisp(18), ierr)
+!call MPI_Bcast(constant_pressure, blockcnt(18), ftype(18),0, MPI_COMM_WORLD,ierr)
+
+call MPI_Get_Address (ivolume_cycle, fdisp(19), ierr)
+!call MPI_Bcast(ivolume_cycle, blockcnt(19), ftype(19),0, MPI_COMM_WORLD,ierr)
+
+ftype(37) = MPI_LOGICAL
+call MPI_Get_Address (rigid_box_centre, fdisp(37), ierr)
+!call MPI_Bcast(rigid_box_centre, blockcnt(37), ftype(37),0, MPI_COMM_WORLD,ierr)
+
+ftype(39) = MPI_LOGICAL
+call MPI_Get_Address (put_solvent_back_in_box, fdisp(39), ierr)
+!call MPI_Bcast(put_solvent_back_in_box, blockcnt(39), ftype(39),0, MPI_COMM_WORLD,ierr)
+
+ftype(40) = MPI_LOGICAL
+call MPI_Get_Address (put_solute_back_in_box, fdisp(40), ierr)
+!call MPI_Bcast(put_solute_back_in_box, blockcnt(40), ftype(40),0, MPI_COMM_WORLD,ierr)
 
 ! xpcent            from TOPO, needed for listgeneration
-call MPI_Bcast(xpcent, 3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast xpcent')
+ftype(20) = MPI_REAL8
+blockcnt(20) = 3
+call MPI_Get_Address (xpcent, fdisp(20), ierr)
+!call MPI_Bcast(xpcent, blockcnt(20), ftype(20),0, MPI_COMM_WORLD,ierr)
+
 
 !**MN-> Behövs om shake ska parallelliseras
 ! shake/temperature parameters
-!call MPI_Bcast(shake_constraints, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)  !bara i init_shake & md_run
-!call MPI_Bcast(shake_molecules, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)    !bara i div init_
-!call MPI_Bcast(Ndegf, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)    !bara i div init_
-!call MPI_Bcast(Ndegfree, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)    !bara i div init_
+!call MPI_Address (shake_constraints, fdisp(17), ierr)  !bara i init_shake & md_run
+!call MPI_Address (shake_molecules, fdisp(18), ierr)    !bara i div init_
+!call MPI_Address (Ndegf, fdisp(19), ierr)    !bara i div init_
+!call MPI_Address (Ndegfree, fdisp(20), ierr)    !bara i div init_
 
 ! a bunch of vars from the TOPO module
-call MPI_Bcast(nat_solute, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast nat_solute')
-call MPI_Bcast(ncgp, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast ncgp')
-call MPI_Bcast(ncgp_solute, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast ncgp_solute')
-call MPI_Bcast(ivdw_rule, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast ivdw_rule')
-call MPI_Bcast(iuse_switch_atom, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast iuse_switch_atom')
-call MPI_Bcast(el14_scale, 1, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast el14_scale')
-call MPI_Bcast(n14long, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast n14long')
-call MPI_Bcast(nexlong, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast nexlong')
-call MPI_Bcast(natyps, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast natyps')
-call MPI_Bcast(rexcl_o, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast rexcl')
-call MPI_Bcast(nmol, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast nmol')
-call MPI_Bcast(nat_pro, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast nat_pro')
+call MPI_Get_Address (nat_solute, fdisp(21), ierr)
+!call MPI_Bcast(nat_solute, blockcnt(21), ftype(21),0, MPI_COMM_WORLD,ierr)
+
+call MPI_Get_Address (ncgp, fdisp(22), ierr)
+!call MPI_Bcast(ncgp, blockcnt(22), ftype(22),0, MPI_COMM_WORLD,ierr)
+
+call MPI_Get_Address (ncgp_solute, fdisp(23), ierr)
+!call MPI_Bcast(ncgp_solute, blockcnt(23), ftype(23),0, MPI_COMM_WORLD,ierr)
+
+call MPI_Get_Address (ivdw_rule, fdisp(24), ierr)
+!call MPI_Bcast(ivdw_rule, blockcnt(24), ftype(24),0, MPI_COMM_WORLD,ierr)
+
+call MPI_Get_Address (iuse_switch_atom, fdisp(25), ierr)
+!call MPI_Bcast(iuse_switch_atom, blockcnt(25), ftype(25),0, MPI_COMM_WORLD,ierr)
+
+ftype(26) = MPI_REAL8
+call MPI_Get_Address (el14_scale, fdisp(26), ierr) 
+!call MPI_Bcast(el14_scale, blockcnt(26), ftype(26),0, MPI_COMM_WORLD,ierr)
+
+call MPI_Get_Address (n14long, fdisp(27), ierr)
+!call MPI_Bcast(n14long, blockcnt(27), ftype(27),0, MPI_COMM_WORLD,ierr)
+
+call MPI_Get_Address (nexlong, fdisp(28), ierr)
+!call MPI_Bcast(nexlong, blockcnt(28), ftype(28),0, MPI_COMM_WORLD,ierr)
+
+call MPI_Get_Address (natyps, fdisp(29), ierr)
+!call MPI_Bcast(natyps, blockcnt(29), ftype(29),0, MPI_COMM_WORLD,ierr)
+
+call MPI_Get_Address (nljtyp3, fdisp(30), ierr)
+!call MPI_Bcast(nljtyp, blockcnt(30), ftype(30),0, MPI_COMM_WORLD,ierr)
+
+
+
+!OBB
+
+call MPI_Get_Address (rexcl_o, fdisp(31), ierr)
+!call MPI_Bcast(rexcl_o, blockcnt(31), ftype(31),0, MPI_COMM_WORLD,ierr)
+
+call MPI_Get_Address (nmol, fdisp(36), ierr)
+!call MPI_Bcast(nmol, blockcnt(36), ftype(36),0, MPI_COMM_WORLD,ierr)
+
+call MPI_Get_Address (nat_pro, fdisp(38), ierr)
+!call MPI_Bcast(nat_pro, blockcnt(38), ftype(38),0, MPI_COMM_WORLD,ierr)
 
 
 !vars from QATOM
-call MPI_Bcast(nstates, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast nstates')
-call MPI_Bcast(nqat, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast nqat')
-call MPI_Bcast(qvdw_flag, 1, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qvdw_flag')
-call MPI_Bcast(nqlib, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast nqlib')
+call MPI_Get_Address (nstates, fdisp(32), ierr)
+call MPI_Get_Address (nqat, fdisp(33), ierr)
+ftype(34) = MPI_LOGICAL
+call MPI_Get_Address (qvdw_flag, fdisp(34), ierr)
+call MPI_Get_Address (nqlib, fdisp(35), ierr)
+
+
+! create relative addresses to circumvent MPI implementation bug
+do i_loop=2,vars
+	fdisp(i_loop) = fdisp(i_loop) - fdisp(1)
+end do
+fdisp(1) = 0
+
+
+
+! create data type and broadcast
+call MPI_Type_create_struct(vars, blockcnt, fdisp, ftype, mpitype_batch, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Type_create_struct')
+call MPI_Type_commit(mpitype_batch, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Type_commit')
+
+! commented out to circumvent MPI implementation bug
+!call MPI_Bcast(MPI_BOTTOM, 1, mpitype_batch, 0, MPI_COMM_WORLD, ierr)
+!if (ierr .ne. 0) call die('init_nodes/MPI_Bcast batch 1')
+
+! alternate bcast to circumvent MPI implementation bug
+call MPI_Bcast(natom, 1, mpitype_batch, 0, MPI_COMM_WORLD, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Bcast batch 1')
+
+
+call MPI_Type_free(mpitype_batch, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Type_free')
 
 
 !Setting all vars not sent to slaves to 2147483647. To avoid hidden bugs.
@@ -2151,20 +2234,36 @@ winv=maxint
 end if
 
 !Broadcast iqatom
-call MPI_Bcast(iqatom, natom, MPI_INTEGER2, 0, MPI_COMM_WORLD, ierr) !(TINY)
+!Use mpi_create_type here too!  (TINY)
+call MPI_Bcast(iqatom, natom, MPI_INTEGER2, 0, MPI_COMM_WORLD, ierr)
 if (ierr .ne. 0) call die('init_nodes/MPI_Bcast iqatom')
 
 !Broadcast ljcod
-call MPI_Bcast(ljcod, size(ljcod), MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+call MPI_Type_contiguous(max_atyp, MPI_INTEGER, mpitype_batch, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Type_contiguous')
+call MPI_Type_commit(mpitype_batch, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Type_commit')
+call MPI_Bcast(ljcod, max_atyp, mpitype_batch, 0, MPI_COMM_WORLD, ierr)
 if (ierr .ne. 0) call die('init_nodes/MPI_Bcast ljcod')
+call MPI_Type_free(mpitype_batch, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Type_free')
 
 !Broadcast qconn(nstates,nat_solute, nqat)
+!Use mpi_create_type here too!  (TINY)
 if (nodeid .ne. 0) then
 allocate(qconn(nstates,nat_solute, nqat),stat=alloc_status)
 call check_alloc('qconn')
 end if
-call MPI_Bcast(qconn, size(qconn), MPI_INTEGER2, 0, MPI_COMM_WORLD, ierr) ! (TINY)
+call MPI_Type_contiguous(nstates, MPI_INTEGER2, mpitype_batch, ierr) !(TINY)
+if (ierr .ne. 0) call die('init_nodes/MPI_Type_contiguous')
+call MPI_Type_contiguous(nat_solute, mpitype_batch, mpitype_batch2, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Type_contiguous')
+call MPI_Type_commit(mpitype_batch2, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Type_commit')
+call MPI_Bcast(qconn, nqat, mpitype_batch2, 0, MPI_COMM_WORLD, ierr)
 if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qconn')
+call MPI_Type_free(mpitype_batch2, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Type_free')
 
 
 ! --- Periodic boundary condition data ---
@@ -2257,16 +2356,47 @@ if (ierr .ne. 0) call die('init_nodes/MPI_Bcast excl')
 call MPI_Bcast(istart_mol, nmol+1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
 if (ierr .ne. 0) call die('init_nodes/MPI_Bcast istart_mol')
 
-! Bcast iac, crg and cgpatom 
-call MPI_Bcast(iac, natom, MPI_INTEGER2, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast iac')
-call MPI_Bcast(crg, natom, MPI_REAL, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast crg')
-call MPI_Bcast(cgpatom, natom, MPI_INTEGER4, 0, MPI_COMM_WORLD, ierr) !(AI)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast cgpatom')
+! bake iac, crg and cgpatom into one big packet
+!blockcnt(1) = nat_pro
+!ftype(1) = MPI_REAL8
+!call MPI_Address (xtop, fdisp(1), ierr)
+blockcnt(1) = natom
+!Use mpi_create_type here too
+ftype(1) = MPI_INTEGER2  !(TINY)
+call MPI_Get_Address  (iac, fdisp(1), ierr)
+blockcnt(2) = natom
+ftype(2) = MPI_REAL
+call MPI_Get_Address  (crg, fdisp(2), ierr)
+blockcnt(3) = natom
+!Use mpi_create_type here too
+ftype(3) = MPI_INTEGER4   !(AI)
+call MPI_Get_Address  (cgpatom, fdisp(3), ierr)
+
+! create relative addresses to circumvent MPI implementation bug
+do i_loop=2,3
+	fdisp(i_loop) = fdisp(i_loop) - fdisp(1)
+end do
+fdisp(1) = 0
+
+call MPI_Type_create_struct(3, blockcnt, fdisp, ftype, mpitype_batch, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Type_create_struct')
+call MPI_Type_commit(mpitype_batch, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Type_commit')
+
+! commented out to circumvent MPI implementation bug
+!call MPI_Bcast(MPI_BOTTOM, 1, mpitype_batch, 0, MPI_COMM_WORLD, ierr)
+!if (ierr .ne. 0) call die('init_nodes/MPI_Bcast topo data')
+
+! alternate bcast to circumvent MPI implementation bug
+call MPI_Bcast(iac, 1, mpitype_batch, 0, MPI_COMM_WORLD, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Bcast topo data')
+
+
+call MPI_Type_free(mpitype_batch, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Type_free')
 
 ! cgp
-!Use MPI_Type_create_struct here too
+!Use mpi_create_type here too
 ftype(:) = MPI_INTEGER4 !(AI)
 blockcnt(:) = 1
 fdisp(1) = 0				! integer(AI) iswitch
@@ -2299,16 +2429,30 @@ call MPI_Type_free(mpitype_batch, ierr)
 if (ierr .ne. 0) call die('init_nodes/MPI_Type_free')
 
 ! list14 and listex share the same format: logical listxx(max_nbr_range,max_atom)
-call MPI_Bcast(list14, size(list14), MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
+call MPI_Type_contiguous(max_nbr_range, MPI_LOGICAL, mpitype_batch, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Type_contiguous')
+call MPI_Type_commit(mpitype_batch, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Type_commit')
+call MPI_Bcast(list14, max_atom, mpitype_batch, 0, MPI_COMM_WORLD, ierr)
 if (ierr .ne. 0) call die('init_nodes/MPI_Bcast list14')
-call MPI_Bcast(listex, size(listex), MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
+call MPI_Bcast(listex, max_atom, mpitype_batch, 0, MPI_COMM_WORLD, ierr)
 if (ierr .ne. 0) call die('init_nodes/MPI_Bcast listex')
+call MPI_Type_free(mpitype_batch, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Type_free')
 
 ! list14long and listexlong share the same format: integer(AI) listxxlong(2,max_nxxlong)
-call MPI_Bcast(list14long, 2*n14long, MPI_INTEGER4, 0, MPI_COMM_WORLD, ierr) !(AI)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast list14long')
-call MPI_Bcast(listexlong, 2*nexlong, MPI_INTEGER4, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast listexlong')
+!Use mpi_create_type here too (AI)
+!Not tested for right result
+call MPI_Type_contiguous(2, MPI_INTEGER4, mpitype_batch, ierr) !(AI)
+if (ierr .ne. 0) call die('init_nodes/MPI_Type_contiguous')
+call MPI_Type_commit(mpitype_batch, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Type_commit')
+call MPI_Bcast(list14long, n14long, mpitype_batch, 0, MPI_COMM_WORLD, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Bcast list14')
+call MPI_Bcast(listexlong, nexlong, mpitype_batch, 0, MPI_COMM_WORLD, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Bcast listex')
+call MPI_Type_free(mpitype_batch, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Type_free')
 
 ! --- data from the QATOM module ---
 
@@ -2328,51 +2472,59 @@ call check_alloc('Q-atom arrays')
 end if
 
 !Broadcast sc_lookup(nqat,natyps+nqat,nstates)
-if (nstates.ne.0) then
-call MPI_Bcast(sc_lookup, size(sc_lookup), MPI_REAL8, 0, MPI_COMM_WORLD,ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast sc_lookup')
-else
-call MPI_Bcast(sc_lookup,  nstates, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast sc_lookup')
-end if
+call MPI_Type_contiguous(nqat, MPI_REAL8, mpitype_batch, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Type_contiguous')
+call MPI_Type_contiguous(natyps + nqat, mpitype_batch, mpitype_batch2, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Type_contiguous')
+call MPI_Type_commit(mpitype_batch2, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Type_commit')
+call MPI_Bcast(sc_lookup, nstates, mpitype_batch2, 0, MPI_COMM_WORLD, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qconn')
+call MPI_Type_free(mpitype_batch2, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Type_free')
+
 
 ! integer(AI) ::  iqseq(nqat)
 !Change to mpi_type_create  (AI)
 call MPI_Bcast(iqseq, nqat, MPI_INTEGER4, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast iqseq')
+if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qatom data batch 2')
 
 !  integer ::  qiac(nqat,nstates)
-if (nstates.ne.0) then
-call MPI_Bcast(qiac, size(qiac), MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+call MPI_Type_contiguous(nqat, MPI_INTEGER, mpitype_batch, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Type_contiguous')
+call MPI_Type_commit(mpitype_batch, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Type_commit')
+call MPI_Bcast(qiac, nstates, mpitype_batch, 0, MPI_COMM_WORLD, ierr)
 if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qiac')
-else
-call MPI_Bcast(qiac, nstates, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qiac')
-end if
+call MPI_Type_free(mpitype_batch, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Type_free')
+
 ! real(4) ::  qcrg(nqat,nstates)
-if (nstates.ne.0) then
-call MPI_Bcast(qcrg, size(qcrg), MPI_REAL4, 0, MPI_COMM_WORLD, ierr)
+call MPI_Type_contiguous(nqat, MPI_REAL4, mpitype_batch, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Type_contiguous')
+call MPI_Type_commit(mpitype_batch, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Type_commit')
+call MPI_Bcast(qcrg, nstates, mpitype_batch, 0, MPI_COMM_WORLD, ierr)
 if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qcrg')
-else
-call MPI_Bcast(qcrg, nstates, MPI_REAL4, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qcrg')
-end if
+call MPI_Type_free(mpitype_batch, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Type_free')
+
 
 if(qvdw_flag) then
 !MN20030409-> Havn't tried with qvdw_flag == .true.
 ! qavdw and qbvdw share the same format: real(8) qxvdw(nqlib,nljtyp)
-if (nstates.ne.0) then
-call MPI_Bcast(qavdw, size(qavdw), MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
+call MPI_Type_contiguous(nqlib, MPI_REAL8, mpitype_batch, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Type_contiguous')
+call MPI_Type_commit(mpitype_batch, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Type_commit')
+call MPI_Bcast(qavdw, nljtyp, mpitype_batch, 0, MPI_COMM_WORLD, ierr)
 if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qavdw')
-call MPI_Bcast(qbvdw, size(qbvdw), MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
+call MPI_Bcast(qbvdw, nljtyp, mpitype_batch, 0, MPI_COMM_WORLD, ierr)
 if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qbvdw')
-else
-call MPI_Bcast(qavdw, nljtyp, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qavdw')
-call MPI_Bcast(qbvdw, nljtyp, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qbvdw')
+call MPI_Type_free(mpitype_batch, ierr)
+if (ierr .ne. 0) call die('init_nodes/MPI_Type_free')
 end if
-end if
+
 if (nstates .gt. 0) then
 ! Broadcast EQ(:)%lambda
 allocate(temp_lambda(1:nstates), stat=alloc_status)
@@ -2640,12 +2792,12 @@ integer						::	mask_rows
 !  nrstr_dist, [rstdis] (allocating memory for rstdis)
 !  nrstr_wall, [rstwal] (allocating memory for rstwal)
 
-! external definition of iargc disabled for gfortran
-!integer(4) iargc
-!external iargc
+! external definition of iargc
+integer(4) iargc
+external iargc
 
 ! read name of input file from the command line
-num_args = command_argument_count()
+num_args = iargc()
 if (num_args .lt. 1) call die('no input file specified on the command line')
 #if defined(CRAY)
 call pxfgetarg(num_args, infilename, 200, i)
@@ -2791,7 +2943,7 @@ if(tau_T < dt) then
         initialize = .false.
 end if
 
-yes = prm_get_logical_by_key('separate_scaling', separate_scaling, .true.)
+yes = prm_get_logical_by_key('separate_scaling', separate_scaling, .false.)
 if(separate_scaling) then
 	   write(*,'(a)') 'Solute and solvent atoms coupled separately to heat bath.'
 else 
@@ -2831,7 +2983,7 @@ end if
 write(*,17) 'all bonds to hydrogen', onoff(shake_hydrogens)
 
 
-       yes = prm_get_logical_by_key('lrf', use_LRF, .true.)
+       yes = prm_get_logical_by_key('lrf', use_LRF, .false.)
        if(use_LRF) then
                write(*,20) 'LRF Taylor expansion outside cut-off'
        else 
@@ -2925,24 +3077,6 @@ if( .not. box ) then
                         write(*,47) fk_pshell
                 end if
 47		format('Shell restraint force constant         =',f8.2)
-                if(.not. prm_get_real8_by_key('excluded_force', fk_fix   )) then
-                        write(*,'(a)') 'Excluded atoms force constant set to default'
-                        fk_fix = fk_fix_default
-                end if
-                if(fk_fix > 0) then
-                        write(*,48) fk_fix
-                else
-                        fk_fix = fk_fix_default
-                        write(*,'(a)')'Shell restraint force constant can not be less-equal zero, set to default'
-                        write(*,48) fk_fix
-                end if
-48              format('Excluded atom restraint force constant         =',f8.2)
-
-                yes = prm_get_logical_by_key('excluded_freeze', freeze, .false.)
-                if(freeze) then
-                        write(*,'(a)') &
-                                'Excluded atoms will not move.'
-                end if
 
                 yes = prm_get_logical_by_key('exclude_bonded', exclude_bonded, .false.)
                 if(exclude_bonded) then
@@ -3295,54 +3429,18 @@ if ( nrstr_dist .gt. 0 ) then
 132		format (i6,1x,i6,3f8.2,i8)
 end if
 
-! --- nrstr_angl, [rstang]
-nrstr_angl = prm_count('angle_restraints')
-135     format (/,'No. of angle restraints =',i10)
-if ( nrstr_angl .gt. 0 ) then
-        write (*,135) nrstr_angl
-        ! allocate memory for rstang
-        allocate(rstang(nrstr_angl), stat=alloc_status)
-        call check_alloc('restraint list')
-        write (*,140)
-140             format ('atom_i atom_j atom_k   angle   fc        state')
-        do i=1,nrstr_angl
-                yes=prm_get_line(text)
-                ! read rstang(i)
-                !if(scan(text, ':') > 0) then !got res:atnr
-                  !Store in i&j as res:atnr and assign atom nr after topology is
-                  !read (prep_coord)
-                !  read(text,*, iostat=fstat) rstang(i)%itext,rstang(i)%jtext,rstang(i)%ktext,&
-                !     rstang(i)%ang, rstang(i)%fk, rstang(i)%ipsi
-                !else !Plain numbers
-                  read(text,*, iostat=fstat) rstang(i)%i,rstang(i)%j,rstang(i)%k,&
-                        rstang(i)%ang, rstang(i)%fk, rstang(i)%ipsi
-                 ! rstang(i)%itext = 'nil'
-                 ! rstang(i)%jtext = 'nil'
-                 ! rstang(i)%ktext = 'nil'
-                !end if
-                if(fstat /= 0) then
-                  write(*,'(a)') '>>> ERROR: Invalid angle restraint data.'
-                  initialize = .false.
-                  exit
-                end if
-                write (*,142) rstang(i)%i,rstang(i)%j,rstang(i)%k,rstang(i)%ang,rstang(i)%fk, &
-                        rstang(i)%ipsi
-        end do
-142             format (i6,1x,i6,1x,i6,2f8.2,i8)
-end if
-
 
 if (.not. box )then
 ! --- nrstr_wall, [rstwal]
 nrstr_wall = prm_count('wall_restraints')
-145 format (/,'No. of wall sequence restraints=',i10)
+135 format (/,'No. of wall sequence restraints=',i10)
 if ( nrstr_wall .gt. 0) then
-        write (*,145) nrstr_wall
+        write (*,135) nrstr_wall
         ! allocate memory for rstwal
         allocate(rstwal(nrstr_wall), stat=alloc_status)
         call check_alloc('restraint list')
-        write (*,150)
-150  format ('atom_i atom_j   dist.      fc  aMorse  dMorse  H-flag')
+        write (*,140)
+140		format ('atom_i atom_j   dist.      fc  aMorse  dMorse  H-flag')
         do i=1,nrstr_wall
                 ! read rstwal(:)
                 yes = prm_get_line(text)
@@ -3353,9 +3451,9 @@ if ( nrstr_wall .gt. 0) then
                         initialize = .false.
                         exit
                 end if
-                write (*,152) rstwal(i)     
+                write (*,142) rstwal(i)     
         end do
-152  format (i6,1x,i6,4f8.2,i8)
+142		format (i6,1x,i6,4f8.2,i8)
 end if
 end if
 
@@ -3692,47 +3790,28 @@ write (*,132) rstdis(i)%i,rstdis(i)%j,rstdis(i)%d1,rstdis(i)%fk, &
   rstdis(i)%ipsi
 end do
 132 format (i6,1x,i6,2f8.2,i8)
-! --- nrstr_ang, [rstang]
-read (fu,*) nrstr_angl
-write (*,135) nrstr_angl
-135 format ('No. angle rstrs =',i10)
-if ( nrstr_angl .gt. 0 ) then
-! allocate memory for rstang
-allocate(rstang(nrstr_angl), stat=alloc_status)
-call check_alloc('restraint list')
-write (*,140)
-end if
-140 format ('atom_i atom_j atom_k   angle      fc  istate')
-do i=1,nrstr_angl
-! read rstang(i)
-read (fu,*) rstang(i)%i,rstang(i)%j,rstang(i)%k,rstang(i)%ang, &
-  rstang(i)%fk,rstang(i)%ipsi
-write (*,142) rstang(i)%i,rstang(i)%j,rstang(i)%k,rstang(i)%ang, &
-  rstang(i)%fk,rstang(i)%ipsi
-end do
-142 format (i6,1x,i6,1x,i6,2f8.2,i8)
 
 ! --- nrstr_wall, [rstwal]
 read (fu,*) nrstr_wall
-write (*,145) nrstr_wall
-145 format ('No. wall seq. rstrs=',i10)
+write (*,135) nrstr_wall
+135 format ('No. wall seq. rstrs=',i10)
 if ( nrstr_wall .gt. 0) then
 
 
 ! allocate memory for rstwal
 allocate(rstwal(nrstr_wall), stat=alloc_status)
 call check_alloc('restraint list')
-write (*,150)
+write (*,140)
 end if
-150 format ('atom_i atom_j   dist.      fc  H-flag')
+140 format ('atom_i atom_j   dist.      fc  H-flag')
 do i=1,nrstr_wall
 ! read rstwal(:)
 read (fu,*) rstwal(i)%i,rstwal(i)%j,rstwal(i)%d,rstwal(i)%fk, &
   rstwal(i)%ih
-write (*,152) rstwal(i)%i,rstwal(i)%j,rstwal(i)%d,rstwal(i)%fk, &
+write (*,142) rstwal(i)%i,rstwal(i)%j,rstwal(i)%d,rstwal(i)%fk, &
   rstwal(i)%ih     
 end do
-152 format (i6,1x,i6,2f8.2,i8)
+142 format (i6,1x,i6,2f8.2,i8)
 
 read (fu,'(a80)') text
 write (*,157) 
@@ -4115,11 +4194,11 @@ do istep = 0, nsteps-1
                         ! print timing info
                         call centered_heading('Timing', '-')
                         time1 = rtime()
-                        time_per_step = 1000*(time1-time0)/NBcycle
-                        time_completion = int(time_per_step*(nsteps-istep)/60000)
+                        time_per_step = (time1-time0)/NBcycle
+                        time_completion = int(time_per_step*(nsteps-istep)/60)
                         time0 = time1
                         write(*,222) time_per_step, time_completion
-222    format('Milliseconds per step (wall-clock): ',f5.2,&
+222				format('Seconds per step (wall-clock): ',f5.2,&
                                 ' Estimated completion in',i6,' minutes')
                 end if
 
@@ -6211,6 +6290,7 @@ nbpw_pair = 0
 rcut2 = Rcpw*Rcpw
 
 
+
 igloop:  do ig = calculation_assignment%pw%start, calculation_assignment%pw%end
 
 !	   --- excluded group ? ---
@@ -7612,7 +7692,7 @@ do iq = 1, nqat - 1
                        l=qq_el_scale(i)%jqat
                        if ((iq == k .and. jq == l) .or. &
                          (iq == l .and. jq == k)) then
-                           nbqq(nbqq_pair(is),is)%el_scale = qq_el_scale(i)%el_scale(is)!masoud
+                           nbqq(nbqq_pair(is),is)%el_scale = qq_el_scale(i)%el_scale
 						   set=.true.
 						   exit
                        end if
@@ -9027,6 +9107,7 @@ do par=1,monitor_group_pairs
                                 bLJi=iaclib(iaci)%bvdw(LJ_code)
                                 aLJj=iaclib(iacj)%avdw(LJ_code)
                                 bLJj=iaclib(iacj)%bvdw(LJ_code)   
+
                                 if (qatomi /= 0) qi = qcrg(qatomi,istate) 
                                 if (qatomj /= 0) qj = qcrg(qatomj,istate) 
                                 if (qvdw_flag) then
@@ -9265,6 +9346,7 @@ subroutine nonbon2_pp_box
     dx1b  = x(pb%j*3-2) - x(pb%i*3-2)
     dx2a  = x(pa%j*3-1) - x(pa%i*3-1)
     dx2b  = x(pb%j*3-1) - x(pb%i*3-1)
+
     dx3a  = x(pa%j*3-0) - x(pa%i*3-0)
     dx3b  = x(pb%j*3-0) - x(pb%i*3-0)
 	dx1a = dx1a - nbpp_cgp(ga)%x         
@@ -11490,6 +11572,7 @@ do jw = 1, nbqw_pair
                 do istate = 1, nstates
                         ! for every state:
                         ! calculate iaci, aLJ and bLJ
+
                         if (qvdw_flag) then
                                 aLJ  = qavdw(qiac(iq,istate),1)
                                 bLJ  = qbvdw(qiac(iq,istate),1)
@@ -13057,14 +13140,14 @@ end subroutine offdiag
 !-----------------------------------------------------------------------
 subroutine p_restrain
 ! *** Local variables
-integer :: ir,i,j,k,i3,j3,k3,istate, n_ctr
-real(8) :: fk,r2,erst,Edum,x2,y2,z2,wgt,b,db,dv, totmass, theta,rij,r2ij,rjk,r2jk, scp,f1
-real(8) :: dr(3), dr2(3), ctr(3), di(3), dk(3)
+integer						::	ir,i,j,k,i3,j3,istate, n_ctr
+real(8)						::	fk,r2,erst,Edum,x2,y2,z2,wgt,b,db,dv, totmass
+real(8)						::	dr(3), ctr(3)
 real(8)						::	fexp
 
 ! global variables used:
 !  E, nstates, EQ, nrstr_seq, rstseq, heavy, x, xtop, d, nrstr_pos, rstpos, nrstr_dist, 
-!  rstdis, nrstr_wall, rstang, nrstr_ang, rstwal, xwcent, excl, freeze
+!  rstdis, nrstr_wall, rstwal, xwcent
 
 ! sequence restraints (independent of Q-state)
 do ir = 1, nrstr_seq
@@ -13079,7 +13162,7 @@ if(rstseq(ir)%to_centre == 1) then     ! Put == 1, then equal to 2
 
   ! calculate deviation from center
   do i = rstseq(ir)%i, rstseq(ir)%j
-        if ( heavy(i) .or. rstseq(ir)%ih .eq. 1 .and.(.not.(excl(i).and.freeze))) then
+        if ( heavy(i) .or. rstseq(ir)%ih .eq. 1 ) then
           n_ctr = n_ctr + 1
           dr(:) = dr(:) + x(i*3-2:i*3) - xtop(i*3-2:i*3)
         end if
@@ -13096,7 +13179,7 @@ if(rstseq(ir)%to_centre == 1) then     ! Put == 1, then equal to 2
 
         ! apply same force to all atoms
         do i = rstseq(ir)%i, rstseq(ir)%j
-        if ( heavy(i) .or. rstseq(ir)%ih .eq. 1 .and.(.not.(excl(i).and.freeze))) then
+          if ( heavy(i) .or. rstseq(ir)%ih .eq. 1 ) then
                 d(i*3-2:i*3) = d(i*3-2:i*3) + fk*dr(:)*iaclib(iac(i))%mass/12.010
           end if
         end do
@@ -13110,7 +13193,7 @@ else if(rstseq(ir)%to_centre == 2) then     ! Put == 1, then equal to 2
   
 ! calculate deviation from mass center
   do i = rstseq(ir)%i, rstseq(ir)%j
-        if ( heavy(i) .or. rstseq(ir)%ih .eq. 1 .and.(.not.(excl(i).and.freeze))) then
+        if ( heavy(i) .or. rstseq(ir)%ih .eq. 1 ) then
           totmass = totmass + iaclib(iac(i))%mass                              ! Add masses
           dr(:) = dr(:) + (x(i*3-2:i*3) - xtop(i*3-2:i*3))*iaclib(iac(i))%mass ! Massweight distances
 		end if
@@ -13127,7 +13210,7 @@ else if(rstseq(ir)%to_centre == 2) then     ! Put == 1, then equal to 2
 
         ! apply same force to all atoms
         do i = rstseq(ir)%i, rstseq(ir)%j
-        if ( heavy(i) .or. rstseq(ir)%ih .eq. 1 .and.(.not.(excl(i).and.freeze))) then
+          if ( heavy(i) .or. rstseq(ir)%ih .eq. 1 ) then
                 d(i*3-2:i*3) = d(i*3-2:i*3) + fk*dr(:)
           end if
         end do
@@ -13136,7 +13219,7 @@ else if(rstseq(ir)%to_centre == 2) then     ! Put == 1, then equal to 2
 else 
   ! restrain each atom to its topology co-ordinate
   do i = rstseq(ir)%i, rstseq(ir)%j
-        if ( heavy(i) .or. rstseq(ir)%ih .eq. 1 .and.(.not.(excl(i).and.freeze))) then
+        if ( heavy(i) .or. rstseq(ir)%ih .eq. 1 ) then
           i3 = i*3-3
 
           dr(1)   = x(i3+1) - xtop(i3+1)
@@ -13254,105 +13337,6 @@ EQ(istate)%restraint = EQ(istate)%restraint + Edum
 end if
 end do
 
-! atom-atom-atom angle restraints (Q-state dependent)
-do ir = 1, nrstr_angl
-
-istate = rstang(ir)%ipsi
-i      = rstang(ir)%i
-j      = rstang(ir)%j
-k      = rstang(ir)%k
-i3     = i*3-3
-j3     = j*3-3
-k3     = k*3-3
-
-! distance from atom i to atom j
-dr(1)  = x(i3+1) - x(j3+1)
-dr(2)  = x(i3+2) - x(j3+2)
-dr(3)  = x(i3+3) - x(j3+3)
-
-! distance from atom k to atom j
-dr2(1) = x(k3+1) - x(j3+1)
-dr2(2) = x(k3+2) - x(j3+2)
-dr2(3) = x(k3+3) - x(j3+3)
-
-! if PBC then adjust lengths according to periodicity - MA
-if( use_PBC ) then
-        dr(1) = dr(1) - boxlength(1)*nint( dr(1)*inv_boxl(1) )
-        dr(2) = dr(2) - boxlength(2)*nint( dr(2)*inv_boxl(2) )
-        dr(3) = dr(3) - boxlength(3)*nint( dr(3)*inv_boxl(3) )
-
-        dr2(1) = dr2(1) - boxlength(1)*nint( dr2(1)*inv_boxl(1) )
-        dr2(2) = dr2(2) - boxlength(2)*nint( dr2(2)*inv_boxl(2) )
-        dr2(3) = dr2(3) - boxlength(3)*nint( dr2(3)*inv_boxl(3) )
-
-end if
-
-if ( istate .ne. 0 ) then
-wgt = EQ(istate)%lambda
-else
-wgt = 1.0
-end if
-
-! square distances from the triangle formed by the atoms i, j and k
-r2ij = dr(1)**2 + dr(2)**2 + dr(3)**2
-r2jk = dr2(1)**2 + dr2(2)**2 + dr2(3)**2
-
-rij  = sqrt ( r2ij )
-rjk  = sqrt ( r2jk )
-
-! calculate the scalar product (scp) and the angle theta from it
-scp = ( dr(1)*dr2(1) + dr(2)*dr2(2) + dr(3)*dr2(3) )
-scp = scp / ( rij*rjk )
-
-! criteria inserted on the real angle force calculations to ensure no weird scp.
-if ( scp .gt.  1.0 ) scp =  1.0
-if ( scp .lt. -1.0 ) scp = -1.0
-
-theta = acos(scp)
-db    = theta - (rstang(ir)%ang)*deg2rad
-
-! dv is the force to be added in module
-Edum   = 0.5*rstang(ir)%fk*db**2
-dv     = wgt*rstang(ir)%fk*db
-
-! calculate sin(theta) to use in forces
-f1 = sin ( theta )
-if ( abs(f1) .lt. 1.e-12 ) then
-        ! avoid division by zero
-        f1 = -1.e12
-else
-        f1 =  -1.0 / f1
-end if
-
-        ! calculate di and dk
-di(1) = f1 * ( dr2(1) / ( rij * rjk ) - scp * dr(1) / r2ij )
-di(2) = f1 * ( dr2(2) / ( rij * rjk ) - scp * dr(2) / r2ij )
-di(3) = f1 * ( dr2(3) / ( rij * rjk ) - scp * dr(3) / r2ij )
-dk(1) = f1 * ( dr(1) / ( rij * rjk ) - scp * dr2(1) / r2jk )
-dk(2) = f1 * ( dr(2) / ( rij * rjk ) - scp * dr2(2) / r2jk )
-dk(3) = f1 * ( dr(3) / ( rij * rjk ) - scp * dr2(3) / r2jk )
-
-        ! update d
-d(i3+1) = d(i3+1) + dv*di(1)
-d(i3+2) = d(i3+2) + dv*di(2)
-d(i3+3) = d(i3+3) + dv*di(3)
-d(k3+1) = d(k3+1) + dv*dk(1)
-d(k3+2) = d(k3+2) + dv*dk(2)
-d(k3+3) = d(k3+3) + dv*dk(3)
-d(j3+1) = d(j3+1) - dv*( di(1) + dk(1) )
-d(j3+2) = d(j3+2) - dv*( di(2) + dk(2) )
-d(j3+3) = d(j3+3) - dv*( di(3) + dk(3) )
-
-
-if ( istate .eq. 0 ) then
-do k = 1, nstates
-EQ(k)%restraint = EQ(k)%restraint + Edum
-end do
-if ( nstates .eq. 0 ) E%restraint%protein = E%restraint%protein + Edum
-else
-EQ(istate)%restraint = EQ(istate)%restraint + Edum
-end if
-end do
 if( .not. use_PBC ) then
 ! extra half-harmonic wall restraints
 do ir = 1, nrstr_wall
@@ -13484,7 +13468,8 @@ start_loop_time1 = rtime()
 #endif
 call pot_energy_bonds
 #if defined (PROFILING)
-profile(8)%time = profile(8)%time + rtime() - start_loop_time1
+start_loop_time3 = rtime()
+profile(8)%time = profile(8)%time + start_loop_time3 - start_loop_time1
 #endif
 
 ! various restraints
@@ -13501,6 +13486,9 @@ if( .not. use_PBC ) then
         end if
 end if
 
+#if defined (PROFILING)
+profile(9)%time = profile(9)%time + rtime() - start_loop_time3
+#endif
 ! q-q nonbonded interactions
 if(.not. qq_use_library_charges) then
         if(ivdw_rule .eq. 1 ) then
@@ -13525,9 +13513,6 @@ do istate = 1, nstates
   call qtorsion (istate)
   call qimproper (istate)
 end do
-#if defined (PROFILING)
-profile(9)%time = profile(9)%time + rtime() - start_loop_time1 - profile(8)%time
-#endif
 #if defined(USE_MPI)
 else  !Slave nodes
 call gather_nonbond
@@ -13536,9 +13521,7 @@ end if
 
 if (nodeid .eq. 0) then 
 #if (USE_MPI)
-do i = 1, 3
-    call MPI_WaitAll(numnodes-1,request_recv(1,i),mpi_status,ierr)
-end do
+call MPI_WaitAll(numnodes-1,request_recv,mpi_status,ierr)
 
 !Forces and energies are summarised
 do i=1,numnodes-1
@@ -13836,7 +13819,7 @@ subroutine make_shell
    end if
 	end do
 	write(*,105) nshellats, rexcl_i, rexcl_o
-105	format('Found   ',i6,' solute atoms in the restrained shell region (',f6.2,' to ',f6.2,')')
+105	format('Found   ',i6,' solute atoms in the restrained shell region (',f6.2,' to ',f6.2,'Å)')
 end subroutine make_shell
 
 !------------------------------------------------------------------------
@@ -14135,7 +14118,9 @@ do im = 1, nang_coupl
 	  !couple improper to bond breaking not making
 	  if ( iang_coupl(3,im) .eq. 1) gamma = 1 - gamma
    end if
+
 end do
+
 
 i  = qang(ia)%i
 j  = qang(ia)%j
@@ -14682,8 +14667,8 @@ if(exclude_bonded) then
                 ('Eliminating torsions & impropers for excluded atoms', '-')
 end if
 
-10	format('Reduced number of ',a,t31,'from ',i8,' to ')
-12	format(i8)
+10	format('Reduced number of ',a,t31,'from ',i5,' to ')
+12	format(i5)
 
 i = 1
 removed = 0
@@ -15049,7 +15034,6 @@ do iw = ncgp_solute + 1, ncgp
                   dv = -2.*Dwmz*awmz*(fexp-fexp*fexp)/b
                 else
                   dv = 0
-                  erst = 0
                 end if
         end if
 
@@ -15519,8 +15503,8 @@ write(*,'(80a)') '==============================================================
 
 22	format('type   st lambda',2A10)
 26	format('type   st lambda',6a10)
-32	format (a,T8,i2,f7.4,2f10.2)
-36	format (a,T8,i2,f7.4,6f10.2)
+32	format (a,T8,i2,1x,f6.4,2f10.2)
+36	format (a,T8,i2,1x,f6.4,6f10.2)
 37  format ('pair   Vwsum    Vwel    Vwvdw')
 38  format (3(i4,':Vel',i3,':Vvdw'))
 39  format (i2,f10.2,f8.2,f9.2)
@@ -15804,7 +15788,7 @@ end if
 
 #if defined(USE_MPI)
 !Update modified coordinates  
-call MPI_Bcast(x, natom*3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
+call MPI_Bcast(x, natom*3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr) !this is already done in NB_update i think... need to check
 if (ierr .ne. 0) call die('init_nodes/MPI_Bcast x')
 #endif
 
@@ -15935,7 +15919,9 @@ end if
 #if defined(USE_MPI)
 !Update modified coordinates and boxlengths 
 call MPI_Bcast(x, natom*3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast x')
+if (ierr .ne. 0) call die('MC_volume/MPI_Bcast x')
+call MPI_Bcast(xx, natom*3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
+if (ierr .ne. 0) call die('MC_volume/MPI_Bcast x')
 call MPI_Bcast(boxlength, 3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
 call MPI_Bcast(inv_boxl, 3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
 #endif
@@ -15984,12 +15970,23 @@ if (nodeid .eq. 0) then
 
 	volume_try = volume_try + 1
 	write(*,'(a)') '---------- After move' 
+end if !nodeid eq 0
+
+
+!broadcast acc to all nodes (this entire MC_volume is probably a rather slow parallel implementation)
+#if defined(USE_MPI)
+call MPI_Bcast(acc, 1, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
+#endif
 
 if( acc ) then
+	if (nodeid .eq. 0) then
 		write(*,'(a)') 'Volume change accepted'
 		volume_acc = volume_acc + 1
+	end if !(nodeid .eq. 0)
 else
+	if (nodeid .eq. 0) then
 		write(*,'(a)') 'Volume change rejected'
+	end if !(nodeid .eq. 0)
 
         !put stuff back to what they were before
         x(:) = old_x(:)
@@ -16048,6 +16045,7 @@ else
 	end if
 end if
 
+if (nodeid .eq. 0) then
 	write(*,11) boxlength(1)*boxlength(2)*boxlength(3)
 	write(*,12) boxlength
 	write(*,13) sum(mass(:))/(boxlength(1)*boxlength(2)*boxlength(3)*1E-24*6.02E23)
@@ -16061,17 +16059,6 @@ end if
 	7 format(A,T17, 2i10, f10.3)
 	write(*,'(80a)') '==============================================================================='
 end if !(nodeid .eq. 0)
-#if defined(USE_MPI)
-!Make slave nodes put things back if rejected
-call MPI_Bcast(acc, 1, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
-if (.not. acc) then
-  if (nodeid .ne. 0) then
-    x(:) = old_x(:)
-    boxlength(:) = old_boxl(:)
-    inv_boxl(:) = old_inv(:)
-  end if
-end if
-#endif
 end subroutine MC_volume	
 
 !-----------------------------------------------------------------------------------------------------
@@ -16185,9 +16172,7 @@ end if
 
 if (nodeid .eq. 0) then 
 #if (USE_MPI)
-do i = 1, 3
-    call MPI_WaitAll((numnodes-1),request_recv(1,i),mpi_status,ierr)
-end do
+	call MPI_WaitAll((numnodes-1),request_recv,mpi_status,ierr)
 
 	!Forces and energies are summarised
 	do i=1,numnodes-1
@@ -16219,10 +16204,17 @@ end do
 	end do
 
 
-E%potential = old%p%bond + old%w%bond + old%p%angle + old%w%angle + old%p%torsion + &
-old%p%improper + E%pp%el + E%pp%vdw + E%pw%el + E%pw%vdw + E%ww%el + &
-E%ww%vdw + old%q%bond + old%q%angle + old%q%torsion + &
-old%q%improper + E%qx%el + E%qx%vdw + E%restraint%protein + E%LRF
+	! commented out because bonds are explicitly calculated now
+	!E%potential = old%p%bond + old%w%bond + old%p%angle + old%w%angle + old%p%torsion + &
+	!old%p%improper + E%pp%el + E%pp%vdw + E%pw%el + E%pw%vdw + E%ww%el + &
+	!E%ww%vdw + old%q%bond + old%q%angle + old%q%torsion + &
+	!old%q%improper + E%qx%el + E%qx%vdw + E%restraint%protein + E%LRF
+
+
+	E%potential = E%p%bond + E%w%bond + E%p%angle + E%w%angle + E%p%torsion + &
+	E%p%improper + E%pp%el + E%pp%vdw + E%pw%el + E%pw%vdw + E%ww%el + &
+	E%ww%vdw + E%q%bond + E%q%angle + E%q%torsion + &
+	E%q%improper + E%qx%el + E%qx%vdw + E%restraint%protein + E%LRF
 
 
 end if !(nodeid .eq. 0)
@@ -16242,35 +16234,57 @@ end subroutine new_potential
 subroutine gather_nonbond()
 
 integer,parameter                       :: vars=3
-integer,dimension(3,numnodes-1)         :: tag
+integer,dimension(numnodes-1)           :: tag
 integer,dimension(vars)	                :: blockcnt,ftype 
-integer(kind=MPI_ADDRESS_KIND), dimension(vars)	:: fdisp, base
+integer(8)          :: fdisp(vars), base(vars)
 integer                                 :: mpitype_package,mpitype_send
 integer                                 :: i,istate
 
 do i=1,numnodes-1
-tag(1,i)=numnodes*100+i
-tag(2,i)=numnodes*200+i
-tag(3,i)=numnodes*300+i
+tag(i)=100+i
 end do
 
+  blockcnt(1)=natom*3
+  blockcnt(2)=2*3+1
+  blockcnt(3)=4*nstates
+
 if (nodeid .eq. 0) then        !master
+  ftype(:) = MPI_REAL8
+  call MPI_Get_Address  (d_recv, base(1), ierr)
+  call MPI_Get_Address  (E_recv, base(2), ierr)
+  call MPI_Get_Address  (EQ_recv, base(3), ierr)
 
 
-! Post receives for each of the d/E/EQ_recv structures
-! E/EQ_Recv should really be handled with MPI_Type_create_struct
-! and d_recv's type should be handled correctly (it's KIND=wp8)
-! should preferably use size(d_recv, 1) for count
 do i = 1,numnodes-1
-  call MPI_IRecv(d_recv(1,i), natom*3, MPI_REAL8, i, tag(1,i), MPI_COMM_WORLD, &
-       request_recv(i,1),ierr)
-  if (ierr .ne. 0) call die('gather_nonbond/MPI_IRecv d_recv')
-  call MPI_IRecv(E_recv(i), 3*2+1, MPI_REAL8, i, tag(2,i), MPI_COMM_WORLD, &
-       request_recv(i,2),ierr)
-  if (ierr .ne. 0) call die('gather_nonbond/MPI_IRecv E_recv')
-  call MPI_IRecv(EQ_recv(1,i), nstates*2*2, MPI_REAL8, i, tag(3,i), MPI_COMM_WORLD, &
-       request_recv(i,3),ierr)
-  if (ierr .ne. 0) call die('gather_nonbond/MPI_IRecv EQ_recv')
+  !Move fdisp to the begining of the corresponding column
+  fdisp(1)=base(1) + ((i-1)*blockcnt(1))*8
+  fdisp(2)=base(2) + ((i-1)*blockcnt(2))*8
+  fdisp(3)=base(3) + ((i-1)*blockcnt(3))*8
+  
+  !Make fdisp relative to base(1)  (i.e. relative to d_recv) solves some MPI implementation bugs
+  fdisp(1) = fdisp(1) - base(1)
+  fdisp(2) = fdisp(2) - base(1)
+  fdisp(3) = fdisp(3) - base(1)
+
+  call MPI_Type_create_struct(vars, blockcnt, fdisp, ftype, mpitype_package, ierr)
+  if (ierr .ne. 0) call die('gather_nonbond/MPI_Type_create_struct')
+
+  call MPI_Type_commit(mpitype_package, ierr)
+  if (ierr .ne. 0) call die('gather_nonbond/MPI_Type_commit')
+
+
+!  Commented out because of MPI implementation bugs with MPI_BOTTOM
+!  call MPI_IRecv(MPI_BOTTOM,1,mpitype_package,i,tag(i),MPI_COMM_WORLD, &
+!       request_recv(i),ierr)
+
+!  Below should work on most MPI implementations. Note: We're not just receiving d_recv... addresses are relative to d_recv
+  call MPI_IRecv(d_recv,1,mpitype_package,i,tag(i),MPI_COMM_WORLD, &
+       request_recv(i),ierr)
+
+  if (ierr .ne. 0) call die('gather_nonbond/MPI_Recv')
+
+  call MPI_Type_free(mpitype_package, ierr)
+  if (ierr .ne. 0) call die('gather_nonbond/MPI_Type_free')
 end do
 
 else                  !slave nodes
@@ -16286,14 +16300,32 @@ EQ_send(1:nstates)%qp%vdw = EQ(1:nstates)%qp%vdw
 EQ_send(1:nstates)%qw%el  = EQ(1:nstates)%qw%el
 EQ_send(1:nstates)%qw%vdw = EQ(1:nstates)%qw%vdw
 
-! See comments above on the IRecv part
-call MPI_Send(d, natom*3, MPI_REAL8, 0, tag(1,nodeid), MPI_COMM_WORLD,ierr) 
-if (ierr .ne. 0) call die('gather_nonbond/Send d')
-call MPI_Send(E_send, 3*2+1, MPI_REAL8, 0, tag(2,nodeid), MPI_COMM_WORLD,ierr) 
-if (ierr .ne. 0) call die('gather_nonbond/Send E_send')
-call MPI_Send(EQ_send, nstates*2*2, MPI_REAL8, 0, tag(3,nodeid), MPI_COMM_WORLD,ierr) 
-if (ierr .ne. 0) call die('gather_nonbond/Send EQ_send')
+ftype(:) = MPI_REAL8
+call MPI_Get_Address  (d, fdisp(1), ierr)
+call MPI_Get_Address  (E_send, fdisp(2), ierr)
+call MPI_Get_Address  (EQ_send, fdisp(3), ierr)
 
+!Make fdisp relative to fdisp(1)  (i.e. relative to d) solves some MPI implementation bugs
+  fdisp(2) = fdisp(2) - fdisp(1)
+  fdisp(3) = fdisp(3) - fdisp(1)
+  fdisp(1) = 0
+
+call MPI_Type_create_struct(vars, blockcnt, fdisp, ftype, mpitype_package, ierr)
+if (ierr .ne. 0) call die('gather_nonbond/MPI_Type_create_struct')
+
+call MPI_Type_commit(mpitype_package, ierr)
+if (ierr .ne. 0) call die('gather_nonbond/MPI_Type_commit')
+
+!  Commented out because of MPI implementation bugs with MPI_BOTTOM
+!call MPI_Send(MPI_BOTTOM,1,mpitype_package,0,tag(nodeid),MPI_COMM_WORLD,ierr) 
+!if (ierr .ne. 0) call die('gather_nonbond/SSend')
+
+!  Below should work on most MPI implementations. Note: We're not just receiving d... addresses are relative to d
+call MPI_Send(d,1,mpitype_package,0,tag(nodeid),MPI_COMM_WORLD,ierr) 
+if (ierr .ne. 0) call die('gather_nonbond/SSend')
+
+call MPI_Type_free(mpitype_package, ierr)
+if (ierr .ne. 0) call die('gather_nonbond/MPI_Type_free')
 end if
 end subroutine gather_nonbond
 

@@ -5,19 +5,19 @@
 ### -i-static -static
 # Put your favorite compilers and flags here.
 FC=		ifort
-CC=		icc
+CC=		gcc
 MPIFC=		mpif90
-FC_OPT=         -O3 -ip -ipo -unroll -i-static
-CC_OPT=         -O3
-MPIFLAGS=	-f90=${FC} -Nmpi
-MPI_FC=        ${FC}
-MPI_CC=        ${CC}
-FFLAGS=         -fstack-protector ${FC_OPT}
-CCFLAGS=        ${CC_OPT}
-MPI_FCFLAGS=   ${FFLAGS}
-MPI_CXXFLAGS=  ${CCFLAGS}
-FLIBS=          -Vaxlib
-FPP_FLG=        -fpp
+FC_OPT=		-xHost -O3 -ip -ipo -unroll -i-static 
+CC_OPT=		-O3
+#MPIFLAGS=	-f90=${FC}
+OMPI_FC=	${FC}
+OMPI_CC=	${CC}	
+FFLAGS=		-fstack-protector ${FC_OPT}
+CCFLAGS=	${CC_OPT}
+OMPI_FCFLAGS=	${FFLAGS}
+OMPI_CXXFLAGS=	${CCFLAGS}
+FLIBS=		-Vaxlib
+FPP_FLG=	-fpp  
 # 
 ###
 
@@ -31,19 +31,13 @@ default: what
 all:	Qfep5 Qprep5 Qdyn5 Qdum5 Qcalc5
 
 debug:	
-	@make FFLAGS="-debug -traceback -g -Wcheck -lVT -I${VT_ROOT}/include -L${VT_LIB_DIR} ${VT_ADD_LIBS}"         \
+	@make FFLAGS='-debug -traceback -g -Wcheck'         \
 	Qfep5 Qprep5 Qdyn5 Qdum5 Qcalc5
 
-<<<<<<< HEAD:src/makefile
-mpi:	
-	@make FC_OPT=-'O3 -ffree-line-length-none -fcray-pointer -fall-intrinsics -std=legacy' \
-	qdyn5p move1 move3
-=======
 mpi:	Qdyn5p
->>>>>>> 98ce848ee2a35493fdf64980192f4caba981f469:src/makefile.ifort
 
 mpi_debug:	
-	@make FFLAGS="-debug -traceback -g -Wcheck -lVT -I${VT_ROOT}/include -L${VT_LIB_DIR} ${VT_ADD_LIBS}"         \
+	@make FFLAGS='-debug -traceback -g -Wcheck'         \
 	Qdyn5p
 
 clean:
@@ -215,17 +209,6 @@ topo.o:  topo.f90 misc.o mpiglob.o sizes.o
 
 trj.o:  trj.f90 mask.o misc.o 
 	${FC} ${FFLAGS} -c $<
-<<<<<<< HEAD:src/makefile
-
-move1:
-	mkdir -p ../obj ; mv *.o *.mod ../obj/
-
-move2:
-	mkdir -p ../bin ; mv qfep5 qprep5 qdyn5 qdum5 qcalc5 ../bin/
-move3:
-	mkdir -p ../bin ; mv qdyn5p ../bin/
-=======
->>>>>>> 98ce848ee2a35493fdf64980192f4caba981f469:src/makefile.ifort
 #
 ###
 
