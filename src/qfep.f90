@@ -13,20 +13,20 @@ implicit none
 	character(*), parameter			::	MODULE_VERSION = '5.01'
 	character(*), parameter			::	MODULE_DATE = '2003-06-03'
 
-	integer,parameter ::mxpts=500000,mxbin=100,mxstates=4
-	character(80)      ::filnam, line
+	integer,parameter ::mxpts=20000,mxbin=100,mxstates=4
+	character(80)      ::filnam, line,filnamiop,mline !masoud file name for seperate energies,mline to print
 	integer           ::i,j,ifile,ipt,istate,ibin,nfiles,nstates,ERR, &
-	                      nskip,nbins,nmin,idum,noffd,nnoffd,offel
+	                      nskip,nbins,nmin,idum,noffd,nnoffd,offel,mibin!for bins
 
 	type(OFFDIAG_SAVE), dimension(mxstates)	:: offd
 
 	real(8) ::rt,gapmin,gapmax,sum,dv,gaprange, &
 			xint,dvg,veff1,veff2,dGa,dGb,dGg,alpha_B,scale_Hij, &
-			veff,min	  		
-	real(8),dimension(mxbin)              ::sumg,sumg2,avdvg,avc11,avc22,avc1,avc2,avr
+			veff,min,mgapmin,mgapmax,mgaprange,mxint!masoud three variables for energy interval of each file,for bin interval
+	real(8),dimension(mxbin)              ::sumg,sumg2,avdvg,avc1,avc2,avr
 										  
-	real(8),dimension(mxbin,6)            ::binsum
-	integer,dimension(mxbin)              ::nbinpts,ptsum
+	real(8),dimension(mxbin,4)            ::binsum
+	integer,dimension(mxbin)              ::nbinpts,ptsum,mnbinpts!to count the population at each energy interval
 
 	type(Q_ENERGIES), dimension(mxstates)	:: EQ 	
 	type(Q_ENERGIES), dimension(mxstates)	:: avEQ
@@ -40,15 +40,16 @@ implicit none
 		integer					::	npts
 		real(8)					::	lambda(mxstates)
 		real(8), pointer		::	v(:,:), r(:,:) !indices are state, point
-		real(8), pointer		::	vg(:), gap(:), c11(:), c22(:), c1(:),c2(:) !index is point
+		real(8), pointer		::	vg(:), gap(:), c1(:), c2(:) !index is point
 	end type FEP_DATA_TYPE
 	type(FEP_DATA_TYPE), allocatable	::	FEP(:) !index is file
 	type(FEP_DATA_TYPE)				::	FEPtmp !temporary storage for one file
 
 	real(8),dimension(mxstates,mxbin)     ::avdvv,sumv,sumv2 
 
-	integer								::	f
-
+	integer								::	f,gas=0,error,dummyno,fiop,priall=0  !!!!!!!!!fiop is for saving energy points masoud
+	real								::	dummy
+	character(100)							::	iline !!!!!!! masoud
 	!header
 	write(*,100) MODULE_VERSION,  MODULE_DATE
 	write(*,*)
@@ -77,11 +78,35 @@ implicit none
 	end if
 
 	! Continue to read input
-	call prompt ('--> Give kT & no, of pts to skip: ')
-	read (*,*) rt,nskip
-	write (*,3) rt,nskip
+	call prompt ('--> Give kT & no, of pts to skip   & calculation mode: ')
+	read(*,'(a)') iline
+
+	!!!!!!!!!!!!!!  masoud reading an extra option for just calculating QQ energies
+	!print*, iline
+	do i=1,5
+		read (iline,*,iostat=error)(dummy,j=1,i)
+!		print*, error,"***",i,dummy
+		if (error .ne. 0) then
+			dummyno=i-1
+			exit
+		endif
+	enddo
+	if (dummyno .eq. 2) then
+		read (iline,*) rt,nskip
+	elseif (dummyno .eq. 3) then
+		read (iline,*) rt,nskip,gas
+	elseif (dummyno .eq. 4) then
+		read (iline,*) rt,nskip,gas,priall
+	else
+		print*, "not correct argumets for KT, data points to skip or calculation mode"
+		stop
+	end if
+	!!!!!!!!!!!!!!  masoud
+
+!	read (*,*) rt,nskip
+	write (*,3) rt,nskip,gas
 3	format('# kT                              =',f6.3,/, &
-		   '# Number of data points to skip   =',i6)
+		   '# Number of data points to skip   =',i6,/, '# Only QQ interactions will be considered   = ',i3)
 
 	call prompt ('--> Give number of gap-bins: ')
 	read (*,*) nbins
@@ -103,7 +128,7 @@ implicit none
 7	format('--> Give alpha for state ',i2,':')
 
 	scale_Hij=0.0
-	if (noffd /=0) then
+	if (noffd /=0) then !its bypassed since we usually redefine Hij 
 		call prompt ('--> Hij scaling:')
 		read (*,*) scale_Hij
 		write (*,8) scale_Hij
@@ -115,7 +140,7 @@ implicit none
 		if(nnoffd >0) write(*,11) 
 		do offel=1,nnoffd
 			call prompt ('--> i, j, A_ij, mu_ij, eta_ij, r_xy0: ')
-			read (*,*) i, j, A(i,j), mu(i,j), eta(i,j), rxy0(i,j)
+			read (*,*) i, j, A(i,j), mu(i,j), eta(i,j), rxy0(i,j) !read offdiagonal 
 			write(*,12) i, j, A(i,j), mu(i,j), eta(i,j), rxy0(i,j)
 		end do
 9	format('# Number of off-diagonal elements =',i6)
@@ -131,7 +156,7 @@ implicit none
 	!allocate large arrays
 	allocate(FEP(nfiles), FEPtmp%v(nstates,mxpts), FEPtmp%r(nstates,mxpts), &
 		FEPtmp%vg(mxpts), FEPtmp%gap(mxpts), &
-		FEPtmp%c11(mxpts), FEPtmp%c22(mxpts),FEPtmp%c1(mxpts), FEPtmp%c2(mxpts), &
+		FEPtmp%c1(mxpts), FEPtmp%c2(mxpts), &
 		dgf(0:nfiles+1),dgr(0:nfiles+1), &
 		dgfsum(0:nfiles+1),dgrsum(0:nfiles+1),dG(0:nfiles+1), &
 		STAT=ERR)
@@ -148,8 +173,6 @@ implicit none
 	gapmin=999.
 	gapmax=-999.
 	f = freefile()
-	FEPtmp%c11(:) = 0.
-	FEPtmp%c22(:) = 0.
 	FEPtmp%c1(:) = 0.
 	FEPtmp%c2(:) = 0.
 
@@ -161,7 +184,7 @@ implicit none
 16	format('# file             state   pts   lambda    EQtot   EQbond',&
 	'  EQang   EQtor   EQimp    EQel   EQvdW  Eel_qq  EvdW_qq Eel_qp  EvdW_qp Eel_qw EvdW_qw Eqrstr')
 
-	do ifile=1,nfiles
+	do ifile=1,nfiles !=================================================================================================================================================================================
 		write(line,14) ifile
 14		format('--> Name of file number',i4,':')
 		call prompt(line)
@@ -190,19 +213,34 @@ implicit none
 				stop 'Qfep5 terminated abnormally: Failed to read off-diagonals.'
 			end if
 		end if
-								
-		FEP(ifile)%lambda(:) = EQ(:)%lambda
-
+!the final storage memory for en is FEP(ifile) array. FEP(ifile)%v(nstates,ipt) contain total energies. the EQ(:)%lambda is already has defined dimension
+		FEP(ifile)%lambda(:) = EQ(:)%lambda 
         rewind (f)
 
 		ipt = 0
 		avEQ(:) = avEQ(:) * 0. !set all fields to zero using multiplication operator
 		FEPtmp%gap(:) = 0.
-		do while(get_ene(f, EQ(:), offd, nstates, nnoffd) == 0) !keep reading till EOF
-			ipt = ipt + 1
+		do while(get_ene(f, EQ(:), offd, nstates, nnoffd) == 0) !keep reading till EOF----------------------------------------------------------------------------------------------------------
+			ipt = ipt + 1                                                                                                                                                                  !
+	!!!!!!!!!!!!!!  masoud                                                                                                                                                                         !
+!			print*,"point",ipt,"en state 1", EQ(1)
+!			print*,"point",ipt,"off state 1", offd(1)
+!			print*,"point",ipt,"en state 2", EQ(2)
+!			print*,"point",ipt,"off state 2", offd(2)
+!if the gas flag is > 0 then total energy will be just q (bonded), qq(nonbonded) and restraint                                                                                                         !
+			if (gas .gt. 0 ) then                                                                                                                                                          !
+			do i=1,nstates                                                                                                                                                                 !
+			EQ(i)%total=EQ(i)%q%bond+EQ(i)%q%angle+EQ(i)%q%torsion+EQ(i)%q%improper+EQ(i)%qq%el+EQ(i)%qq%vdw+EQ(i)%restraint                                                               !
+!			print*, EQ(i)%total, EQ(i)%q,EQ(i)%qq,EQ(i)%restraint                                                                                                                          !
+!			print*, "''''''''''"                                                                                                                                                           !
+!			if (ipt > 10 ) stop                                                                                                                                                            !
+			end do
+			end if
+	!!!!!!!!!!!!!!   masoud
 			if(ipt > nskip) then
 				avEQ(:) = avEQ(:) + EQ(:) !use Qenergies + operator 
 			end if
+
 
 !-------------------------------------------
 ! Correct H_ii with alfa, and modify H_ij...
@@ -210,7 +248,7 @@ implicit none
 
             alfa(1)=0.
 			EQ(:)%total=EQ(:)%total+alfa(:)
-			FEPtmp%v(1:nstates, ipt) = EQ(1:nstates)%total
+			FEPtmp%v(1:nstates, ipt) = EQ(1:nstates)%total !save energy of each point at different states to FEPtmp%v
 			if (nnoffd .ne. 0) then
 				FEPtmp%r(:,ipt) = offd(:)%rkl
             end if
@@ -219,39 +257,39 @@ implicit none
 			do i=1, noffd
 				Hij(offd(i)%i, offd(i)%j) = offd(i)%Hij
 			end do
-
+!			print*,Hij,"a"!masoud
 			if ( scale_Hij .gt. 0.0 ) then
 				Hij(1,2) = scale_Hij*Hij(1,2)
 			else
-				do i=1,nstates
+				do i=1,nstates!itirate over hamiltonian matrix 
 					do j=1,nstates
 						if (i==j) then
- 							Hij(i,j)=EQ(i)%total
+ 							Hij(i,j)=EQ(i)%total!diagonal elemets get the total energies
 						else
  							if (A(i,j)==0.0) then
  								Hij(i,j) = A(j,i)*exp(-mu(j,i)*(offd(1)%rkl-rxy0(j,i)))* &
- 								exp(-eta(j,i)*(offd(1)%rkl-rxy0(j,i))**2)					 					
+ 								exp(-eta(j,i)*(offd(1)%rkl-rxy0(j,i))**2)		
  							else 
  								Hij(i,j) = A(i,j)*exp(-mu(i,j)*(offd(1)%rkl-rxy0(i,j)))* &
- 								exp(-eta(i,j)*(offd(1)%rkl-rxy0(i,j))**2)									 
+ 								exp(-eta(i,j)*(offd(1)%rkl-rxy0(i,j))**2)		
  							end if 
 						end if
 					end do
  				end do
             end if
-
+!			print*,"point",ipt !masoud
+!			print*,Hij(1,:)    !masoud
+!			print*,Hij(2,:)
 !-----------------------------------------------------------
 ! Ground state energy is calculated from secular determinant
 !-----------------------------------------------------------
 
 			if (nstates==2) then
 				FEPtmp%vg(ipt)=0.5*(EQ(1)%total+EQ(2)%total)-  &
-					0.5*sqrt( (EQ(1)%total-EQ(2)%total)**2 + 4.*Hij(1,2)**2 )
+					0.5*sqrt( (EQ(1)%total-EQ(2)%total)**2 + 4.*Hij(1,2)**2 )!eground, choosing the smaller eigen value
 				if(nnoffd > 0) then
-					FEPtmp%c11(ipt)=1./(1.+((FEPtmp%vg(ipt)-EQ(1)%total)/Hij(1,2))**2)
-					FEPtmp%c22(ipt)=1-FEPtmp%c11(ipt)
-					FEPtmp%c1(ipt)=sqrt(FEPtmp%c11(ipt))
-					FEPtmp%c2(ipt)=sqrt(FEPtmp%c22(ipt))
+					FEPtmp%c1(ipt)=1./(1.+((FEPtmp%vg(ipt)-EQ(1)%total)/Hij(1,2))**2)
+					FEPtmp%c2(ipt)=1-FEPtmp%c1(ipt)
 				end if
 			else 
 				call tred2(Hij,nstates,nstates,d,e)
@@ -259,27 +297,25 @@ implicit none
 				FEPtmp%vg(ipt)=MINVAL(d)
 			end if 
 
-			do istate=1,nstates
-				FEPtmp%gap(ipt)=FEPtmp%gap(ipt)+FEPtmp%v(istate,ipt)*coeff(istate)
-			end do
-
-
-              if(ipt .gt. nskip) then
-                 if(FEPtmp%gap(ipt) .lt. gapmin) gapmin=FEPtmp%gap(ipt)
-                 if(FEPtmp%gap(ipt) .gt. gapmax) gapmax=FEPtmp%gap(ipt)
-              end if
-         end do  !(ipt)
-		 close(f)
+			do istate=1,nstates                                                                                                                                                             !
+				FEPtmp%gap(ipt)=FEPtmp%gap(ipt)+FEPtmp%v(istate,ipt)*coeff(istate)  !for each point in itirates twise multiplies Ei with linear combination and add                     !
+			end do                                                                                                                                                                          !
+                                                                                                                                                                                                        !
+                                                                                                                                                                                                        !
+              if(ipt .gt. nskip) then                                                                                                                                                                   !
+                 if(FEPtmp%gap(ipt) .lt. gapmin) gapmin=FEPtmp%gap(ipt) !finding the min max of energy gap                                                                                              !
+                 if(FEPtmp%gap(ipt) .gt. gapmax) gapmax=FEPtmp%gap(ipt)                                                                                                                                 !
+              end if                                                                                                                                                                                    !
+         end do  !(ipt)----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+		 close(f) !finishes with current file
 		FEP(ifile)%npts = ipt
-
+                ! so far Eg, c1, c2 and Egap for each point is done still in the same file
 		!copy FEPtmp to D
-		allocate(FEP(ifile)%v(nstates, FEP(ifile)%npts), &
-			FEP(ifile)%vg(FEP(ifile)%npts), &
-			FEP(ifile)%gap(FEP(ifile)%npts), &
-			FEP(ifile)%c11(FEP(ifile)%npts), &
-			FEP(ifile)%c22(FEP(ifile)%npts), &
-			FEP(ifile)%c1(FEP(ifile)%npts), &
-			FEP(ifile)%c2(FEP(ifile)%npts), &
+		allocate(FEP(ifile)%v(nstates, FEP(ifile)%npts), & !2rows for each state and to the number of points columns
+			FEP(ifile)%vg(FEP(ifile)%npts), &  !to the number of points columns
+			FEP(ifile)%gap(FEP(ifile)%npts), & !to the number of points columns
+			FEP(ifile)%c1(FEP(ifile)%npts), &  !to the number of points columns
+			FEP(ifile)%c2(FEP(ifile)%npts), &  !to the number of points columns
 			STAT=ERR)
 		if(ERR /= 0) then
 			stop 'Qfep5 terminated abnormally: Out of memory when allocating arrays.'
@@ -287,8 +323,6 @@ implicit none
 		FEP(ifile)%v(:,:) = FEPtmp%v(1:nstates, 1:FEP(ifile)%npts)
 		FEP(ifile)%vg(:) = FEPtmp%vg(1:FEP(ifile)%npts)
 		FEP(ifile)%gap(:) = FEPtmp%gap(1:FEP(ifile)%npts)
-		FEP(ifile)%c11(:) = FEPtmp%c11(1:FEP(ifile)%npts)
-		FEP(ifile)%c22(:) = FEPtmp%c22(1:FEP(ifile)%npts)
 		FEP(ifile)%c1(:) = FEPtmp%c1(1:FEP(ifile)%npts)
 		FEP(ifile)%c2(:) = FEPtmp%c2(1:FEP(ifile)%npts)
 		if(nnoffd > 0) then 
@@ -321,8 +355,8 @@ implicit none
 
 		end do
 17	format(a,t23,i2,1x,i6,1x,f8.6,14f8.2)
-	end do  !ifile
-
+	end do  !ifile======================================================================================================================================================================================
+! All files are finished 
 	if(nfiles > 1) then !the following is meaningless for a single file
 		dgf=0.
 		dgfsum=0.
@@ -338,9 +372,9 @@ implicit none
 			end if
 			do ipt=nskip+1,FEP(ifile)%npts
 				do istate=1,nstates
-					veff1=veff1+FEP(ifile)%lambda(istate)*FEP(ifile)%v(istate,ipt)
-   					veff2=veff2+FEP(ifile+1)%lambda(istate)*FEP(ifile)%v(istate,ipt)
-   	   			end do
+					veff1=veff1+FEP(ifile)%lambda(istate)*FEP(ifile)%v(istate,ipt)   !landa wighted E sum for i file
+					veff2=veff2+FEP(ifile+1)%lambda(istate)*FEP(ifile)%v(istate,ipt) !landa wighted E sum for i+1 file
+				end do
 				dv=veff2-veff1
 				veff1=0.
 				veff2=0.
@@ -349,7 +383,7 @@ implicit none
 			sum=sum/real(FEP(ifile)%npts-nskip)
 			dgf(ifile)=-rt*dlog(sum)
 			dgfsum(ifile+1)=dgfsum(ifile)+dgf(ifile)
-			sum=0.
+			sum=0.!FEP for each file and sum of free energy 
 		end do
 		dgrsum=0.
 		dgr=0.
@@ -381,7 +415,7 @@ implicit none
 22		format('# lambda(1)      dGf sum(dGf)      dGr sum(dGr)     <dG>')
         dG(1)=0.0
         do ifile=2,nfiles
-            dG(ifile)=dG(ifile-1)+0.5*(dgf(ifile-1)-dgr(ifile))
+            dG(ifile)=dG(ifile-1)+0.5*(dgf(ifile-1)-dgr(ifile)) !averaged forward and backwars energies
         end do
         do ifile=1,nfiles
            write (*,23) &
@@ -393,7 +427,54 @@ implicit none
 		write (*,*)
 		write (*,'(a,f9.2)') '# Min energy-gap is: ',gapmin
 		write (*,'(a,f9.2)') '# Max energy-gap is: ',gapmax
+!*********************************************************************************************************************************masoud
+!writing out v%states(total energy), vg(ground state energy),veff1(linear combination of landa)-masoud
 
+if (priall .gt. 0 ) then
+	do ifile=1,nfiles
+		mgapmin=0.
+		mgapmax=0.
+		do istate=1,nstates
+			mgapmin=mgapmin+FEP(ifile)%lambda(istate)*FEP(ifile)%v(istate,1) !setting initil values
+			mgapmax=mgapmax+FEP(ifile)%lambda(istate)*FEP(ifile)%v(istate,1) 
+		end do
+		mgaprange=0.
+		mnbinpts(:)=0
+		fiop = freefile() !masoud find a file handle to save the vindow energies
+		write (filnamiop, "(I3,A2)") , ifile,".en"
+		open (file=filnamiop, unit=fiop,status="replace",access='stream', form='formatted', action="write") !masoud open a file to save the window energies
+		write(fiop,*),"      V1       V2         L1        L2       Vef         C1       C2        Vg       GAP"
+		do ipt=nskip+1,FEP(ifile)%npts
+			veff1=0.0
+			do istate=1,nstates
+				veff1=veff1+FEP(ifile)%lambda(istate)*FEP(ifile)%v(istate,ipt) 
+			end do
+!masoud appending all effective potential energy points for each landa window
+		write(fiop,201),FEP(ifile)%v(1:nstates,ipt),FEP(ifile)%lambda(1:nstates),veff1,FEP(ifile)%c1(ipt)&
+							,FEP(ifile)%c2(ipt),FEP(ifile)%vg(ipt),FEP(ifile)%gap(ipt)
+			if (veff1 < mgapmin) mgapmin=veff1
+			if (veff1 > mgapmax) mgapmax=veff1
+		end do
+		do ipt=nskip+1,FEP(ifile)%npts
+			mgaprange=mgapmax-mgapmin!the energy interval
+			mxint=mgaprange/real(20)
+			veff1=0.0
+			do istate=1,nstates
+				veff1=veff1+FEP(ifile)%lambda(istate)*FEP(ifile)%v(istate,ipt) 
+			end do
+			mibin=int((veff1-mgapmin)/mxint)+1
+!			write(fiop,*),mibin,veff1,mgapmin,mgapmax
+			mnbinpts(mibin)=mnbinpts(mibin)+1
+		end do
+		do mibin=1,21
+			write(fiop,*), mibin, (mgapmin+real(mibin)*mxint),mnbinpts(mibin)
+		end do
+		close(fiop) !masoud closing file handle
+	end do
+201			format(7(f10.3),1X,7(f10.3),1X,f10.3,1X,f10.3,1X,f10.3,1X,f10.3,1X,f10.3)
+endif
+
+!*********************************************************************************************************************************masoud
 		!-----------------------------------
 		! Reaction free energy is calculated
 		!-----------------------------------
@@ -412,8 +493,6 @@ implicit none
 			avdvg=0.
 			sumv=0.
 			sumg=0.
-			avc11=0.
-			avc22=0.
 			avc1=0.
 			avc2=0.
 			avr=0.
@@ -421,62 +500,60 @@ implicit none
 			dvg=0.
 			nbinpts=0
 
-			do ipt=nskip+1,FEP(ifile)%npts
+			do ipt=nskip+1,FEP(ifile)%npts!finds which bin the point belongs to based on energy gap                   !
 				ibin=int((FEP(ifile)%gap(ipt)-gapmin)/xint)+1
 				veff=0.
-				do istate=1,nstates
-					veff=veff+FEP(ifile)%lambda(istate)*FEP(ifile)%v(istate,ipt)
-				end do  !states
-				dvv(1:nstates)=FEP(ifile)%v(1:nstates,ipt)-veff
-				dvg=FEP(ifile)%vg(ipt)-veff
-				avdvv(:,ibin)=avdvv(:,ibin)+dvv(:)
-				avdvg(ibin)=avdvg(ibin)+dvg
-				avc11(ibin)=avc11(ibin)+FEP(ifile)%c11(ipt)
-				avc22(ibin)=avc22(ibin)+FEP(ifile)%c22(ipt)
-				avc1(ibin)=avc1(ibin)+FEP(ifile)%c1(ipt)
-				avc2(ibin)=avc2(ibin)+FEP(ifile)%c2(ipt)
+				do istate=1,nstates                                                   !
+					veff=veff+FEP(ifile)%lambda(istate)*FEP(ifile)%v(istate,ipt)  !
+				end do  !states                                                       !
+				dvv(1:nstates)=FEP(ifile)%v(1:nstates,ipt)-veff!diffrence between veff and v1 and v2              !
+!print*,dvv(1:nstates),"dvv",FEP(ifile)%v(1:nstates,ipt),"v1,v2",veff
+				dvg=FEP(ifile)%vg(ipt)-veff             !diffrence vg-veff for each point                         !itirates over points
+				avdvv(:,ibin)=avdvv(:,ibin)+dvv(:)      !adding up dvv based on ibins 
+				avdvg(ibin)=avdvg(ibin)+dvg             !adding up dvg based on ibins
+				avc1(ibin)=avc1(ibin)+FEP(ifile)%c1(ipt)!adding up c1 based on ibins
+				avc2(ibin)=avc2(ibin)+FEP(ifile)%c2(ipt)!!adding up c2 based on ibins                             !
 				!Only gives first r_xy distance
-				if(nnoffd > 0)	avr(ibin)=avr(ibin)+FEP(ifile)%r(1,ipt)		 
-				nbinpts(ibin)=nbinpts(ibin)+1
-			end do          !ipt
-			do ibin=1,nbins
+				if(nnoffd > 0)	avr(ibin)=avr(ibin)+FEP(ifile)%r(1,ipt)
+				nbinpts(ibin)=nbinpts(ibin)+1!counting number of points per bin
+			end do          !ipt                                                                                      !
+
+                                                 !take the averages differences over a file
+			do ibin=1,nbins                                                                                           !#
 				if ( nbinpts(ibin) .ne. 0 ) then
-				   avc11(ibin)=avc11(ibin)/real(nbinpts(ibin))
-				   avc22(ibin)=avc22(ibin)/real(nbinpts(ibin))
-				   avc1(ibin)=avc1(ibin)/real(nbinpts(ibin))
-				   avc2(ibin)=avc2(ibin)/real(nbinpts(ibin))
-				   avr(ibin)=avr(ibin)/real(nbinpts(ibin))				
-				   avdvv(:,ibin)=avdvv(:,ibin)/nbinpts(ibin)
-				   avdvg(ibin)=avdvg(ibin)/nbinpts(ibin)
+					avc1(ibin)=avc1(ibin)/real(nbinpts(ibin))
+					avc2(ibin)=avc2(ibin)/real(nbinpts(ibin))
+					avr(ibin)=avr(ibin)/real(nbinpts(ibin))                                                   !#itirates over points
+					avdvv(:,ibin)=avdvv(:,ibin)/nbinpts(ibin)
+					avdvg(ibin)=avdvg(ibin)/nbinpts(ibin)
 
 				end if 
-			end do !ibin
-			do ipt=nskip+1,FEP(ifile)%npts
-				ibin=int((FEP(ifile)%gap(ipt)-gapmin)/xint)+1
+			end do !ibin                                                                                              !#
+
+			do ipt=nskip+1,FEP(ifile)%npts                                                                                    !
+				ibin=int((FEP(ifile)%gap(ipt)-gapmin)/xint)+1!for each point in ifile find again the correspondant bin
 				veff=0.
 				do istate=1,nstates
 					veff=veff+FEP(ifile)%lambda(istate)*FEP(ifile)%v(istate,ipt)
 				end do  !istate
-
+                                                                                                                                          !itirates over points
 				do istate=1,nstates
 					dvv(istate)=FEP(ifile)%v(istate,ipt)-veff-avdvv(istate,ibin)
 				end do
-				dvg=FEP(ifile)%vg(ipt)-veff-avdvg(ibin)
+				dvg=FEP(ifile)%vg(ipt)-veff-avdvg(ibin)!this will cancel since its constant and go out of summation later we add same constant
 				sumv(:,ibin)=sumv(:,ibin)+exp(-dvv(:)/rt)
 				sumg(ibin)=sumg(ibin)+exp(-dvg/rt)
-			end do   !ipt
+			end do   !ipt                                                                                                     !
 
 			do ibin=1,nbins
 				if (nbinpts(ibin).ge.nmin) then
-				   binsum(ibin,2)=binsum(ibin,2)+avc11(ibin)*nbinpts(ibin)
-				   binsum(ibin,3)=binsum(ibin,3)+avc22(ibin)*nbinpts(ibin)
-				   binsum(ibin,4)=binsum(ibin,4)+avc1(ibin)*nbinpts(ibin)
-				   binsum(ibin,5)=binsum(ibin,5)+avc2(ibin)*nbinpts(ibin)
-				   binsum(ibin,6)=binsum(ibin,6)+avr(ibin)*nbinpts(ibin) !Bin-averaged r_xy
-				   sumv(:,ibin)=sumv(:,ibin)/real(nbinpts(ibin)) 
-				   sumg(ibin)=sumg(ibin)/real(nbinpts(ibin))
+					binsum(ibin,2)=binsum(ibin,2)+avc1(ibin)*nbinpts(ibin)
+					binsum(ibin,3)=binsum(ibin,3)+avc2(ibin)*nbinpts(ibin)
+					binsum(ibin,4)=binsum(ibin,4)+avr(ibin)*nbinpts(ibin)  !Bin-averaged r_xy
+					sumv(:,ibin)=sumv(:,ibin)/real(nbinpts(ibin)) 
+					sumg(ibin)=sumg(ibin)/real(nbinpts(ibin))
 
-			    	ptsum(ibin)=ptsum(ibin)+nbinpts(ibin)
+					ptsum(ibin)=ptsum(ibin)+nbinpts(ibin)
 
 					do istate=1,nstates
 						sumv2(istate,ibin)=-rt*dlog(sumv(istate,ibin))+avdvv(istate,ibin)
@@ -487,11 +564,11 @@ implicit none
 					! This is the reaction free energy
 					dGg=dG(ifile)+sumg2(ibin)
 
-				    binsum(ibin,1)=binsum(ibin,1)+dGg*int(nbinpts(ibin))
-
+				    binsum(ibin,1)=binsum(ibin,1)+dGg*int(nbinpts(ibin))!nbinpts will cancel since binsum will be divide by total binsum later but I think it gives same wight to 
+! all points with same dG(ifile)
 					write (*,26) FEP(ifile)%lambda(1),ibin, &
 						gapmin+real(ibin)*xint-xint/2., dGv(1),dGv(2),dGg, &
-						int(nbinpts(ibin)),avc11(ibin),avc22(ibin) 
+						int(nbinpts(ibin)),avc1(ibin),avc2(ibin) 
 				end if
 			end do  !ibin
 		end do      !ifile
@@ -501,24 +578,22 @@ write(*,27)
 write(*,28)
 
 27		format('# Part 3: Bin-averaged summary:')
-28		format('# bin  energy gap  <dGg> <dGg norm> pts  <c1**2> <c2**2>  <|c1|> <|c2|>  <r_xy>')
+28		format('# bin  energy gap  <dGg> <dGg norm> pts  <c1**2> <c2**2> <r_xy>')
 
 	do ibin=1,nbins
 	if (ptsum(ibin).ge.nmin) then
 	binsum(ibin,1)=binsum(ibin,1)/real(ptsum(ibin)) ! Bin-averaged reaction free energy
  	binsum(ibin,2)=binsum(ibin,2)/real(ptsum(ibin)) ! Bin-averaged c1**2
  	binsum(ibin,3)=binsum(ibin,3)/real(ptsum(ibin)) ! Bin-averaged c2**2
- 	binsum(ibin,4)=binsum(ibin,4)/real(ptsum(ibin)) ! Bin-averaged c1
- 	binsum(ibin,5)=binsum(ibin,5)/real(ptsum(ibin)) ! Bin-averaged c2
-	binsum(ibin,6)=binsum(ibin,6)/real(ptsum(ibin)) ! Bin-averaged r_xy
+	binsum(ibin,4)=binsum(ibin,4)/real(ptsum(ibin)) ! Bin-averaged r_xy
 	end if
  	end do
  	min=MINVAL(binsum(:,1))
  	do ibin=1,nbins
 		if (ptsum(ibin).ge.nmin) then
- 29		format(i4,1x,3f9.2,2x,i5,4f8.3,4f8.2)
+ 29		format(i4,1x,3f9.2,2x,i5,3f8.3,4f8.2)
  		write(*,29) ibin,gapmin+real(ibin)*xint-xint/2.,binsum(ibin,1),  &
- 		binsum(ibin,1)-min,int(ptsum(ibin)),binsum(ibin,2),binsum(ibin,3),binsum(ibin,4),binsum(ibin,5),binsum(ibin,6)
+ 		binsum(ibin,1)-min,int(ptsum(ibin)),binsum(ibin,2),binsum(ibin,3),binsum(ibin,4)
         end if
 	end do !ibin
 	end if !nfiles >1
@@ -526,7 +601,7 @@ write(*,28)
 	!clean up
 	do ifile=1,nfiles
 		deallocate(FEP(ifile)%v, FEP(ifile)%vg, FEP(ifile)%gap, &
-		FEP(ifile)%c11, FEP(ifile)%c22,FEP(ifile)%c1, FEP(ifile)%c2)
+		FEP(ifile)%c1, FEP(ifile)%c2)
 		if(nnoffd > 0) deallocate(FEP(ifile)%r)
 	end do
 	deallocate(FEP)

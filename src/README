@@ -1,3 +1,0 @@
-Path to ifort compiler:
-source /home/apps/intel/bin/ifortvars.csh intel64
-setenv OMPI_FC ifort

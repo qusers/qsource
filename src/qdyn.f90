@@ -70,6 +70,7 @@ program Qdyn5
 
   if (nodeid .eq. 0) then
 	! master node: read input and initialise
+
 	if(.not. initialize()) call die('Invalid data in input file')						! read input data
 	call open_files						! open necessary files
 	call topology				! read topology

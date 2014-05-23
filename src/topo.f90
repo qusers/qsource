@@ -15,7 +15,8 @@ module TOPO
 	real, private, parameter			::	MODULE_VERSION = 5.03
 	character(*), private, parameter	::	MODULE_DATE = '2003-11-12'
 
-	integer, parameter			::	nljtyp = 3	!TINY
+    integer, parameter			::	nljtyp = 3	!TINY
+
 	integer, parameter			::	max_nbr_range	= 25
 
 ! types

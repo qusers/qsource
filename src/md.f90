@@ -852,9 +852,6 @@ j3=j*3-3
 k3=k*3-3
 rji(1) = x(i3+1) - x(j3+1)
 rji(2) = x(i3+2) - x(j3+2)
-
-
-
 rji(3) = x(i3+3) - x(j3+3)
 rjk(1) = x(k3+1) - x(j3+1)
 rjk(2) = x(k3+2) - x(j3+2)
@@ -6290,7 +6287,6 @@ nbpw_pair = 0
 rcut2 = Rcpw*Rcpw
 
 
-
 igloop:  do ig = calculation_assignment%pw%start, calculation_assignment%pw%end
 
 !	   --- excluded group ? ---
@@ -7692,7 +7688,7 @@ do iq = 1, nqat - 1
                        l=qq_el_scale(i)%jqat
                        if ((iq == k .and. jq == l) .or. &
                          (iq == l .and. jq == k)) then
-                           nbqq(nbqq_pair(is),is)%el_scale = qq_el_scale(i)%el_scale
+                           nbqq(nbqq_pair(is),is)%el_scale = qq_el_scale(i)%el_scale(is)!masoud
 						   set=.true.
 						   exit
                        end if
@@ -9107,7 +9103,6 @@ do par=1,monitor_group_pairs
                                 bLJi=iaclib(iaci)%bvdw(LJ_code)
                                 aLJj=iaclib(iacj)%avdw(LJ_code)
                                 bLJj=iaclib(iacj)%bvdw(LJ_code)   
-
                                 if (qatomi /= 0) qi = qcrg(qatomi,istate) 
                                 if (qatomj /= 0) qj = qcrg(qatomj,istate) 
                                 if (qvdw_flag) then
@@ -9346,7 +9341,6 @@ subroutine nonbon2_pp_box
     dx1b  = x(pb%j*3-2) - x(pb%i*3-2)
     dx2a  = x(pa%j*3-1) - x(pa%i*3-1)
     dx2b  = x(pb%j*3-1) - x(pb%i*3-1)
-
     dx3a  = x(pa%j*3-0) - x(pa%i*3-0)
     dx3b  = x(pb%j*3-0) - x(pb%i*3-0)
 	dx1a = dx1a - nbpp_cgp(ga)%x         
@@ -11400,8 +11394,10 @@ do istate = 1, nstates
   d(j3+3) = d(j3+3) + dv*dx3
 
   ! update q-protein energies
+!  if(i < 3173 .OR. i > 3180) then !!  paul found this error  !!
         EQ(istate)%qp%el  = EQ(istate)%qp%el + Vel
         EQ(istate)%qp%vdw = EQ(istate)%qp%vdw + V_a - V_b
+!  end if
 end do ! istate
 
 end do
@@ -11572,7 +11568,6 @@ do jw = 1, nbqw_pair
                 do istate = 1, nstates
                         ! for every state:
                         ! calculate iaci, aLJ and bLJ
-
                         if (qvdw_flag) then
                                 aLJ  = qavdw(qiac(iq,istate),1)
                                 bLJ  = qbvdw(qiac(iq,istate),1)
@@ -14118,9 +14113,7 @@ do im = 1, nang_coupl
 	  !couple improper to bond breaking not making
 	  if ( iang_coupl(3,im) .eq. 1) gamma = 1 - gamma
    end if
-
 end do
-
 
 i  = qang(ia)%i
 j  = qang(ia)%j
@@ -14137,12 +14130,6 @@ k3 = 3*k-3
         EQ(istate)%q%angle = EQ(istate)%q%angle + Eurey*gamma
         du = gamma*2*(qanglib(ic)%ureyfk*ru/dik)*EQ(istate)%lambda
 
-        d(k3+1) = d(k3+1) + du*rik(1)
-        d(k3+2) = d(k3+2) + du*rik(2)
-        d(k3+3) = d(k3+3) + du*rik(3)
-        d(i3+1) = d(i3+1) - du*rik(1)
-        d(i3+2) = d(i3+2) - du*rik(2)
-        d(i3+3) = d(i3+3) - du*rik(3)
 
 if ( icoupl .ne. 0 ) then
 
