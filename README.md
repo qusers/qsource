@@ -7,7 +7,7 @@ of the NEW MPI implementation by Ake Sandgren. Ake also took care
 of cleaning parts of the code such as an odd call to acosd which only
 use to work on old IBM proprietary compilers.
 
-So there are now three testing versions now:
+So there are three testing versions now:
 
     testing/masoud
     testing/esguerra
@@ -21,7 +21,7 @@ say, if I (username:esguerra) wanted to create a new dead branch I could do:
     git checkout esguerra
     git add .
     git commit -a
-    git push
+    git push --set-upstream origin testing/esguerra
 
 ##To go back to main development (master) branch.  
     git checkout master
