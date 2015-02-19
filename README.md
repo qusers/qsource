@@ -5,7 +5,7 @@ This is yet another testing version.
 This one will be kept as a stale branch with the final version
 of the NEW MPI implementation by Ake Sandgren. Ake also took care
 of cleaning parts of the code such as an odd call to acosd which only
-use to work on old IBM proprietary compilers.
+used to work on old IBM proprietary compilers.
 
 So there are three testing versions now:
 
@@ -25,4 +25,8 @@ say, if I (username:esguerra) wanted to create a new dead branch I could do:
 
 ##To go back to main development (master) branch.  
     git checkout master
+
+When you want to clone only one branch and not the full repository use:
+    git clone https://github.com/qusers/qsource.git --branch testing/akesandgren --single-branch qakesandgren
+
 
