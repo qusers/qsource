@@ -26,3 +26,8 @@ git push
 #To go back to main development branch.
 git checkout merge
 
+
+When you want to clone only one branch and not the full repository use:
+
+    git clone https://github.com/qusers/qsource.git --branch testing/masoud --single-branch qmasoud
+
