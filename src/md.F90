@@ -1,379 +1,352 @@
-!	(C) 2003 Uppsala Molekylmekaniska HB, Uppsala, Sweden
+!-------------------------------------------------------------------------------
+!(c) 2003 uppsala molekylmekaniska hb, uppsala, sweden
+!md.f90
+!by johan Ã…qvist, john marelius, anders kaplan, isabella feierberg,
+!martin nervall & martin almlÃ¶f
+!molecular dynamics
+!-------------------------------------------------------------------------------
 
+module md
 
-!	md.f90
-!	by Johan Åqvist, John Marelius, Anders Kaplan, Isabella Feierberg, Martin Nervall & Martin Almlöf
-
-
-!	molecular dynamics
-
-
-module MD
-
-
-! used modules
-!use PROFILING
-use SIZES
-use TRJ
-use MPIGLOB
-use QATOM
-#if defined (_DF_VERSION_)
-use DFPORT
-use DFLIB
-#endif
+!used modules
+!use profiling
+use sizes
+use trj
+use mpiglob
+use qatom
 implicit none
-#if defined (USE_MPI)
+#if defined (use_mpi)
 include "mpif.h"
 #endif
 
+!-------------------------------------------------------------------------------
+!       shared variables
+!-------------------------------------------------------------------------------
+!constants
+character*(*), parameter :: md_version = '5.7'
+character*(*), parameter :: md_date = '2015-02-18'
+real(8) :: pi, deg2rad !set in sub startup
+real, parameter :: rho_wat = 0.0335 ! molecules / a**3
+real, parameter :: boltz = 0.001986
 
-
-!-----------------------------------------------------------------------
-!	shared variables
-!-----------------------------------------------------------------------
-
-!	Constants
-real(8)			::	pi, deg2rad	!set in sub startup
-character*(*), parameter	::	MD_VERSION = '5.06'
-character*(*), parameter	::	MD_DATE = '2007-07-27'
-real, parameter		::  rho_wat = 0.0335  ! molecules / A**3
-real, parameter		::	Boltz = 0.001986
-
-!Read status
-integer                     :: stat
+!read status
+integer                         :: stat
 
 !print temperature if it changed more than 2% in one time step
-real, parameter				::	TEMP_PRINT_THRESHOLD=0.02
+real, parameter                 :: temp_print_threshold=0.02
 
+!memory management
+integer                         :: alloc_status
 
-!	Memory management
-integer						::	alloc_status
-
-
-!	Topology information
-! --- Atoms
-integer						::	natom
-integer                     :: nat3
+!topology information
+! --- atoms
+integer                         :: natom
+integer                         :: nat3
 ! --- q-atom number or 0 for non-q
-integer(TINY), allocatable		::	iqatom(:)
+integer(tiny), allocatable      :: iqatom(:)
 ! --- water topology
 ! atoms of water, total water molecules, excluded water molecules
-integer						::	nwat
-real(4)						::	crg_ow, crg_hw, mu_w
-
+integer                         :: nwat
+real(4)                         :: crg_ow, crg_hw, mu_w
 
 !-------------------------------------------------------------------
-!	Periodic box information
+!       periodic box information
 !-------------------------------------------------------------------
 
-!******PWadded variable 2001-10-10
-logical						:: box, rigid_box_centre
-logical						:: put_solute_back_in_box, put_solvent_back_in_box
+!******pwadded variable 2001-10-10
+logical                         :: box, rigid_box_centre
+logical                         :: put_solute_back_in_box, put_solvent_back_in_box
 
-!variabels used for constant pressure algorithm
-logical						:: constant_pressure = .false.
-integer						:: volume_try, volume_acc
-real(8)						:: pressure, max_vol_displ
-integer						:: pressure_seed
-real(8), allocatable		:: mol_mass(:)
-real(8), allocatable		:: mass(:)
+!variables used for constant pressure algorithm
+logical                         :: constant_pressure = .false.
+integer                         :: volume_try, volume_acc
+real(8)                         :: pressure, max_vol_displ
+integer                         :: pressure_seed
+real(8), allocatable            :: mol_mass(:)
+real(8), allocatable            :: mass(:)
 
-!variabels used when user change boxsize in inputfile
-logical						:: control_box
-real(8)						:: new_boxl(3) 
+!variables used when user changes boxsize in inputfile
+logical                         :: control_box
+real(8)                         :: new_boxl(3) 
 
 !-----------------------------------------------------------------------
-!	Dynamics control information     
+!       dynamics control information     
 !-----------------------------------------------------------------------
+! --- md parameters
+integer                                         ::      nsteps, istep
+integer                                         ::      iseed
+logical                                         ::      restart
+real(8)                                         ::      dt, temp0, tmaxw, tau_t
+logical                                         ::      shake_solvent, shake_solute
+logical                                         ::      shake_hydrogens
+logical                                         ::      separate_scaling
+
+! --- non-bonded strategy
+logical                                         ::      use_lrf
+integer                                         ::      nbcycle
+real(8)                                         ::      rcpp, rcww, rcpw, rcq, rclrf
+integer, parameter                              ::      max_atyp = 255
+integer                                         ::      ljcod(max_atyp,max_atyp)
 
 
-! --- MD parameters
-integer						::	nsteps, istep
-integer						::	iseed
-logical						::	restart
-real(8)						::	dt, Temp0, Tmaxw, tau_T
-logical						::	shake_solvent, shake_solute
-logical						::	shake_hydrogens
-logical						::	separate_scaling
+! --- output control parameters
+integer                                         ::      itrj_cycle, iene_cycle
+integer                                         ::      itemp_cycle, iout_cycle
+logical                                         ::      force_rms
+!******pwadded 2001-10-23
+integer                                         ::      ivolume_cycle
 
-! --- Non-bonded strategy
-logical						::	use_LRF
-integer						::	NBcycle
-real(8)						::	Rcpp, Rcww, Rcpw, Rcq, RcLRF
-integer, parameter			                ::	max_atyp = 255
-integer						::	ljcod(max_atyp,max_atyp)
+! --- protein boundary
+logical                                         ::      exclude_bonded
+real(8)                                         ::      fk_pshell
+real(8), parameter                              ::      fk_fix = 200.0
 
-
-! --- Output control parameters
-integer						::	itrj_cycle, iene_cycle
-integer						::	itemp_cycle, iout_cycle
-logical						::	force_rms
-!******PWadded 2001-10-23
-integer						::	ivolume_cycle
-
-! --- Protein boundary
-logical						::	exclude_bonded
-real(8)						::	fk_pshell
-real(8), parameter			::	fk_fix				= 200.0
-
-! --- Water sphere
-real(8)						::	Dwmz, awmz, rwat_in
-real(8)						::	fkwpol
-logical						::	wpol_restr, wpol_Born
-real(8)						::	fk_wsphere, crgtot, crgQtot
-integer(AI), allocatable	::	list_sh(:,:), nsort(:,:)
-real(8),  allocatable		::	theta(:), theta0(:), tdum(:)
-integer						::	nwpolr_shell, n_max_insh
+! --- water sphere
+real(8)                                         ::      dwmz, awmz, rwat_in
+real(8)                                         ::      fkwpol
+logical                                         ::      wpol_restr, wpol_born
+real(8)                                         ::      fk_wsphere, crgtot, crgqtot
+integer(ai), allocatable                        ::      list_sh(:,:), nsort(:,:)
+real(8),  allocatable                           ::      theta(:), theta0(:), tdum(:)
+integer                                         ::      nwpolr_shell, n_max_insh
 
 
-type SHELL_TYPE
-        real					::	rout, dr, cstb
-        real					::	avtheta, avn_insh, theta_corr
-        integer					::	n_insh
-end type SHELL_TYPE
+type shell_type
+  real                                    ::      rout, dr, cstb
+  real                                    ::      avtheta, avn_insh, theta_corr
+  integer                                 ::      n_insh
+end type shell_type
 
-
-type(SHELL_TYPE), allocatable::	wshell(:)
-
+type(shell_type), allocatable :: wshell(:)
 
 ! constants & default values
-integer, parameter			::	itdis_update		= 100
-real,  parameter			::	wpolr_layer			= 3.0001
-real, parameter				::	drout				= 0.5
-real(8), parameter			::	tau_T_default		= 10.
-real(8), parameter			::	rcpp_default		= 10.
-real(8), parameter			::	rcww_default		= 10.
-real(8), parameter			::	rcpw_default		= 10.
-real(8), parameter			::	rcq_default			= 99.
-real(8), parameter			::	rcLRF_default		= 99.
+integer, parameter                      ::      itdis_update            = 100
+real,  parameter                        ::      wpolr_layer             = 3.0001
+real, parameter                         ::      drout                   = 0.5
+real(8), parameter                      ::      tau_t_default           = 10.
+real(8), parameter                      ::      rcpp_default            = 10.
+real(8), parameter                      ::      rcww_default            = 10.
+real(8), parameter                      ::      rcpw_default            = 10.
+real(8), parameter                      ::      rcq_default             = 99.
+real(8), parameter                      ::      rclrf_default           = 99.
 !recxl_i is set to rexcl_o * shell_default
-real(8), parameter			::	shell_default		= 0.85
-real(8), parameter			::	fk_pshell_default	= 10.
-integer, parameter			::	itrj_cycle_default	= 100
-integer, parameter			::	iene_cycle_default	= 10
-integer, parameter			::	iout_cycle_default	= 10
-integer, parameter			::	nb_cycle_default	= 10
-real(8), parameter			::	fkwpol_default		= 20.
-real(8), parameter			::	fk_wsphere_default	= 60.
-logical, parameter			::	wpol_restr_default	= .true.
+real(8), parameter                      ::      shell_default           = 0.85
+real(8), parameter                      ::      fk_pshell_default       = 10.
+integer, parameter                      ::      itrj_cycle_default      = 100
+integer, parameter                      ::      iene_cycle_default      = 10
+integer, parameter                      ::      iout_cycle_default      = 10
+integer, parameter                      ::      nb_cycle_default        = 10
+real(8), parameter                      ::      fkwpol_default          = 20.
+real(8), parameter                      ::      fk_wsphere_default      = 60.
+logical, parameter                      ::      wpol_restr_default      = .true.
+integer, parameter                      ::      ivolume_cycle_default   = 10
+integer, parameter                      ::      ipressure_cycle_default = 100
+!yes, and use born corr.
+!constants in the sigmoid function giving default dwmz as function of radius
 
-integer, parameter			::	ivolume_cycle_default = 10
+! --- file names
+character(len=200)                      ::      top_file
+character(len=200)                      ::      restart_file
+character(len=200)                      ::      xfin_file
+character(len=200)                      ::      trj_file
+character(len=200)                      ::      fep_file
+character(len=200)                      ::      ene_file
+character(len=200)                      ::      exrstr_file
+character(len=200)                      ::      xwat_file
 
-integer, parameter			::	ipressure_cycle_default = 100
- ! Yes, and use Born corr.
-!constants in the sigmoid function giving default Dwmz as function of radius
+! --- restraints
+integer                                 ::      implicit_rstr_from_file
+integer                                 ::      nrstr_seq, nrstr_pos, nrstr_dist, nrstr_wall
 
+type rstrseq_type
+  integer(ai)                           ::      i,j
+  real(8)                               ::      fk
+  integer(tiny)                         ::      ih
+  integer                               ::      to_centre !flag for restraining to geom. or mass centre
+end type rstrseq_type
 
-! --- File names
-character(len=200)			::	top_file
-character(len=200)			::	restart_file
-character(len=200)			::	xfin_file
-character(len=200)			::	trj_file
-character(len=200)			::	fep_file
-character(len=200)			::	ene_file
-character(len=200)			::	exrstr_file
-character(len=200)			::	xwat_file
+type rstrpos_type
+        integer(ai)                     ::      i
+        integer(tiny)                   ::      ipsi
+        real(8)                         ::      fk(3)
+        real(8)                         ::      x(3)
+end type rstrpos_type
 
+type rstrdis_type
+        integer(ai)                     ::      i,j
+        integer(tiny)                   ::      ipsi
+        real(8)                         ::      fk
+        real(8)                         ::      d1, d2
+        character(len=20)               ::  itext,jtext
+end type rstrdis_type
 
-! --- Restraints
-integer						::	implicit_rstr_from_file
-integer						::	nrstr_seq, nrstr_pos, nrstr_dist, nrstr_wall
+type rstrwal_type
+        integer(ai)                             ::      i,j
+        real(8)                                 ::      d, fk, amorse, dmorse
+        integer(tiny)                   ::      ih
+end type rstrwal_type
 
-
-type RSTRSEQ_TYPE
-        integer(AI)				::	i,j
-        real(8)					::	fk
-        integer(TINY)			::	ih
-        integer					::	to_centre !flag for restraining to geom. or mass centre
-end type RSTRSEQ_TYPE
-
-
-type RSTRPOS_TYPE
-        integer(AI)				::	i
-        integer(TINY)			::	ipsi
-        real(8)					::	fk(3)
-        real(8)					::	x(3)
-end type RSTRPOS_TYPE
-
-
-type RSTRDIS_TYPE
-        integer(AI)				::	i,j
-        integer(TINY)			::	ipsi
-        real(8)					::	fk
-        real(8)					::	d1, d2
-        character(len=20)       ::  itext,jtext
-end type RSTRDIS_TYPE
-
-
-type RSTRWAL_TYPE
-
-        integer(AI)				::	i,j
-        real(8)					::	d, fk, aMorse, dMorse
-        integer(TINY)			::	ih
-end type RSTRWAL_TYPE
-
-
-type(RSTRSEQ_TYPE), allocatable::	rstseq(:)
-type(RSTRPOS_TYPE), allocatable::	rstpos(:)
-type(RSTRDIS_TYPE), allocatable::	rstdis(:)
-type(RSTRWAL_TYPE), allocatable::	rstwal(:)
+type(rstrseq_type), allocatable::       rstseq(:)
+type(rstrpos_type), allocatable::       rstpos(:)
+type(rstrdis_type), allocatable::       rstdis(:)
+type(rstrwal_type), allocatable::       rstwal(:)
 
 
 !-----------------------------------------------------------------------
-!	Coordinates, velocities, forces
+!       coordinates, velocities, forces
 !-----------------------------------------------------------------------
-real(8), allocatable		::	d(:)
-real(8), allocatable		::	x(:)
-real(8), allocatable		::	xx(:) !for shake
-real(8), allocatable		::	v(:)
-real, allocatable			::	winv(:)
-real(8)						::	grms !RMS force
-
-
-!-----------------------------------------------------------------------
-!	Energies , EQ is defined in qatom.f90
-!-----------------------------------------------------------------------
-type(ENERGIES)				::	E
-real(8)						::	Tfree, Tfree_solvent, Tfree_solute
-real(8)						::	Temp_solvent, Temp_solute, Texcl_solute, Texcl_solvent
+real(8), allocatable            ::      d(:)
+real(8), allocatable            ::      x(:)
+real(8), allocatable            ::      xx(:) !for shake
+real(8), allocatable            ::      v(:)
+real, allocatable               ::      winv(:)
+real(8)                         ::      grms !rms force
 
 
 !-----------------------------------------------------------------------
-!	Nonbonded pair information
+!       energies , eq is defined in qatom.f90
 !-----------------------------------------------------------------------
-type NB_TYPE
-        integer(AI)				::	i, j
-        integer(TINY)			::	LJcod
-        integer					:: cgp_pair ! cgp_pair only used with periodic conditions
-end type NB_TYPE
-
-type CGP_PAIR_TYPE
-        integer(AI)				:: i, j !switching atoms (or equal in case of no switching atoms) of the chargegroups
-        real(8)					:: x, y, z !periodical shifts
-end type CGP_PAIR_TYPE
-
-type NBQP_TYPE
-        integer(AI)				::	i, j
-        integer(TINY)			::	LJcod, qLJcod
-        integer					::	cgp_pair !this variable only used with periodic conditions
-end type NBQP_TYPE
+type(energies)                          ::      e
+real(8)                                         ::      tfree, tfree_solvent, tfree_solute
+real(8)                                         ::      temp_solvent, temp_solute, texcl_solute, texcl_solvent
 
 
-type NBQ_TYPE
-        integer(AI)				::	j       !atom number
-        integer(AI)				::	iq, jq  !q-atom numbers
-        integer(TINY)			::	LJcod
+!-----------------------------------------------------------------------
+!       nonbonded pair information
+!-----------------------------------------------------------------------
+type nb_type
+        integer(ai)                             ::      i, j
+        integer(tiny)                   ::      ljcod
+        integer                                 :: cgp_pair ! cgp_pair only used with periodic conditions
+end type nb_type
+
+type cgp_pair_type
+        integer(ai)                             :: i, j !switching atoms (or equal in case of no switching atoms) of the chargegroups
+        real(8)                                 :: x, y, z !periodical shifts
+end type cgp_pair_type
+
+type nbqp_type
+        integer(ai)                             ::      i, j
+        integer(tiny)                   ::      ljcod, qljcod
+        integer                                 ::      cgp_pair !this variable only used with periodic conditions
+end type nbqp_type
+
+
+type nbq_type
+        integer(ai)                             ::      j       !atom number
+        integer(ai)                             ::      iq, jq  !q-atom numbers
+        integer(tiny)                   ::      ljcod
         real(8)                 ::  el_scale !scale factor for electostatic interactions in qq-pairs
-end type NBQ_TYPE
+end type nbq_type
 
-integer						::	nbpp_pair !current no solute-solute pairs
-type(NB_TYPE), allocatable, target::nbpp(:)
+integer                                         ::      nbpp_pair !current no solute-solute pairs
+type(nb_type), allocatable, target::nbpp(:)
 
-integer	::	nbww_pair,nbww_true_pair !current no solvent-solvent pairs, implicit and explicit
-integer(AI), allocatable, target::nbww(:)
+integer ::      nbww_pair,nbww_true_pair !current no solvent-solvent pairs, implicit and explicit
+integer(ai), allocatable, target::nbww(:)
 
-integer						::	nbpw_pair !current no solute-solvent pairs
-type(NB_TYPE), allocatable, target::nbpw(:)
+integer                                         ::      nbpw_pair !current no solute-solvent pairs
+type(nb_type), allocatable, target::nbpw(:)
 
-integer						::	nbqq_max !max number of q-q pairs in any state
-integer(TINY), allocatable	::	qconn(:,:,:) !Q-atom connectivity list
-integer						::	nbqq_pair(max_states)
-type(NBQ_TYPE), allocatable ::nbqq(:,:)
+integer                                         ::      nbqq_max !max number of q-q pairs in any state
+integer(tiny), allocatable      ::      qconn(:,:,:) !q-atom connectivity list
+integer                                         ::      nbqq_pair(max_states)
+type(nbq_type), allocatable ::nbqq(:,:)
 
-integer						::	nbqp_pair !current no of qatom-solute pairs
-type(NBQP_TYPE), allocatable, target::nbqp(:)
+integer                                         ::      nbqp_pair !current no of qatom-solute pairs
+type(nbqp_type), allocatable, target::nbqp(:)
 
-integer						::	nbqw_pair !current no of q-atom-water mol. pairs
-integer(AI), allocatable	::	nbqw(:)
+integer                                         ::      nbqw_pair !current no of q-atom-water mol. pairs
+integer(ai), allocatable        ::      nbqw(:)
 
 
 !these three used only under periodic conditions
-integer						:: nbpp_cgp_pair !number of solute-solute chargegroups interacting
-type(CGP_PAIR_TYPE), allocatable:: nbpp_cgp(:)
-integer						:: nbpw_cgp_pair
-type(CGP_PAIR_TYPE), allocatable :: nbpw_cgp(:)
-integer						::	nbqp_cgp_pair
-type(CGP_PAIR_TYPE), allocatable :: nbqp_cgp(:)
+integer                                         :: nbpp_cgp_pair !number of solute-solute chargegroups interacting
+type(cgp_pair_type), allocatable:: nbpp_cgp(:)
+integer                                         :: nbpw_cgp_pair
+type(cgp_pair_type), allocatable :: nbpw_cgp(:)
+integer                                         ::      nbqp_cgp_pair
+type(cgp_pair_type), allocatable :: nbqp_cgp(:)
 
 !special monitoring of pairs
-integer (TINY),allocatable  :: special_LJcod(:,:,:,:)
+integer (tiny),allocatable  :: special_ljcod(:,:,:,:)
 
-! LRF related variables
-integer(AI), allocatable	::	iwhich_cgp(:)
-
-
-type LRF_TYPE
-        real(8)					::	cgp_cent(3)
-        real(8)					::	phi0
-        real(8)					::	phi1(3)
-        real(8)					::	phi2(9)
-        real(8)					::	phi3(27)
-end type LRF_TYPE
-
-type(LRF_TYPE), allocatable	::	lrf(:)
-type(LRF_TYPE), allocatable	::	old_lrf(:)  !for constant pressure: MC_volume routine
+! lrf related variables
+integer(ai), allocatable        ::      iwhich_cgp(:)
 
 
-type(node_assignment_type)	:: calculation_assignment
+type lrf_type
+        real(8)                                 ::      cgp_cent(3)
+        real(8)                                 ::      phi0
+        real(8)                                 ::      phi1(3)
+        real(8)                                 ::      phi2(9)
+        real(8)                                 ::      phi3(27)
+end type lrf_type
+
+type(lrf_type), allocatable     ::      lrf(:)
+type(lrf_type), allocatable     ::      old_lrf(:)  !for constant pressure: mc_volume routine
+
+
+type(node_assignment_type)      :: calculation_assignment
 
 
 !shake types & variables
 !convergence criterion (fraction of distance)
-real(8), parameter			::	SHAKE_TOL = 0.0001
-integer, parameter			::	SHAKE_MAX_ITER = 1000
+real(8), parameter                      ::      shake_tol = 0.0001
+integer, parameter                      ::      shake_max_iter = 1000
 
 
-type SHAKE_BOND_TYPE
-        integer(AI)				::	i,j
-        real(8)					::	dist2
-        logical					::	ready
-end type SHAKE_BOND_TYPE
+type shake_bond_type
+        integer(ai)                             ::      i,j
+        real(8)                                 ::      dist2
+        logical                                 ::      ready
+end type shake_bond_type
 
 
-type SHAKE_MOL_TYPE
-        integer					::	nconstraints
-        type(SHAKE_BOND_TYPE), pointer :: bond(:)
-end type SHAKE_MOL_TYPE
+type shake_mol_type
+        integer                                 ::      nconstraints
+        type(shake_bond_type), pointer :: bond(:)
+end type shake_mol_type
 
 
-integer						::	shake_constraints, shake_molecules
-type(SHAKE_MOL_TYPE), allocatable :: shake_mol(:)
+integer                                         ::      shake_constraints, shake_molecules
+type(shake_mol_type), allocatable :: shake_mol(:)
 
 !-----------------------------------------------------------------------
-!	profiling vars
+!       profiling vars
 !-----------------------------------------------------------------------
-#if defined (PROFILING)
+#if defined (profiling)
 
 
-integer, parameter		:: num_profiling_times = 11
+integer, parameter              :: num_profiling_times = 11
 
 type profiling_var_type
-	character(len=100)	:: name
-	real(8)			:: time = 0.0
+        character(len=100)      :: name
+        real(8)                 :: time = 0.0
 end type profiling_var_type
 
-type(profiling_var_type)	:: profile(num_profiling_times)
+type(profiling_var_type)        :: profile(num_profiling_times)
 
-#if defined (USE_MPI)
+#if defined (use_mpi)
  !vectors for keeping track of node times
-real(8),allocatable				:: all_node_times(:)
-real(8),allocatable				:: node_times(:)
+real(8),allocatable                             :: all_node_times(:)
+real(8),allocatable                             :: node_times(:)
 #endif
 
 #endif
 
 !-----------------------------------------------------------------------
-!	temperature calculation variables
+!       temperature calculation variables
 !-----------------------------------------------------------------------
-integer						:: Ndegf,Ndegfree
-integer						:: Ndegf_solute,Ndegfree_solute
-integer						:: Ndegf_solvent,Ndegfree_solvent
-logical						:: detail_temps			!controls whether or not solute and solvent temps are printed separately (true if solute and solvent degrees of freedom are both not zero)
+integer                                         :: ndegf,ndegfree
+integer                                         :: ndegf_solute,ndegfree_solute
+integer                                         :: ndegf_solvent,ndegfree_solvent
+logical                                         :: detail_temps                 !controls whether or not solute and solvent temps are printed separately (true if solute and solvent degrees of freedom are both not zero)
 
-!----END OF SHARED VARIABLES
+!----end of shared variables
 
 
-!----START OF PUBLIC SUBROUTINES
+!----start of public subroutines
 contains
 
 
@@ -384,8 +357,6 @@ subroutine md_startup
 ! initialise used modules
 call qatom_startup
 call trj_startup
-
-
 ! initialise constants
 pi = 4.0*atan(1.0)
 deg2rad = pi/180.0
@@ -406,7 +377,7 @@ end subroutine md_shutdown
 
 subroutine die(cause)
 ! args
-character(*), optional		:: cause
+character(*), optional          :: cause
 
 
 !
@@ -415,57 +386,57 @@ character(*), optional		:: cause
 
 
 ! local vars
-integer						:: i
+integer                                         :: i
 ! flush stuff
-integer(4), parameter			:: stdout_unit = 6
+integer(4), parameter                   :: stdout_unit = 6
 
 if (nodeid .eq. 0) then
         write(*,*)
-        call centered_heading('ABNORMAL TERMINATION', '!')
+        call centered_heading('abnormal termination', '!')
         ! write final energies if run has started
         if (istep > 0) then
                 if ( mod(istep,iout_cycle) .ne. 1 ) call write_out
         end if
-		if(allocated(v)) then
-	        !save restart file for diagnosing coordinate problems
-		    write(*,*) 'restart file written at step', istep
-			call write_xfin
-		endif
+                if(allocated(v)) then
+                !save restart file for diagnosing coordinate problems
+                    write(*,*) 'restart file written at step', istep
+                        call write_xfin
+                endif
         write (*,'(79a)') ('!',i=1,79)
         call close_output_files
 
         ! apologise
-        write(*,'(a)') 'ABNORMAL TERMINATION of Qdyn5'
+        write(*,'(a)') 'abnormal termination of qdyn5'
         if (present(cause)) then
-                write(*,'(79a)') 'Terminating due to ', cause
+                write(*,'(79a)') 'terminating due to ', cause
                 endif
         write (*,'(79a)') ('!',i=1,79)
-#if defined(CRAY)
-        !Cray can't flush stdout...
-#elif defined(NO_FLUSH)
-		!When you can't flush
+#if defined(cray)
+        !cray can't flush stdout...
+#elif defined(no_flush)
+                !when you can't flush
 #else
         ! flush stdout
         call flush(stdout_unit)
 #endif
-end if	
+end if  
 ! clean up
 call md_deallocate
 
 
-#if defined (USE_MPI)
+#if defined (use_mpi)
 ! abort all processes with exit code 255
-call MPI_Abort(MPI_COMM_WORLD, 255, ierr)
+call mpi_abort(mpi_comm_world, 255, ierr)
 #else
 ! stop with a message to stderr
-stop 'Qdyn5 terminated abnormally'
+stop 'qdyn5 terminated abnormally'
 #endif
 
 end subroutine die
 
 !----------------------------------------------------------------------
 
-! --- Memory management routines
+! --- memory management routines
 
 subroutine allocate_natom_arrays
 
@@ -480,7 +451,7 @@ call check_alloc('atom data arrays')
 end subroutine allocate_natom_arrays
 
 !----------------------------------------------------------------------
-!Allocate arrays that hold no. pairs per chargegroup.
+!allocate arrays that hold no. pairs per chargegroup.
 subroutine allocate_nbxx_per_cgp
 
  allocate(nbpp_per_cgp(ncgp_solute), & 
@@ -489,7 +460,7 @@ subroutine allocate_nbxx_per_cgp
           nbqw_per_cgp(nwat), &
           nbpw_per_cgp(ncgp_solute), &
           stat=alloc_status)
- call check_alloc('MPI data arrays')
+ call check_alloc('mpi data arrays')
 
 end subroutine allocate_nbxx_per_cgp
 
@@ -497,32 +468,32 @@ end subroutine allocate_nbxx_per_cgp
 
 subroutine allocate_lrf_arrays
 
-if (use_PBC .and. constant_pressure) then
-	allocate(iwhich_cgp(natom), lrf(ncgp), old_lrf(ncgp), stat=alloc_status)
+if (use_pbc .and. constant_pressure) then
+        allocate(iwhich_cgp(natom), lrf(ncgp), old_lrf(ncgp), stat=alloc_status)
 else
-	allocate(iwhich_cgp(natom), lrf(ncgp), stat=alloc_status)
+        allocate(iwhich_cgp(natom), lrf(ncgp), stat=alloc_status)
 end if
 
-call check_alloc('LRF arrays')
+call check_alloc('lrf arrays')
 end subroutine allocate_lrf_arrays
 
 !----------------------------------------------------------------------
-#if defined(USE_MPI)
+#if defined(use_mpi)
 subroutine allocate_mpi
 
 if(nodeid .eq. 0) then
- allocate(mpi_status(MPI_STATUS_SIZE,numnodes-1), & 
+ allocate(mpi_status(mpi_status_size,numnodes-1), & 
          request_recv(numnodes-1,3), &
          d_recv(natom*3,numnodes-1), &
-         E_recv(numnodes-1), &
-         EQ_recv(nstates,numnodes-1), &
+         e_recv(numnodes-1), &
+         eq_recv(nstates,numnodes-1), &
          stat=alloc_status)
- call check_alloc('MPI data arrays')
+ call check_alloc('mpi data arrays')
 else
- allocate(E_send(1), &
-          EQ_send(nstates), &
+ allocate(e_send(1), &
+          eq_send(nstates), &
           stat=alloc_status)
- call check_alloc('MPI data arrays')
+ call check_alloc('mpi data arrays')
 end if
 end subroutine allocate_mpi
 #endif
@@ -551,7 +522,7 @@ character(*) message
 character(120) allocmsg
 
 if (alloc_status .ne. 0) then
-allocmsg = '>>> Out of memory trying to allocate '//message
+allocmsg = '>>> out of memory trying to allocate '//message
 call die(allocmsg)
 end if
 end subroutine check_alloc
@@ -559,7 +530,7 @@ end subroutine check_alloc
 !----------------------------------------------------------------------
 
 subroutine md_deallocate
-! deallocatde this module's own arrays. Called by shutdown
+! deallocatde this module's own arrays. called by shutdown
 
 ! use status to avoid errors if not allocated
 
@@ -582,7 +553,7 @@ deallocate(theta, stat=alloc_status)
 deallocate(theta0, stat=alloc_status)
 deallocate(tdum, stat=alloc_status)
 
-! LRF arrays
+! lrf arrays
 deallocate(iwhich_cgp, lrf, stat=alloc_status)
 
 ! restraints
@@ -591,8 +562,8 @@ deallocate(rstpos, stat=alloc_status)
 deallocate(rstdis, stat=alloc_status)
 deallocate(rstwal, stat=alloc_status)
 
-#if defined (USE_MPI)
-!MPI arrays
+#if defined (use_mpi)
+!mpi arrays
 deallocate(nbpp_per_cgp ,stat=alloc_status)
 deallocate(nbww_per_cgp ,stat=alloc_status)
 deallocate(nbqp_per_cgp ,stat=alloc_status)
@@ -602,11 +573,11 @@ deallocate(nbpw_per_cgp ,stat=alloc_status)
 
 if(nodeid .eq. 0) then
    deallocate(d_recv, stat=alloc_status)
-   deallocate(E_recv, stat=alloc_status)
-   deallocate(EQ_recv, stat=alloc_status)
+   deallocate(e_recv, stat=alloc_status)
+   deallocate(eq_recv, stat=alloc_status)
 else
-   deallocate(E_send, stat=alloc_status)
-   deallocate(EQ_send, stat=alloc_status)
+   deallocate(e_send, stat=alloc_status)
+   deallocate(eq_send, stat=alloc_status)
 end if
 #endif
 
@@ -617,8 +588,8 @@ end subroutine md_deallocate
 subroutine reallocate_nonbondlist_pp
 
 ! variables
-type(NB_TYPE), allocatable	:: old_nbxx(:)
-integer						:: old_max
+type(nb_type), allocatable      :: old_nbxx(:)
+integer                                         :: old_max
 
 ! copy
 old_max = calculation_assignment%pp%max
@@ -645,8 +616,8 @@ end subroutine reallocate_nonbondlist_pp
 subroutine reallocate_nbpp_cgp
 
 ! variables
-type(CGP_PAIR_TYPE), allocatable	:: old_nbxx(:)
-integer						:: old_max, new_max
+type(cgp_pair_type), allocatable        :: old_nbxx(:)
+integer                                         :: old_max, new_max
 
 ! copy
 old_max = size(nbpp_cgp, 1)
@@ -673,8 +644,8 @@ end subroutine reallocate_nbpp_cgp
 subroutine reallocate_nbpw_cgp
 
 ! variables
-type(CGP_PAIR_TYPE), allocatable	:: old_nbxx(:)
-integer						:: old_max, new_max
+type(cgp_pair_type), allocatable        :: old_nbxx(:)
+integer                                         :: old_max, new_max
 
 ! copy
 old_max = size(nbpw_cgp, 1)
@@ -701,8 +672,8 @@ end subroutine reallocate_nbpw_cgp
 subroutine reallocate_nbqp_cgp
 
 ! variables
-type(CGP_PAIR_TYPE), allocatable	:: old_nbxx(:)
-integer						:: old_max, new_max
+type(cgp_pair_type), allocatable        :: old_nbxx(:)
+integer                                         :: old_max, new_max
 
 ! copy
 old_max = size(nbqp_cgp, 1)
@@ -730,8 +701,8 @@ end subroutine reallocate_nbqp_cgp
 
 subroutine reallocate_nonbondlist_pw
 ! variables
-type(NB_TYPE), allocatable	:: old_nbxx(:)
-integer						:: old_max
+type(nb_type), allocatable      :: old_nbxx(:)
+integer                                         :: old_max
 
 ! copy
 old_max = calculation_assignment%pw%max
@@ -759,8 +730,8 @@ end subroutine reallocate_nonbondlist_pw
 
 subroutine reallocate_nonbondlist_qp
 ! variables
-type(NBQP_TYPE), allocatable	:: old_nbxx(:)
-integer						:: old_max
+type(nbqp_type), allocatable    :: old_nbxx(:)
+integer                                         :: old_max
 
 ! copy
 old_max = calculation_assignment%qp%max
@@ -788,8 +759,8 @@ end subroutine reallocate_nonbondlist_qp
 
 subroutine reallocate_nonbondlist_ww
 ! variables
-integer(AI), allocatable		:: old_nbxx(:)
-integer						:: old_max
+integer(ai), allocatable                :: old_nbxx(:)
+integer                                         :: old_max
 
 ! copy
 allocate(old_nbxx(calculation_assignment%ww%max), stat=alloc_status)
@@ -815,17 +786,17 @@ end subroutine reallocate_nonbondlist_ww
 
 !----------------------------------------------------------------------
 
-! --- Dynamics subroutines, alphabetically
+! --- dynamics subroutines, alphabetically
 
 real(8) function angle(istart, iend)
 ! *** arguments
-integer						::	istart, iend
+integer                                         ::      istart, iend
 
 ! *** local variables
-integer						::	i,j,k,ia,ic,i3,j3,k3
-real(8)						::	bjiinv, bjkinv, bji2inv, bjk2inv
-real(8)						::	scp,angv,da,dv,f1
-real(8)						::  rji(3),rjk(3),di(3),dk(3) 
+integer                                         ::      i,j,k,ia,ic,i3,j3,k3
+real(8)                                         ::      bjiinv, bjkinv, bji2inv, bjk2inv
+real(8)                                         ::      scp,angv,da,dv,f1
+real(8)                                         ::  rji(3),rjk(3),di(3),dk(3) 
 
 ! global variables used:
 ! ang, x, anglib, d
@@ -833,7 +804,7 @@ real(8)						::  rji(3),rjk(3),di(3),dk(3)
 ! calculate the total energy of all protein or water angles, depending
 ! updates d
 
-! reset Eangle
+! reset eangle
 angle = 0.
 
 do ia=istart,iend
@@ -909,15 +880,15 @@ end function angle
 !-----------------------------------------------------------------------
 real(8) function urey_bradley(istart, iend)
 ! *** arguments
-integer						::	istart, iend
+integer                                         ::      istart, iend
 
 ! *** local variables
-integer						::	i,j,k,ia,ic,i3,j3,k3
-real(8)						::	bjiinv, bjkinv, bji2inv, bjk2inv
-real(8)						::	scp,angv,da,dv,f1
-real(8)						::  rji(3),rjk(3),di(3),dk(3) 
-real(8)						::	rik(3), dik, ru, du 
-real(8)						::	Eurey
+integer                                         ::      i,j,k,ia,ic,i3,j3,k3
+real(8)                                         ::      bjiinv, bjkinv, bji2inv, bjk2inv
+real(8)                                         ::      scp,angv,da,dv,f1
+real(8)                                         ::  rji(3),rjk(3),di(3),dk(3) 
+real(8)                                         ::      rik(3), dik, ru, du 
+real(8)                                         ::      eurey
 
 ! global variables used:
 ! ang, x, anglib, d
@@ -936,7 +907,7 @@ do ia=istart,iend
 i3=i*3-3
 j3=j*3-3
 k3=k*3-3
-        ! 1-3 distance for Urey-Bradley potential:
+        ! 1-3 distance for urey-bradley potential:
     if(anglib(ic)%ureyfk > 0.) then
                 rik(1) = x(k3+1) - x(i3+1)
                 rik(2) = x(k3+2) - x(i3+2)
@@ -960,17 +931,17 @@ end function urey_bradley
 
 real(8) function bond(istart, iend)
 ! *** arguments
-integer						::	istart, iend
+integer                                         ::      istart, iend
 
 ! *** local variables
-integer						::	i,j,ib,ic,i3,j3
-real(8)						::	b,db,dv
-real(8)						::	rij(3)
+integer                                         ::      i,j,ib,ic,i3,j3
+real(8)                                         ::      b,db,dv
+real(8)                                         ::      rij(3)
 
 ! global variables used:
 ! bnd, x, bondlib, d
 
-! reset Ebond
+! reset ebond
 bond = 0
 
 do ib=istart,iend
@@ -986,7 +957,7 @@ do ib=istart,iend
         rij(2) = x(j3+2) - x(i3+2)
         rij(3) = x(j3+3) - x(i3+3)
 
-        ! calculate b and db, update Ebond
+        ! calculate b and db, update ebond
         b = sqrt ( rij(1)**2 + rij(2)**2 + rij(3)**2 )
         db = b - bondlib(ic)%bnd0
         bond = bond + 0.5*bondlib(ic)%fk*db**2
@@ -1005,7 +976,7 @@ end function bond
 !-----------------------------------------------------------------------
 subroutine cgp_centers
 ! *** local variables
-integer						::	ig,i,i3
+integer                                         ::      ig,i,i3
 
 do ig = 1, ncgp
         lrf(ig)%cgp_cent(:) = 0.
@@ -1026,12 +997,12 @@ end subroutine cgp_centers
 !-----------------------------------------------------------------------
 subroutine make_nbqqlist
 !locals
-integer						::	is
+integer                                         ::      is
 
 call make_qconn
 nbqq_max = nbqq_count()
 allocate(nbqq(nbqq_max, nstates), stat=alloc_status)
-call check_alloc('Qatom-Qatom non-bond list')
+call check_alloc('qatom-qatom non-bond list')
 ! prepare q-atom nonbond lists that do not need updating
 call nbqqlist
 
@@ -1040,7 +1011,7 @@ do is =1, nstates
 end do
 write (*,*)
 
-200 format ('No. of Rcq indep. nb pairs involving q-atoms = ',i5, &
+200 format ('no. of rcq indep. nb pairs involving q-atoms = ',i5, &
 ' in state :',i3)
 end subroutine make_nbqqlist
 
@@ -1048,16 +1019,16 @@ end subroutine make_nbqqlist
 
 subroutine distribute_nonbonds
 !locals
-integer					:: npp, npw, nqp, nww, nqw
-type(NODE_ASSIGNMENT_TYPE),allocatable  :: node_assignment(:)
-real					:: avgload, old_avgload
-integer					:: i, last_cgp, last_pair
-integer					:: mpitype_pair_assignment, mpitype_node_assignment
+integer                                 :: npp, npw, nqp, nww, nqw
+type(node_assignment_type),allocatable  :: node_assignment(:)
+real                                    :: avgload, old_avgload
+integer                                 :: i, last_cgp, last_pair
+integer                                 :: mpitype_pair_assignment, mpitype_node_assignment
 integer                                 :: average_pairs,inode,icgp,sum,less_than_sum
 integer                                 :: n_bonded, n_nonbonded, master_assign
 real                                   :: percent
 integer                                 :: master_sum
-!!!!Tmp vars för allokering
+!!!!tmp vars fï¿½r allokering
 integer,parameter :: vars = 5
 integer :: i_loop
 !!!
@@ -1067,29 +1038,29 @@ integer :: i_loop
 
 if (nodeid .eq. 0) then
 ! nice header
-call centered_heading('Distribution of charge groups','-')
+call centered_heading('distribution of charge groups','-')
 
-!Allocate node_assignment
+!allocate node_assignment
 allocate(node_assignment(0:numnodes-1),stat=alloc_status)
 call check_alloc('node_assignment')
 
-!Allocate arrays that hold no. pairs per chargegroup.
+!allocate arrays that hold no. pairs per chargegroup.
 call allocate_nbxx_per_cgp
 
-!Count stuff for balancing nodes and allocating nonbond arrays nbxx()
+!count stuff for balancing nodes and allocating nonbond arrays nbxx()
 nbpp_per_cgp = 0
 nbpw_per_cgp = 0
 nbqp_per_cgp = 0
 nbqw_per_cgp = 0
 nbww_per_cgp = 0
 
-call nbpp_count(npp, nbpp_per_cgp)    !Only for switching atoms!!!?
+call nbpp_count(npp, nbpp_per_cgp)    !only for switching atoms!!!?
 call nbpw_count(npw, nbpw_per_cgp)
 call nbqp_count(nqp, nbqp_per_cgp)
 call nbqw_count(nqw, nbqw_per_cgp) 
 call nbww_count(nww, nbww_per_cgp) 
 
-!For keeping track of actual # of nonbonded pairs
+!for keeping track of actual # of nonbonded pairs
 totnbpp = npp
 totnbpw = npw
 totnbww = nww*9
@@ -1111,36 +1082,36 @@ calculation_assignment%qw%end = nwat
 calculation_assignment%ww%start = 1
 calculation_assignment%ww%end = nwat
 
-#if defined (USE_MPI)
+#if defined (use_mpi)
 else ! i.e. slave nodes exists
 
-! A simple solution to avoid parallelising the bonded
-! Calculate n_bonded and n_nonbonded 
-! Approximate time of computing one bonded with one nonbonded
-! The number of qq-interactions are neglected
+! a simple solution to avoid parallelising the bonded
+! calculate n_bonded and n_nonbonded 
+! approximate time of computing one bonded with one nonbonded
+! the number of qq-interactions are neglected
 n_bonded = nbonds + nangles + ntors + nimps
 n_nonbonded = totnbpp + totnbpw + totnbww + totnbqw + totnbqp
 
-! Compare to determine how many nonbonded master should get
-! A bonded is faster, so this favours an early completion for master
+! compare to determine how many nonbonded master should get
+! a bonded is faster, so this favours an early completion for master
 master_assign =  n_nonbonded/numnodes - n_bonded * numnodes
 
 ! calculate the assignments ********************
 
-!Calculate balanced assignment for p-p pairs
+!calculate balanced assignment for p-p pairs
 icgp=0
 sum=0
- !First assign master a small part
+ !first assign master a small part
 node_assignment(0)%pp%start=icgp+1
-percent=REAL(totnbpp)/n_nonbonded
-less_than_sum = master_assign*percent  ! No. of pp-type to assign master
+percent=real(totnbpp)/n_nonbonded
+less_than_sum = master_assign*percent  ! no. of pp-type to assign master
 do while((icgp .lt. ncgp_solute) .and. (sum .lt. less_than_sum))
    icgp=icgp+1
    sum=sum + nbpp_per_cgp(icgp)
 end do
 node_assignment(0)%pp%end=icgp
 master_sum=sum
- !Now assign slaves
+ !now assign slaves
 average_pairs=(totnbpp-sum)/(numnodes-1)
 do inode=1,numnodes-2
   node_assignment(inode)%pp%start=icgp+1
@@ -1154,11 +1125,11 @@ end do
 node_assignment(numnodes-1)%pp%start=icgp+1
 node_assignment(numnodes-1)%pp%end=ncgp_solute
 
-!Calculate balanced assignment for p-w pairs
+!calculate balanced assignment for p-w pairs
 icgp=0
 sum=0
 node_assignment(0)%pw%start=icgp+1
-percent=REAL(totnbpw)/n_nonbonded
+percent=real(totnbpw)/n_nonbonded
 less_than_sum = master_assign*percent
 do while((icgp .lt. ncgp_solute) .and. (sum .lt. less_than_sum))
    icgp=icgp+1
@@ -1179,11 +1150,11 @@ end do
 node_assignment(numnodes-1)%pw%start=icgp+1
 node_assignment(numnodes-1)%pw%end=ncgp_solute
 
-!Calculate balanced assignment for q-p pairs
+!calculate balanced assignment for q-p pairs
 icgp=0
 sum=0
 node_assignment(0)%qp%start=icgp+1
-percent=REAL(totnbqp)/n_nonbonded
+percent=real(totnbqp)/n_nonbonded
 less_than_sum = master_assign*percent
 do while((icgp .lt. ncgp_solute) .and. (sum .lt. less_than_sum))
    icgp=icgp+1
@@ -1204,11 +1175,11 @@ end do
 node_assignment(numnodes-1)%qp%start=icgp+1
 node_assignment(numnodes-1)%qp%end=ncgp_solute
 
-!Calculate balanced assignment for w-w pairs
+!calculate balanced assignment for w-w pairs
 icgp=0
 sum=0
 node_assignment(0)%ww%start=icgp+1
-percent=REAL(totnbww)/n_nonbonded
+percent=real(totnbww)/n_nonbonded
 less_than_sum = master_assign*percent
 do while((icgp .lt. nwat) .and. (sum .lt. less_than_sum))
    icgp=icgp+1
@@ -1229,11 +1200,11 @@ end do
 node_assignment(numnodes-1)%ww%start=icgp+1
 node_assignment(numnodes-1)%ww%end=nwat
 
-!Calculate balanced assignment for q-w pairs
+!calculate balanced assignment for q-w pairs
 icgp=0
 sum=0
 node_assignment(0)%qw%start=icgp+1
-percent=REAL(totnbqw)/n_nonbonded
+percent=real(totnbqw)/n_nonbonded
 less_than_sum = master_assign*percent
 do while((icgp .lt. nwat) .and. (sum .lt. less_than_sum))
    icgp=icgp+1
@@ -1263,41 +1234,41 @@ end if    !if (numnodes .eq. 1)
 end if   !if (nodeid .eq. 0)
 
 ! distribute assignments to the nodes
-#if defined (USE_MPI)
+#if defined (use_mpi)
 if (numnodes .gt. 1) then
     if (nodeid .ne. 0) then
-	! Dummy allocation to avoid runtime errors when using pointer checking
-	allocate(node_assignment(1),stat=alloc_status)
+        ! dummy allocation to avoid runtime errors when using pointer checking
+        allocate(node_assignment(1),stat=alloc_status)
     endif 
 ! register data types
-call MPI_Type_contiguous(3, MPI_INTEGER, mpitype_pair_assignment, ierr)
-if (ierr .ne. 0) call die('failure while creating custom MPI data type')
-call MPI_Type_commit(mpitype_pair_assignment, ierr)
-if (ierr .ne. 0) call die('failure while creating custom MPI data type')
+call mpi_type_contiguous(3, mpi_integer, mpitype_pair_assignment, ierr)
+if (ierr .ne. 0) call die('failure while creating custom mpi data type')
+call mpi_type_commit(mpitype_pair_assignment, ierr)
+if (ierr .ne. 0) call die('failure while creating custom mpi data type')
 
-call MPI_Type_contiguous(5, mpitype_pair_assignment, mpitype_node_assignment, ierr)
-if (ierr .ne. 0) call die('failure while creating custom MPI data type')
-call MPI_Type_commit(mpitype_node_assignment, ierr)
-if (ierr .ne. 0) call die('failure while creating custom MPI data type')
+call mpi_type_contiguous(5, mpitype_pair_assignment, mpitype_node_assignment, ierr)
+if (ierr .ne. 0) call die('failure while creating custom mpi data type')
+call mpi_type_commit(mpitype_node_assignment, ierr)
+if (ierr .ne. 0) call die('failure while creating custom mpi data type')
 
 ! distribute
-call MPI_Scatter(node_assignment, 1, mpitype_node_assignment, &
-    calculation_assignment, 1, mpitype_node_assignment, 0, MPI_COMM_WORLD, ierr)
+call mpi_scatter(node_assignment, 1, mpitype_node_assignment, &
+    calculation_assignment, 1, mpitype_node_assignment, 0, mpi_comm_world, ierr)
 if (ierr .ne. 0) call die('failure while sending node assignments')
 
 ! free data type
-call MPI_Type_free(mpitype_node_assignment, ierr)
-call MPI_Type_free(mpitype_pair_assignment, ierr)
+call mpi_type_free(mpitype_node_assignment, ierr)
+call mpi_type_free(mpitype_pair_assignment, ierr)
 
     if (nodeid .ne. 0) then
-	deallocate(node_assignment)
+        deallocate(node_assignment)
     endif 
 end if
 #endif
 
 if (nodeid .eq. 0) then
  ! print a status report
- write(*,98) 'solute-solute', 'solute-water', 'water-water', 'Q-solute', 'Q-water'
+ write(*,98) 'solute-solute', 'solute-water', 'water-water', 'q-solute', 'q-water'
  write(*,99) 'total', ncgp_solute,ncgp_solute,nwat,ncgp_solute,nwat
 if (numnodes .gt. 1) then
  do i=0,numnodes-1
@@ -1311,12 +1282,12 @@ if (numnodes .gt. 1) then
 end if
 end if
 
-#if defined (USE_MPI)
-call MPI_Bcast(totnbpp, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-call MPI_Bcast(totnbpw, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-call MPI_Bcast(totnbqp, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-call MPI_Bcast(totnbqw, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-call MPI_Bcast(totnbww, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+#if defined (use_mpi)
+call mpi_bcast(totnbpp, 1, mpi_integer, 0, mpi_comm_world, ierr)
+call mpi_bcast(totnbpw, 1, mpi_integer, 0, mpi_comm_world, ierr)
+call mpi_bcast(totnbqp, 1, mpi_integer, 0, mpi_comm_world, ierr)
+call mpi_bcast(totnbqw, 1, mpi_integer, 0, mpi_comm_world, ierr)
+call mpi_bcast(totnbww, 1, mpi_integer, 0, mpi_comm_world, ierr)
 #endif
 
 ! allocate
@@ -1334,26 +1305,26 @@ call check_alloc('solvent-solvent non-bond list')
 
 calculation_assignment%qp%max = totnbqp/numnodes + 0.20*totnbqp
 allocate(nbqp(calculation_assignment%qp%max), stat=alloc_status)
-call check_alloc('Qatom - solute non-bond list')
+call check_alloc('qatom - solute non-bond list')
 
 calculation_assignment%qw%max = nwat
 allocate(nbqw(calculation_assignment%qw%max), stat=alloc_status)
-call check_alloc('Qatom - water non-bond list')
+call check_alloc('qatom - water non-bond list')
 
 
 
-  if (use_PBC) then
-	!allocate array to keep track of chargegroups
-	!approximate with one half of the number of atompairs
-	allocate(nbpp_cgp(calculation_assignment%pp%max / 2), stat=alloc_status)
-	call check_alloc('solute-solute non-bond charge group pair list')
-	allocate(nbpw_cgp(calculation_assignment%pw%max / 2), stat=alloc_status)
-	call check_alloc('solute-solvent non-bond charge group pair list')
-	allocate(nbqp_cgp(calculation_assignment%qp%max / 2), stat=alloc_status)
-	call check_alloc('qatom-solute non-bond charge group pair list')
-  end if	
+  if (use_pbc) then
+        !allocate array to keep track of chargegroups
+        !approximate with one half of the number of atompairs
+        allocate(nbpp_cgp(calculation_assignment%pp%max / 2), stat=alloc_status)
+        call check_alloc('solute-solute non-bond charge group pair list')
+        allocate(nbpw_cgp(calculation_assignment%pw%max / 2), stat=alloc_status)
+        call check_alloc('solute-solvent non-bond charge group pair list')
+        allocate(nbqp_cgp(calculation_assignment%qp%max / 2), stat=alloc_status)
+        call check_alloc('qatom-solute non-bond charge group pair list')
+  end if        
 
-!Kanske deallokera nbxx_per_cgp TODO
+!kanske deallokera nbxx_per_cgp todo
 
 98 format('node value ',5a13)
 99 format(a10,1x,5(1x,i12))
@@ -1361,7 +1332,7 @@ call check_alloc('Qatom - water non-bond list')
 100 format(i4,1x,a5,1x,5(1x,i12))
 !100 format(i4,2x,a,t18,i13,3x,i13,3x,i13,3x,i13)
 
-if (nodeid .eq. 0)  call centered_heading('End of distribution', '-')
+if (nodeid .eq. 0)  call centered_heading('end of distribution', '-')
 
 end subroutine distribute_nonbonds
 
@@ -1419,15 +1390,15 @@ end subroutine open_files
 
 !-----------------------------------------------------------------------
 
-!Restrain all excluded atoms plus heavy solute atoms in the inner shell.
+!restrain all excluded atoms plus heavy solute atoms in the inner shell.
 subroutine fix_shell
 ! local variables
-integer						::	i,i3
-real(8)						::	fk,r2,erst
-real(8)						::	dr(3)
+integer                                         ::      i,i3
+real(8)                                         ::      fk,r2,erst
+real(8)                                         ::      dr(3)
 
 ! global variables used:
-!  E, nat_pro, excl, shell, heavy, fk_fix, fk_pshell, x, xtop, d
+!  e, nat_pro, excl, shell, heavy, fk_fix, fk_pshell, x, xtop, d
 
 do i = 1, nat_pro
 if (excl(i) .or. shell(i)) then
@@ -1447,8 +1418,8 @@ r2      = dr(1)**2 + dr(2)**2 + dr(3)**2
 erst    = 0.5*fk*r2
 
   ! update restraint energies
-if ( excl(i) ) E%restraint%fix   = E%restraint%fix + erst
-if ( shell(i) ) E%restraint%shell = E%restraint%shell + erst 
+if ( excl(i) ) e%restraint%fix   = e%restraint%fix + erst
+if ( shell(i) ) e%restraint%shell = e%restraint%shell + erst 
 
   ! update forces
 d(i3+1) = d(i3+1) + fk*dr(1)
@@ -1462,12 +1433,12 @@ end subroutine fix_shell
 
 subroutine gauss (am,sd,v,ig)
 ! arguments
-real(8)					::	am,sd,v
-integer					::	ig
+real(8)                                 ::      am,sd,v
+integer                                 ::      ig
 
 ! local variables
-integer					::	i
-real(8)					::	a,y
+integer                                 ::      i
+real(8)                                 ::      a,y
 
 a=0.0
 do i=1,12
@@ -1480,14 +1451,14 @@ end subroutine gauss
 !-----------------------------------------------------------------------
 subroutine get_fep
 ! local variables
-character					::	libtext*80,qaname*2
-integer					::	i,j,k,iat
+character                                       ::      libtext*80,qaname*2
+integer                                 ::      i,j,k,iat
 !temp. array for reallocating long-range exclusion list
-integer(AI), pointer	::	tempexlong(:,:)
+integer(ai), pointer    ::      tempexlong(:,:)
 
 ! --- # states, # q-atoms
 if(.not. qatom_load_atoms(fep_file)) then
-        call die('failure to load Q-atoms from FEP file.')
+        call die('failure to load q-atoms from fep file.')
 end if
 
 ! set flags
@@ -1501,11 +1472,11 @@ do i=1,nqat
                 call die('invalid q-atom data')
         end if
 end do
-10	format('>>> WARNING: Q-atom no. ',i2,' is not associated with a topology atom.')
-20	format('>>>>> ERROR: Q-atom no. ',i2,' has invalid topology number ',i5)
+10      format('>>> warning: q-atom no. ',i2,' is not associated with a topology atom.')
+20      format('>>>>> error: q-atom no. ',i2,' has invalid topology number ',i5)
 !allocate memory for qatom charges
 allocate(qcrg(nqat,nstates), stat=alloc_status)
-call check_alloc('Qatom charges')
+call check_alloc('qatom charges')
 
 ! --- copy topology charges
 
@@ -1521,11 +1492,11 @@ sc_lookup(:,:,:)=0.0
 
 !load rest of fep file
 if(.not. qatom_load_fep(fep_file)) then
-        call die('failure to load FEP file.')
+        call die('failure to load fep file.')
 end if
 
-!Adapt LJ parameters to topology
-!If arithmetic combination rule take sqrt(epsilon) now
+!adapt lj parameters to topology
+!if arithmetic combination rule take sqrt(epsilon) now
 if (qvdw_flag .and. ivdw_rule .eq. 2 ) then
         qbvdw(:,1) = sqrt( qbvdw(:,1) )
         qbvdw(:,3) = sqrt( qbvdw(:,3) )
@@ -1534,10 +1505,10 @@ end if
 !remove redefined bonded interactions from topology
 if(nqbond > 0 .or. nqangle > 0 .or. nqtor > 0 .or. nqimp > 0 ) then
         write(*,*)
-        call centered_heading('Removing redefined interactions from topology','-')
-230		format('type',t10,' atom1 atom2 atom3 atom4')
+        call centered_heading('removing redefined interactions from topology','-')
+230             format('type',t10,' atom1 atom2 atom3 atom4')
         write(*,230)
-231		format(a,t10,4i6)
+231             format(a,t10,4i6)
         !remove bonds that were redefined
         do i=1,nbonds
                 do j=1,nqbond
@@ -1566,21 +1537,21 @@ if(nqbond > 0 .or. nqangle > 0 .or. nqtor > 0 .or. nqimp > 0 ) then
         !remove torsions that were redefined
         do i=1,ntors
                 do j=1,nqtor
-						if(( (tor(i)%i.eq.iqtor(j) .and. tor(i)%j.eq.jqtor(j) .and. &
-						        tor(i)%k.eq.kqtor(j) .and. tor(i)%l.eq.lqtor(j)) .or. &
+                                                if(( (tor(i)%i.eq.iqtor(j) .and. tor(i)%j.eq.jqtor(j) .and. &
+                                                        tor(i)%k.eq.kqtor(j) .and. tor(i)%l.eq.lqtor(j)) .or. &
                                 (tor(i)%i.eq.lqtor(j) .and. tor(i)%j.eq.kqtor(j) .and. &
-								tor(i)%k.eq.jqtor(j) .and. tor(i)%l.eq.iqtor(j)) ) .and. &
+                                                                tor(i)%k.eq.jqtor(j) .and. tor(i)%l.eq.iqtor(j)) ) .and. &
                                 tor(i)%cod /= 0) then
                                 tor(i)%cod = 0
                                 write (*,231) 'torsion', tor(i)%i,tor(i)%j,tor(i)%k,tor(i)%l
-						end if
+                                                end if
                 end do
         end do
 
 
         !remove impropers that were redefined
         select case(ff_type)
-        case(FF_CHARMM) !special code for CHARMM
+        case(ff_charmm) !special code for charmm
                 do i=1,nimps
                         do j=1,nqimp
                                 if(((imp(i)%i .eq. iqimp(j)) .or. &
@@ -1618,7 +1589,7 @@ if(nqbond > 0 .or. nqangle > 0 .or. nqtor > 0 .or. nqimp > 0 ) then
 end if
 
 !check special exclusions
-!modify exclusion lists to inclue special exclusions between Q and non-Q
+!modify exclusion lists to inclue special exclusions between q and non-q
 if(nexspec > 0) then
         allocate(tempexlong(2,nexlong+nexspec))
         tempexlong(:, 1:nexlong) = listexlong(:, 1:nexlong)
@@ -1633,9 +1604,9 @@ do k = 1, nexspec
                 write(*, 592) k, i, j
                 call die('invalid special exclusion data')
         end if
-        !if one or more non-Q-atoms modify exclusion lists
+        !if one or more non-q-atoms modify exclusion lists
         if(iqatom(i)==0 .or. iqatom(j)==0) then
-                !With non-Q-atoms involved only accept all or no states
+                !with non-q-atoms involved only accept all or no states
                 if(any(exspec(k)%flag(1:nstates))) then
                         if(.not. all(exspec(k)%flag(1:nstates))) then
                                 write(*,594) k
@@ -1656,20 +1627,20 @@ do k = 1, nexspec
                 end if
         end if
 end do
-592	format('>>>>> ERROR: Special exclusion pair ',i2,' (',i5,1x,i5,') is invalid')
-594	format('>>>>> ERROR: Non-Q-atom special excl. pair ',i2,' must be on in all or no states')
+592     format('>>>>> error: special exclusion pair ',i2,' (',i5,1x,i5,') is invalid')
+594     format('>>>>> error: non-q-atom special excl. pair ',i2,' must be on in all or no states')
 end subroutine get_fep
 
 !-----------------------------------------------------------------------
 
 subroutine get_fname (text,length,filnam)
 ! arguments
-character					::	text*80,filnam*80
-integer					::	length
+character                                       ::      text*80,filnam*80
+integer                                 ::      length
 ! local variables
 
 
-integer					::	i
+integer                                 ::      i
 
 length=80
 do i=1,80
@@ -1686,17 +1657,17 @@ end subroutine get_fname
 
 real(8) function improper(istart, iend)
 !arguments
-integer						::	istart, iend
+integer                                         ::      istart, iend
 
 ! evaluate harmonic impropers
 ! local variables
-integer						::	ip
-real(8)						::	scp,phi,dv,arg,f1
-real(8)						::	bjinv, bkinv, bj2inv, bk2inv
-real(8)						::	rji(3),rjk(3),rkl(3),rnj(3),rnk(3)
-real(8)						::	rki(3),rlj(3),dp(12),di(3),dl(3)
-type(TOR_TYPE), pointer		::	t
-type(IMPLIB_TYPE), pointer	::	lib
+integer                                         ::      ip
+real(8)                                         ::      scp,phi,dv,arg,f1
+real(8)                                         ::      bjinv, bkinv, bj2inv, bk2inv
+real(8)                                         ::      rji(3),rjk(3),rkl(3),rnj(3),rnk(3)
+real(8)                                         ::      rki(3),rlj(3),dp(12),di(3),dl(3)
+type(tor_type), pointer         ::      t
+type(implib_type), pointer      ::      lib
 
 ! global variables used:
 !  imp, implib, x, pi, d
@@ -1802,15 +1773,15 @@ end function improper
 real(8) function improper2(istart, iend)
 !evaluate periodic impropers
 !arguments
-integer						::	istart, iend
+integer                                         ::      istart, iend
 ! local variables
-integer						::	ip
-real(8)						::	scp,phi,dv,arg,f1
-real(8)						::	bjinv, bkinv, bj2inv, bk2inv
-real(8)						::	rji(3),rjk(3),rkl(3),rnj(3),rnk(3)
-real(8)						::	rki(3),rlj(3),dp(12),di(3),dl(3)
-type(TOR_TYPE), pointer		::	t
-type(IMPLIB_TYPE), pointer	::	lib
+integer                                         ::      ip
+real(8)                                         ::      scp,phi,dv,arg,f1
+real(8)                                         ::      bjinv, bkinv, bj2inv, bk2inv
+real(8)                                         ::      rji(3),rjk(3),rkl(3),rnj(3),rnk(3)
+real(8)                                         ::      rki(3),rlj(3),dp(12),di(3),dl(3)
+type(tor_type), pointer         ::      t
+type(implib_type), pointer      ::      lib
 
 ! global variables used:
 ! imp, implib, x, pi, d
@@ -1913,182 +1884,182 @@ end function improper2
 
 !-----------------------------------------------------------------------
 
-#if defined (USE_MPI)
-!Defines and allocates variables needed in the md-calculations
-!The node initiation is written for AI = 4. If changes are made to any size in
-! sizes.f90 the MPI-code must be changed accordingly. It is not dynamically
+#if defined (use_mpi)
+!defines and allocates variables needed in the md-calculations
+!the node initiation is written for ai = 4. if changes are made to any size in
+! sizes.f90 the mpi-code must be changed accordingly. it is not dynamically
 ! implemented yet.
 subroutine init_nodes
 !
 ! initialise slave nodes, sending to slaves:
 !
 ! variables:
-!  natom,nwat,nsteps,use_LRF,NBcycle,crg_ow,crg_hw,Rcpp,Rcww,Rcpw,Rcq,xpcent
+!  natom,nwat,nsteps,use_lrf,nbcycle,crg_ow,crg_hw,rcpp,rcww,rcpw,rcq,xpcent
 !  nat_solute,ncgp,ncgp_solute,ivdw_rule,iuse_switch_atom,el14_scale,n14long
-!  nexlong,natyps,nljtyp,rexcl_o,nstates,nqat,qvdw_flag,nqlib,RcLRF,
-!  use_PBC, qswitch, nmol, nat_pro
+!  nexlong,natyps,nljtyp,rexcl_o,nstates,nqat,qvdw_flag,nqlib,rclrf,
+!  use_pbc, qswitch, nmol, nat_pro
 !
 ! arrays:
 !  x,v,iqatom,ljcod,qconn,iwhich_cgp,lrf,excl,iac,crg,cgpatom,cgp,iaclib
-!  list14,listex,list14long,listexlong,iqseq,qiac,qcrg,qavdw,qbvdw,EQ(:)%lambda,
+!  list14,listex,list14long,listexlong,iqseq,qiac,qcrg,qavdw,qbvdw,eq(:)%lambda,
 !  boxlength, inv_boxl, boxcentre, sc_lookup 
 !
 
-integer, parameter			:: vars = 40    !increment this var when adding data to broadcast in batch 1
-integer			   	:: blockcnt(vars), ftype(vars) 
-integer(kind=MPI_ADDRESS_KIND)			   	:: fdisp(vars)
-integer					:: mpitype_batch,mpitype_batch2
-integer					:: nat3
-real(kind=wp8), allocatable		:: temp_lambda(:)
+integer, parameter                      :: vars = 40    !increment this var when adding data to broadcast in batch 1
+integer                         :: blockcnt(vars), ftype(vars) 
+integer(kind=mpi_address_kind)                          :: fdisp(vars)
+integer                                 :: mpitype_batch,mpitype_batch2
+integer                                 :: nat3
+real(kind=wp8), allocatable             :: temp_lambda(:)
 integer, parameter                      ::maxint=2147483647
-real(kind=wp8), parameter                        ::maxreal=1E35
-integer  :: MPI_AI_INTEGER, MPI_TINY_INTEGER, i_loop
+real(kind=wp8), parameter                        ::maxreal=1e35
+integer  :: mpi_ai_integer, mpi_tiny_integer, i_loop
 
-!external MPI_Address
-!external MPI_Bcast
+!external mpi_address
+!external mpi_bcast
 
 !**********
 !2002-11-28 
-!MN-> This will work with new implementations of MPI standard >= 2
-!The MPI library at PDC does not support these definitions when I tried to use them.
-!Using these routines will allow a change made to the sizes in sizes.f90 to
-! affect the mpi. Without them the variables below marked (AI) and (TINY) will have to 
+!mn-> this will work with new implementations of mpi standard >= 2
+!the mpi library at pdc does not support these definitions when i tried to use them.
+!using these routines will allow a change made to the sizes in sizes.f90 to
+! affect the mpi. without them the variables below marked (ai) and (tiny) will have to 
 ! be changed manually.
-!When using this part make sure the vars marked with comments (AI) and (TINY) are 
-! changed to MPI_AI_INTEGER and MPI_TINY_INTEGER.
+!when using this part make sure the vars marked with comments (ai) and (tiny) are 
+! changed to mpi_ai_integer and mpi_tiny_integer.
 
-!external MPI_Type_Create_F90_Integer
-!external MPI_SizeOf
+!external mpi_type_create_f90_integer
+!external mpi_sizeof
 
-!Define data types
-! This is wrong, the 1:st param is "Precision, in decimal digits", not bits
-!call MPI_Type_Create_F90_Integer((8*AI-1),MPI_AI_INTEGER,ierr)
-!call MPI_Type_Create_F90_Integer((8*TINY-1),MPI_TINY_INTEGER,ierr)
-!To check the size in bytes of the new types use
-!call MPI_SizeOf(MPI_AI_INTEGER,size,ierr)
-!call MPI_SizeOf(MPI_TINY_INTEGER,size,ierr)
+!define data types
+! this is wrong, the 1:st param is "precision, in decimal digits", not bits
+!call mpi_type_create_f90_integer((8*ai-1),mpi_ai_integer,ierr)
+!call mpi_type_create_f90_integer((8*tiny-1),mpi_tiny_integer,ierr)
+!to check the size in bytes of the new types use
+!call mpi_sizeof(mpi_ai_integer,size,ierr)
+!call mpi_sizeof(mpi_tiny_integer,size,ierr)
 !***************************
 
 
-if (nodeid .eq. 0) call centered_heading('Distributing data to slave nodes', '-')
+if (nodeid .eq. 0) call centered_heading('distributing data to slave nodes', '-')
 
 ! --- mandatory data, first batch ---
 
-if (nodeid .eq. 0) write (*,'(80a)') 'MD data, first batch'
+if (nodeid .eq. 0) write (*,'(80a)') 'md data, first batch'
 
-! Broadcast some initial variables
+! broadcast some initial variables
 
-! run control constants: natom, nwat, nsteps, NBmethod, NBcycle
-call MPI_Bcast(natom, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast natom')
-call MPI_Bcast(nwat, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast nwat')
-call MPI_Bcast(nsteps, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast nsteps')
-call MPI_Bcast(use_LRF, 1, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast use_LRF')
-call MPI_Bcast(NBcycle, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast NBcycle')
+! run control constants: natom, nwat, nsteps, nbmethod, nbcycle
+call mpi_bcast(natom, 1, mpi_integer, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast natom')
+call mpi_bcast(nwat, 1, mpi_integer, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast nwat')
+call mpi_bcast(nsteps, 1, mpi_integer, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast nsteps')
+call mpi_bcast(use_lrf, 1, mpi_logical, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast use_lrf')
+call mpi_bcast(nbcycle, 1, mpi_integer, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast nbcycle')
 
 ! water parameters: crg_ow, crg_hw (used by nonbond_ww)
-call MPI_Bcast(crg_ow, 1, MPI_REAL4, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast crg_ow')
-call MPI_Bcast(crg_hw, 1, MPI_REAL4, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast crg_hw')
+call mpi_bcast(crg_ow, 1, mpi_real4, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast crg_ow')
+call mpi_bcast(crg_hw, 1, mpi_real4, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast crg_hw')
 
-! cutoffs: Rcpp, Rcww, Rcpw, Rcq, RcLRF (used by pair list generating functions)
-call MPI_Bcast(Rcpp, 1, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast Rcpp')
-call MPI_Bcast(Rcww, 1, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast Rcww')
-call MPI_Bcast(Rcpw, 1, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast Rcpw')
-call MPI_Bcast(Rcq, 1, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast Rcq')
-call MPI_Bcast(RcLRF, 1, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast RcLRF')
+! cutoffs: rcpp, rcww, rcpw, rcq, rclrf (used by pair list generating functions)
+call mpi_bcast(rcpp, 1, mpi_real8, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast rcpp')
+call mpi_bcast(rcww, 1, mpi_real8, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast rcww')
+call mpi_bcast(rcpw, 1, mpi_real8, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast rcpw')
+call mpi_bcast(rcq, 1, mpi_real8, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast rcq')
+call mpi_bcast(rclrf, 1, mpi_real8, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast rclrf')
 
-!Periodic Boudary Condition
-call MPI_Bcast(use_PBC, 1, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast use_PBC')
-call MPI_Bcast(boxcentre, 3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast boxcentre')
-call MPI_Bcast(boxlength, 3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast boxlength')
-call MPI_Bcast(inv_boxl, 3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast inv_boxl')
-call MPI_Bcast(qswitch, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qswitch')
-call MPI_Bcast(constant_pressure, 1, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast constant_pressure')
-call MPI_Bcast(ivolume_cycle, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast ivolume_cycle')
-call MPI_Bcast(rigid_box_centre, 1, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast rigid_box_centre')
-call MPI_Bcast(put_solvent_back_in_box, 1, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast put_solvent_back_in_box')
-call MPI_Bcast(put_solute_back_in_box, 1, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast put_solute_back_in_box')
+!periodic boudary condition
+call mpi_bcast(use_pbc, 1, mpi_logical, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast use_pbc')
+call mpi_bcast(boxcentre, 3, mpi_real8, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast boxcentre')
+call mpi_bcast(boxlength, 3, mpi_real8, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast boxlength')
+call mpi_bcast(inv_boxl, 3, mpi_real8, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast inv_boxl')
+call mpi_bcast(qswitch, 1, mpi_integer, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast qswitch')
+call mpi_bcast(constant_pressure, 1, mpi_logical, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast constant_pressure')
+call mpi_bcast(ivolume_cycle, 1, mpi_integer, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast ivolume_cycle')
+call mpi_bcast(rigid_box_centre, 1, mpi_logical, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast rigid_box_centre')
+call mpi_bcast(put_solvent_back_in_box, 1, mpi_logical, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast put_solvent_back_in_box')
+call mpi_bcast(put_solute_back_in_box, 1, mpi_logical, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast put_solute_back_in_box')
 
-! xpcent            from TOPO, needed for listgeneration
-call MPI_Bcast(xpcent, 3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast xpcent')
+! xpcent            from topo, needed for listgeneration
+call mpi_bcast(xpcent, 3, mpi_real8, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast xpcent')
 
-!**MN-> Behövs om shake ska parallelliseras
+!**mn-> behï¿½vs om shake ska parallelliseras
 ! shake/temperature parameters
-!call MPI_Bcast(shake_constraints, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)  !bara i init_shake & md_run
-!call MPI_Bcast(shake_molecules, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)    !bara i div init_
-!call MPI_Bcast(Ndegf, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)    !bara i div init_
-!call MPI_Bcast(Ndegfree, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)    !bara i div init_
+!call mpi_bcast(shake_constraints, 1, mpi_integer, 0, mpi_comm_world, ierr)  !bara i init_shake & md_run
+!call mpi_bcast(shake_molecules, 1, mpi_integer, 0, mpi_comm_world, ierr)    !bara i div init_
+!call mpi_bcast(ndegf, 1, mpi_integer, 0, mpi_comm_world, ierr)    !bara i div init_
+!call mpi_bcast(ndegfree, 1, mpi_integer, 0, mpi_comm_world, ierr)    !bara i div init_
 
-! a bunch of vars from the TOPO module
-call MPI_Bcast(nat_solute, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast nat_solute')
-call MPI_Bcast(ncgp, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast ncgp')
-call MPI_Bcast(ncgp_solute, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast ncgp_solute')
-call MPI_Bcast(ivdw_rule, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast ivdw_rule')
-call MPI_Bcast(iuse_switch_atom, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast iuse_switch_atom')
-call MPI_Bcast(el14_scale, 1, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast el14_scale')
-call MPI_Bcast(n14long, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast n14long')
-call MPI_Bcast(nexlong, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast nexlong')
-call MPI_Bcast(natyps, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast natyps')
-call MPI_Bcast(rexcl_o, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast rexcl')
-call MPI_Bcast(nmol, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast nmol')
-call MPI_Bcast(nat_pro, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast nat_pro')
+! a bunch of vars from the topo module
+call mpi_bcast(nat_solute, 1, mpi_integer, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast nat_solute')
+call mpi_bcast(ncgp, 1, mpi_integer, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast ncgp')
+call mpi_bcast(ncgp_solute, 1, mpi_integer, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast ncgp_solute')
+call mpi_bcast(ivdw_rule, 1, mpi_integer, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast ivdw_rule')
+call mpi_bcast(iuse_switch_atom, 1, mpi_integer, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast iuse_switch_atom')
+call mpi_bcast(el14_scale, 1, mpi_real8, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast el14_scale')
+call mpi_bcast(n14long, 1, mpi_integer, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast n14long')
+call mpi_bcast(nexlong, 1, mpi_integer, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast nexlong')
+call mpi_bcast(natyps, 1, mpi_integer, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast natyps')
+call mpi_bcast(rexcl_o, 1, mpi_integer, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast rexcl')
+call mpi_bcast(nmol, 1, mpi_integer, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast nmol')
+call mpi_bcast(nat_pro, 1, mpi_integer, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast nat_pro')
 
-!vars from QATOM
-call MPI_Bcast(nstates, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast nstates')
-call MPI_Bcast(nqat, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast nqat')
-call MPI_Bcast(qvdw_flag, 1, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qvdw_flag')
-call MPI_Bcast(nqlib, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast nqlib')
+!vars from qatom
+call mpi_bcast(nstates, 1, mpi_integer, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast nstates')
+call mpi_bcast(nqat, 1, mpi_integer, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast nqat')
+call mpi_bcast(qvdw_flag, 1, mpi_logical, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast qvdw_flag')
+call mpi_bcast(nqlib, 1, mpi_integer, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast nqlib')
 
-!Setting all vars not sent to slaves to 2147483647. To avoid hidden bugs.
+!setting all vars not sent to slaves to 2147483647. to avoid hidden bugs.
 if (nodeid .ne. 0) then 
 shake_constraints=maxint 
 shake_molecules=maxint 
-Ndegf=maxint 
-Ndegfree=maxint
+ndegf=maxint 
+ndegfree=maxint
 xwcent(:)=maxreal 
 end if
 
-! --- MD data, second batch ---
+! --- md data, second batch ---
 
-if (nodeid .eq. 0) write (*,'(80a)') 'MD data, second batch'
+if (nodeid .eq. 0) write (*,'(80a)') 'md data, second batch'
 
 ! allocate arrays
 if (nodeid .ne. 0) then
@@ -2097,34 +2068,34 @@ end if
 
 ! broadcast x, v and winv
 nat3 = 3*natom
-call MPI_Bcast(x, nat3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast x')
-call MPI_Bcast(v, nat3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast v')
+call mpi_bcast(x, nat3, mpi_real8, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast x')
+call mpi_bcast(v, nat3, mpi_real8, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast v')
 
-!Setting all vars not sent to slaves to 2147483647. To avoid conflicts.
+!setting all vars not sent to slaves to 2147483647. to avoid conflicts.
 if (nodeid .ne. 0) then 
 winv=maxint 
 end if
 
-!Broadcast iqatom
-call MPI_Bcast(iqatom, natom, MPI_INTEGER2, 0, MPI_COMM_WORLD, ierr) !(TINY)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast iqatom')
+!broadcast iqatom
+call mpi_bcast(iqatom, natom, mpi_integer2, 0, mpi_comm_world, ierr) !(tiny)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast iqatom')
 
-!Broadcast ljcod
-call MPI_Bcast(ljcod, size(ljcod), MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast ljcod')
+!broadcast ljcod
+call mpi_bcast(ljcod, size(ljcod), mpi_integer, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast ljcod')
 
-!Broadcast qconn(nstates,nat_solute, nqat)
+!broadcast qconn(nstates,nat_solute, nqat)
 if (nodeid .ne. 0) then
 allocate(qconn(nstates,nat_solute, nqat),stat=alloc_status)
 call check_alloc('qconn')
 end if
-call MPI_Bcast(qconn, size(qconn), MPI_INTEGER2, 0, MPI_COMM_WORLD, ierr) ! (TINY)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qconn')
+call mpi_bcast(qconn, size(qconn), mpi_integer2, 0, mpi_comm_world, ierr) ! (tiny)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast qconn')
 
 
-! --- Periodic boundary condition data ---
+! --- periodic boundary condition data ---
 
 
 
@@ -2138,16 +2109,16 @@ if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qconn')
 
 !if (nodeid .ne. 0) then
 ! allocate shake arrays
-! ADD CODE HERE to allocate shake array!
+! add code here to allocate shake array!
 !end if
 
 ! bake all shake data into a big packet & bcast
-! ADD CODE HERE to broadcast shake data
+! add code here to broadcast shake data
 !end if
 
 ! --- lrf data ---
 
-if (use_LRF) then
+if (use_lrf) then
 ! lrf stuff
 
 if (nodeid .eq. 0) write (*,'(80a)') 'lrf data'
@@ -2155,37 +2126,37 @@ if (nodeid .eq. 0) write (*,'(80a)') 'lrf data'
 ! allocate arrays
 if (nodeid .ne. 0) call allocate_lrf_arrays
 
-!MPI_INTEGER4 is used instead of MPI_AI_INTEGER
-!Change to mpi_type_create, see note above or note2 in sizes.f90
+!mpi_integer4 is used instead of mpi_ai_integer
+!change to mpi_type_create, see note above or note2 in sizes.f90
 ! iwhich_cgp
-call MPI_Bcast(iwhich_cgp, natom, MPI_INTEGER4, 0, MPI_COMM_WORLD, ierr) !(AI)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast lrf parameters')
+call mpi_bcast(iwhich_cgp, natom, mpi_integer4, 0, mpi_comm_world, ierr) !(ai)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast lrf parameters')
 
 ! lrf
-ftype(:) = MPI_REAL8
-blockcnt(1) = 3					! real(8) cgp_cent(3)
+ftype(:) = mpi_real8
+blockcnt(1) = 3                                 ! real(8) cgp_cent(3)
 fdisp(1) = 0
-blockcnt(2) = 1					! real(8) phi0
+blockcnt(2) = 1                                 ! real(8) phi0
 fdisp(2) = 3*8
-blockcnt(3) = 3					! real(8) phi1(3)
+blockcnt(3) = 3                                 ! real(8) phi1(3)
 fdisp(3) = 3*8 + 8
-blockcnt(4) = 9					! real(8) phi2(9)
+blockcnt(4) = 9                                 ! real(8) phi2(9)
 fdisp(4) = 3*8 + 8 + 3*8
-blockcnt(5) = 27				! real(8) phi3(27)
+blockcnt(5) = 27                                ! real(8) phi3(27)
 fdisp(5) = 3*8 + 8 + 3*8 + 9*8
-call MPI_Type_create_struct(5, blockcnt, fdisp, ftype, mpitype_batch, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Type_create_struct')
-call MPI_Type_commit(mpitype_batch, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Type_commit')
-call MPI_Bcast(lrf, ncgp, mpitype_batch, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast shake parameters')
-call MPI_Type_free(mpitype_batch, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Type_free')
-end if !(use_LRF)
+call mpi_type_create_struct(5, blockcnt, fdisp, ftype, mpitype_batch, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_type_create_struct')
+call mpi_type_commit(mpitype_batch, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_type_commit')
+call mpi_bcast(lrf, ncgp, mpitype_batch, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast shake parameters')
+call mpi_type_free(mpitype_batch, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_type_free')
+end if !(use_lrf)
 
-! --- data from the TOPO module ---
+! --- data from the topo module ---
 
-if (nodeid .eq. 0) write (*,'(80a)') 'TOPO data'
+if (nodeid .eq. 0) write (*,'(80a)') 'topo data'
 
 ! allocate topology arrays
 if (nodeid .ne. 0) then
@@ -2207,68 +2178,68 @@ call check_alloc('topology arrays')
 end if
 
 ! broadcast excl
-call MPI_Bcast(excl, natom, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast excl')
+call mpi_bcast(excl, natom, mpi_logical, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast excl')
 ! broadcast istart_mol
-call MPI_Bcast(istart_mol, nmol+1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast istart_mol')
+call mpi_bcast(istart_mol, nmol+1, mpi_integer, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast istart_mol')
 
-! Bcast iac, crg and cgpatom 
-call MPI_Bcast(iac, natom, MPI_INTEGER2, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast iac')
-call MPI_Bcast(crg, natom, MPI_REAL, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast crg')
-call MPI_Bcast(cgpatom, natom, MPI_INTEGER4, 0, MPI_COMM_WORLD, ierr) !(AI)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast cgpatom')
+! bcast iac, crg and cgpatom 
+call mpi_bcast(iac, natom, mpi_integer2, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast iac')
+call mpi_bcast(crg, natom, mpi_real, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast crg')
+call mpi_bcast(cgpatom, natom, mpi_integer4, 0, mpi_comm_world, ierr) !(ai)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast cgpatom')
 
 ! cgp
-!Use MPI_Type_create_struct here too
-ftype(:) = MPI_INTEGER4 !(AI)
+!use mpi_type_create_struct here too
+ftype(:) = mpi_integer4 !(ai)
 blockcnt(:) = 1
-fdisp(1) = 0				! integer(AI) iswitch
-fdisp(2) = AI				! integer(AI) first
-fdisp(3) = AI + AI			! integer(AI) last
-call MPI_Type_create_struct(3, blockcnt, fdisp, ftype, mpitype_batch, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Type_create_struct')
-call MPI_Type_commit(mpitype_batch, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Type_commit')
-call MPI_Bcast(cgp, ncgp, mpitype_batch, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast cgp')
-call MPI_Type_free(mpitype_batch, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Type_free')
+fdisp(1) = 0                            ! integer(ai) iswitch
+fdisp(2) = ai                           ! integer(ai) first
+fdisp(3) = ai + ai                      ! integer(ai) last
+call mpi_type_create_struct(3, blockcnt, fdisp, ftype, mpitype_batch, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_type_create_struct')
+call mpi_type_commit(mpitype_batch, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_type_commit')
+call mpi_bcast(cgp, ncgp, mpitype_batch, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast cgp')
+call mpi_type_free(mpitype_batch, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_type_free')
 
 ! iaclib
-ftype(:) = MPI_REAL8
-blockcnt(1) = 1					! real(8) mass
+ftype(:) = mpi_real8
+blockcnt(1) = 1                                 ! real(8) mass
 fdisp(1) = 0
-blockcnt(2) = nljtyp				! real(8) avdw(nljtyp)
+blockcnt(2) = nljtyp                            ! real(8) avdw(nljtyp)
 fdisp(2) = 8
-blockcnt(3) = nljtyp				! real(8) bvdw(nljtyp)
+blockcnt(3) = nljtyp                            ! real(8) bvdw(nljtyp)
 fdisp(3) = 8 + 8*nljtyp
-call MPI_Type_create_struct(3, blockcnt, fdisp, ftype, mpitype_batch, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Type_create_struct')
-call MPI_Type_commit(mpitype_batch, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Type_commit')
-call MPI_Bcast(iaclib, max_atyps, mpitype_batch, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast iaclib')
-call MPI_Type_free(mpitype_batch, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Type_free')
+call mpi_type_create_struct(3, blockcnt, fdisp, ftype, mpitype_batch, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_type_create_struct')
+call mpi_type_commit(mpitype_batch, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_type_commit')
+call mpi_bcast(iaclib, max_atyps, mpitype_batch, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast iaclib')
+call mpi_type_free(mpitype_batch, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_type_free')
 
 ! list14 and listex share the same format: logical listxx(max_nbr_range,max_atom)
-call MPI_Bcast(list14, size(list14), MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast list14')
-call MPI_Bcast(listex, size(listex), MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast listex')
+call mpi_bcast(list14, size(list14), mpi_logical, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast list14')
+call mpi_bcast(listex, size(listex), mpi_logical, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast listex')
 
-! list14long and listexlong share the same format: integer(AI) listxxlong(2,max_nxxlong)
-call MPI_Bcast(list14long, 2*n14long, MPI_INTEGER4, 0, MPI_COMM_WORLD, ierr) !(AI)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast list14long')
-call MPI_Bcast(listexlong, 2*nexlong, MPI_INTEGER4, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast listexlong')
+! list14long and listexlong share the same format: integer(ai) listxxlong(2,max_nxxlong)
+call mpi_bcast(list14long, 2*n14long, mpi_integer4, 0, mpi_comm_world, ierr) !(ai)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast list14long')
+call mpi_bcast(listexlong, 2*nexlong, mpi_integer4, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast listexlong')
 
-! --- data from the QATOM module ---
+! --- data from the qatom module ---
 
-if (nodeid .eq. 0) write (*,'(80a)') 'QATOM data'
+if (nodeid .eq. 0) write (*,'(80a)') 'qatom data'
 
 ! allocate memory
 if (nodeid .ne. 0) then
@@ -2277,56 +2248,56 @@ qiac(nqat,nstates), &
 qcrg(nqat,nstates), &
 qavdw(nqlib,nljtyp), &
 qbvdw(nqlib,nljtyp), &
-EQ(nstates), &
+eq(nstates), &
 sc_lookup(nqat,natyps+nqat,nstates), &
 stat=alloc_status)
-call check_alloc('Q-atom arrays')
+call check_alloc('q-atom arrays')
 end if
 
-!Broadcast sc_lookup(nqat,natyps+nqat,nstates)
-call MPI_Bcast(sc_lookup, size(sc_lookup), MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast sc_lookup')
+!broadcast sc_lookup(nqat,natyps+nqat,nstates)
+call mpi_bcast(sc_lookup, size(sc_lookup), mpi_real8, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast sc_lookup')
 
-! integer(AI) ::  iqseq(nqat)
-!Change to mpi_type_create  (AI)
-call MPI_Bcast(iqseq, nqat, MPI_INTEGER4, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast iqseq')
+! integer(ai) ::  iqseq(nqat)
+!change to mpi_type_create  (ai)
+call mpi_bcast(iqseq, nqat, mpi_integer4, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast iqseq')
 
 !  integer ::  qiac(nqat,nstates)
-call MPI_Bcast(qiac, size(qiac), MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qiac')
+call mpi_bcast(qiac, size(qiac), mpi_integer, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast qiac')
 
 ! real(4) ::  qcrg(nqat,nstates)
-call MPI_Bcast(qcrg, size(qcrg), MPI_REAL4, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qcrg')
+call mpi_bcast(qcrg, size(qcrg), mpi_real4, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast qcrg')
 
 if(qvdw_flag) then
-!MN20030409-> Havn't tried with qvdw_flag == .true.
+!mn20030409-> havn't tried with qvdw_flag == .true.
 ! qavdw and qbvdw share the same format: real(8) qxvdw(nqlib,nljtyp)
-call MPI_Bcast(qavdw, size(qavdw), MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qavdw')
-call MPI_Bcast(qbvdw, size(qbvdw), MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast qbvdw')
+call mpi_bcast(qavdw, size(qavdw), mpi_real8, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast qavdw')
+call mpi_bcast(qbvdw, size(qbvdw), mpi_real8, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast qbvdw')
 end if
 
 if (nstates .gt. 0) then
-! Broadcast EQ(:)%lambda
+! broadcast eq(:)%lambda
 allocate(temp_lambda(1:nstates), stat=alloc_status)
-call check_alloc('Q-atom energy array')
-if (nodeid .eq. 0) temp_lambda(1:nstates) = EQ(1:nstates)%lambda
-call MPI_Bcast(temp_lambda, nstates, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast EQ%lambda')
-if (nodeid .ne. 0) EQ(1:nstates)%lambda = temp_lambda(1:nstates)
+call check_alloc('q-atom energy array')
+if (nodeid .eq. 0) temp_lambda(1:nstates) = eq(1:nstates)%lambda
+call mpi_bcast(temp_lambda, nstates, mpi_real8, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast eq%lambda')
+if (nodeid .ne. 0) eq(1:nstates)%lambda = temp_lambda(1:nstates)
 deallocate(temp_lambda)
 end if
 
 if (nodeid .eq. 0) then 
-call centered_heading('End of initiation', '-')
+call centered_heading('end of initiation', '-')
 print *
 end if
 
-!Finally allocate for  slaves:E_send, EQ_send
-!For master :E_recv,d_recv
+!finally allocate for  slaves:e_send, eq_send
+!for master :e_recv,d_recv
 call allocate_mpi  
 
 end subroutine init_nodes
@@ -2340,10 +2311,10 @@ subroutine init_shake
 ! initialize shake constraints
 !
 !locals
-integer						::	mol, b, ia, ja, constr, angle
-real(8)						:: exclshk
-integer						::	src, trg
-integer						::	solute_shake_constraints
+integer                                         ::      mol, b, ia, ja, constr, angle
+real(8)                                         :: exclshk
+integer                                         ::      src, trg
+integer                                         ::      solute_shake_constraints
 
 !allocate molecule list
 allocate(shake_mol(nmol), stat=alloc_status)
@@ -2369,7 +2340,7 @@ do b=1,nbonds
            (shake_solvent .and. ia > nat_solute)) then
            shake_mol(mol)%nconstraints = shake_mol(mol)%nconstraints + 1
 
-           if( .not. use_PBC ) then
+           if( .not. use_pbc ) then
                 if(excl(ia)) exclshk = exclshk + 0.5
                 if(excl(ja)) exclshk = exclshk + 0.5
            end if
@@ -2445,7 +2416,7 @@ do b = 1, nqshake
         shake_mol(mol)%bond(constr)%i = ia
         shake_mol(mol)%bond(constr)%j = ja
         shake_mol(mol)%bond(constr)%dist2 = &
-                dot_product(EQ(1:nstates)%lambda,qshake_dist(b,1:nstates))**2
+                dot_product(eq(1:nstates)%lambda,qshake_dist(b,1:nstates))**2
         shake_mol(mol)%nconstraints = shake_mol(mol)%nconstraints + 1
 end do
 
@@ -2474,23 +2445,23 @@ shake_molecules = trg
 shake_constraints = sum(shake_mol(1:shake_molecules)%nconstraints)
 write(*,100) shake_constraints
 write(*,101) shake_molecules
-100	format(/,'Number of shake constraints             = ',i10)
-101	format('No. molecules with shake constraints    = ',i10)
+100     format(/,'number of shake constraints             = ',i10)
+101     format('no. molecules with shake constraints    = ',i10)
 ! calculate #degrees of freedom
-Ndegf=3*natom-shake_constraints    !changed from Ndegf=3*natom-3-shake_constraints, center of mass position is NOT CONstrained in the simulation, but IS constrained for initial temperatures....
-Ndegfree=Ndegf-3*nexats+exclshk
+ndegf=3*natom-shake_constraints    !changed from ndegf=3*natom-3-shake_constraints, center of mass position is not constrained in the simulation, but is constrained for initial temperatures....
+ndegfree=ndegf-3*nexats+exclshk
 
-Ndegf_solvent = Ndegf - 3*nat_solute + solute_shake_constraints
-Ndegf_solute = Ndegf - Ndegf_solvent
+ndegf_solvent = ndegf - 3*nat_solute + solute_shake_constraints
+ndegf_solute = ndegf - ndegf_solvent
 
-Ndegfree_solvent = 3*(natom - nat_solute) - (shake_constraints - solute_shake_constraints)
-Ndegfree_solute = Ndegfree - Ndegfree_solvent
+ndegfree_solvent = 3*(natom - nat_solute) - (shake_constraints - solute_shake_constraints)
+ndegfree_solute = ndegfree - ndegfree_solvent
 
-if (Ndegfree_solvent*Ndegfree_solute .eq. 0) then    ! if either solvent or solute have 0 degrees of freedom, turn off separate scaling (in case it's on) and do not print detailed temperatures
-	detail_temps = .false.
-	separate_scaling = .false.
+if (ndegfree_solvent*ndegfree_solute .eq. 0) then    ! if either solvent or solute have 0 degrees of freedom, turn off separate scaling (in case it's on) and do not print detailed temperatures
+        detail_temps = .false.
+        separate_scaling = .false.
 else
-	detail_temps = .true.
+        detail_temps = .true.
 end if
 
 
@@ -2517,17 +2488,17 @@ subroutine initial_shaking
 !
 ! initial shaking
 !
-integer						:: niter
+integer                                         :: niter
 
 
 xx(:)=x(:)
-niter=shake(xx, x)	
+niter=shake(xx, x)      
 write(*,100) 'x', niter
-100	format('Initial ',a,'-shaking required',i4,&
+100     format('initial ',a,'-shaking required',i4,&
 ' interations per molecule on average.')
 
 xx(:)=x(:)-dt*v(:)
-niter=shake(x, xx)	
+niter=shake(x, xx)      
 write(*,100) 'v', niter
 
 v(:)=(x(:)-xx(:))/dt
@@ -2538,38 +2509,38 @@ end subroutine initial_shaking
 !-----------------------------------------------------------------------
 logical function initialize()                  
 ! local variables
-character					:: text*80
-integer						:: i,j,length
-real(8)						:: stepsize
-real(8)						:: lamda_tmp(max_states)
-integer						:: fu, fstat
-real(8)						::	rjunk
-integer						::	ijunk
+character                                       :: text*80
+integer                                         :: i,j,length
+real(8)                                         :: stepsize
+real(8)                                         :: lamda_tmp(max_states)
+integer                                         :: fu, fstat
+real(8)                                         ::      rjunk
+integer                                         ::      ijunk
 
 ! local parameters
-integer						:: num_args
-character(200)				:: infilename
-logical						::	yes
-logical						::	need_restart
-character(len=80)			::	instring
-logical						::	inlog
-integer						::	mask_rows
+integer                                         :: num_args
+character(200)                          :: infilename
+logical                                         ::      yes
+logical                                         ::      need_restart
+character(len=80)                       ::      instring
+logical                                         ::      inlog
+integer                                         ::      mask_rows
 
 ! this subroutine will init:
 !  nsteps, stepsize, dt
-!  Temp0, tau_T, iseed, Tmaxw
-!  use_LRF, NBcycle, Rcpp, Rcww, Rcpw, Rcq
+!  temp0, tau_t, iseed, tmaxw
+!  use_lrf, nbcycle, rcpp, rcww, rcpw, rcq
 !  shake_solute, shake_solvent, shake_hydrogens
 ! fk_pshell
 !  fk_wsphere=-1, wpol_restr, wpol_born
-!  fkwpol=-1, Dwmz=-1 (values  ized to -1 will
+!  fkwpol=-1, dwmz=-1 (values  ized to -1 will
 !    be set in water_sphere, once target radius is known)
 !  top_file
 !  restart, [restart_file]
 !  xfin_file
 !  itrj_cycle, iene_cycle, iout_cycle, itemp_cycle, [trj_file], [ene_file]
 !  fep_file
-!  nstates, EQ (allocating memory for EQ)
+!  nstates, eq (allocating memory for eq)
 !  implicit_rstr_from_file, [exrstr_file]
 !  nrstr_seq, [rstseq] (allocating memory for rstseq)
 !  nrstr_pos, [rstpos] (allocating memory for rstpos)
@@ -2579,92 +2550,92 @@ integer						::	mask_rows
 ! read name of input file from the command line
 num_args = command_argument_count()
 if (num_args .lt. 1) call die('no input file specified on the command line')
-#if defined(CRAY)
+#if defined(cray)
 call pxfgetarg(num_args, infilename, 200, i)
-#elif defined(MPICH)
+#elif defined(mpich)
 call getarg(1, infilename)
 #else
 call getarg(num_args, infilename)
 #endif
-text = 'Reading input from '//infilename
+text = 'reading input from '//infilename
 call centered_heading(trim(text), '-')
 
 initialize = .true. 
 
-if(.not. prm_open_section('PBC', infilename)) then
+if(.not. prm_open_section('pbc', infilename)) then
         box = .false.
-        write(*,'(a)') 'Boundary: sphere'
+        write(*,'(a)') 'boundary: sphere'
 else
         box = .true.
-        write(*,'(a)') 'Boundary: periodic box'
+        write(*,'(a)') 'boundary: periodic box'
         if( .not. prm_get_logical_by_key('rigid_box_centre', rigid_box_centre, .false. ) ) then
-                write(*,'(a)') '>>> Error: rigid_box_centre must be on or off'
+                write(*,'(a)') '>>> error: rigid_box_centre must be on or off'
                 initialize = .false.
         end if
-        write(*,'(a,a3)') 'Rigid box centre ', onoff(rigid_box_centre)
+        write(*,'(a,a3)') 'rigid box centre ', onoff(rigid_box_centre)
         if( .not. prm_get_logical_by_key('constant_pressure', constant_pressure, .false.) ) then
-                write(*,'(a)') '>>> Error: constant_pressure must be on or off'
+                write(*,'(a)') '>>> error: constant_pressure must be on or off'
                 initialize = .false.
         end if
 
         if( constant_pressure ) then
-                write(*,'(a)') 'NPT-ensemble'
+                write(*,'(a)') 'npt-ensemble'
                 volume_try = 0
                 volume_acc = 0
                 if( .not. prm_get_real8_by_key('max_volume_displ', max_vol_displ) ) then
                         initialize = .false.
-                        write(*,'(a)') '>>> ERROR: maximum volume displacement not specified (section PBC)'
+                        write(*,'(a)') '>>> error: maximum volume displacement not specified (section pbc)'
                 else
                         write(*,5) max_vol_displ
                 end if
-5	format ('Maximum volume displacemet = ', f10.3)
+5       format ('maximum volume displacemet = ', f10.3)
 
                 if( .not. prm_get_integer_by_key('pressure_seed', pressure_seed)) then
                         pressure_seed = 3781
                 end if
 
-				write(*, '(a, i4 )' ) 'Pressure seed: ', pressure_seed
+                                write(*, '(a, i4 )' ) 'pressure seed: ', pressure_seed
 
                 if( .not. prm_get_real8_by_key('pressure', pressure) ) then
                         pressure = 1.0
                 end if
                 write(*,9) pressure
-9	format ('Pressure = ',f10.3,'  bar')
+9       format ('pressure = ',f10.3,'  bar')
                 !convert pressure to strange internal unit
                 pressure = pressure * 1.43836e-5
         else
-                write(*,'(a)') 'NVT-ensemble'
+                write(*,'(a)') 'nvt-ensemble'
                 if( prm_get_line_by_key('control_box', instring) ) then
                         read(instring, *) new_boxl(:)
                         control_box = .true.
-                        write(*,'(a, 3f10.3)')'Boxsize will be changed to: ', new_boxl
+                        write(*,'(a, 3f10.3)')'boxsize will be changed to: ', new_boxl
                 else
                         control_box = .false.
                 end if
         end if !section constant_pressure
 
-	yes = prm_get_logical_by_key('put_solvent_back_in_box', put_solvent_back_in_box)
+        yes = prm_get_logical_by_key('put_solvent_back_in_box', put_solvent_back_in_box)
 
-	yes = prm_get_logical_by_key('put_solute_back_in_box', put_solute_back_in_box)
-
-
-	if(put_solute_back_in_box .and. put_solvent_back_in_box) then
-           write(*,'(a)') 'Solute and solvent molecules will be put back in box.'
-	else
-		if (put_solute_back_in_box) then
-           	write(*,'(a)') 'Only solute molecules will be put back in box.'
-		else
-			if (put_solvent_back_in_box) then
-				write(*,'(a)') 'Only solvent molecules will be put back in box.'
-			else
-				write(*,'(a)') 'No molecules will be put back in box.'				
-			end if
-		end if
-	end if
+        yes = prm_get_logical_by_key('put_solute_back_in_box', put_solute_back_in_box)
 
 
+        if(put_solute_back_in_box .and. put_solvent_back_in_box) then
+           write(*,'(a)') 'solute and solvent molecules will be put back in box.'
+        else
+                if (put_solute_back_in_box) then
+                write(*,'(a)') 'only solute molecules will be put back in box.'
+                else
+                        if (put_solvent_back_in_box) then
+                                write(*,'(a)') 'only solvent molecules will be put back in box.'
+                        else
+                                write(*,'(a)') 'no molecules will be put back in box.'                          
+                        end if
+                end if
+        end if
 
-end if !section PBC
+
+
+end if !section pbc
 
 
 if(.not. prm_open_section('md')) then
@@ -2680,104 +2651,104 @@ end if
 
 need_restart = .false. !flag for restart file required
 if(.not. prm_get_integer_by_key('steps', nsteps)) then
-        write(*,*) '>>> ERROR: steps not specified (section MD)'
+        write(*,*) '>>> error: steps not specified (section md)'
         initialize = .false.
 end if
 if(.not. prm_get_real8_by_key('stepsize', stepsize)) then
-        write(*,*) '>>> ERROR: stepsize not specified (section MD)'
+        write(*,*) '>>> error: stepsize not specified (section md)'
         initialize = .false.
 end if
 write (*,10) nsteps, stepsize
-10	format ('Number of MD steps =',i10,'  Stepsize (fs)    =',f10.3)
+10      format ('number of md steps =',i10,'  stepsize (fs)    =',f10.3)
 
 ! convert to internal time units once and for all.
 dt=0.020462*stepsize
 
-! --- Temperature etc.
-if(.not. prm_get_real8_by_key('temperature', Temp0)) then
-        write(*,*) '>>> ERROR: temperature not specified (section MD)'
+! --- temperature etc.
+if(.not. prm_get_real8_by_key('temperature', temp0)) then
+        write(*,*) '>>> error: temperature not specified (section md)'
         initialize = .false.
 end if
-if(.not. prm_get_real8_by_key('bath_coupling', tau_T)) then
-        write(*,*) 'Temperature bath relaxation time tau_T set to default'
-        tau_T = tau_T_default
+if(.not. prm_get_real8_by_key('bath_coupling', tau_t)) then
+        write(*,*) 'temperature bath relaxation time tau_t set to default'
+        tau_t = tau_t_default
 end if
-write (*,15) Temp0,tau_T
-tau_T=0.020462*tau_T
-if(Temp0 <= 0) then
+write (*,15) temp0,tau_t
+tau_t=0.020462*tau_t
+if(temp0 <= 0) then
         write(*,'(a)') &
-                '>>> Error: No dynamics at zero temperature!'
+                '>>> error: no dynamics at zero temperature!'
         initialize = .false.
 end if
-if(tau_T < dt) then
-        write(*,'(a)') '>>> Error: tau_t must be >= stepsize.'
+if(tau_t < dt) then
+        write(*,'(a)') '>>> error: tau_t must be >= stepsize.'
         initialize = .false.
 end if
 
 yes = prm_get_logical_by_key('separate_scaling', separate_scaling, .false.)
 if(separate_scaling) then
-	   write(*,'(a)') 'Solute and solvent atoms coupled separately to heat bath.'
+           write(*,'(a)') 'solute and solvent atoms coupled separately to heat bath.'
 else 
-	   write(*,'(a)') 'Solute and solvent atoms coupled together to heat bath.'
+           write(*,'(a)') 'solute and solvent atoms coupled together to heat bath.'
 end if
 
-15	format ('Target temperature =',f10.2,'  T-relax time     =',f10.2)
+15      format ('target temperature =',f10.2,'  t-relax time     =',f10.2)
 
 yes = prm_get_integer_by_key('random_seed', iseed, 1) 
-if(.not. prm_get_real8_by_key('initial_temperature', Tmaxw)) then
+if(.not. prm_get_real8_by_key('initial_temperature', tmaxw)) then
         iseed = 0 !set iseed = 0 if no initial temp
         need_restart = .true.
 end if
 
-if (iseed > 0) write (*,16) Tmaxw, iseed
-16	format ('Initial velocities will be generated from Maxwell distribution:',&
-                /,'Maxwell temperature=',f10.2,' Random number seed=',i10)
+if (iseed > 0) write (*,16) tmaxw, iseed
+16      format ('initial velocities will be generated from maxwell distribution:',&
+                /,'maxwell temperature=',f10.2,' random number seed=',i10)
 
-! --- shake, LRF
+! --- shake, lrf
 if(.not. prm_get_logical_by_key('shake_solvent', shake_solvent, .true.)) then
-        write(*,'(a)') '>>> Error: shake_solvent must be on or off.'
+        write(*,'(a)') '>>> error: shake_solvent must be on or off.'
         initialize = .false.
 end if
 write(*,17) 'all solvent bonds', onoff(shake_solvent)
-17	format('Shake constaints on ',a,t42,': ',a3)
+17      format('shake constaints on ',a,t42,': ',a3)
 
 if(.not. prm_get_logical_by_key('shake_solute', shake_solute, .false.)) then
-        write(*,'(a)') '>>> Error: shake_solute must be on or off.'
+        write(*,'(a)') '>>> error: shake_solute must be on or off.'
         initialize = .false.
 end if 
 write(*,17) 'all solute bonds', onoff(shake_solute)
 
 if(.not. prm_get_logical_by_key('shake_hydrogens', shake_hydrogens, .false.)) then
-        write(*,'(a)') '>>> Error: shake_hydrogens must be on or off.'
+        write(*,'(a)') '>>> error: shake_hydrogens must be on or off.'
         initialize = .false.
 end if 
 write(*,17) 'all bonds to hydrogen', onoff(shake_hydrogens)
 
 
-       yes = prm_get_logical_by_key('lrf', use_LRF, .false.)
-       if(use_LRF) then
-               write(*,20) 'LRF Taylor expansion outside cut-off'
+       yes = prm_get_logical_by_key('lrf', use_lrf, .false.)
+       if(use_lrf) then
+               write(*,20) 'lrf taylor expansion outside cut-off'
        else 
                write(*,20) 'standard cut-off'
        end if
 
-20	format ('Nonbonded method   = ',a)
+20      format ('nonbonded method   = ',a)
 
 yes = prm_get_logical_by_key('force_rms', force_rms, .false.)
 if(force_rms) then
         write(*,22) 
 end if
-22	format ('R.M.S. force will be calculated.')
+22      format ('r.m.s. force will be calculated.')
 
 
-! --- Rcpp, Rcww, Rcpw, Rcq, RcLRF
+! --- rcpp, rcww, rcpw, rcq, rclrf
 if(.not. prm_open_section('cut-offs')) then
-        write(*,'(a)') 'No cut-offs section, default cut-offs used'
+        write(*,'(a)') 'no cut-offs section, default cut-offs used'
         rcpp = rcpp_default
         rcww = rcww_default
         rcpw = rcpw_default
         rcq = rcq_default
-        rcLRF = rcLRF_default
+        rclrf = rclrf_default
 else
         if(.not. prm_get_real8_by_key('solute_solute', rcpp, rcpp_default)) then
                 write(*,'(a)') 'solute-solute cut-off set to default'
@@ -2791,36 +2762,36 @@ else
         if(.not. prm_get_real8_by_key('q_atom', rcq, rcq_default)) then
                 write(*,'(a)') 'q-atom cut-off set to default'
         end if
-        if(use_LRF) then
-                if(.not. prm_get_real8_by_key('lrf', rcLRF, rcLRF_default)) then
-                        write(*,'(a)') 'LRF cut-off set to default'
+        if(use_lrf) then
+                if(.not. prm_get_real8_by_key('lrf', rclrf, rclrf_default)) then
+                        write(*,'(a)') 'lrf cut-off set to default'
                 end if
-                if(RcLRF < rcpp .or. RcLRF < rcpw .or. RcLRF < rcww) then
+                if(rclrf < rcpp .or. rclrf < rcpw .or. rclrf < rcww) then
                         write(*,'(a)') &
-                                '>>> ERROR; LRF cut-off must not be smaller than solute or solvent cut-offs!'
+                                '>>> error; lrf cut-off must not be smaller than solute or solvent cut-offs!'
                         initialize = .false.
                 end if
         end if
 end if
 
-write (*,25) Rcpp,Rcww,Rcpw,Rcq
-if(use_LRF) write(*,26) RcLRF
-25	format ('Cut-off radii for non-bonded interactions:',/, &
-                'Solute-solute:    ',f6.2,/,&
-                'Solvent-solvent:  ',f6.2,/,&
-                'Solute-solvent:   ',f6.2,/,&
-                'Q-atom-non-Q-atom:',f6.2)
-26	format ('LRF:              ',f6.2)
+write (*,25) rcpp,rcww,rcpw,rcq
+if(use_lrf) write(*,26) rclrf
+25      format ('cut-off radii for non-bonded interactions:',/, &
+                'solute-solute:    ',f6.2,/,&
+                'solvent-solvent:  ',f6.2,/,&
+                'solute-solvent:   ',f6.2,/,&
+                'q-atom-non-q-atom:',f6.2)
+26      format ('lrf:              ',f6.2)
 
-30	format ('>>> WARNING: Ingnoring obsolete keyword ',a,'.')
+30      format ('>>> warning: ingnoring obsolete keyword ',a,'.')
 ! --- simulation sphere
 
 if( .not. box ) then
         if(.not. prm_open_section('sphere')) then
-			fk_pshell = fk_pshell_default
-			print*,'Radius of inner restrained shell set to 85% of exclusion shell radius.'
-			rexcl_i = shell_default
-			write(*,50) rexcl_i
+                        fk_pshell = fk_pshell_default
+                        print*,'radius of inner restrained shell set to 85% of exclusion shell radius.'
+                        rexcl_i = shell_default
+                        write(*,50) rexcl_i
         else
                 if(prm_get_line_by_key('centre', instring)) then
                         write(*,30) 'centre'
@@ -2835,24 +2806,24 @@ if( .not. box ) then
                       call die('inner radius of restrained shell must be >= 0')
                     end if
                 else
-                    print*,'Radius of inner restrained shell set to 85% of exclusion shell radius.'
-					rexcl_i = shell_default
+                    print*,'radius of inner restrained shell set to 85% of exclusion shell radius.'
+                                        rexcl_i = shell_default
                     write(*,50) rexcl_i
                 end if
-50 format('Radius of inner restrained shell       =    ',f8.3) 
+50 format('radius of inner restrained shell       =    ',f8.3) 
                 if(.not. prm_get_real8_by_key('shell_force', fk_pshell)) then
-                        write(*,'(a)') 'Shell force constant set to default'
+                        write(*,'(a)') 'shell force constant set to default'
                         fk_pshell = fk_pshell_default
                 end if
                 if(fk_pshell > 0) then
                         write(*,47) fk_pshell
                 end if
-47		format('Shell restraint force constant         =',f8.2)
+47              format('shell restraint force constant         =',f8.2)
 
                 yes = prm_get_logical_by_key('exclude_bonded', exclude_bonded, .false.)
                 if(exclude_bonded) then
                         write(*,'(a)') &
-                                'Bonded interactions outside the sphere will be eliminated'
+                                'bonded interactions outside the sphere will be eliminated'
                 end if
        end if
 
@@ -2861,14 +2832,14 @@ if( .not. box ) then
         if(.not. inlog) inlog = prm_open_section('water') !try also the old name
         if(.not. inlog) then       !defaults
                 fk_wsphere = -1
-                Dwmz = -1
+                dwmz = -1
                 awmz = -1
                 wpol_restr = wpol_restr_default
                 wpol_born = wpol_restr_default
                 fkwpol = -1 
         else
                 if(prm_get_real8_by_key('radius', rwat_in)) then
-                        write(*,'(a,f8.2)') 'Target solvent radius =',rwat_in
+                        write(*,'(a,f8.2)') 'target solvent radius =',rwat_in
                 end if
                 if(prm_get_line_by_key('centre', instring)) then
                         write(*,30) 'centre'
@@ -2879,22 +2850,22 @@ if( .not. box ) then
 
 
           if(.not. prm_get_real8_by_key('radial_force', fk_wsphere)) then
-                write(*,'(a)') 'Solvent radial restraint force constant set to default'
+                write(*,'(a)') 'solvent radial restraint force constant set to default'
                 fk_wsphere = -1 ! this will be set in water_sphere, once target radius is known
           end if
           yes=prm_get_logical_by_key('polarisation', wpol_restr, wpol_restr_default)
           !default is on when pol. restr is on, otherwise off
           yes=prm_get_logical_by_key('charge_correction', wpol_born, wpol_restr)
           if(wpol_born .and. .not. wpol_restr) then
-                write(*,'(a)') '>>> ERROR: charge_correction on requires polarisation on (section solvent)'
+                write(*,'(a)') '>>> error: charge_correction on requires polarisation on (section solvent)'
                 initialize = .false.
           end if
           if(.not. prm_get_real8_by_key('polarisation_force', fkwpol)) then
-                write(*,'(a)') 'Solvent polarisation force constant set to default'
+                write(*,'(a)') 'solvent polarisation force constant set to default'
                 fkwpol = -1 ! this will be set in water_sphere, once target radius is known
           end if
-          yes = prm_get_real8_by_key('morse_depth', Dwmz, -1._8)			
-          yes = prm_get_real8_by_key('morse_width', awmz, -1._8)			
+          yes = prm_get_real8_by_key('morse_depth', dwmz, -1._8)                        
+          yes = prm_get_real8_by_key('morse_width', awmz, -1._8)                        
           if(prm_get_string_by_key('model', instring)) then
                 write(*,30) 'model'
           end if
@@ -2904,7 +2875,7 @@ end if !if( .not. box )
 
 if(.not. prm_open_section('intervals')) then
         write(*,'(a)') 'non-bond list update interval set to default.'
-        NBcycle = NB_cycle_default
+        nbcycle = nb_cycle_default
         write(*,'(a)') 'energy summary interval set to default.'
         iout_cycle = iout_cycle_default
         itemp_cycle = iout_cycle_default
@@ -2915,9 +2886,9 @@ if(.not. prm_open_section('intervals')) then
 
 
 else
-        if(.not. prm_get_integer_by_key('non_bond', NBcycle)) then
+        if(.not. prm_get_integer_by_key('non_bond', nbcycle)) then
                 write(*,'(a)') 'non-bond list update interval set to default.'
-                NBcycle = NB_cycle_default
+                nbcycle = nb_cycle_default
         end if
         if(.not. prm_get_integer_by_key('output', iout_cycle)) then
                 write(*,'(a)') 'energy summary interval set to default.'
@@ -2938,37 +2909,37 @@ else
         end if
 end if
 
-write(*,84) NBcycle
-84	format('Non-bonded pair list update interval   =',i8)
-86	format('Energy summary print-out interval      =',i8)
-87	format('Temperature print-out interval         =',i8)
-88	format('Trajectory write interval              =',i8)
-89	format('Energy file write interval             =',i8)
-83  format('Volume change interval                 =',i8)
+write(*,84) nbcycle
+84      format('non-bonded pair list update interval   =',i8)
+86      format('energy summary print-out interval      =',i8)
+87      format('temperature print-out interval         =',i8)
+88      format('trajectory write interval              =',i8)
+89      format('energy file write interval             =',i8)
+83  format('volume change interval                 =',i8)
 
 if(iout_cycle > 0) then
         write (*,86) iout_cycle
 else
-        write(*,'(a)') 'No energy summaries written.'
+        write(*,'(a)') 'no energy summaries written.'
         iout_cycle = -999999999 ! make sure mod(istep, iout_cycle) never = 0
 end if
 if(itemp_cycle > 0) then
         write (*,87) itemp_cycle
 else
-        write(*,'(a)') 'No temperatures written.'
+        write(*,'(a)') 'no temperatures written.'
         itemp_cycle = -999999999 ! make sure mod(istep, itemp_cycle) never = 0
 end if
 if(itrj_cycle > 0) then
         write (*,88) itrj_cycle
 else
         itrj_cycle = -999999999 !no energy
-        write(*,'(a)') 'No trajectory written.'
+        write(*,'(a)') 'no trajectory written.'
 end if
 if(iene_cycle > 0) then
         write (*,89) iene_cycle
 else
         iene_cycle = -999999999 !no energy
-        write(*,'(a)') 'No energy file written.'
+        write(*,'(a)') 'no energy file written.'
 end if
 if( constant_pressure ) then
         write(*,83) ivolume_cycle
@@ -2978,7 +2949,7 @@ end if
 mask_rows = prm_count('trajectory_atoms')
 if(itrj_cycle > 0) then
         if(mask_rows == 0) then
-                write(*,'(a)') 'All atoms will be included in the trajectory.'
+                write(*,'(a)') 'all atoms will be included in the trajectory.'
                 yes = trj_store_mask('all')
         else
                 do i=1,mask_rows
@@ -2987,24 +2958,24 @@ if(itrj_cycle > 0) then
                 end do
         end if
 elseif(mask_rows == 0) then
-        write(*,'(a)') 'Ignoring section trajectory_atoms.'
+        write(*,'(a)') 'ignoring section trajectory_atoms.'
 end if
 
 if(.not. prm_open_section('files')) then
-        write(*,'(a)') '>>> ERROR: files section not found.'
+        write(*,'(a)') '>>> error: files section not found.'
         initialize = .false.
 else
         if(.not. prm_get_string_by_key('topology', top_file)) then
-                write(*,'(a)') '>>> ERROR: topology not specified (section files)'
+                write(*,'(a)') '>>> error: topology not specified (section files)'
                 initialize = .false.
         end if
         write (*,60) trim(top_file)
-60		format ('Topology file      = ',a)
+60              format ('topology file      = ',a)
 
         if(.not. prm_get_string_by_key('restart', restart_file)) then
                 restart = .false.
                 if(need_restart) then
-                        write(*,'(a)') '>>> ERROR: Restart file required when initial temp. not given.'
+                        write(*,'(a)') '>>> error: restart file required when initial temp. not given.'
                         initialize = .false.
                 end if
         else
@@ -3014,82 +2985,82 @@ else
         if(restart) then
                 write (*,65) trim(restart_file)
         else
-                write (*,'(a)') 'Initial coordinates taken from topology.'
+                write (*,'(a)') 'initial coordinates taken from topology.'
                 if(iseed == 0) then
                         write(*,'(a)') &
-                                '>>> ERROR: Need a random number seed to generate initial velocities, aborting.'
+                                '>>> error: need a random number seed to generate initial velocities, aborting.'
                         initialize = .false.
                 end if
         end if
-65		format ('Initial coord. file= ',a)
+65              format ('initial coord. file= ',a)
 
         if(.not. prm_get_string_by_key('final', xfin_file)) then
-                write(*,'(a)') '>>> ERROR: final co-ordinate file not specified (section files, keyword final)'
+                write(*,'(a)') '>>> error: final co-ordinate file not specified (section files, keyword final)'
                 initialize = .false.
         end if
         write (*,80) trim(xfin_file)
-80		format ('Final coord. file  = ',a)
+80              format ('final coord. file  = ',a)
 
         if(.not. prm_get_string_by_key('trajectory', trj_file)) then
                 if(itrj_cycle > 0) then
-                        write(*,'(a)') '>>> ERROR: Trajectory file name required to write trajectory!'
+                        write(*,'(a)') '>>> error: trajectory file name required to write trajectory!'
                         initialize = .false.
                 end if
         else
                 if(itrj_cycle < 0) then
-                        write(*,*) '>>> Error: Trajectory file given but no output interval'
+                        write(*,*) '>>> error: trajectory file given but no output interval'
                         initialize = .false.
                 end if
                 if(itrj_cycle > 0) write (*,90) trim(trj_file)
         end if
-90		format ('Trajectory file    = ',a)
+90              format ('trajectory file    = ',a)
 
         if(.not. prm_get_string_by_key('energy', ene_file)) then
                 if(iene_cycle > 0) then
-                        write(*,'(a)') '>>> ERROR: Energy file name required to write energies!'
+                        write(*,'(a)') '>>> error: energy file name required to write energies!'
                         initialize = .false.
                 end if
         else
 
                 if(iene_cycle < 0) then
 
-                        write(*,'(a)') '>>> ERROR: Energy file given but no energy interval'
+                        write(*,'(a)') '>>> error: energy file given but no energy interval'
 
                         initialize=.false.
 
                 end if
                 if(iene_cycle > 0) write (*,94) trim(ene_file)
         end if
-94		format ('Energy output file = ',a)
+94              format ('energy output file = ',a)
 
         if(.not. prm_get_string_by_key('fep', fep_file)) then
-                write(*,'(a)') 'No FEP file.'
-                !initialize = .false. !This condition IS OK.
+                write(*,'(a)') 'no fep file.'
+                !initialize = .false. !this condition is ok.
                 fep_file = ''
         else
                 write (*,95) trim(fep_file)
-95			format ('FEP input file     = ',a,/)
+95                      format ('fep input file     = ',a,/)
         end if
         if(.not. prm_get_string_by_key('restraint', exrstr_file)) then
                 implicit_rstr_from_file = 0
         else
                 implicit_rstr_from_file = 1
                 write (*,104) trim(exrstr_file)
-104			format ('External rstr file = ',a,/)
+104                     format ('external rstr file = ',a,/)
         end if
         if(prm_get_string_by_key('water', instring)) then
                 write(*,30) 'water'
         end if
-end if			
+end if                  
 
-! --- states, EQ
+! --- states, eq
 nstates = 0
 if(prm_open_section('lambdas')) then
         do while(prm_get_field(instring))
                 nstates = nstates + 1
                 read(instring, *, iostat=fstat) lamda_tmp(nstates)
                 if(fstat /= 0) then
-                        write(*,'(a)') '>>> ERROR: Invalid lambda value.'
+                        write(*,'(a)') '>>> error: invalid lambda value.'
                         initialize = .false.
                         exit
                 end if
@@ -3097,134 +3068,134 @@ if(prm_open_section('lambdas')) then
 end if
 if(nstates == 0 .and. fep_file /= '') then
         if(fep_file /= '') then
-                write(*,'(a)') 'Defaulting to single FEP state.'
+                write(*,'(a)') 'defaulting to single fep state.'
                 nstates = 1
                 lamda_tmp(1) = 1.
         end if
 end if
 if(nstates > 0 ) then
         if(fep_file == '') then
-                write(*,'(a)') '>>> ERROR: FEP file required to use lambdas!'
+                write(*,'(a)') '>>> error: fep file required to use lambdas!'
                 initialize = .false.
         else
-                ! allocate memory for EQ
-                allocate(EQ(nstates), stat=alloc_status)
-                call check_alloc('Q-atom energy array')
+                ! allocate memory for eq
+                allocate(eq(nstates), stat=alloc_status)
+                call check_alloc('q-atom energy array')
 
-                ! init EQ%lambda
-                EQ(1:nstates)%lambda = lamda_tmp(1:nstates)
-                write (*,98) (EQ(i)%lambda,i=1,nstates)
-98			format ('lambda-values      = ',10f8.5)
+                ! init eq%lambda
+                eq(1:nstates)%lambda = lamda_tmp(1:nstates)
+                write (*,98) (eq(i)%lambda,i=1,nstates)
+98                      format ('lambda-values      = ',10f8.5)
         end if
 end if
 
-!	--- restraints:
-write (*,'(/,a)') 'Listing of restraining data:'
+!       --- restraints:
+write (*,'(/,a)') 'listing of restraining data:'
 
 ! --- nrstr_seq, [rstseq]
 nrstr_seq = prm_count('sequence_restraints')
-109 format (/,'No. of sequence restraints =',i10)
+109 format (/,'no. of sequence restraints =',i10)
 if ( nrstr_seq .gt. 0 ) then
         ! allocate memory for rstseq
         write (*,109) nrstr_seq
         allocate(rstseq(nrstr_seq), stat=alloc_status)
         call check_alloc('restraint list')
         write (*,110)
-110		format ('  atom_i  atom_j      fc  H-flag to_centre')
+110             format ('  atom_i  atom_j      fc  h-flag to_centre')
         do i=1,nrstr_seq
                 ! read rstseq(i)
                 yes = prm_get_line(text)
                 rstseq(i)%to_centre = 0 
                 read(text,*, end=111, err=111) rstseq(i)
-111			write(*,112) rstseq(i)
-112			format (2i8,f8.2,i8,i10)
+111                     write(*,112) rstseq(i)
+112                     format (2i8,f8.2,i8,i10)
   end do
 end if
 
 ! --- nrstr_pos, [rstpos]
 nrstr_pos = prm_count('atom_restraints')
-115 format (/,'No. of position restratints =',i10)
+115 format (/,'no. of position restratints =',i10)
 if ( nrstr_pos .gt. 0 ) then
         write (*,115) nrstr_pos
         ! allocate memory for rstpos
         allocate(rstpos(nrstr_pos), stat=alloc_status)
         call check_alloc('restraint list')
         write (*,120)
-120		format ('atom_i      x0      y0      z0     fcx     fcy     fcz   state')
+120             format ('atom_i      x0      y0      z0     fcx     fcy     fcz   state')
         do i=1,nrstr_pos ! read rstpos(i)
                 yes = prm_get_line(text)
                 read(text,*, iostat=fstat) rstpos(i)%i,(rstpos(i)%x(j),j=1,3), &
                         (rstpos(i)%fk(j),j=1,3), rstpos(i)%ipsi
                 if(fstat /= 0) then
-                        write(*,'(a)') '>>> ERROR: Invalid atom restraint data.'
+                        write(*,'(a)') '>>> error: invalid atom restraint data.'
                         initialize = .false.
                         exit
                 end if
                 write (*,122) rstpos(i)%i,(rstpos(i)%x(j),j=1,3), &
                         (rstpos(i)%fk(j),j=1,3), rstpos(i)%ipsi
         end do
-122		format (i6,6f8.2,i8)
+122             format (i6,6f8.2,i8)
 end if
 
 ! --- nrstr_dist, [rstdis]
 nrstr_dist = prm_count('distance_restraints')
-125	format (/,'No. of distance restraints =',i10)
+125     format (/,'no. of distance restraints =',i10)
 if ( nrstr_dist .gt. 0 ) then
         write (*,125) nrstr_dist
         ! allocate memory for rstdis
         allocate(rstdis(nrstr_dist), stat=alloc_status)
         call check_alloc('restraint list')
         write (*,130)
-130		format ('atom_i atom_j   dist1   dist2   fc        state') 
+130             format ('atom_i atom_j   dist1   dist2   fc        state') 
         do i=1,nrstr_dist
                 yes=prm_get_line(text)
                 ! read rstdis(i)
                 if(scan(text, ':') > 0) then !got res:atnr
-                  !Store in i&j as res:atnr and assign atom nr after topology is read (prep_coord)
+                  !store in i&j as res:atnr and assign atom nr after topology is read (prep_coord)
                   read(text,*, iostat=fstat) rstdis(i)%itext,rstdis(i)%jtext,rstdis(i)%d1,& 
                      rstdis(i)%d2, rstdis(i)%fk, rstdis(i)%ipsi
-                else !Plain numbers
+                else !plain numbers
                   read(text,*, iostat=fstat) rstdis(i)%i,rstdis(i)%j,rstdis(i)%d1,&
                         rstdis(i)%d2, rstdis(i)%fk, rstdis(i)%ipsi
                   rstdis(i)%itext = 'nil'
                   rstdis(i)%jtext = 'nil'
                 end if
                 if(fstat /= 0) then
-                  write(*,'(a)') '>>> ERROR: Invalid distance restraint data.'
+                  write(*,'(a)') '>>> error: invalid distance restraint data.'
                   initialize = .false.
                   exit
                 end if
                 write (*,132) rstdis(i)%i,rstdis(i)%j,rstdis(i)%d1,rstdis(i)%d2,rstdis(i)%fk, &
                         rstdis(i)%ipsi
         end do
-132		format (i6,1x,i6,3f8.2,i8)
+132             format (i6,1x,i6,3f8.2,i8)
 end if
 
 
 if (.not. box )then
 ! --- nrstr_wall, [rstwal]
 nrstr_wall = prm_count('wall_restraints')
-135 format (/,'No. of wall sequence restraints=',i10)
+135 format (/,'no. of wall sequence restraints=',i10)
 if ( nrstr_wall .gt. 0) then
         write (*,135) nrstr_wall
         ! allocate memory for rstwal
         allocate(rstwal(nrstr_wall), stat=alloc_status)
         call check_alloc('restraint list')
         write (*,140)
-140		format ('atom_i atom_j   dist.      fc  aMorse  dMorse  H-flag')
+140             format ('atom_i atom_j   dist.      fc  amorse  dmorse  h-flag')
         do i=1,nrstr_wall
                 ! read rstwal(:)
                 yes = prm_get_line(text)
                 read(text,*, iostat=fstat) rstwal(i)%i,rstwal(i)%j,rstwal(i)%d,rstwal(i)%fk, &
-                        rstwal(i)%aMorse, rstwal(i)%dMorse, rstwal(i)%ih
+                        rstwal(i)%amorse, rstwal(i)%dmorse, rstwal(i)%ih
                 if(fstat /= 0) then
-                        write(*,'(a)') '>>> ERROR: Invalid wall restraint data.'
+                        write(*,'(a)') '>>> error: invalid wall restraint data.'
                         initialize = .false.
                         exit
                 end if
                 write (*,142) rstwal(i)     
         end do
-142		format (i6,1x,i6,4f8.2,i8)
+142             format (i6,1x,i6,4f8.2,i8)
 end if
 end if
 
@@ -3237,31 +3208,31 @@ end function initialize
 
 logical function old_initialize(fu)
 !arguments
-integer						::	fu
+integer                                         ::      fu
 ! local variables
-integer						::	iuse_indip, shake_flag
-character					:: text*80, watmodel*80
-integer						:: i,j,length
-integer						:: irestart
-real(8)						:: stepsize
-real(8)						:: lamda_tmp(max_states)
-integer						:: fstat
-integer						::	NBMethod
-integer						::	iwpol_restr
-real(8)						::	rjunk
+integer                                         ::      iuse_indip, shake_flag
+character                                       :: text*80, watmodel*80
+integer                                         :: i,j,length
+integer                                         :: irestart
+real(8)                                         :: stepsize
+real(8)                                         :: lamda_tmp(max_states)
+integer                                         :: fstat
+integer                                         ::      nbmethod
+integer                                         ::      iwpol_restr
+real(8)                                         ::      rjunk
 
 !this is called by initialize to read old-style input file which is 
 !alreadu open as unit fu
 
 ! this subroutine will init:
 !  nsteps, stepsize, dt
-!  Temp0, tau_T, iseed, Tmaxw
-!  usr_LRF, NBcycle, Rcpp, Rcww, Rcpw, Rcq
+!  temp0, tau_t, iseed, tmaxw
+!  usr_lrf, nbcycle, rcpp, rcww, rcpw, rcq
 !  shake_solvent, shake_solute, shake_hydrogens
 !  fk_pshell
 
 
-!  fk_wsphere=-1, wpol_restr, wpol_born fkwpol=-1, Dwmz=-1, awmz=-1
+!  fk_wsphere=-1, wpol_restr, wpol_born fkwpol=-1, dwmz=-1, awmz=-1
 !    (values initialized to -1 will be set in water_sphere, 
 !    once target radius is known)
 !  top_file
@@ -3269,7 +3240,7 @@ real(8)						::	rjunk
 !  xfin_file
 !  itrj_cycle, iene_cycle, iout_cycle, itemp_cycle [trj_file], [ene_file]
 !  fep_file
-!  nstates, EQ (allocating memory for EQ)
+!  nstates, eq (allocating memory for eq)
 !  implicit_rstr_from_file, [exrstr_file]
 !  nrstr_seq, [rstseq] (allocating memory for rstseq)
 !  nrstr_pos, [rstpos] (allocating memory for rstpos)
@@ -3278,14 +3249,14 @@ real(8)						::	rjunk
 
 
 write(*,1)
-1	format('>>> WARNING: Entering unsupported compatibility mode',/ &
+1       format('>>> warning: entering unsupported compatibility mode',/ &
            '             to read version 2 input file.',/,&
-           '             New features unavailable.')
+           '             new features unavailable.')
 
 old_initialize = .true. 
 
 !use default values for new features not in old kind of input.
-RcLRF = 999.
+rclrf = 999.
 exclude_bonded = .false.
 force_rms = .false.
 shake_hydrogens = .false.
@@ -3296,48 +3267,48 @@ awmz = -1
 !read (fu,*, iostat=stat) nsteps,stepsize
 if (.not. prm_get_int_real8(nsteps,stepsize)) then
         old_initialize = .false.
-		call die("Wrong input format.")
+                call die("wrong input format.")
 end if
 
 write (*,10) nsteps, stepsize
-10	format ('Number of MD steps =',i10,'  Stepsize (fs)    =',f10.3)
+10      format ('number of md steps =',i10,'  stepsize (fs)    =',f10.3)
 
 ! convert to internal time units once and for all.
 dt=0.020462*stepsize
 
-! --- Temp0, tau_T, iseed, Tmaxw
+! --- temp0, tau_t, iseed, tmaxw
 read(fu,'(a80)') text !read line into buffer
 !now read buffer (avoid reading more lines from inpunt in search for more values)
-read(text,*, err=17, end=17) Temp0,tau_T, iseed,Tmaxw 
-17	write (*,15) Temp0,tau_T
-if(Temp0 <= 0) then
+read(text,*, err=17, end=17) temp0,tau_t, iseed,tmaxw 
+17      write (*,15) temp0,tau_t
+if(temp0 <= 0) then
         write(*,'(a)') &
-                '>>> Error: No dynamics at zero temperature! Aborting.'
+                '>>> error: no dynamics at zero temperature! aborting.'
         old_initialize = .false.
 end if
 
-15	format ('Target temperature =',f10.2,'  T-relax time     =',f10.2)
-if (iseed > 0) write (*,16) Tmaxw, iseed
-16	format ('Initial velocities will be generated from Maxwell distribution:',&
-                /,'Maxwell temperature=',f10.2,' Random number seed=',i10)
-tau_T=0.020462*tau_T
-if(tau_T < dt) then
-        write(*,'(a)') '>>> Error: tau_t must be >= stepsize.'
+15      format ('target temperature =',f10.2,'  t-relax time     =',f10.2)
+if (iseed > 0) write (*,16) tmaxw, iseed
+16      format ('initial velocities will be generated from maxwell distribution:',&
+                /,'maxwell temperature=',f10.2,' random number seed=',i10)
+tau_t=0.020462*tau_t
+if(tau_t < dt) then
+        write(*,'(a)') '>>> error: tau_t must be >= stepsize.'
         old_initialize = .false.
 end if
 
-! --- NBmethod, NBcycle, Rcpp, Rcww, Rcpw, Rcq
-read (fu,*) NBmethod,NBcycle,Rcpp,Rcww,Rcpw,Rcq
-if(NBMethod == 2) then
-        use_LRF = .true.
+! --- nbmethod, nbcycle, rcpp, rcww, rcpw, rcq
+read (fu,*) nbmethod,nbcycle,rcpp,rcww,rcpw,rcq
+if(nbmethod == 2) then
+        use_lrf = .true.
 else 
-        use_LRF = .false.
+        use_lrf = .false.
 end if
-write (*,20) NBmethod,NBcycle
-20	format ('Nonbonded method   =',i10,'  NB update cycle  =',i10,/)
-write (*,25) Rcpp,Rcww,Rcpw,Rcq
-25	format ('Cutoffs are: Rcpp  =',f6.2,'  Rcww =',f6.2,'  Rcpw =', &
-f6.2,'  Rcqp =',f6.2,/)
+write (*,20) nbmethod,nbcycle
+20      format ('nonbonded method   =',i10,'  nb update cycle  =',i10,/)
+write (*,25) rcpp,rcww,rcpw,rcq
+25      format ('cutoffs are: rcpp  =',f6.2,'  rcww =',f6.2,'  rcpw =', &
+f6.2,'  rcqp =',f6.2,/)
 
 ! --- shake_flag
 read (fu,*) shake_flag
@@ -3351,47 +3322,47 @@ if(shake_flag == 2) then
 end if
 
 write (*,30) shake_flag
-30	format ('Shake method       =',i10)
+30      format ('shake method       =',i10)
 
 ! --- iuse_indip
 read (fu,*) 
 write (*,35) 
-35	format ('Ignoring induced dipole flag.')
+35      format ('ignoring induced dipole flag.')
 
 ! --- protein center: xpcent(:)
 read (fu,*) 
 write (*,40)
-40	format ('Ignoring solute centre.')
+40      format ('ignoring solute centre.')
 
 ! --- rexcl_o, rexcl_i, fk_pshell
 read (fu,*) rjunk, rjunk, fk_pshell
 write(*,44)
 write (*,45) fk_pshell
-44	format ('Ignoring exclusion and shell radii.')
-45	format ('Restrained shell force const.          =',f8.2)
+44      format ('ignoring exclusion and shell radii.')
+45      format ('restrained shell force const.          =',f8.2)
 
 ! --- water center: xwcent(:)
 read (fu,*) 
 write (*,50) 
-50	format ('Ignoring solvent centre.')
+50      format ('ignoring solvent centre.')
 
 ! set default values before reading
-! done this way because the SGI compiler initialises values to be read to zero
+! done this way because the sgi compiler initialises values to be read to zero
 
 read(fu,'(a80)') text ! read line into buffer
 ! now read buffer (avoid reading more lines from input in search for more values)
-read(text, fmt=*, err=58, end=58) rjunk, rjunk, fk_wsphere, iwpol_restr, fkwpol, Dwmz
+read(text, fmt=*, err=58, end=58) rjunk, rjunk, fk_wsphere, iwpol_restr, fkwpol, dwmz
 goto 59
 
 ! set default values:
-58	Dwmz = -1
+58      dwmz = -1
 if (fkwpol .eq. 0) then
   fkwpol = -1
         if (fk_wsphere .eq. 0) then
           fk_wsphere = -1
   end if
 end if
-59	if(iwpol_restr == 0) then
+59      if(iwpol_restr == 0) then
         wpol_restr = .false.
         wpol_born = .false.
 elseif(iwpol_restr == 1) then
@@ -3404,12 +3375,12 @@ else
         call die('unknown water polarisation restraining mode')
 end if
 write(*,57)
-57	format('Ignoring solvent radius and min. packing distance.')
+57      format('ignoring solvent radius and min. packing distance.')
 ! --- top_file
 read (fu,'(a80)') text
 call get_fname (text,length,top_file)
 write (*,60) top_file(1:length)
-60	format ('Topology file      = ',a)
+60      format ('topology file      = ',a)
 
 ! --- restart, [restart_file]
 read (fu,*) irestart
@@ -3420,48 +3391,48 @@ if ( irestart .eq. 1 ) then
         write (*,65) restart_file(1:length)
 else
         restart = .false.
-        write (*,'(a)') 'Initial coordinates taken from topology.'
+        write (*,'(a)') 'initial coordinates taken from topology.'
         if(iseed == 0) then
                 write(*,'(a)') &
-                        'Error: Need a random number seed to generate initial velocities, aborting.'
+                        'error: need a random number seed to generate initial velocities, aborting.'
                 call die('invalid data in input')
         end if
 end if
-65 format ('Initial coord. file= ',a)
+65 format ('initial coord. file= ',a)
 
 ! --- xfin_file
 read (fu,'(a80)') text
 call get_fname (text,length,xfin_file)
 write (*,80) xfin_file(1:length)
-80 format ('Final coord. file  = ',a,/)
+80 format ('final coord. file  = ',a,/)
 
 ! --- itrj_cycle, iene_cycle, iout_cycle, [trj_file], [ene_file]
 read (fu,*) itrj_cycle, iene_cycle, iout_cycle
 write (*,85) itrj_cycle, iene_cycle, iout_cycle
-85 format ('Trajectory, Energy and Output cycles   =',3i8,/)
+85 format ('trajectory, energy and output cycles   =',3i8,/)
 
 if ( itrj_cycle .gt. 0 ) then
 read (fu,'(a80)') text
 call get_fname (text,length,trj_file)
 write (*,90) trj_file(1:length)
 else
-write (*,'(a)') 'No trajectory written.'
+write (*,'(a)') 'no trajectory written.'
  itrj_cycle = -999999999 !make sure mod(istep, itrj_cycle) never = 0
 end if
-90 format ('Trajectory file    = ',a)
+90 format ('trajectory file    = ',a)
 
 if ( iene_cycle .gt. 0 ) then
 read (fu,'(a80)') text
 call get_fname (text,length,ene_file)
 write (*,94) ene_file(1:length)
 else
-write (*,'(a)') 'No energy file written'
+write (*,'(a)') 'no energy file written'
  iene_cycle = -999999999 ! make sure mod(istep, iene_cycle) never = 0
 end if
-94 format ('Energy output file = ',a)
+94 format ('energy output file = ',a)
 
 if(iout_cycle == 0) then
-write(*,'(a)') 'No energy summaries written.'
+write(*,'(a)') 'no energy summaries written.'
 iout_cycle = -999999999 ! make sure mod(istep, iout_cycle) never = 0
 end if
 
@@ -3469,28 +3440,28 @@ end if
 read (fu,'(a80)') text
 call get_fname (text,length,fep_file)
 write (*,95) fep_file(1:length)
-95 format ('FEP input file     = ',a,/)
+95 format ('fep input file     = ',a,/)
 
-! --- nstates, EQ
+! --- nstates, eq
 read (fu,*) nstates, (lamda_tmp(i),i=1,nstates)
 if ( nstates .gt. 0 ) then
-! allocate memory for EQ
-allocate(EQ(nstates), stat=alloc_status)
-call check_alloc('Q-atom energy array')
+! allocate memory for eq
+allocate(eq(nstates), stat=alloc_status)
+call check_alloc('q-atom energy array')
 
-! init EQ%lambda
-EQ(1:nstates)%lambda = lamda_tmp(1:nstates)
-write (*,98) (EQ(i)%lambda,i=1,nstates)
+! init eq%lambda
+eq(1:nstates)%lambda = lamda_tmp(1:nstates)
+write (*,98) (eq(i)%lambda,i=1,nstates)
 98  format ('lambda-values      = ',10f8.5)
 end if
 
-!	--- restraints:
-write (*,'(/,a)') 'Listing of restraining data:'
+!       --- restraints:
+write (*,'(/,a)') 'listing of restraining data:'
 
 ! --- implicit_rstr_from_file, [exrstr_file]
 read (fu,*) implicit_rstr_from_file
 write (*,101) implicit_rstr_from_file
-101 format ('Read rstr file     =',i10)
+101 format ('read rstr file     =',i10)
 if ( implicit_rstr_from_file .eq. 1 ) then
 read (fu,'(a80)') text
 call get_fname (text,length,exrstr_file)
@@ -3498,33 +3469,33 @@ write (*,104) exrstr_file(1:length)
 else
 write (*,105)
 end if
-104 format ('External rstr file = ',a,/)
-105 format ('Implicit positional restraints from topology.',/)
+104 format ('external rstr file = ',a,/)
+105 format ('implicit positional restraints from topology.',/)
 
 ! --- nrstr_seq, [rstseq]
 read (fu,*) nrstr_seq
 write (*,109) nrstr_seq
-109 format (/,'No. sequence rstrs =',i10)
+109 format (/,'no. sequence rstrs =',i10)
 if ( nrstr_seq .gt. 0 ) then
 ! allocate memory for rstseq
 allocate(rstseq(nrstr_seq), stat=alloc_status)
 call check_alloc('restraint list')
 write (*,110)
-110 format (1x,'  atom_i  atom_j      fc  H-flag to_centre')
+110 format (1x,'  atom_i  atom_j      fc  h-flag to_centre')
 end if
 do i=1,nrstr_seq
 ! read rstseq(i)
 read (fu,'(a80)') text
 rstseq(i)%to_centre = 0 
 read(text,*, end=111, err=111) rstseq(i)
-111	write(*,112) rstseq(i)
+111     write(*,112) rstseq(i)
 112 format (2i8,f8.2,i8,i10)
 end do
 
 ! --- nrstr_pos, [rstpos]
 read (fu,*) nrstr_pos
 write (*,115) nrstr_pos
-115 format (/,'No. position rstrs =',i10)
+115 format (/,'no. position rstrs =',i10)
 if ( nrstr_pos .gt. 0 ) then
 ! allocate memory for rstpos
 allocate(rstpos(nrstr_pos), stat=alloc_status)
@@ -3544,7 +3515,7 @@ end do
 ! --- nrstr_dist, [rstdis]
 read (fu,*) nrstr_dist
 write (*,125) nrstr_dist
-125 format ('No. distance rstrs =',i10)
+125 format ('no. distance rstrs =',i10)
 if ( nrstr_dist .gt. 0 ) then
 ! allocate memory for rstdis
 allocate(rstdis(nrstr_dist), stat=alloc_status)
@@ -3565,7 +3536,7 @@ end do
 ! --- nrstr_wall, [rstwal]
 read (fu,*) nrstr_wall
 write (*,135) nrstr_wall
-135 format ('No. wall seq. rstrs=',i10)
+135 format ('no. wall seq. rstrs=',i10)
 if ( nrstr_wall .gt. 0) then
 
 
@@ -3574,7 +3545,7 @@ allocate(rstwal(nrstr_wall), stat=alloc_status)
 call check_alloc('restraint list')
 write (*,140)
 end if
-140 format ('atom_i atom_j   dist.      fc  H-flag')
+140 format ('atom_i atom_j   dist.      fc  h-flag')
 do i=1,nrstr_wall
 ! read rstwal(:)
 read (fu,*) rstwal(i)%i,rstwal(i)%j,rstwal(i)%d,rstwal(i)%fk, &
@@ -3586,12 +3557,12 @@ end do
 
 read (fu,'(a80)') text
 write (*,157) 
-157 format ('Ignoring water file.')
+157 format ('ignoring water file.')
 
 ! --- determine water model
 read (fu,'(a80)') text
 write (*,160) 
-160 format ('Ignoring water model.')
+160 format ('ignoring water model.')
 
 end function old_initialize
 
@@ -3599,17 +3570,17 @@ end function old_initialize
 
 subroutine lrf_taylor
 ! *** local variables
-integer						::	i,i3,ic
-real(8)						::	Vij, q
-real(8)						::	dr(3),df(3)
+integer                                         ::      i,i3,ic
+real(8)                                         ::      vij, q
+real(8)                                         ::      dr(3),df(3)
 
 ! global variables used:
-!  E%LRF, natom, excl, iqatom, iwhich_cgp, lrf, x, crg, d
+!  e%lrf, natom, excl, iqatom, iwhich_cgp, lrf, x, crg, d
 
 do i = 1, natom
 ! for every atom:
 
-if ( ( use_PBC .and. (iqatom(i)==0) ) .or. ( (.not. excl(i) ) .and. (iqatom(i)==0) ) ) then
+if ( ( use_pbc .and. (iqatom(i)==0) ) .or. ( (.not. excl(i) ) .and. (iqatom(i)==0) ) ) then
   ! unless excluded atom or q-atom:
 
   ! find the displacement dr from the center of the charge group
@@ -3619,8 +3590,8 @@ dr(1) = lrf(ic)%cgp_cent(1) - x(i3+1)
 dr(2) = lrf(ic)%cgp_cent(2) - x(i3+2)
 dr(3) = lrf(ic)%cgp_cent(3) - x(i3+3)
 
-! --- Electric potential
-Vij=lrf(ic)%phi0 &
+! --- electric potential
+vij=lrf(ic)%phi0 &
      +lrf(ic)%phi1(1)*dr(1)+lrf(ic)%phi1(2)*dr(2)+lrf(ic)%phi1(3)*dr(3) &
      +0.5*(lrf(ic)%phi2(1)*dr(1)+lrf(ic)%phi2(2)*dr(2) &
      +lrf(ic)%phi2(3)*dr(3))*dr(1) &
@@ -3629,9 +3600,9 @@ Vij=lrf(ic)%phi0 &
      +0.5*(lrf(ic)%phi2(7)*dr(1)+lrf(ic)%phi2(8)*dr(2) &
      +lrf(ic)%phi2(9)*dr(3))*dr(3)
 
-E%LRF = E%LRF + .5 * crg(i) * Vij
+e%lrf = e%lrf + .5 * crg(i) * vij
 
-! --- Electric field
+! --- electric field
 df(1)=lrf(ic)%phi1(1) &
      +lrf(ic)%phi2(1)*dr(1)+lrf(ic)%phi2(2)*dr(2)+lrf(ic)%phi2(3)*dr(3) &
      +0.5*(lrf(ic)%phi3(1 )*dr(1)+lrf(ic)%phi3(2 )*dr(2) &
@@ -3669,14 +3640,14 @@ end subroutine lrf_taylor
 !-----------------------------------------------------------------------
 
 subroutine make_pair_lists
-#if defined (PROFILING)
+#if defined (profiling)
 real(8)                                         :: start_loop_time
 start_loop_time = rtime()
 #endif
 
-if( use_PBC ) then
-        if (.not. use_LRF)then
-		!cutoff
+if( use_pbc ) then
+        if (.not. use_lrf)then
+                !cutoff
            if(iuse_switch_atom == 1) then
                 call nbpplist_box
                 call nbpwlist_box
@@ -3689,20 +3660,20 @@ if( use_PBC ) then
             call nbwwlist_box
         else
             call cgp_centers
-			      if ( iuse_switch_atom == 1 ) then 
-			        call nbpplist_box_lrf
-				      call nbpwlist_box_lrf
-				      call nbqplist_box
-			      else
- 			        call nbpplis2_box_lrf
-				      call nbpwlis2_box_lrf
-				      call nbqplis2_box
+                              if ( iuse_switch_atom == 1 ) then 
+                                call nbpplist_box_lrf
+                                      call nbpwlist_box_lrf
+                                      call nbqplist_box
+                              else
+                                call nbpplis2_box_lrf
+                                      call nbpwlis2_box_lrf
+                                      call nbqplis2_box
             endif
             call nbwwlist_box_lrf
         endif
-		call nbqwlist_box
+                call nbqwlist_box
 else !spherical case
-        if(.not. use_LRF) then
+        if(.not. use_lrf) then
                 ! cutoff
                 if( iuse_switch_atom .eq. 1 ) then
                         call nbpplist
@@ -3716,7 +3687,7 @@ else !spherical case
                 call nbwwlist
         else 
                 ! cutoff with lrf
-                call cgp_centers ! *** måste anropas av alla noder (nollställer lrf)
+                call cgp_centers ! *** mï¿½ste anropas av alla noder (nollstï¿½ller lrf)
                 if( iuse_switch_atom .eq. 1 ) then
                         call nbpplist_lrf   
                         call nbpwlist_lrf   
@@ -3732,7 +3703,7 @@ else !spherical case
         call nbqwlist   
 end if
 
-#if defined (PROFILING)
+#if defined (profiling)
 profile(1)%time = profile(1)%time + rtime() - start_loop_time
 #endif
 
@@ -3742,15 +3713,15 @@ end subroutine make_pair_lists
 
 subroutine maxwell
 ! *** local variables
-integer						:: i,j,k
-real(8)						:: zero,sd,vg,kT
+integer                                         :: i,j,k
+real(8)                                         :: zero,sd,vg,kt
 
-!	Generate Maxwellian velocities 
+!       generate maxwellian velocities 
 zero  = 0.0
-kT = Boltz*Tmaxw
+kt = boltz*tmaxw
 
 do i=1,natom
-        sd = sqrt (kT/iaclib(iac(i))%mass)
+        sd = sqrt (kt/iaclib(iac(i))%mass)
         do j=1,3
                 call gauss (zero,sd,vg,iseed)
                 k=(i-1)*3+j
@@ -3764,140 +3735,140 @@ end subroutine maxwell
 
 
 
-subroutine temperature(Temp,Tscale_solute,Tscale_solvent,Ekinmax)
+subroutine temperature(temp,tscale_solute,tscale_solvent,ekinmax)
 ! calculate the temperature
 !arguments
-real(8)						:: Temp,Tscale_solute,Tscale_solvent,Ekinmax
+real(8)                                         :: temp,tscale_solute,tscale_solvent,ekinmax
 
 !locals
-integer						::	i, i3
-real(8)						::	Ekin
+integer                                         ::      i, i3
+real(8)                                         ::      ekin
 
-Temp = 0.
-Temp_solute = 0.
-Tfree_solute = 0.
-Texcl_solute = 0.
+temp = 0.
+temp_solute = 0.
+tfree_solute = 0.
+texcl_solute = 0.
 
 !get kinetic energies for solute atoms
 do i=1,nat_solute
         i3=i*3-3
-        Ekin = 0.5*iaclib(iac(i))%mass*(v(i3+1)**2+v(i3+2)**2+v(i3+3)**2)
-        Temp_solute = Temp_solute + Ekin
+        ekin = 0.5*iaclib(iac(i))%mass*(v(i3+1)**2+v(i3+2)**2+v(i3+3)**2)
+        temp_solute = temp_solute + ekin
 
-        !******PWadded if
-        if( use_PBC .or. ( (.not. use_PBC) .and. (.not. excl(i)) ) ) then
-                Tfree_solute = Tfree_solute +Ekin
+        !******pwadded if
+        if( use_pbc .or. ( (.not. use_pbc) .and. (.not. excl(i)) ) ) then
+                tfree_solute = tfree_solute +ekin
         else
-        	Texcl_solute = Texcl_solute +Ekin
+                texcl_solute = texcl_solute +ekin
         end if
-        !if ( .not. excl(i)) Tfree = Tfree + Ekin
-        if ( Ekin .gt. Ekinmax ) then
+        !if ( .not. excl(i)) tfree = tfree + ekin
+        if ( ekin .gt. ekinmax ) then
                 ! hot atom warning
-                write (*,180) i,2.*Ekin/Boltz/3.
+                write (*,180) i,2.*ekin/boltz/3.
         end if
 end do
 
-Tfree_solvent = 0.
-Temp_solvent = 0.
-Texcl_solvent = 0.
-Ekin = 0
+tfree_solvent = 0.
+temp_solvent = 0.
+texcl_solvent = 0.
+ekin = 0
 
 
 !get kinetic energies for solvent atoms
 do i=nat_solute+1,natom
         i3=i*3-3
-        Ekin = 0.5*iaclib(iac(i))%mass*(v(i3+1)**2+v(i3+2)**2+v(i3+3)**2)
-        Temp_solvent = Temp_solvent + Ekin
+        ekin = 0.5*iaclib(iac(i))%mass*(v(i3+1)**2+v(i3+2)**2+v(i3+3)**2)
+        temp_solvent = temp_solvent + ekin
 
-        !******PWadded if
-        if( use_PBC .or. ( (.not. use_PBC) .and. (.not. excl(i)) ) ) then
-                Tfree_solvent = Tfree_solvent +Ekin
+        !******pwadded if
+        if( use_pbc .or. ( (.not. use_pbc) .and. (.not. excl(i)) ) ) then
+                tfree_solvent = tfree_solvent +ekin
         else
-        	Texcl_solvent = Texcl_solvent +Ekin
+                texcl_solvent = texcl_solvent +ekin
         end if
-        !if ( .not. excl(i)) Tfree = Tfree + Ekin
-        if ( Ekin .gt. Ekinmax ) then
+        !if ( .not. excl(i)) tfree = tfree + ekin
+        if ( ekin .gt. ekinmax ) then
                 ! hot atom warning
-                write (*,180) i,2.*Ekin/Boltz/3.
+                write (*,180) i,2.*ekin/boltz/3.
         end if
 end do
 
-Tfree = Tfree_solvent + Tfree_solute
-Temp = Temp_solute + Temp_solvent
+tfree = tfree_solvent + tfree_solute
+temp = temp_solute + temp_solvent
 
-E%kinetic = Temp
+e%kinetic = temp
 
-Temp  = 2.0*Temp/Boltz/real(Ndegf)
-Tfree = 2.0*Tfree/Boltz/real(Ndegfree)
+temp  = 2.0*temp/boltz/real(ndegf)
+tfree = 2.0*tfree/boltz/real(ndegfree)
 
 if (detail_temps) then
-	Temp_solute  = 2.0*Temp_solute /Boltz/real(Ndegf_solute)
-	Tfree_solute = 2.0*Tfree_solute/Boltz/real(Ndegfree_solute)
-	if ( Ndegf_solute .ne. Ndegfree_solute) Texcl_solute = 2.0*Texcl_solute/Boltz/real(Ndegf_solute - Ndegfree_solute)
+        temp_solute  = 2.0*temp_solute /boltz/real(ndegf_solute)
+        tfree_solute = 2.0*tfree_solute/boltz/real(ndegfree_solute)
+        if ( ndegf_solute .ne. ndegfree_solute) texcl_solute = 2.0*texcl_solute/boltz/real(ndegf_solute - ndegfree_solute)
 
-	Temp_solvent  = 2.0*Temp_solvent /Boltz/real(Ndegf_solvent)
-	Tfree_solvent = 2.0*Tfree_solvent/Boltz/real(Ndegfree_solvent)
-	if ( Ndegf_solvent .ne. Ndegfree_solvent) Texcl_solvent = 2.0*Texcl_solvent/Boltz/real(Ndegf_solvent - Ndegfree_solvent)
+        temp_solvent  = 2.0*temp_solvent /boltz/real(ndegf_solvent)
+        tfree_solvent = 2.0*tfree_solvent/boltz/real(ndegfree_solvent)
+        if ( ndegf_solvent .ne. ndegfree_solvent) texcl_solvent = 2.0*texcl_solvent/boltz/real(ndegf_solvent - ndegfree_solvent)
 end if
 
 
 if (separate_scaling) then
-	if ( Tfree_solvent .ne. 0 ) Tscale_solvent = Temp0/Tfree_solvent - 1.0
-	Tscale_solvent = sqrt ( 1 + dt/tau_T * Tscale_solvent )
-	if ( Tfree_solute .ne. 0 ) Tscale_solute = Temp0/Tfree_solute - 1.0
-	Tscale_solute = sqrt ( 1 + dt/tau_T * Tscale_solute )
+        if ( tfree_solvent .ne. 0 ) tscale_solvent = temp0/tfree_solvent - 1.0
+        tscale_solvent = sqrt ( 1 + dt/tau_t * tscale_solvent )
+        if ( tfree_solute .ne. 0 ) tscale_solute = temp0/tfree_solute - 1.0
+        tscale_solute = sqrt ( 1 + dt/tau_t * tscale_solute )
 else
-	if ( Tfree .ne. 0 ) Tscale_solvent = Temp0/Tfree - 1.0
-	Tscale_solvent = sqrt ( 1 + dt/tau_T * Tscale_solvent )
-	Tscale_solute = Tscale_solvent
+        if ( tfree .ne. 0 ) tscale_solvent = temp0/tfree - 1.0
+        tscale_solvent = sqrt ( 1 + dt/tau_t * tscale_solvent )
+        tscale_solute = tscale_solvent
 end if
 
 
-180 format ('>>> WARNING: hot atom, i =',i10,' Temp(i)=',f10.2)
+180 format ('>>> warning: hot atom, i =',i10,' temp(i)=',f10.2)
 
 end subroutine temperature
 
 !-----------------------------------------------------------------------
-!******PWchanged 2002-10-01
+!******pwchanged 2002-10-01
 subroutine md_run
 
 ! local variables
-integer				:: i,j,k,niter
+integer                         :: i,j,k,niter
 
-integer				:: i3
-real(8)				:: Temp,Tlast
-real(8)				::Ekinmax
-real(8)				::Tscale_solute,Tscale_solvent
+integer                         :: i3
+real(8)                         :: temp,tlast
+real(8)                         ::ekinmax
+real(8)                         ::tscale_solute,tscale_solvent
 
-real(8)				:: time0, time1, time_per_step, startloop
-integer(4)				:: time_completion
+real(8)                         :: time0, time1, time_per_step, startloop
+integer(4)                              :: time_completion
 
-#if defined(PROFILING)
+#if defined(profiling)
 real(8)                                         :: start_loop_time1, start_loop_time2
 
-profile(1)%name = 'NB_update'
+profile(1)%name = 'nb_update'
 profile(2)%name = '   nbwwlist_time'
 profile(3)%name = '   nbpplist_time'
 profile(4)%name = '   nbpwlist_time'
 profile(5)%name = '   nbqplist_time'
 profile(6)%name = '   nbqwlist_time'
-profile(7)%name = 'SHAKE'
-profile(8)%name = 'Bonded Terms'
-profile(9)%name = 'Restraints'
-profile(10)%name = 'Nonbonded Terms'
-profile(11)%name = 'Update vel. & coords.'
+profile(7)%name = 'shake'
+profile(8)%name = 'bonded terms'
+profile(9)%name = 'restraints'
+profile(10)%name = 'nonbonded terms'
+profile(11)%name = 'update vel. & coords.'
 
 
 #endif
 
-#if defined(PROFILING)
-#if defined(USE_MPI)
+#if defined(profiling)
+#if defined(use_mpi)
 if (nodeid .eq. 0) then
-	allocate(all_node_times(num_profiling_times*numnodes), stat=alloc_status) !vector for storing all node's node_times, used by mpi_gather at end of md_run
-	call check_alloc('MPI profiling')
+        allocate(all_node_times(num_profiling_times*numnodes), stat=alloc_status) !vector for storing all node's node_times, used by mpi_gather at end of md_run
+        call check_alloc('mpi profiling')
 end if
 allocate(node_times(num_profiling_times), stat=alloc_status) !each node's profiling times, used at end of md_run by mpi_gather
-call check_alloc('MPI profiling')
+call check_alloc('mpi profiling')
 
 all_node_times(:) = 0.0
 node_times(:) = 0.0
@@ -3906,82 +3877,82 @@ node_times(:) = 0.0
 #endif
 
 
-!Define number of coord to send/recieve
+!define number of coord to send/recieve
 nat3=natom*3
 
 ! calculate maximum temperature
-!**MN-> Only master calc. temp for now.
+!**mn-> only master calc. temp for now.
 if (nodeid .eq. 0) then
-Ekinmax = 1000.0*Ndegf*Boltz*Temp0/2.0/real(natom)
+ekinmax = 1000.0*ndegf*boltz*temp0/2.0/real(natom)
 
-call temperature(Temp,Tscale_solute,Tscale_solvent,Ekinmax)
-!store old Temp
-Tlast = Temp
+call temperature(temp,tscale_solute,tscale_solvent,ekinmax)
+!store old temp
+tlast = temp
 end if
 
 if (nodeid .eq. 0) then
         ! master node only: print initial temperatures
         write (*,*)
-        write (*,120) 'Initial', Temp, Tfree
-		if ( detail_temps ) then
-			write (*,120) 'Solvent', Temp_solvent, Tfree_solvent
-			write (*,120) 'Solute', Temp_solute, Tfree_solute
-!			write (*,120) 'Excl solute, solvent', Texcl_solute, Texcl_solvent
-		end if
-120		format(a7,' temperatures are : Ttot =',f10.2,' Tfree =',f10.2)
+        write (*,120) 'initial', temp, tfree
+                if ( detail_temps ) then
+                        write (*,120) 'solvent', temp_solvent, tfree_solvent
+                        write (*,120) 'solute', temp_solute, tfree_solute
+!                       write (*,120) 'excl solute, solvent', texcl_solute, texcl_solvent
+                end if
+120             format(a7,' temperatures are : ttot =',f10.2,' tfree =',f10.2)
         write (*,*)
 
         ! init timer
         time0 = rtime()
 
-		! Init timer of total loop time
-		startloop = rtime()
+                ! init timer of total loop time
+                startloop = rtime()
 end if
 
 
 !***********************************************************************
-!	begin MAIN DYNAMICS LOOP (Verlet leap-frog algorithm)
+!       begin main dynamics loop (verlet leap-frog algorithm)
 !***********************************************************************
 
-! No loop (only calc. energies) if compiling with the DUM flag
-#ifndef DUM
+! no loop (only calc. energies) if compiling with the dum flag
+#ifndef dum
 do istep = 0, nsteps-1
 #endif
-        if ( mod(istep, NBcycle) .eq. 0 ) then
+        if ( mod(istep, nbcycle) .eq. 0 ) then
 
 
-                ! every NBcycle steps:
+                ! every nbcycle steps:
 
-				!Put molecules back in box for nice visualisation, needs to be here to prevent problems with LRF
-				!Update cgp_centers for LRF
-				!only call put_back_in_box if using PBC and either solute or solvent should be put back in box
-				if( use_PBC .and. (put_solute_back_in_box .or. put_solvent_back_in_box) ) then 
-				  call put_back_in_box() 
-				end if
+                                !put molecules back in box for nice visualisation, needs to be here to prevent problems with lrf
+                                !update cgp_centers for lrf
+                                !only call put_back_in_box if using pbc and either solute or solvent should be put back in box
+                                if( use_pbc .and. (put_solute_back_in_box .or. put_solvent_back_in_box) ) then 
+                                  call put_back_in_box() 
+                                end if
 
                 if ((nodeid .eq. 0) .and. (istep > 0)) then
                         ! print timing info
-                        call centered_heading('Timing', '-')
+                        call centered_heading('timing', '-')
                         time1 = rtime()
-                        time_per_step = (time1-time0)/NBcycle
+                        time_per_step = (time1-time0)/nbcycle
                         time_completion = int(time_per_step*(nsteps-istep)/60)
                         time0 = time1
                         write(*,222) time_per_step, time_completion
-222				format('Seconds per step (wall-clock): ',f5.2,&
-                                ' Estimated completion in',i6,' minutes')
+222                             format('seconds per step (wall-clock): ',f5.2,&
+                                ' estimated completion in',i6,' minutes')
                 end if
 
                 ! update lists of nonbonded interaction pairs
                 if (nodeid .eq. 0) then
-                   call centered_heading('Nonbonded pair list generation', '-')
+                   call centered_heading('nonbonded pair list generation', '-')
                 end if
                 call make_pair_lists
-#if defined(DUMP)
-write(*,332) 'solute-solute', 'solute-water', 'water-water', 'Q-solute', 'Q-water'
+#if defined(dump)
+write(*,332) 'solute-solute', 'solute-water', 'water-water', 'q-solute', 'q-water'
 write(*,333) nodeid, 'count', nbpp_pair, nbpw_pair, &
      &  nbww_true_pair, nbqp_pair, 3*nqat*nbqw_pair
 
-#if defined(USE_MPI)
+#if defined(use_mpi)
 !reduce totnxx, i.e. collect # pairs found by slave nodes
 nbxx(1)=nbpp_pair
 nbxx(2)=nbpw_pair
@@ -3989,8 +3960,8 @@ nbxx(3)=nbww_true_pair
 nbxx(4)=nbqp_pair
 nbxx(5)=3*nqat*nbqw_pair
 
-call MPI_Reduce(nbxx,nbxx_tot,5,MPI_INTEGER,MPI_SUM,0,MPI_COMM_WORLD,ierr) 
-if (ierr .ne. 0) call die('run/Reduce')
+call mpi_reduce(nbxx,nbxx_tot,5,mpi_integer,mpi_sum,0,mpi_comm_world,ierr) 
+if (ierr .ne. 0) call die('run/reduce')
 
 if (nodeid .eq. 0) then
 totnbpp=nbxx_tot(1)
@@ -4002,15 +3973,15 @@ write(*,99) 'total', totnbpp,totnbpw,totnbww,totnbqp,totnbqw
 end if
 99  format(a10,1x,5(1x,i12))
 #endif
-332	format('node value ',5a13)
-333	format(i4,1x,a5,1x,5(1x,i12))
+332     format('node value ',5a13)
+333     format(i4,1x,a5,1x,5(1x,i12))
 #endif
 
-        end if ! every NBcycle steps
+        end if ! every nbcycle steps
 
         ! --- start of time step ---
 
-        ! get potential energy and derivatives from FF
+        ! get potential energy and derivatives from ff
         call pot_energy
 
 if(nodeid .eq. 0) then
@@ -4021,45 +3992,45 @@ if(nodeid .eq. 0) then
         ! off-diagonals
         if ( noffd .gt. 0 ) call offdiag
 
-#ifndef DUM
+#ifndef dum
         ! update velocities from accelerations,
         ! scale velocities & update positions from velocities
-#if defined (PROFILING)
+#if defined (profiling)
 start_loop_time1 = rtime()
 #endif
 
-		!solute atoms first
+                !solute atoms first
         do i=1,nat_solute
                 i3=i*3-3
-                v(i3+1)= ( v(i3+1)-d(i3+1)*winv(i)*dt ) * Tscale_solute
+                v(i3+1)= ( v(i3+1)-d(i3+1)*winv(i)*dt ) * tscale_solute
                 xx(i3+1) = x(i3+1)
                 x(i3+1) = x(i3+1) + v(i3+1)*dt
 
-                v(i3+2)= ( v(i3+2)-d(i3+2)*winv(i)*dt ) * Tscale_solute
+                v(i3+2)= ( v(i3+2)-d(i3+2)*winv(i)*dt ) * tscale_solute
                 xx(i3+2) = x(i3+2)
                 x(i3+2) = x(i3+2) + v(i3+2)*dt
 
-                v(i3+3)= ( v(i3+3)-d(i3+3)*winv(i)*dt ) * Tscale_solute
+                v(i3+3)= ( v(i3+3)-d(i3+3)*winv(i)*dt ) * tscale_solute
                 xx(i3+3) = x(i3+3)
                 x(i3+3) = x(i3+3) + v(i3+3)*dt
         end do
 
-		!now solvent atoms
+                !now solvent atoms
         do i=nat_solute+1,natom
                 i3=i*3-3
-                v(i3+1)= ( v(i3+1)-d(i3+1)*winv(i)*dt ) * Tscale_solvent
+                v(i3+1)= ( v(i3+1)-d(i3+1)*winv(i)*dt ) * tscale_solvent
                 xx(i3+1) = x(i3+1)
                 x(i3+1) = x(i3+1) + v(i3+1)*dt
 
-                v(i3+2)= ( v(i3+2)-d(i3+2)*winv(i)*dt ) * Tscale_solvent
+                v(i3+2)= ( v(i3+2)-d(i3+2)*winv(i)*dt ) * tscale_solvent
                 xx(i3+2) = x(i3+2)
                 x(i3+2) = x(i3+2) + v(i3+2)*dt
 
-                v(i3+3)= ( v(i3+3)-d(i3+3)*winv(i)*dt ) * Tscale_solvent
+                v(i3+3)= ( v(i3+3)-d(i3+3)*winv(i)*dt ) * tscale_solvent
                 xx(i3+3) = x(i3+3)
                 x(i3+3) = x(i3+3) + v(i3+3)*dt
         end do
-#if defined (PROFILING)
+#if defined (profiling)
 profile(11)%time = profile(11)%time + rtime() - start_loop_time1
 #endif
 
@@ -4070,13 +4041,13 @@ profile(11)%time = profile(11)%time + rtime() - start_loop_time1
         end if
 
         ! --- end of time step ---
-#if defined (PROFILING)
+#if defined (profiling)
 start_loop_time2 = rtime()
 #endif
 
         ! calculate temperature and scaling factor
-        call temperature(Temp,Tscale_solute,Tscale_solvent,Ekinmax)
-#if defined (PROFILING)
+        call temperature(temp,tscale_solute,tscale_solvent,ekinmax)
+#if defined (profiling)
 profile(12)%time = profile(12)%time + rtime() - start_loop_time2
 #endif
 
@@ -4084,15 +4055,15 @@ end if !if(nodeid .eq. 0)
 
 
 !change volume
-if( use_PBC .and. constant_pressure) then
+if( use_pbc .and. constant_pressure) then
    if( mod(istep, ivolume_cycle)==0 .and. istep>0 ) then
-      call MC_volume
+      call mc_volume
    end if
 end if
 
-#if defined(USE_MPI)
-call MPI_Bcast(x, nat3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast x')
+#if defined(use_mpi)
+call mpi_bcast(x, nat3, mpi_real8, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast x')
 #endif
 
         ! print [intermediate] results (master node only)
@@ -4104,10 +4075,10 @@ if (ierr .ne. 0) call die('init_nodes/MPI_Bcast x')
                 end if
                 ! energies
                 if ( mod(istep, iene_cycle) == 0 .and. istep > 0) then
-                ! nrgy_put_ene(unit, e2, OFFD): print 'e2'=EQ and OFFD to unit 'unit'=11
-                        call put_ene(11, EQ, OFFD)
+                ! nrgy_put_ene(unit, e2, offd): print 'e2'=eq and offd to unit 'unit'=11
+                        call put_ene(11, eq, offd)
                 end if
-                ! end-of-line, then call write_out, which will print a report on E and EQ
+                ! end-of-line, then call write_out, which will print a report on e and eq
                 if ( mod(istep,iout_cycle) == 0 ) then
                         call write_out
                 end if
@@ -4115,16 +4086,16 @@ if (ierr .ne. 0) call die('init_nodes/MPI_Bcast x')
                 if ( mod(istep,1000) .eq. 0 ) then
                         call write_xfin
                 end if
-                if ( abs(Temp-Tlast)/Temp > TEMP_PRINT_THRESHOLD .or. &
+                if ( abs(temp-tlast)/temp > temp_print_threshold .or. &
                         (mod(istep, itemp_cycle) == 0 .and. istep > 0)) then
                         ! temperatures
-                        Tlast = Temp
-                        write(*,201) istep, Temp, Tfree
-						if (detail_temps) then
-							write(*,2020) Tfree_solute, Tfree_solvent
-!							write(*,2030) Texcl_solute, Texcl_solvent
+                        tlast = temp
+                        write(*,201) istep, temp, tfree
+                                                if (detail_temps) then
+                                                        write(*,2020) tfree_solute, tfree_solvent
+!                                                       write(*,2030) texcl_solute, texcl_solvent
 
-						end if
+                                                end if
 
                 end if
 
@@ -4133,22 +4104,22 @@ if (ierr .ne. 0) call die('init_nodes/MPI_Bcast x')
 
 
 end do ! time step
-201	 format('Temperature at step',i8,':         T_tot=',f10.1,'         T_free=',f10.1)
-2020 format('                             T_free_solute=',f10.1,' T_free_solvent=',f10.1)
-2030 format('                             T_excl_solute=',f10.1,' T_excl_solvent=',f10.1)
+201      format('temperature at step',i8,':         t_tot=',f10.1,'         t_free=',f10.1)
+2020 format('                             t_free_solute=',f10.1,' t_free_solvent=',f10.1)
+2030 format('                             t_excl_solute=',f10.1,' t_excl_solvent=',f10.1)
 
 
 !***********************************************************************
-!	end MAIN DYNAMICS LOOP
+!       end main dynamics loop
 !***********************************************************************
 
-! end of Qdum exclusion
+! end of qdum exclusion
 #else
 end if !(nodeid .eq. 0) from far above
 #endif
 
         ! write final trajectory image when istep = nsteps
-#ifndef DUM
+#ifndef dum
 if (nodeid .eq. 0) then
     if ( mod(istep,itrj_cycle) == 0) call write_trj
 end if
@@ -4166,39 +4137,39 @@ end if
 
 
 if (nodeid .eq. 0) then
-	time1 = rtime()
-	write (*,202) time1 - startloop
-	202 format('Total time of main loop:                     ', f15.1,'(s)')
+        time1 = rtime()
+        write (*,202) time1 - startloop
+        202 format('total time of main loop:                     ', f15.1,'(s)')
 end if
-#if defined(PROFILING)
-!Print more profiling info
+#if defined(profiling)
+!print more profiling info
 
-#if defined(USE_MPI)
+#if defined(use_mpi)
 do i=1,num_profiling_times
-	node_times(i) = profile(i)%time
+        node_times(i) = profile(i)%time
 end do
-call MPI_GATHER(node_times,num_profiling_times,MPI_REAL8,all_node_times,num_profiling_times,MPI_REAL8,0,MPI_COMM_WORLD,ierr)
-if (ierr .ne. 0) call die('md_run/MPI_GATHER profiling times')
+call mpi_gather(node_times,num_profiling_times,mpi_real8,all_node_times,num_profiling_times,mpi_real8,0,mpi_comm_world,ierr)
+if (ierr .ne. 0) call die('md_run/mpi_gather profiling times')
 
 if (nodeid .eq. 0) then
 write (*,210,advance='no')
 do j=0,numnodes-1
-	write (*,209,advance='no') j
+        write (*,209,advance='no') j
 end do
 write(*,*)
 
 do i=1,num_profiling_times
-	write (*,207,advance='no') profile(i)%name
-	do j=0,numnodes-1
-		write (*,208,advance='no') all_node_times(i+j*num_profiling_times)
-	end do
-	write (*,*) ' (s)'
+        write (*,207,advance='no') profile(i)%name
+        do j=0,numnodes-1
+                write (*,208,advance='no') all_node_times(i+j*num_profiling_times)
+        end do
+        write (*,*) ' (s)'
 end do
 
-207	format('Total time of ',A25,T40,': ')
-208	format(f10.1,' ')
-209	format(I11)
-210 format(T30,'node:     ')
+207     format('total time of ',a25,t40,': ')
+208     format(f10.1,' ')
+209     format(i11)
+210 format(t30,'node:     ')
 
 write (*,*)
 
@@ -4207,9 +4178,9 @@ end if
 #else
 
 do i=1,num_profiling_times
-	write (*,207) profile(i)%name,profile(i)%time
+        write (*,207) profile(i)%name,profile(i)%time
 end do
-207	format('Total time of ',A25,T40,': ',f15.1,' (s).')
+207     format('total time of ',a25,t40,': ',f15.1,' (s).')
 #endif
 #endif
 
@@ -4219,25 +4190,25 @@ end subroutine md_run
 !-----------------------------------------------------------------------
 subroutine nbpp_count(npp, nppcgp)
 ! arguments
-integer						:: npp
-integer						:: nppcgp(:)
+integer                                         :: npp
+integer                                         :: nppcgp(:)
 
 ! local variables
-integer						:: i,j,ig,jg,ia,ja,i3,j3,nl
-real(8)						:: rcut2,r2
-integer						:: LJ_code
+integer                                         :: i,j,ig,jg,ia,ja,i3,j3,nl
+real(8)                                         :: rcut2,r2
+integer                                         :: lj_code
 
-real(8)						:: dx, dy, dz
-! This routine counts non-bonded solute-solute atom pairs 
-! excluding any Q-atoms.
+real(8)                                         :: dx, dy, dz
+! this routine counts non-bonded solute-solute atom pairs 
+! excluding any q-atoms.
 
 ! uses the global variables:
-!  Rcpp, ncgp, cgp, excl, x, cgpatom, iqatom, ljcod, crg, 
+!  rcpp, ncgp, cgp, excl, x, cgpatom, iqatom, ljcod, crg, 
 !  iaclib, max_nbr_range, listex, nexlong, listexlong
 
 
 npp = 0
-rcut2 = Rcpp*Rcpp
+rcut2 = rcpp*rcpp
 
 igloop: do ig = 1, ncgp_solute
 nppcgp(ig) = 0
@@ -4245,15 +4216,15 @@ nppcgp(ig) = 0
 ia = cgp(ig)%iswitch
  
 ! skip if excluded group
-if ( .not. use_PBC .and. excl(ia) ) cycle igloop
+if ( .not. use_pbc .and. excl(ia) ) cycle igloop
 
 i3 = 3*ia-3
 
-jgloop:	do jg = 1, ncgp_solute
+jgloop: do jg = 1, ncgp_solute
   ja = cgp(jg)%iswitch
  
    ! skip if excluded group
-  if ( .not. use_PBC .and. excl(ja) ) cycle jgloop
+  if ( .not. use_pbc .and. excl(ja) ) cycle jgloop
 
   ! count each charge group pair once only
   if ( ((ig .gt. jg) .and. (mod(ig+jg,2) .eq. 0)) .or. &
@@ -4262,9 +4233,9 @@ jgloop:	do jg = 1, ncgp_solute
 
   j3 = 3*ja-3
 
-  !******PWadded if-statement 2001-10-01
+  !******pwadded if-statement 2001-10-01
 
-  if( .not. use_PBC ) then
+  if( .not. use_pbc ) then
   r2 = ( x(i3+1) -x(j3+1) )**2 &
         +( x(i3+2) -x(j3+2) )**2 &
         +( x(i3+3) -x(j3+3) )**2
@@ -4288,7 +4259,7 @@ ialoop: do ia = cgp(ig)%first, cgp(ig)%last
         ! skip if q-atom
         if ( iqatom(i)/=0 ) cycle ialoop
 
-jaloop:	do ja = cgp(jg)%first, cgp(jg)%last
+jaloop: do ja = cgp(jg)%first, cgp(jg)%last
           j = cgpatom(ja)
 
           ! skip if q-atom
@@ -4297,12 +4268,12 @@ jaloop:	do ja = cgp(jg)%first, cgp(jg)%last
           if ( ig .eq. jg .and. i .ge. j ) cycle jaloop
 
           ! skip if all interactions zero
-          LJ_code = ljcod(iac(i),iac(j))
+          lj_code = ljcod(iac(i),iac(j))
           if((crg(i) * crg(j) == 0.) &
                 .and. &
-                (iaclib(iac(i))%avdw(LJ_code)*iaclib(iac(j))%avdw(LJ_code) == 0.) &
+                (iaclib(iac(i))%avdw(lj_code)*iaclib(iac(j))%avdw(lj_code) == 0.) &
                 .and. &
-                (iaclib(iac(i))%bvdw(LJ_code)*iaclib(iac(j))%bvdw(LJ_code) == 0.)) &
+                (iaclib(iac(i))%bvdw(lj_code)*iaclib(iac(j))%bvdw(lj_code) == 0.)) &
                 cycle jaloop
 
           ! check bonded exclusions and 1-4 nbors
@@ -4337,21 +4308,21 @@ end subroutine nbpp_count
 
 subroutine nbpplis2
 ! local variables
-integer						:: i,j,ig,jg,ia,ja,i3,j3,nl,inside
-real(8)						:: rcut2,r2
+integer                                         :: i,j,ig,jg,ia,ja,i3,j3,nl,inside
+real(8)                                         :: rcut2,r2
 
 
 ! for spherical boundary 
-!	This routine makes a list of non-bonded solute-solute atom pairs 
-!	excluding any Q-atoms.
+!       this routine makes a list of non-bonded solute-solute atom pairs 
+!       excluding any q-atoms.
 
-#if defined (PROFILING)
+#if defined (profiling)
 real(8)                                         :: start_loop_time
 start_loop_time = rtime()
 #endif
 
 nbpp_pair = 0
-rcut2 = Rcpp*Rcpp
+rcut2 = rcpp*rcpp
 
 
 igloop:  do ig = calculation_assignment%pp%start, calculation_assignment%pp%end
@@ -4369,7 +4340,7 @@ jgloop:     do jg = 1, ncgp_solute
 ja = cgp(jg)%iswitch
          if ( excl(ja) ) cycle jgloop
 
-!	      --- outside cutoff ? ---
+!             --- outside cutoff ? ---
         inside = 0
         ia = cgp(ig)%first
         do while ((ia .le. cgp(ig)%last) .and. (inside .eq. 0))
@@ -4401,19 +4372,19 @@ end do
 ialoop:    do ia = cgp(ig)%first, cgp(ig)%last
    i = cgpatom(ia)
 
-   !	         --- q-atom ? ---
+   !             --- q-atom ? ---
    if ( iqatom(i)/=0 ) cycle ialoop
 
 jaloop:       do ja = cgp(jg)%first, cgp(jg)%last
       j = cgpatom(ja)
 
-      !	            --- q-atom ? ---
+      !             --- q-atom ? ---
       if ( iqatom(j)/=0 ) cycle jaloop
 
                         ! count once
       if ( ig .eq. jg .and. i .ge. j ) cycle jaloop
 
-      !	            --- check bonded exclusions and 1-4 nbors ---
+      !             --- check bonded exclusions and 1-4 nbors ---
 
       if ( abs(j-i) .le. max_nbr_range ) then
          if ( i .lt. j ) then
@@ -4436,13 +4407,13 @@ jaloop:       do ja = cgp(jg)%first, cgp(jg)%last
       nbpp_pair = nbpp_pair + 1
       nbpp(nbpp_pair)%i = i
       nbpp(nbpp_pair)%j = j 
-      nbpp(nbpp_pair)%LJcod = ljcod(iac(i),iac(j))
+      nbpp(nbpp_pair)%ljcod = ljcod(iac(i),iac(j))
 
       if ( abs(j-i) .le. max_nbr_range ) then
          if ( i .lt. j ) then
-            if ( list14(j-i,i) ) nbpp(nbpp_pair)%LJcod = 3
+            if ( list14(j-i,i) ) nbpp(nbpp_pair)%ljcod = 3
          else
-            if ( list14(i-j,j) ) nbpp(nbpp_pair)%LJcod = 3
+            if ( list14(i-j,j) ) nbpp(nbpp_pair)%ljcod = 3
          end if
       else
          do nl = 1, n14long
@@ -4450,7 +4421,7 @@ jaloop:       do ja = cgp(jg)%first, cgp(jg)%last
                  list14long(2,nl) .eq. j      ) .or. &
                  (list14long(1,nl) .eq. j .and. &
                  list14long(2,nl) .eq. i      ) ) then
-                 nbpp(nbpp_pair)%LJcod = 3
+                 nbpp(nbpp_pair)%ljcod = 3
                                 end if
          end do
       end if
@@ -4459,7 +4430,7 @@ jaloop:       do ja = cgp(jg)%first, cgp(jg)%last
            end do ialoop
         end do jgloop
 end do igloop
-#if defined (PROFILING) 
+#if defined (profiling) 
 profile(3)%time = profile(3)%time + rtime() - start_loop_time
 #endif 
 
@@ -4470,85 +4441,85 @@ end subroutine nbpplis2
 
 subroutine nbpplis2_box
   ! local variables
-  integer						:: i,j,ig,jg,ia,ja,i3,j3,nl,inside
-  real(8)						:: rcut2,r2
-  real(8)						:: dx, dy, dz
+  integer                                               :: i,j,ig,jg,ia,ja,i3,j3,nl,inside
+  real(8)                                               :: rcut2,r2
+  real(8)                                               :: dx, dy, dz
 
-#if defined (PROFILING)
+#if defined (profiling)
 real(8)                                         :: start_loop_time
 start_loop_time = rtime()
 #endif
  
   ! for periodic boundary conditions
-  !	This routine makes a list of non-bonded solute-solute atom pairs 
-  !	excluding any Q-atoms.
+  !     this routine makes a list of non-bonded solute-solute atom pairs 
+  !     excluding any q-atoms.
 
   nbpp_pair = 0
   nbpp_cgp_pair = 0
-  rcut2 = Rcpp*Rcpp
+  rcut2 = rcpp*rcpp
 
 igloop:  do ig = calculation_assignment%pp%start, calculation_assignment%pp%end
 jgloop:     do jg = 1, ncgp_solute
 
-	  ! count each charge group pair once only
-	  if ( ((ig .gt. jg) .and. (mod(ig+jg,2) .eq. 0)) .or. &
-		   ((ig .lt. jg) .and. (mod(ig+jg,2) .eq. 1)) ) &
-		   cycle jgloop
-		
-        !	      --- outside cutoff ? ---
-		inside = 0
-		ia = cgp(ig)%first
-		do while ((ia .le. cgp(ig)%last) .and. (inside .eq. 0))
+          ! count each charge group pair once only
+          if ( ((ig .gt. jg) .and. (mod(ig+jg,2) .eq. 0)) .or. &
+                   ((ig .lt. jg) .and. (mod(ig+jg,2) .eq. 1)) ) &
+                   cycle jgloop
+                
+        !             --- outside cutoff ? ---
+                inside = 0
+                ia = cgp(ig)%first
+                do while ((ia .le. cgp(ig)%last) .and. (inside .eq. 0))
            i = cgpatom(ia)
            i3 = 3*i-3
 
-		   ja = cgp(jg)%first
-		   do while ((ja .le. cgp(jg)%last) .and. (inside .eq. 0))
+                   ja = cgp(jg)%first
+                   do while ((ja .le. cgp(jg)%last) .and. (inside .eq. 0))
               j = cgpatom(ja)
               j3 = 3*j-3
-			  dx = x(i3+1) - x(j3+1)
-			  dy = x(i3+2) - x(j3+2)
-			  dz = x(i3+3) - x(j3+3)
-			  dx = dx - boxlength(1)*nint( dx*inv_boxl(1) )
-			  dy = dy - boxlength(2)*nint( dy*inv_boxl(2) )
-			  dz = dz - boxlength(3)*nint( dz*inv_boxl(3) )
-			  r2 = dx**2 + dy**2 + dz**2
+                          dx = x(i3+1) - x(j3+1)
+                          dy = x(i3+2) - x(j3+2)
+                          dz = x(i3+3) - x(j3+3)
+                          dx = dx - boxlength(1)*nint( dx*inv_boxl(1) )
+                          dy = dy - boxlength(2)*nint( dy*inv_boxl(2) )
+                          dz = dz - boxlength(3)*nint( dz*inv_boxl(3) )
+                          r2 = dx**2 + dy**2 + dz**2
 
               if ( r2 .le. rcut2 ) then
-			    ! one atom pair is within cutoff: set inside
-			    inside = 1
+                            ! one atom pair is within cutoff: set inside
+                            inside = 1
 
-				if (nbpp_cgp_pair .eq. size(nbpp_cgp, 1) )  call reallocate_nbpp_cgp
+                                if (nbpp_cgp_pair .eq. size(nbpp_cgp, 1) )  call reallocate_nbpp_cgp
 
-				nbpp_cgp_pair = nbpp_cgp_pair + 1
-				nbpp_cgp(nbpp_cgp_pair)%i = i
-				nbpp_cgp(nbpp_cgp_pair)%j = j
+                                nbpp_cgp_pair = nbpp_cgp_pair + 1
+                                nbpp_cgp(nbpp_cgp_pair)%i = i
+                                nbpp_cgp(nbpp_cgp_pair)%j = j
 
-			  end if
+                          end if
 
-			  ja = ja + 1
+                          ja = ja + 1
            end do
 
-		   ia = ia + 1
+                   ia = ia + 1
         end do
-		if (inside .eq. 0) cycle jgloop
+                if (inside .eq. 0) cycle jgloop
 
 ialoop:    do ia = cgp(ig)%first, cgp(ig)%last
            i = cgpatom(ia)
 
-           !	         --- q-atom ? ---
+           !             --- q-atom ? ---
            if ( iqatom(i)/=0 ) cycle ialoop
 
 jaloop:       do ja = cgp(jg)%first, cgp(jg)%last
               j = cgpatom(ja)
 
-              !	            --- q-atom ? ---
+              !             --- q-atom ? ---
               if ( iqatom(j)/=0 ) cycle jaloop
 
-				! count once
+                                ! count once
               if ( ig .eq. jg .and. i .ge. j ) cycle jaloop
 
-              !	            --- check bonded exclusions and 1-4 nbors ---
+              !             --- check bonded exclusions and 1-4 nbors ---
 
               if ( abs(j-i) .le. max_nbr_range ) then
                  if ( i .lt. j ) then
@@ -4565,20 +4536,20 @@ jaloop:       do ja = cgp(jg)%first, cgp(jg)%last
                  end do
               end if
 
-			  ! if out of space then make more space
+                          ! if out of space then make more space
               if (nbpp_pair .eq. calculation_assignment%pp%max) call reallocate_nonbondlist_pp
 
               nbpp_pair = nbpp_pair + 1
               nbpp(nbpp_pair)%i = i
               nbpp(nbpp_pair)%j = j 
-              nbpp(nbpp_pair)%LJcod = ljcod(iac(i),iac(j))
-			  nbpp(nbpp_pair)%cgp_pair = nbpp_cgp_pair
+              nbpp(nbpp_pair)%ljcod = ljcod(iac(i),iac(j))
+                          nbpp(nbpp_pair)%cgp_pair = nbpp_cgp_pair
 
               if ( abs(j-i) .le. max_nbr_range ) then
                  if ( i .lt. j ) then
-                    if ( list14(j-i,i) ) nbpp(nbpp_pair)%LJcod = 3
+                    if ( list14(j-i,i) ) nbpp(nbpp_pair)%ljcod = 3
                  else
-                    if ( list14(i-j,j) ) nbpp(nbpp_pair)%LJcod = 3
+                    if ( list14(i-j,j) ) nbpp(nbpp_pair)%ljcod = 3
                  end if
               else
                  do nl = 1, n14long
@@ -4586,16 +4557,16 @@ jaloop:       do ja = cgp(jg)%first, cgp(jg)%last
                          list14long(2,nl) .eq. j      ) .or. &
                          (list14long(1,nl) .eq. j .and. &
                          list14long(2,nl) .eq. i      ) ) then
-                         nbpp(nbpp_pair)%LJcod = 3
-					end if
+                         nbpp(nbpp_pair)%ljcod = 3
+                                        end if
                  end do
               end if
 
-			  end do jaloop
-		   end do ialoop
-		end do jgloop
-	end do igloop
-#if defined (PROFILING) 
+                          end do jaloop
+                   end do ialoop
+                end do jgloop
+        end do igloop
+#if defined (profiling) 
 profile(3)%time = profile(3)%time + rtime() - start_loop_time
 #endif 
 
@@ -4603,89 +4574,89 @@ end subroutine nbpplis2_box
 !-----------------------------------------------------------------------------
 subroutine nbpplis2_box_lrf
   ! local variables
-  integer						:: i,j,ig,jg,ia,ja,i3,j3,nl,inside
-  real(8)						:: rcut2,r2
-  real(8)						:: dx, dy, dz
+  integer                                               :: i,j,ig,jg,ia,ja,i3,j3,nl,inside
+  real(8)                                               :: rcut2,r2
+  real(8)                                               :: dx, dy, dz
  
-  real(8)						::RcLRF2,field0, field1, field2
-  real(8)						::dr(3)
-  real(8)						::boxshiftx, boxshifty, boxshiftz	
-  integer						::inside_LRF, is3
+  real(8)                                               ::rclrf2,field0, field1, field2
+  real(8)                                               ::dr(3)
+  real(8)                                               ::boxshiftx, boxshifty, boxshiftz       
+  integer                                               ::inside_lrf, is3
   ! for periodic boundary conditions
-  !	This routine makes a list of non-bonded solute-solute atom pairs 
-  !	excluding any Q-atoms.
-#if defined (PROFILING)
+  !     this routine makes a list of non-bonded solute-solute atom pairs 
+  !     excluding any q-atoms.
+#if defined (profiling)
 real(8)                                         :: start_loop_time
 start_loop_time = rtime()
 #endif
 
   nbpp_pair = 0
   nbpp_cgp_pair = 0
-  rcut2 = Rcpp*Rcpp
-  RcLRF2 = RcLRF*RcLRF
+  rcut2 = rcpp*rcpp
+  rclrf2 = rclrf*rclrf
 
 igloop:  do ig = calculation_assignment%pp%start, calculation_assignment%pp%end
 jgloop:     do jg = 1, ncgp_solute
 
-	  ! count each charge group pair once only
-	  if ( ((ig .gt. jg) .and. (mod(ig+jg,2) .eq. 0)) .or. &
-		   ((ig .lt. jg) .and. (mod(ig+jg,2) .eq. 1)) ) &
-		   cycle jgloop
-		
-        !	      --- outside cutoff ? ---
-		inside = 0
-		inside_LRF = 0
-		ia = cgp(ig)%first
-		do while ((ia .le. cgp(ig)%last) .and. (inside .eq. 0))
+          ! count each charge group pair once only
+          if ( ((ig .gt. jg) .and. (mod(ig+jg,2) .eq. 0)) .or. &
+                   ((ig .lt. jg) .and. (mod(ig+jg,2) .eq. 1)) ) &
+                   cycle jgloop
+                
+        !             --- outside cutoff ? ---
+                inside = 0
+                inside_lrf = 0
+                ia = cgp(ig)%first
+                do while ((ia .le. cgp(ig)%last) .and. (inside .eq. 0))
            i = cgpatom(ia)
            i3 = 3*i-3
 
-		   ja = cgp(jg)%first
-		   do while ((ja .le. cgp(jg)%last) .and. (inside .eq. 0))
+                   ja = cgp(jg)%first
+                   do while ((ja .le. cgp(jg)%last) .and. (inside .eq. 0))
               j = cgpatom(ja)
               j3 = 3*j-3
-			  dx = x(i3+1) - x(j3+1)
-			  dy = x(i3+2) - x(j3+2)
-			  dz = x(i3+3) - x(j3+3)
-			  dx = dx - boxlength(1)*nint( dx*inv_boxl(1) )
-			  dy = dy - boxlength(2)*nint( dy*inv_boxl(2) )
-			  dz = dz - boxlength(3)*nint( dz*inv_boxl(3) )
-			  r2 = dx**2 + dy**2 + dz**2
+                          dx = x(i3+1) - x(j3+1)
+                          dy = x(i3+2) - x(j3+2)
+                          dz = x(i3+3) - x(j3+3)
+                          dx = dx - boxlength(1)*nint( dx*inv_boxl(1) )
+                          dy = dy - boxlength(2)*nint( dy*inv_boxl(2) )
+                          dz = dz - boxlength(3)*nint( dz*inv_boxl(3) )
+                          r2 = dx**2 + dy**2 + dz**2
 
               if ( r2 .le. rcut2 ) then
-			    ! one atom pair is within cutoff: set inside
-			    inside = 1
+                            ! one atom pair is within cutoff: set inside
+                            inside = 1
 
-				if (nbpp_cgp_pair .eq. size(nbpp_cgp, 1) )  call reallocate_nbpp_cgp
+                                if (nbpp_cgp_pair .eq. size(nbpp_cgp, 1) )  call reallocate_nbpp_cgp
 
-				nbpp_cgp_pair = nbpp_cgp_pair + 1
-				nbpp_cgp(nbpp_cgp_pair)%i = i
-				nbpp_cgp(nbpp_cgp_pair)%j = j
-              elseif (r2 <= RcLRF2) then
-			    inside_LRF = 1
+                                nbpp_cgp_pair = nbpp_cgp_pair + 1
+                                nbpp_cgp(nbpp_cgp_pair)%i = i
+                                nbpp_cgp(nbpp_cgp_pair)%j = j
+              elseif (r2 <= rclrf2) then
+                            inside_lrf = 1
               end if
-			  ja = ja + 1
+                          ja = ja + 1
            end do
-		   ia = ia + 1
+                   ia = ia + 1
         end do
-		
-		if (inside .eq. 1) then
+                
+                if (inside .eq. 1) then
 ialoop:    do ia = cgp(ig)%first, cgp(ig)%last
            i = cgpatom(ia)
 
-           !	         --- q-atom ? ---
+           !             --- q-atom ? ---
            if ( iqatom(i)/=0 ) cycle ialoop
 
 jaloop:       do ja = cgp(jg)%first, cgp(jg)%last
               j = cgpatom(ja)
 
-              !	            --- q-atom ? ---
+              !             --- q-atom ? ---
               if ( iqatom(j)/=0 ) cycle jaloop
 
-				! count once
+                                ! count once
               if ( ig .eq. jg .and. i .ge. j ) cycle jaloop
 
-              !	            --- check bonded exclusions and 1-4 nbors ---
+              !             --- check bonded exclusions and 1-4 nbors ---
 
               if ( abs(j-i) .le. max_nbr_range ) then
                  if ( i .lt. j ) then
@@ -4702,20 +4673,20 @@ jaloop:       do ja = cgp(jg)%first, cgp(jg)%last
                  end do
               end if
 
-			  ! if out of space then make more space
+                          ! if out of space then make more space
               if (nbpp_pair .eq. calculation_assignment%pp%max) call reallocate_nonbondlist_pp
 
               nbpp_pair = nbpp_pair + 1
               nbpp(nbpp_pair)%i = i
               nbpp(nbpp_pair)%j = j 
-              nbpp(nbpp_pair)%LJcod = ljcod(iac(i),iac(j))
-			  nbpp(nbpp_pair)%cgp_pair = nbpp_cgp_pair
+              nbpp(nbpp_pair)%ljcod = ljcod(iac(i),iac(j))
+                          nbpp(nbpp_pair)%cgp_pair = nbpp_cgp_pair
 
               if ( abs(j-i) .le. max_nbr_range ) then
                  if ( i .lt. j ) then
-                    if ( list14(j-i,i) ) nbpp(nbpp_pair)%LJcod = 3
+                    if ( list14(j-i,i) ) nbpp(nbpp_pair)%ljcod = 3
                  else
-                    if ( list14(i-j,j) ) nbpp(nbpp_pair)%LJcod = 3
+                    if ( list14(i-j,j) ) nbpp(nbpp_pair)%ljcod = 3
                  end if
               else
                  do nl = 1, n14long
@@ -4723,24 +4694,24 @@ jaloop:       do ja = cgp(jg)%first, cgp(jg)%last
                          list14long(2,nl) .eq. j      ) .or. &
                          (list14long(1,nl) .eq. j .and. &
                          list14long(2,nl) .eq. i      ) ) then
-                         nbpp(nbpp_pair)%LJcod = 3
-					end if
+                         nbpp(nbpp_pair)%ljcod = 3
+                                        end if
                  end do
               end if
 
-			  end do jaloop
-		   end do ialoop
-    	elseif((inside_LRF ==1) .and. (inside == 0)) then
-        ! outside pp-cutoff but inside LRF cut-off use LRF
-		
-		!ig : jg calculation
-		boxshiftx = x(i3+1) - lrf(jg)%cgp_cent(1)
-		boxshifty = x(i3+2) - lrf(jg)%cgp_cent(2)
-		boxshiftz = x(i3+3) - lrf(jg)%cgp_cent(3)
+                          end do jaloop
+                   end do ialoop
+        elseif((inside_lrf ==1) .and. (inside == 0)) then
+        ! outside pp-cutoff but inside lrf cut-off use lrf
+                
+                !ig : jg calculation
+                boxshiftx = x(i3+1) - lrf(jg)%cgp_cent(1)
+                boxshifty = x(i3+2) - lrf(jg)%cgp_cent(2)
+                boxshiftz = x(i3+3) - lrf(jg)%cgp_cent(3)
 
-		boxshiftx = boxlength(1)*nint( boxshiftx*inv_boxl(1) )
-		boxshifty = boxlength(2)*nint( boxshifty*inv_boxl(2) )
-		boxshiftz = boxlength(3)*nint( boxshiftz*inv_boxl(3) )
+                boxshiftx = boxlength(1)*nint( boxshiftx*inv_boxl(1) )
+                boxshifty = boxlength(2)*nint( boxshifty*inv_boxl(2) )
+                boxshiftz = boxlength(3)*nint( boxshiftz*inv_boxl(3) )
 
         do ia = cgp(ig)%first, cgp(ig)%last
 
@@ -4753,7 +4724,7 @@ jaloop:       do ja = cgp(jg)%first, cgp(jg)%last
           dr(1) = x(is3+1) - lrf(jg)%cgp_cent(1) - boxshiftx
           dr(2) = x(is3+2) - lrf(jg)%cgp_cent(2) - boxshifty
           dr(3) = x(is3+3) - lrf(jg)%cgp_cent(3) - boxshiftz
-       	  r2 = dr(1)*dr(1) + dr(2)*dr(2) + dr(3)*dr(3)
+          r2 = dr(1)*dr(1) + dr(2)*dr(2) + dr(3)*dr(3)
 
           field0=crg(i)/(r2*sqrt(r2))
           lrf(jg)%phi0=lrf(jg)%phi0+field0*r2
@@ -4800,16 +4771,16 @@ jaloop:       do ja = cgp(jg)%first, cgp(jg)%last
           lrf(jg)%phi3(27)=lrf(jg)%phi3(27) +field2*(5.*dr(3)*dr(3)*dr(3)-r2*3.*dr(3))
         end do
 
-		!jg : ig calculations
-		boxshiftx = x(j3+1) - lrf(ig)%cgp_cent(1)
-		boxshifty = x(j3+2) - lrf(ig)%cgp_cent(2)
-		boxshiftz = x(j3+3) - lrf(ig)%cgp_cent(3)
-	
-		boxshiftx = boxlength(1)*nint( boxshiftx*inv_boxl(1) )
-		boxshifty = boxlength(2)*nint( boxshifty*inv_boxl(2) )
-		boxshiftz = boxlength(3)*nint( boxshiftz*inv_boxl(3) )
+                !jg : ig calculations
+                boxshiftx = x(j3+1) - lrf(ig)%cgp_cent(1)
+                boxshifty = x(j3+2) - lrf(ig)%cgp_cent(2)
+                boxshiftz = x(j3+3) - lrf(ig)%cgp_cent(3)
+        
+                boxshiftx = boxlength(1)*nint( boxshiftx*inv_boxl(1) )
+                boxshifty = boxlength(2)*nint( boxshifty*inv_boxl(2) )
+                boxshiftz = boxlength(3)*nint( boxshiftz*inv_boxl(3) )
 
-	    do ja = cgp(jg)%first, cgp(jg)%last
+            do ja = cgp(jg)%first, cgp(jg)%last
 
           ! skip if q-atom
           j = cgpatom(ja)
@@ -4869,9 +4840,9 @@ jaloop:       do ja = cgp(jg)%first, cgp(jg)%last
 
       end if ! outside cutoff
 
-	end do jgloop
+        end do jgloop
   end do igloop
-#if defined (PROFILING) 
+#if defined (profiling) 
 profile(3)%time = profile(3)%time + rtime() - start_loop_time
 #endif 
 
@@ -4879,22 +4850,22 @@ end subroutine nbpplis2_box_lrf
 !-----------------------------------------------------------------------
 subroutine nbpplis2_lrf
 ! local variables
-integer						:: i,j,ig,jg,ia,ja,i3,j3,nl,is 
-logical						::	inside
-real(8)						:: rcut2,r2,field0,field1,field2
-real(8)						:: dr(3)
-real(8)						::	RcLRF2
+integer                                         :: i,j,ig,jg,ia,ja,i3,j3,nl,is 
+logical                                         ::      inside
+real(8)                                         :: rcut2,r2,field0,field1,field2
+real(8)                                         :: dr(3)
+real(8)                                         ::      rclrf2
 
-!	This routine makes a list of non-bonded solute-solute atom pairs 
-!	excluding any Q-atoms.
-#if defined (PROFILING)
+!       this routine makes a list of non-bonded solute-solute atom pairs 
+!       excluding any q-atoms.
+#if defined (profiling)
 real(8)                                         :: start_loop_time
 start_loop_time = rtime()
 #endif
 
 nbpp_pair = 0
-rcut2 = Rcpp*Rcpp
-RcLRF2 = RcLRF*RcLRF
+rcut2 = rcpp*rcpp
+rclrf2 = rclrf*rclrf
 
 
 igloop: do ig = calculation_assignment%pp%start, calculation_assignment%pp%end
@@ -4903,20 +4874,20 @@ igloop: do ig = calculation_assignment%pp%start, calculation_assignment%pp%end
         is = cgp(ig)%iswitch
         if ( excl(is) ) cycle igloop
 
-jgloop:	do jg = 1, ncgp_solute
+jgloop: do jg = 1, ncgp_solute
 
                 ! count each charge group pair once only
                 if( ((ig .gt. jg) .and. (mod(ig+jg,2) .eq. 0)) .or. &
                         ((ig .lt. jg) .and. (mod(ig+jg,2) .eq. 1)) ) &
                         cycle jgloop
 
-                !	      --- excluded group ? ---
+                !             --- excluded group ? ---
                 ja = cgp(jg)%iswitch
                 if ( excl(ja) ) cycle jgloop
 
-                !	      --- outside cutoff ? ---
+                !             --- outside cutoff ? ---
                 inside = .false.
-pairloop:	do ia=cgp(ig)%first, cgp(ig)%last
+pairloop:       do ia=cgp(ig)%first, cgp(ig)%last
                         i = cgpatom(ia)
                         i3 = 3*i-3
 
@@ -4936,20 +4907,20 @@ pairloop:	do ia=cgp(ig)%first, cgp(ig)%last
                         end do
             end do pairloop
 
-                !	      --- inside cutoff ? ---
+                !             --- inside cutoff ? ---
                 if (inside) then
-ialoop:			do ia = cgp(ig)%first, cgp(ig)%last
+ialoop:                 do ia = cgp(ig)%first, cgp(ig)%last
                                 i = cgpatom(ia)
 
-                                !	             --- q-atom ? ---
+                                !                    --- q-atom ? ---
                                 if ( iqatom(i)/=0 ) cycle ialoop
-jaloop:				do ja = cgp(jg)%first, cgp(jg)%last
+jaloop:                         do ja = cgp(jg)%first, cgp(jg)%last
                                         j = cgpatom(ja)
-                                        !	               --- q-atom ? ---
+                                        !                      --- q-atom ? ---
                                         if ( iqatom(j)/=0 ) cycle jaloop
                                         ! count once
                                         if ( ig .eq. jg .and. i .ge. j ) cycle jaloop
-                                        !	               --- check bonded exclusions and 1-4 nbors ---
+                                        !                      --- check bonded exclusions and 1-4 nbors ---
                                         if ( abs(j-i) .le. max_nbr_range ) then
                                                 if ( i .lt. j ) then
                                                         if ( listex(j-i,i) ) cycle jaloop
@@ -4971,13 +4942,13 @@ jaloop:				do ja = cgp(jg)%first, cgp(jg)%last
                                         nbpp_pair = nbpp_pair + 1
                                         nbpp(nbpp_pair)%i = i
                                         nbpp(nbpp_pair)%j = j 
-                                        nbpp(nbpp_pair)%LJcod = ljcod(iac(i),iac(j))
+                                        nbpp(nbpp_pair)%ljcod = ljcod(iac(i),iac(j))
 
                                         if ( abs(j-i) .le. max_nbr_range ) then
                                                 if ( i .lt. j ) then
-                                                        if ( list14(j-i,i) ) nbpp(nbpp_pair)%LJcod = 3
+                                                        if ( list14(j-i,i) ) nbpp(nbpp_pair)%ljcod = 3
                                                 else
-                                                        if ( list14(i-j,j) ) nbpp(nbpp_pair)%LJcod = 3
+                                                        if ( list14(i-j,j) ) nbpp(nbpp_pair)%ljcod = 3
                                                 end if
                                         else
                                                 do nl = 1, n14long
@@ -4985,7 +4956,7 @@ jaloop:				do ja = cgp(jg)%first, cgp(jg)%last
                                                                 list14long(2,nl) .eq. j      ) .or. &
                                                                 (list14long(1,nl) .eq. j .and. &
                                                                 list14long(2,nl) .eq. i      ) ) &
-                                                                nbpp(nbpp_pair)%LJcod = 3
+                                                                nbpp(nbpp_pair)%ljcod = 3
                                                 end do
                                         end if
 
@@ -4994,12 +4965,12 @@ jaloop:				do ja = cgp(jg)%first, cgp(jg)%last
 
                         end do jaloop
                         end do ialoop
-                elseif(r2 <= RcLRF2) then
-                        ! outside pp-cutoff but inside LRF cut-off: use LRF
+                elseif(r2 <= rclrf2) then
+                        ! outside pp-cutoff but inside lrf cut-off: use lrf
 
-ialoop2:		do ia = cgp(ig)%first, cgp(ig)%last
+ialoop2:                do ia = cgp(ig)%first, cgp(ig)%last
 
-                                !	             --- q-atom ? ---
+                                !                    --- q-atom ? ---
                                 i = cgpatom(ia)
                                 if ( iqatom(i)/=0 ) cycle ialoop2
 
@@ -5055,9 +5026,9 @@ ialoop2:		do ia = cgp(ig)%first, cgp(ig)%last
                                 lrf(jg)%phi3(27)=lrf(jg)%phi3(27) +field2*(5.*dr(3)*dr(3)*dr(3)-r2*3.*dr(3))
                         end do ialoop2
 
-jaloop2:		do ja = cgp(jg)%first, cgp(jg)%last
+jaloop2:                do ja = cgp(jg)%first, cgp(jg)%last
 
-                                !	             --- q-atom ? ---
+                                !                    --- q-atom ? ---
                                 j = cgpatom(ja)
                                 if ( iqatom(j)/=0 ) cycle jaloop2
 
@@ -5118,7 +5089,7 @@ jaloop2:		do ja = cgp(jg)%first, cgp(jg)%last
                 end if
         end do jgloop
 end do igloop
-#if defined (PROFILING) 
+#if defined (profiling) 
 profile(3)%time = profile(3)%time + rtime() - start_loop_time
 #endif 
 
@@ -5128,27 +5099,27 @@ end subroutine nbpplis2_lrf
 
 subroutine nbpplist
 ! local variables
-integer						:: i,j,ig,jg,ia,ja,i3,j3,nl
-real(8)						:: rcut2,r2
-integer						:: LJ_code
+integer                                         :: i,j,ig,jg,ia,ja,i3,j3,nl
+real(8)                                         :: rcut2,r2
+integer                                         :: lj_code
 
-! For use with spherical boundary   
-!	This routine makes a list of non-bonded solute-solute atom pairs 
-!	excluding any Q-atoms.
+! for use with spherical boundary   
+!       this routine makes a list of non-bonded solute-solute atom pairs 
+!       excluding any q-atoms.
 
 ! uses the global variables:
-!  Rcpp, ncgp, cgp, excl, x, cgpatom, iqatom, ljcod, crg, iaclib, max_nbr_range, listex
+!  rcpp, ncgp, cgp, excl, x, cgpatom, iqatom, ljcod, crg, iaclib, max_nbr_range, listex
 !  nexlong, listexlong, calculation_assignment%pp%max, alloc_status, list14, n14long, list14long
 
 ! reset #pairs
 
-#if defined (PROFILING)
+#if defined (profiling)
 real(8)                                         :: start_loop_time
 start_loop_time = rtime()
 #endif
 
 nbpp_pair = 0
-rcut2 = Rcpp*Rcpp
+rcut2 = rcpp*rcpp
 
 igloop: do ig = calculation_assignment%pp%start, calculation_assignment%pp%end
 ! for every assigned charge group:
@@ -5196,14 +5167,14 @@ jaloop: do ja = cgp(jg)%first, cgp(jg)%last
           ! skip if q-atom
           if ( iqatom(j)/=0 ) cycle jaloop
 
-          LJ_code = ljcod(iac(i),iac(j))
+          lj_code = ljcod(iac(i),iac(j))
 
           ! skip if all interactions zero
           if((crg(i) * crg(j) == 0.) &
                 .and. &
-                (iaclib(iac(i))%avdw(LJ_code)*iaclib(iac(j))%avdw(LJ_code) == 0.) &
+                (iaclib(iac(i))%avdw(lj_code)*iaclib(iac(j))%avdw(lj_code) == 0.) &
                 .and. &
-                (iaclib(iac(i))%bvdw(LJ_code)*iaclib(iac(j))%bvdw(LJ_code) == 0.)) &
+                (iaclib(iac(i))%bvdw(lj_code)*iaclib(iac(j))%bvdw(lj_code) == 0.)) &
                 cycle jaloop
 
           ! skip bonded exclusions and 1-4 nbors
@@ -5228,14 +5199,14 @@ jaloop: do ja = cgp(jg)%first, cgp(jg)%last
           nbpp_pair = nbpp_pair + 1
           nbpp(nbpp_pair)%i = i
           nbpp(nbpp_pair)%j = j 
-          nbpp(nbpp_pair)%LJcod = LJ_code
+          nbpp(nbpp_pair)%ljcod = lj_code
 
-          ! set LJcod of the pair to 3 if the atoms have bonded interactions
+          ! set ljcod of the pair to 3 if the atoms have bonded interactions
           if ( abs(j-i) .le. max_nbr_range ) then
                 if ( i .lt. j ) then
-                  if ( list14(j-i, i) ) nbpp(nbpp_pair)%LJcod = 3
+                  if ( list14(j-i, i) ) nbpp(nbpp_pair)%ljcod = 3
                 else
-                  if ( list14(i-j, j) ) nbpp(nbpp_pair)%LJcod = 3
+                  if ( list14(i-j, j) ) nbpp(nbpp_pair)%ljcod = 3
                 end if
           else
 
@@ -5243,14 +5214,14 @@ jaloop: do ja = cgp(jg)%first, cgp(jg)%last
         do nl = 1, n14long
                   if ((list14long(1, nl) .eq. i .and. list14long(2, nl) .eq. j) .or. &
                         (list14long(1, nl) .eq. j .and. list14long(2, nl) .eq. i)) &
-                        nbpp(nbpp_pair)%LJcod = 3
+                        nbpp(nbpp_pair)%ljcod = 3
                 end do
           end if
         end do jaloop
   end do ialoop
 end do jgloop
 end do igloop
-#if defined (PROFILING) 
+#if defined (profiling) 
 profile(3)%time = profile(3)%time + rtime() - start_loop_time
 #endif 
 
@@ -5260,138 +5231,138 @@ end subroutine nbpplist
 
 subroutine nbpplist_box
   ! local variables
-  integer						:: i,j,ig,jg,ia,ja,i3,j3,nl,ig_sw, jg_sw
-  real(8)						:: rcut2,r2
-  integer						:: LJ_code
-  real(8)						:: dx, dy, dz
+  integer                                               :: i,j,ig,jg,ia,ja,i3,j3,nl,ig_sw, jg_sw
+  real(8)                                               :: rcut2,r2
+  integer                                               :: lj_code
+  real(8)                                               :: dx, dy, dz
   
-  ! For use with periodic boundary conditions
-  !	This routine makes a list of non-bonded solute-solute atom pairs 
-  !	excluding any Q-atoms.
+  ! for use with periodic boundary conditions
+  !     this routine makes a list of non-bonded solute-solute atom pairs 
+  !     excluding any q-atoms.
 
   ! uses the global variables:
-  !  Rcpp, ncgp, cgp, excl, x, cgpatom, iqatom, ljcod, crg, iaclib, max_nbr_range, listex
+  !  rcpp, ncgp, cgp, excl, x, cgpatom, iqatom, ljcod, crg, iaclib, max_nbr_range, listex
   !  nexlong, listexlong, calculation_assignment%pp%max, alloc_status, list14, n14long, list14long
 
   ! reset #pairs
 
-#if defined (PROFILING)
+#if defined (profiling)
 real(8)                                         :: start_loop_time
 start_loop_time = rtime()
 #endif
 
   nbpp_pair = 0 !atom pairs
   nbpp_cgp_pair = 0 !chargegroup pairs
-  rcut2 = Rcpp*Rcpp
+  rcut2 = rcpp*rcpp
 
 igloop: do ig = calculation_assignment%pp%start, calculation_assignment%pp%end
-	! for every assigned charge group:
-	ig_sw = cgp(ig)%iswitch !switching atom in charge group ig
-	i3 = 3*ig_sw-3
+        ! for every assigned charge group:
+        ig_sw = cgp(ig)%iswitch !switching atom in charge group ig
+        i3 = 3*ig_sw-3
 
 jgloop: do jg = 1, ncgp_solute
-	  ! for every charge group:
+          ! for every charge group:
 
-	  ! count each charge group pair once only
-	  if ( ((ig .gt. jg) .and. (mod(ig+jg,2) .eq. 0)) .or. &
-		   ((ig .lt. jg) .and. (mod(ig+jg,2) .eq. 1)) ) &
-		   cycle jgloop
+          ! count each charge group pair once only
+          if ( ((ig .gt. jg) .and. (mod(ig+jg,2) .eq. 0)) .or. &
+                   ((ig .lt. jg) .and. (mod(ig+jg,2) .eq. 1)) ) &
+                   cycle jgloop
 
-	  jg_sw = cgp(jg)%iswitch !switching atom in charge group jg
-	  j3 = 3*jg_sw-3
-	
-	  dx = x(i3+1) - x(j3+1)
-	  dy = x(i3+2) - x(j3+2)
-	  dz = x(i3+3) - x(j3+3)
-	  dx = dx - boxlength(1)*nint( dx*inv_boxl(1) )
-	  dy = dy - boxlength(2)*nint( dy*inv_boxl(2) )
-	  dz = dz - boxlength(3)*nint( dz*inv_boxl(3) )
-	  r2 = dx**2 + dy**2 + dz**2
-	
-	  ! skip if outside cutoff
-	  if ( r2 .gt. rcut2 ) cycle jgloop
+          jg_sw = cgp(jg)%iswitch !switching atom in charge group jg
+          j3 = 3*jg_sw-3
+        
+          dx = x(i3+1) - x(j3+1)
+          dy = x(i3+2) - x(j3+2)
+          dz = x(i3+3) - x(j3+3)
+          dx = dx - boxlength(1)*nint( dx*inv_boxl(1) )
+          dy = dy - boxlength(2)*nint( dy*inv_boxl(2) )
+          dz = dz - boxlength(3)*nint( dz*inv_boxl(3) )
+          r2 = dx**2 + dy**2 + dz**2
+        
+          ! skip if outside cutoff
+          if ( r2 .gt. rcut2 ) cycle jgloop
 
-	  !inside cutoff
+          !inside cutoff
 
-	  !check if more memory is needed
-	  if(nbpp_cgp_pair .eq. size(nbpp_cgp, 1)) call reallocate_nbpp_cgp
-	  !add the charge group pair
-	  nbpp_cgp_pair = nbpp_cgp_pair + 1
-	  nbpp_cgp(nbpp_cgp_pair)%i = ig_sw !the switching atoms of the charge groups in the pair
-	  nbpp_cgp(nbpp_cgp_pair)%j = jg_sw
+          !check if more memory is needed
+          if(nbpp_cgp_pair .eq. size(nbpp_cgp, 1)) call reallocate_nbpp_cgp
+          !add the charge group pair
+          nbpp_cgp_pair = nbpp_cgp_pair + 1
+          nbpp_cgp(nbpp_cgp_pair)%i = ig_sw !the switching atoms of the charge groups in the pair
+          nbpp_cgp(nbpp_cgp_pair)%j = jg_sw
 
 ialoop: do ia = cgp(ig)%first, cgp(ig)%last
-		! for every atom in the charge group ig (of the outermost loop):
-		i = cgpatom(ia)
+                ! for every atom in the charge group ig (of the outermost loop):
+                i = cgpatom(ia)
 
-		! skip if q-atom
-		if ( iqatom(i)/=0 ) cycle ialoop
+                ! skip if q-atom
+                if ( iqatom(i)/=0 ) cycle ialoop
 
 jaloop: do ja = cgp(jg)%first, cgp(jg)%last
-		  ! for every atom in the charge group jg (innermost loop)
-		  j = cgpatom(ja)
+                  ! for every atom in the charge group jg (innermost loop)
+                  j = cgpatom(ja)
 
-		  ! make sure each pair is only counted once
-		  if ( ig .eq. jg .and. i .ge. j ) cycle jaloop
+                  ! make sure each pair is only counted once
+                  if ( ig .eq. jg .and. i .ge. j ) cycle jaloop
 
-		  ! skip if q-atom
-		  if ( iqatom(j)/=0 ) cycle jaloop
+                  ! skip if q-atom
+                  if ( iqatom(j)/=0 ) cycle jaloop
 
-		  LJ_code = ljcod(iac(i),iac(j))
+                  lj_code = ljcod(iac(i),iac(j))
 
-		  ! skip if all interactions zero
-		  if((crg(i) * crg(j) == 0.) &
-			.and. &
-			(iaclib(iac(i))%avdw(LJ_code)*iaclib(iac(j))%avdw(LJ_code) == 0.) &
-			.and. &
-			(iaclib(iac(i))%bvdw(LJ_code)*iaclib(iac(j))%bvdw(LJ_code) == 0.)) &
-			cycle jaloop
+                  ! skip if all interactions zero
+                  if((crg(i) * crg(j) == 0.) &
+                        .and. &
+                        (iaclib(iac(i))%avdw(lj_code)*iaclib(iac(j))%avdw(lj_code) == 0.) &
+                        .and. &
+                        (iaclib(iac(i))%bvdw(lj_code)*iaclib(iac(j))%bvdw(lj_code) == 0.)) &
+                        cycle jaloop
 
-		  ! skip bonded exclusions and 1-4 nbors
-		  if ( abs(j-i) .le. max_nbr_range ) then
-			if ( i .lt. j ) then
-			  if ( listex(j-i, i) ) cycle jaloop
-			else
-			  if ( listex(i-j, j) ) cycle jaloop
-			end if
-		  else
-			do nl = 1, nexlong
-			  if ((listexlong(1, nl) .eq. i .and. listexlong(2, nl) .eq. j) .or. &
-				(listexlong(1, nl) .eq. j .and. listexlong(2, nl) .eq. i) ) &
-				cycle jaloop
-			end do
-		  end if
+                  ! skip bonded exclusions and 1-4 nbors
+                  if ( abs(j-i) .le. max_nbr_range ) then
+                        if ( i .lt. j ) then
+                          if ( listex(j-i, i) ) cycle jaloop
+                        else
+                          if ( listex(i-j, j) ) cycle jaloop
+                        end if
+                  else
+                        do nl = 1, nexlong
+                          if ((listexlong(1, nl) .eq. i .and. listexlong(2, nl) .eq. j) .or. &
+                                (listexlong(1, nl) .eq. j .and. listexlong(2, nl) .eq. i) ) &
+                                cycle jaloop
+                        end do
+                  end if
 
-		  ! if out of space then make more space
-		  if (nbpp_pair .eq. calculation_assignment%pp%max) call reallocate_nonbondlist_pp
+                  ! if out of space then make more space
+                  if (nbpp_pair .eq. calculation_assignment%pp%max) call reallocate_nonbondlist_pp
 
-		  ! all tests passed, add the pair
-		  nbpp_pair = nbpp_pair + 1
-		  nbpp(nbpp_pair)%i = i
-		  nbpp(nbpp_pair)%j = j 
-		  nbpp(nbpp_pair)%LJcod = LJ_code
-		  nbpp(nbpp_pair)%cgp_pair = nbpp_cgp_pair !which pair of charge groups the atom pair belongs to
-		
-		  ! set LJcod of the pair to 3 if the atoms have bonded interactions
-		  if ( abs(j-i) .le. max_nbr_range ) then
-			if ( i .lt. j ) then
-			  if ( list14(j-i, i) ) nbpp(nbpp_pair)%LJcod = 3
-			else
-			  if ( list14(i-j, j) ) nbpp(nbpp_pair)%LJcod = 3
-			end if
-		  else
+                  ! all tests passed, add the pair
+                  nbpp_pair = nbpp_pair + 1
+                  nbpp(nbpp_pair)%i = i
+                  nbpp(nbpp_pair)%j = j 
+                  nbpp(nbpp_pair)%ljcod = lj_code
+                  nbpp(nbpp_pair)%cgp_pair = nbpp_cgp_pair !which pair of charge groups the atom pair belongs to
+                
+                  ! set ljcod of the pair to 3 if the atoms have bonded interactions
+                  if ( abs(j-i) .le. max_nbr_range ) then
+                        if ( i .lt. j ) then
+                          if ( list14(j-i, i) ) nbpp(nbpp_pair)%ljcod = 3
+                        else
+                          if ( list14(i-j, j) ) nbpp(nbpp_pair)%ljcod = 3
+                        end if
+                  else
 
-		do nl = 1, n14long
-			  if ((list14long(1, nl) .eq. i .and. list14long(2, nl) .eq. j) .or. &
-				(list14long(1, nl) .eq. j .and. list14long(2, nl) .eq. i)) &
-				nbpp(nbpp_pair)%LJcod = 3
-			end do
-		  end if
-		end do jaloop
-	  end do ialoop
-	end do jgloop
+                do nl = 1, n14long
+                          if ((list14long(1, nl) .eq. i .and. list14long(2, nl) .eq. j) .or. &
+                                (list14long(1, nl) .eq. j .and. list14long(2, nl) .eq. i)) &
+                                nbpp(nbpp_pair)%ljcod = 3
+                        end do
+                  end if
+                end do jaloop
+          end do ialoop
+        end do jgloop
   end do igloop
-#if defined (PROFILING) 
+#if defined (profiling) 
 profile(3)%time = profile(3)%time + rtime() - start_loop_time
 #endif 
 
@@ -5401,29 +5372,29 @@ end subroutine nbpplist_box
 
 subroutine nbpplist_lrf
 ! local variables
-integer						:: i,j,ig,jg,ia,ja,i3,j3,nl,is,is3
-real(8)						:: rcut2,r2,field0,field1,field2
-real(8)						:: dr(3)
-integer						:: LJ_code
-real(8)						::	RcLRF2
+integer                                         :: i,j,ig,jg,ia,ja,i3,j3,nl,is,is3
+real(8)                                         :: rcut2,r2,field0,field1,field2
+real(8)                                         :: dr(3)
+integer                                         :: lj_code
+real(8)                                         ::      rclrf2
 
-#if defined (PROFILING)
-real(8)						:: start_loop_time
+#if defined (profiling)
+real(8)                                         :: start_loop_time
 start_loop_time = rtime()
 #endif
 
 
-!	This routine makes a list of non-bonded solute-solute atom pairs 
-!	excluding any Q-atoms.
+!       this routine makes a list of non-bonded solute-solute atom pairs 
+!       excluding any q-atoms.
 
 ! uses the global variables:
-!  nbpp_pair, Rcpp, RcLRF, cgp, excl, ncgp, x, cgpatom, iqatom, ljcod, crg, iaclib, max_nbr_range,
+!  nbpp_pair, rcpp, rclrf, cgp, excl, ncgp, x, cgpatom, iqatom, ljcod, crg, iaclib, max_nbr_range,
 !  listex, nexlong, listexlong, nbpp, alloc_status, list14, n14long, list14long, lrf
 
 
 nbpp_pair = 0
-rcut2 = Rcpp*Rcpp
-RcLRF2 = RcLRF*RcLRF
+rcut2 = rcpp*rcpp
+rclrf2 = rclrf*rclrf
 igloop: do ig = calculation_assignment%pp%start, calculation_assignment%pp%end
 ! for every assigned charge group:
 
@@ -5453,13 +5424,13 @@ jgloop: do jg = 1, ncgp_solute
 
   ! inside cutoff?
   if ( r2 .le. rcut2 ) then
-ialoop:	do ia = cgp(ig)%first, cgp(ig)%last
+ialoop: do ia = cgp(ig)%first, cgp(ig)%last
 
           ! skip if q-atom
           i = cgpatom(ia)
           if ( iqatom(i)/=0 ) cycle ialoop
 
-jaloop:	  do ja = cgp(jg)%first, cgp(jg)%last
+jaloop:   do ja = cgp(jg)%first, cgp(jg)%last
                 j = cgpatom(ja)
 
                 ! make sure each pair is only counted once
@@ -5468,14 +5439,14 @@ jaloop:	  do ja = cgp(jg)%first, cgp(jg)%last
                 ! skip if q-atom
                 if ( iqatom(j)/=0 ) cycle jaloop
 
-                LJ_code = ljcod(iac(i),iac(j))
+                lj_code = ljcod(iac(i),iac(j))
 
                 ! skip if all interactions zero
                 if ((crg(i) * crg(j) == 0.) &
                   .and. &
-                  (iaclib(iac(i))%avdw(LJ_code)*iaclib(iac(j))%avdw(LJ_code) == 0.) &
+                  (iaclib(iac(i))%avdw(lj_code)*iaclib(iac(j))%avdw(lj_code) == 0.) &
                   .and. &
-                  (iaclib(iac(i))%bvdw(LJ_code)*iaclib(iac(j))%bvdw(LJ_code) == 0.)) &
+                  (iaclib(iac(i))%bvdw(lj_code)*iaclib(iac(j))%bvdw(lj_code) == 0.)) &
                   cycle jaloop
 
                 ! check bonded exclusions and 1-4 nbors
@@ -5502,14 +5473,14 @@ jaloop:	  do ja = cgp(jg)%first, cgp(jg)%last
                 nbpp_pair = nbpp_pair + 1
                 nbpp(nbpp_pair)%i = i
                 nbpp(nbpp_pair)%j = j 
-                nbpp(nbpp_pair)%LJcod = ljcod(iac(i),iac(j))
-!TMP                nbpp_per_cgp(ig)=nbpp_per_cgp(ig)+1
+                nbpp(nbpp_pair)%ljcod = ljcod(iac(i),iac(j))
+!tmp                nbpp_per_cgp(ig)=nbpp_per_cgp(ig)+1
 
                 if ( abs(j-i) .le. max_nbr_range ) then
                   if ( i .lt. j ) then
-                        if ( list14(j-i,i) ) nbpp(nbpp_pair)%LJcod = 3
+                        if ( list14(j-i,i) ) nbpp(nbpp_pair)%ljcod = 3
                   else
-                        if ( list14(i-j,j) ) nbpp(nbpp_pair)%LJcod = 3
+                        if ( list14(i-j,j) ) nbpp(nbpp_pair)%ljcod = 3
                   end if
                 else
                   do nl = 1, n14long
@@ -5517,14 +5488,14 @@ jaloop:	  do ja = cgp(jg)%first, cgp(jg)%last
                           list14long(2,nl) .eq. j      ) .or. &
                           (list14long(1,nl) .eq. j .and. &
                           list14long(2,nl) .eq. i      ) ) &
-                          nbpp(nbpp_pair)%LJcod = 3
+                          nbpp(nbpp_pair)%ljcod = 3
                   end do
                 end if
           end do jaloop
         end do ialoop
 
-  elseif(r2 <= RcLRF2) then
-        ! outside pp-cutoff but inside LRF cut-off use LRF
+  elseif(r2 <= rclrf2) then
+        ! outside pp-cutoff but inside lrf cut-off use lrf
 
         do ia = cgp(ig)%first, cgp(ig)%last
 
@@ -5647,160 +5618,160 @@ jaloop:	  do ja = cgp(jg)%first, cgp(jg)%last
 end do jgloop
 end do igloop
 
-#if defined (PROFILING)
+#if defined (profiling)
 profile(3)%time = profile(3)%time + rtime() - start_loop_time
 #endif
 
 end subroutine nbpplist_lrf
-!----------------LRF version of PW PBC-----------------------
+!----------------lrf version of pw pbc-----------------------
 subroutine nbpplist_box_lrf
   ! local variables
-  integer						:: i,j,ig,jg,ia,ja,i3,j3,nl,ig_sw, jg_sw, is3
-  real(8)						:: rcut2,r2
-  integer						:: LJ_code
-  real(8)						:: dx, dy, dz
+  integer                                               :: i,j,ig,jg,ia,ja,i3,j3,nl,ig_sw, jg_sw, is3
+  real(8)                                               :: rcut2,r2
+  integer                                               :: lj_code
+  real(8)                                               :: dx, dy, dz
   
-  real(8)						::RcLRF2,field0, field1, field2
-  real(8)						::dr(3)
-  real(8)						::boxshiftx, boxshifty, boxshiftz	
+  real(8)                                               ::rclrf2,field0, field1, field2
+  real(8)                                               ::dr(3)
+  real(8)                                               ::boxshiftx, boxshifty, boxshiftz       
 
-#if defined (PROFILING)
+#if defined (profiling)
 real(8)                                         :: start_loop_time
 start_loop_time = rtime()
 #endif
 
-  ! For use with periodic boundary conditions
-  !	This routine makes a list of non-bonded solute-solute atom pairs 
-  !	excluding any Q-atoms.
+  ! for use with periodic boundary conditions
+  !     this routine makes a list of non-bonded solute-solute atom pairs 
+  !     excluding any q-atoms.
 
   ! uses the global variables:
-  !  Rcpp, ncgp, cgp, excl, x, cgpatom, iqatom, ljcod, crg, iaclib, max_nbr_range, listex
+  !  rcpp, ncgp, cgp, excl, x, cgpatom, iqatom, ljcod, crg, iaclib, max_nbr_range, listex
   !  nexlong, listexlong, calculation_assignment%pp%max, alloc_status, list14, n14long, list14long
 
   ! reset #pairs
   nbpp_pair = 0 !atom pairs
   nbpp_cgp_pair = 0 !chargegroup pairs
-  rcut2 = Rcpp*Rcpp
-  RcLRF2 = RcLRF*RcLRF
+  rcut2 = rcpp*rcpp
+  rclrf2 = rclrf*rclrf
 
 igloop: do ig = calculation_assignment%pp%start, calculation_assignment%pp%end
-	! for every assigned charge group:
-	ig_sw = cgp(ig)%iswitch !switching atom in charge group ig
-	i3 = 3*ig_sw-3
+        ! for every assigned charge group:
+        ig_sw = cgp(ig)%iswitch !switching atom in charge group ig
+        i3 = 3*ig_sw-3
 
 jgloop: do jg = 1, ncgp_solute
-	  ! for every charge group:
+          ! for every charge group:
 
-	  ! count each charge group pair once only
-	  if ( ((ig .gt. jg) .and. (mod(ig+jg,2) .eq. 0)) .or. &
-		   ((ig .lt. jg) .and. (mod(ig+jg,2) .eq. 1)) ) &
-		   cycle jgloop
+          ! count each charge group pair once only
+          if ( ((ig .gt. jg) .and. (mod(ig+jg,2) .eq. 0)) .or. &
+                   ((ig .lt. jg) .and. (mod(ig+jg,2) .eq. 1)) ) &
+                   cycle jgloop
 
-	  jg_sw = cgp(jg)%iswitch !switching atom in charge group jg
-	  j3 = 3*jg_sw-3
-	
-	  dx = x(i3+1) - x(j3+1)
-	  dy = x(i3+2) - x(j3+2)
-	  dz = x(i3+3) - x(j3+3)
-	  dx = dx - boxlength(1)*nint( dx*inv_boxl(1) )
-	  dy = dy - boxlength(2)*nint( dy*inv_boxl(2) )
-	  dz = dz - boxlength(3)*nint( dz*inv_boxl(3) )
-	  r2 = dx**2 + dy**2 + dz**2
-	
-	  ! skip if outside cutoff
-	  if ( r2 .le. rcut2 ) then 
+          jg_sw = cgp(jg)%iswitch !switching atom in charge group jg
+          j3 = 3*jg_sw-3
+        
+          dx = x(i3+1) - x(j3+1)
+          dy = x(i3+2) - x(j3+2)
+          dz = x(i3+3) - x(j3+3)
+          dx = dx - boxlength(1)*nint( dx*inv_boxl(1) )
+          dy = dy - boxlength(2)*nint( dy*inv_boxl(2) )
+          dz = dz - boxlength(3)*nint( dz*inv_boxl(3) )
+          r2 = dx**2 + dy**2 + dz**2
+        
+          ! skip if outside cutoff
+          if ( r2 .le. rcut2 ) then 
 
         !innside cutoff
 
-	    !check if more memory is needed
-	    if(nbpp_cgp_pair .eq. size(nbpp_cgp, 1)) call reallocate_nbpp_cgp
-	    !add the charge group pair
-	    nbpp_cgp_pair = nbpp_cgp_pair + 1
-	    nbpp_cgp(nbpp_cgp_pair)%i = ig_sw !the switching atoms of the charge groups in the pair
-	    nbpp_cgp(nbpp_cgp_pair)%j = jg_sw
+            !check if more memory is needed
+            if(nbpp_cgp_pair .eq. size(nbpp_cgp, 1)) call reallocate_nbpp_cgp
+            !add the charge group pair
+            nbpp_cgp_pair = nbpp_cgp_pair + 1
+            nbpp_cgp(nbpp_cgp_pair)%i = ig_sw !the switching atoms of the charge groups in the pair
+            nbpp_cgp(nbpp_cgp_pair)%j = jg_sw
 
 ialoop: do ia = cgp(ig)%first, cgp(ig)%last
-	    ! for every atom in the charge group ig (of the outermost loop):
-		i = cgpatom(ia)
+            ! for every atom in the charge group ig (of the outermost loop):
+                i = cgpatom(ia)
 
-		! skip if q-atom
-		if ( iqatom(i)/=0 ) cycle ialoop
+                ! skip if q-atom
+                if ( iqatom(i)/=0 ) cycle ialoop
 
 jaloop:   do ja = cgp(jg)%first, cgp(jg)%last
-		    ! for every atom in the charge group jg (innermost loop)
-		    j = cgpatom(ja)
+                    ! for every atom in the charge group jg (innermost loop)
+                    j = cgpatom(ja)
 
-		    ! make sure each pair is only counted once
-		    if ( ig .eq. jg .and. i .ge. j ) cycle jaloop
+                    ! make sure each pair is only counted once
+                    if ( ig .eq. jg .and. i .ge. j ) cycle jaloop
 
-		    ! skip if q-atom
-		    if ( iqatom(j)/=0 ) cycle jaloop
+                    ! skip if q-atom
+                    if ( iqatom(j)/=0 ) cycle jaloop
 
-		    LJ_code = ljcod(iac(i),iac(j))
+                    lj_code = ljcod(iac(i),iac(j))
 
-		    ! skip if all interactions zero
-		    if((crg(i) * crg(j) == 0.) &
-			  .and. &
-			  (iaclib(iac(i))%avdw(LJ_code)*iaclib(iac(j))%avdw(LJ_code) == 0.) &
-			  .and. &
-			  (iaclib(iac(i))%bvdw(LJ_code)*iaclib(iac(j))%bvdw(LJ_code) == 0.)) &
-			  cycle jaloop
+                    ! skip if all interactions zero
+                    if((crg(i) * crg(j) == 0.) &
+                          .and. &
+                          (iaclib(iac(i))%avdw(lj_code)*iaclib(iac(j))%avdw(lj_code) == 0.) &
+                          .and. &
+                          (iaclib(iac(i))%bvdw(lj_code)*iaclib(iac(j))%bvdw(lj_code) == 0.)) &
+                          cycle jaloop
 
-		    ! skip bonded exclusions and 1-4 nbors
-		    if ( abs(j-i) .le. max_nbr_range ) then
-			  if ( i .lt. j ) then
-			    if ( listex(j-i, i) ) cycle jaloop
-			  else
-			    if ( listex(i-j, j) ) cycle jaloop
-			  end if
-		    else
-			  do nl = 1, nexlong
-			    if ((listexlong(1, nl) .eq. i .and. listexlong(2, nl) .eq. j) .or. &
-				  (listexlong(1, nl) .eq. j .and. listexlong(2, nl) .eq. i) ) &
-				  cycle jaloop
-			  end do
-		    end if
+                    ! skip bonded exclusions and 1-4 nbors
+                    if ( abs(j-i) .le. max_nbr_range ) then
+                          if ( i .lt. j ) then
+                            if ( listex(j-i, i) ) cycle jaloop
+                          else
+                            if ( listex(i-j, j) ) cycle jaloop
+                          end if
+                    else
+                          do nl = 1, nexlong
+                            if ((listexlong(1, nl) .eq. i .and. listexlong(2, nl) .eq. j) .or. &
+                                  (listexlong(1, nl) .eq. j .and. listexlong(2, nl) .eq. i) ) &
+                                  cycle jaloop
+                          end do
+                    end if
 
-		    ! if out of space then make more space
-		    if (nbpp_pair .eq. calculation_assignment%pp%max) call reallocate_nonbondlist_pp
+                    ! if out of space then make more space
+                    if (nbpp_pair .eq. calculation_assignment%pp%max) call reallocate_nonbondlist_pp
 
-		    ! all tests passed, add the pair
-		    nbpp_pair = nbpp_pair + 1
-		    nbpp(nbpp_pair)%i = i
-		    nbpp(nbpp_pair)%j = j 
-		    nbpp(nbpp_pair)%LJcod = LJ_code
-		    nbpp(nbpp_pair)%cgp_pair = nbpp_cgp_pair !which pair of charge groups the atom pair belongs to
-		
-		    ! set LJcod of the pair to 3 if the atoms have bonded interactions
-		    if ( abs(j-i) .le. max_nbr_range ) then
-			  if ( i .lt. j ) then
-			    if ( list14(j-i, i) ) nbpp(nbpp_pair)%LJcod = 3
-			  else
-			    if ( list14(i-j, j) ) nbpp(nbpp_pair)%LJcod = 3
-			  end if
-		    else
+                    ! all tests passed, add the pair
+                    nbpp_pair = nbpp_pair + 1
+                    nbpp(nbpp_pair)%i = i
+                    nbpp(nbpp_pair)%j = j 
+                    nbpp(nbpp_pair)%ljcod = lj_code
+                    nbpp(nbpp_pair)%cgp_pair = nbpp_cgp_pair !which pair of charge groups the atom pair belongs to
+                
+                    ! set ljcod of the pair to 3 if the atoms have bonded interactions
+                    if ( abs(j-i) .le. max_nbr_range ) then
+                          if ( i .lt. j ) then
+                            if ( list14(j-i, i) ) nbpp(nbpp_pair)%ljcod = 3
+                          else
+                            if ( list14(i-j, j) ) nbpp(nbpp_pair)%ljcod = 3
+                          end if
+                    else
 
-		      do nl = 1, n14long
-		       if ((list14long(1, nl) .eq. i .and. list14long(2, nl) .eq. j) .or. &
-			      (list14long(1, nl) .eq. j .and. list14long(2, nl) .eq. i)) &
-				  nbpp(nbpp_pair)%LJcod = 3
-			  end do
-		    end if
-	
-		  end do jaloop
-	    end do ialoop
+                      do nl = 1, n14long
+                       if ((list14long(1, nl) .eq. i .and. list14long(2, nl) .eq. j) .or. &
+                              (list14long(1, nl) .eq. j .and. list14long(2, nl) .eq. i)) &
+                                  nbpp(nbpp_pair)%ljcod = 3
+                          end do
+                    end if
+        
+                  end do jaloop
+            end do ialoop
       
-	  elseif(r2 <= RcLRF2) then
-        ! outside pp-cutoff but inside LRF cut-off use LRF
-		
-		!ig : jg calculation
-		boxshiftx = x(i3+1) - lrf(jg)%cgp_cent(1)
-		boxshifty = x(i3+2) - lrf(jg)%cgp_cent(2)
-		boxshiftz = x(i3+3) - lrf(jg)%cgp_cent(3)
+          elseif(r2 <= rclrf2) then
+        ! outside pp-cutoff but inside lrf cut-off use lrf
+                
+                !ig : jg calculation
+                boxshiftx = x(i3+1) - lrf(jg)%cgp_cent(1)
+                boxshifty = x(i3+2) - lrf(jg)%cgp_cent(2)
+                boxshiftz = x(i3+3) - lrf(jg)%cgp_cent(3)
 
-		boxshiftx = boxlength(1)*nint( boxshiftx*inv_boxl(1) )
-		boxshifty = boxlength(2)*nint( boxshifty*inv_boxl(2) )
-		boxshiftz = boxlength(3)*nint( boxshiftz*inv_boxl(3) )
+                boxshiftx = boxlength(1)*nint( boxshiftx*inv_boxl(1) )
+                boxshifty = boxlength(2)*nint( boxshifty*inv_boxl(2) )
+                boxshiftz = boxlength(3)*nint( boxshiftz*inv_boxl(3) )
 
         do ia = cgp(ig)%first, cgp(ig)%last
 
@@ -5813,7 +5784,7 @@ jaloop:   do ja = cgp(jg)%first, cgp(jg)%last
           dr(1) = x(is3+1) - lrf(jg)%cgp_cent(1) - boxshiftx
           dr(2) = x(is3+2) - lrf(jg)%cgp_cent(2) - boxshifty
           dr(3) = x(is3+3) - lrf(jg)%cgp_cent(3) - boxshiftz
-       	  r2 = dr(1)*dr(1) + dr(2)*dr(2) + dr(3)*dr(3)
+          r2 = dr(1)*dr(1) + dr(2)*dr(2) + dr(3)*dr(3)
 
           field0=crg(i)/(r2*sqrt(r2))
           lrf(jg)%phi0=lrf(jg)%phi0+field0*r2
@@ -5860,16 +5831,16 @@ jaloop:   do ja = cgp(jg)%first, cgp(jg)%last
           lrf(jg)%phi3(27)=lrf(jg)%phi3(27) +field2*(5.*dr(3)*dr(3)*dr(3)-r2*3.*dr(3))
         end do
 
-		!jg : ig calculations
-		boxshiftx = x(j3+1) - lrf(ig)%cgp_cent(1)
-		boxshifty = x(j3+2) - lrf(ig)%cgp_cent(2)
-		boxshiftz = x(j3+3) - lrf(ig)%cgp_cent(3)
-	
-		boxshiftx = boxlength(1)*nint( boxshiftx*inv_boxl(1) )
-		boxshifty = boxlength(2)*nint( boxshifty*inv_boxl(2) )
-		boxshiftz = boxlength(3)*nint( boxshiftz*inv_boxl(3) )
+                !jg : ig calculations
+                boxshiftx = x(j3+1) - lrf(ig)%cgp_cent(1)
+                boxshifty = x(j3+2) - lrf(ig)%cgp_cent(2)
+                boxshiftz = x(j3+3) - lrf(ig)%cgp_cent(3)
+        
+                boxshiftx = boxlength(1)*nint( boxshiftx*inv_boxl(1) )
+                boxshifty = boxlength(2)*nint( boxshifty*inv_boxl(2) )
+                boxshiftz = boxlength(3)*nint( boxshiftz*inv_boxl(3) )
 
-	    do ja = cgp(jg)%first, cgp(jg)%last
+            do ja = cgp(jg)%first, cgp(jg)%last
 
           ! skip if q-atom
           j = cgpatom(ja)
@@ -5929,37 +5900,37 @@ jaloop:   do ja = cgp(jg)%first, cgp(jg)%last
 
       end if ! outside cutoff
 
-	end do jgloop
+        end do jgloop
   end do igloop
-#if defined (PROFILING)
+#if defined (profiling)
 profile(3)%time = profile(3)%time + rtime() - start_loop_time
 #endif
 
 end subroutine nbpplist_box_lrf
 !-----------------------------------------------------------------------
-!******PWchanged 2001-10-01
+!******pwchanged 2001-10-01
 subroutine nbpw_count(npw, npwcgp)
 ! arguments
-integer						:: npw
-integer						:: npwcgp(:)
+integer                                         :: npw
+integer                                         :: npwcgp(:)
 
 ! local variables
-integer						:: i,ig,jg,ia,ja,i3,j3
-real(8)						:: rcut2,r2
-integer						:: LJ_code
+integer                                         :: i,ig,jg,ia,ja,i3,j3
+real(8)                                         :: rcut2,r2
+integer                                         :: lj_code
 
-!******PWadded variables 2001-10-01
+!******pwadded variables 2001-10-01
 
-real(8)						:: dx, dy, dz
+real(8)                                         :: dx, dy, dz
 
-!	This routine makes a list of non-bonded solute-solvent atom pairs
-!	excluding Q-atoms.
+!       this routine makes a list of non-bonded solute-solvent atom pairs
+!       excluding q-atoms.
 
 ! uses the global variables:
-!  Rcpw, ncgp, cgp, excl, nwat, nat_solute, x, cgpatom, iqatom, ljcod, crg, iaclib
+!  rcpw, ncgp, cgp, excl, nwat, nat_solute, x, cgpatom, iqatom, ljcod, crg, iaclib
 
 npw = 0
-rcut2 = Rcpw*Rcpw
+rcut2 = rcpw*rcpw
 
 igloop: do ig = 1, ncgp_solute
 ! for each charge group of the protein:
@@ -5967,18 +5938,18 @@ npwcgp(ig) = 0
 
 ! skip if excluded charge group
 ia = cgp(ig)%iswitch
-if ( .not.use_PBC .and. excl(ia) ) cycle igloop
+if ( .not.use_pbc .and. excl(ia) ) cycle igloop
 
 i3 = 3*ia-3
 
 jgloop: do jg = 1, nwat
   ! for each water molecule:
 ja = nat_solute + 3*jg-2
-if(.not. use_PBC .and. excl(ja) ) cycle jgloop ! skip excluded waters
+if(.not. use_pbc .and. excl(ja) ) cycle jgloop ! skip excluded waters
 
 j3 = 3*ja-3
 
-  if( .not. use_PBC ) then
+  if( .not. use_pbc ) then
         r2 = ( x(i3+1) -x(j3+1) )**2 &
                 +( x(i3+2) -x(j3+2) )**2 &
                 +( x(i3+3) -x(j3+3) )**2
@@ -6002,18 +5973,18 @@ i = cgpatom(ia)
 ! skip if q-atom
 if ( iqatom(i)/=0 ) cycle ialoop
 
-jaloop:	do ja = nat_solute + 3*jg-2, nat_solute + 3*jg
+jaloop: do ja = nat_solute + 3*jg-2, nat_solute + 3*jg
           ! for every atom of the water molecule:
 
-          ! calculate LJ_code for the pair
-          LJ_code = ljcod(iac(i),iac(ja))
+          ! calculate lj_code for the pair
+          lj_code = ljcod(iac(i),iac(ja))
 
           ! skip pairs with zero interaction
           if((crg(i) * crg(ja) == 0.) &
                   .and. &
-                  (iaclib(iac(i))%avdw(LJ_code)*iaclib(iac(ja))%avdw(LJ_code) == 0.) &
+                  (iaclib(iac(i))%avdw(lj_code)*iaclib(iac(ja))%avdw(lj_code) == 0.) &
                   .and. &
-                  (iaclib(iac(i))%bvdw(LJ_code)*iaclib(iac(ja))%bvdw(LJ_code) == 0.)) &
+                  (iaclib(iac(i))%bvdw(lj_code)*iaclib(iac(ja))%bvdw(lj_code) == 0.)) &
                   cycle jaloop
 
           ! count the pair
@@ -6031,24 +6002,24 @@ end subroutine nbpw_count
 
 subroutine nbpwlis2
 ! local variables
-integer						:: i,ig,jg,ia,ja,i3,j3, inside
-real(8)						:: rcut2,r2
-#if defined (PROFILING)
-real(8)						:: start_loop_time
+integer                                         :: i,ig,jg,ia,ja,i3,j3, inside
+real(8)                                         :: rcut2,r2
+#if defined (profiling)
+real(8)                                         :: start_loop_time
 start_loop_time = rtime()
 #endif
 
-!	This routine makes a list of non-bonded solute-solvent atom pairs
-!	excluding Q-atoms.
+!       this routine makes a list of non-bonded solute-solvent atom pairs
+!       excluding q-atoms.
 
 
 nbpw_pair = 0
-rcut2 = Rcpw*Rcpw
+rcut2 = rcpw*rcpw
 
 
 igloop:  do ig = calculation_assignment%pw%start, calculation_assignment%pw%end
 
-!	   --- excluded group ? ---
+!          --- excluded group ? ---
 ia = cgp(ig)%iswitch
 if ( excl(ia) ) cycle igloop
 
@@ -6057,7 +6028,7 @@ ja = nat_solute + 3*jg-2
 if ( excl(ja) ) cycle jgloop ! skip excluded waters
 j3 = 3*ja-3
 
-!	      --- outside cutoff ? ---
+!             --- outside cutoff ? ---
         inside = 0
         ia = cgp(ig)%first
         do while ((ia .le. cgp(ig)%last) .and. (inside .eq. 0))
@@ -6079,7 +6050,7 @@ end do
 
 ialoop:    do ia = cgp(ig)%first, cgp(ig)%last
 
-   !	         --- q-atom ? ---
+   !             --- q-atom ? ---
    i = cgpatom(ia)
    if ( iqatom(i)/=0 ) cycle ialoop
 
@@ -6089,18 +6060,18 @@ ialoop:    do ia = cgp(ig)%first, cgp(ig)%last
    nbpw_pair = nbpw_pair + 3
    nbpw(nbpw_pair-2)%i = i
    nbpw(nbpw_pair-2)%j = ja 
-   nbpw(nbpw_pair-2)%LJcod = ljcod(iac(i),iac(ja))
+   nbpw(nbpw_pair-2)%ljcod = ljcod(iac(i),iac(ja))
    nbpw(nbpw_pair-1)%i = i
    nbpw(nbpw_pair-1)%j = ja+1
-   nbpw(nbpw_pair-1)%LJcod = ljcod(iac(i),iac(ja+1))
+   nbpw(nbpw_pair-1)%ljcod = ljcod(iac(i),iac(ja+1))
    nbpw(nbpw_pair  )%i = i
    nbpw(nbpw_pair  )%j = ja+2
-   nbpw(nbpw_pair  )%LJcod = ljcod(iac(i),iac(ja+2))
+   nbpw(nbpw_pair  )%ljcod = ljcod(iac(i),iac(ja+2))
 
 end do ialoop
 end do jgloop
 end do igloop
-#if defined (PROFILING)
+#if defined (profiling)
 profile(4)%time = profile(4)%time + rtime() - start_loop_time
 #endif
 
@@ -6108,87 +6079,87 @@ end subroutine nbpwlis2
 
 !------------------------------------------------------------------------------
 
-!******PWadded 2001-10-18
+!******pwadded 2001-10-18
 subroutine nbpwlis2_box
   ! local variables
-  integer						:: i,ig,jg,ia,ja,i3,j3,ig_atom, inside
-  real(8)						:: rcut2,r2
-  real(8)						:: dx, dy,dz
+  integer                                               :: i,ig,jg,ia,ja,i3,j3,ig_atom, inside
+  real(8)                                               :: rcut2,r2
+  real(8)                                               :: dx, dy,dz
   
   ! for periodic boundary conditions
-  !	This routine makes a list of non-bonded solute-solvent atom pairs
-  !	excluding Q-atoms.
-#if defined (PROFILING)
-real(8)						:: start_loop_time
+  !     this routine makes a list of non-bonded solute-solvent atom pairs
+  !     excluding q-atoms.
+#if defined (profiling)
+real(8)                                         :: start_loop_time
 start_loop_time = rtime()
 #endif
 
   nbpw_pair = 0
   nbpw_cgp_pair = 0
-  rcut2 = Rcpw*Rcpw
+  rcut2 = rcpw*rcpw
 
 igloop:  do ig = calculation_assignment%pw%start, calculation_assignment%pw%end
 
 jgloop:     do jg = 1, nwat
 
-        	ja = nat_solute + 3*jg-2
-		j3 = 3*ja-3
+                ja = nat_solute + 3*jg-2
+                j3 = 3*ja-3
 
-        !	      --- outside cutoff ? ---
-		inside = 0
-		ig_atom = cgp(ig)%first
-		do while ((ig_atom .le. cgp(ig)%last) .and. (inside .eq. 0))
-           	i = cgpatom(ig_atom)
-          	i3 = 3*i-3
+        !             --- outside cutoff ? ---
+                inside = 0
+                ig_atom = cgp(ig)%first
+                do while ((ig_atom .le. cgp(ig)%last) .and. (inside .eq. 0))
+                i = cgpatom(ig_atom)
+                i3 = 3*i-3
 
-		dx = x(i3+1) - x(j3+1)
-		dy = x(i3+2) - x(j3+2)
-		dz = x(i3+3) - x(j3+3)
-		dx = dx - boxlength(1)*nint( dx*inv_boxl(1) )
-		dy = dy - boxlength(2)*nint( dy*inv_boxl(2) )
-		dz = dz - boxlength(3)*nint( dz*inv_boxl(3) )
-		r2 = dx**2 + dy**2 + dz**2
-		   
-          	 if ( r2 .le. rcut2 ) then
-		     ! inside cutoff, raise the flag
-			 inside = 1
-			 if (nbpw_cgp_pair .eq. size(nbpw_cgp, 1)) call reallocate_nbpw_cgp
-			 nbpw_cgp_pair = nbpw_cgp_pair + 1
-			 nbpw_cgp(nbpw_cgp_pair)%i = i
-			 nbpw_cgp(nbpw_cgp_pair)%j = ja
-		   end if
+                dx = x(i3+1) - x(j3+1)
+                dy = x(i3+2) - x(j3+2)
+                dz = x(i3+3) - x(j3+3)
+                dx = dx - boxlength(1)*nint( dx*inv_boxl(1) )
+                dy = dy - boxlength(2)*nint( dy*inv_boxl(2) )
+                dz = dz - boxlength(3)*nint( dz*inv_boxl(3) )
+                r2 = dx**2 + dy**2 + dz**2
+                   
+                 if ( r2 .le. rcut2 ) then
+                     ! inside cutoff, raise the flag
+                         inside = 1
+                         if (nbpw_cgp_pair .eq. size(nbpw_cgp, 1)) call reallocate_nbpw_cgp
+                         nbpw_cgp_pair = nbpw_cgp_pair + 1
+                         nbpw_cgp(nbpw_cgp_pair)%i = i
+                         nbpw_cgp(nbpw_cgp_pair)%j = ja
+                   end if
 
-		  ig_atom = ig_atom + 1 !ia = ia + 1
+                  ig_atom = ig_atom + 1 !ia = ia + 1
         end do
-		if (inside .eq. 0) cycle jgloop
+                if (inside .eq. 0) cycle jgloop
 
 ialoop:    do ia = cgp(ig)%first, cgp(ig)%last
 
-           !	         --- q-atom ? ---
+           !             --- q-atom ? ---
            i = cgpatom(ia)
            if ( iqatom(i)/=0 ) cycle ialoop
 
-		   ! if out of space then make more space
-		   if (nbpw_pair > calculation_assignment%pw%max-3) call reallocate_nonbondlist_pw
+                   ! if out of space then make more space
+                   if (nbpw_pair > calculation_assignment%pw%max-3) call reallocate_nonbondlist_pw
 
            nbpw_pair = nbpw_pair + 3
            nbpw(nbpw_pair-2)%i = i
            nbpw(nbpw_pair-2)%j = ja 
-           nbpw(nbpw_pair-2)%LJcod = ljcod(iac(i),iac(ja))
-		   nbpw(nbpw_pair-2)%cgp_pair = nbpw_cgp_pair
+           nbpw(nbpw_pair-2)%ljcod = ljcod(iac(i),iac(ja))
+                   nbpw(nbpw_pair-2)%cgp_pair = nbpw_cgp_pair
            nbpw(nbpw_pair-1)%i = i
            nbpw(nbpw_pair-1)%j = ja+1
-           nbpw(nbpw_pair-1)%LJcod = ljcod(iac(i),iac(ja+1))
-		   nbpw(nbpw_pair-1)%cgp_pair = nbpw_cgp_pair
+           nbpw(nbpw_pair-1)%ljcod = ljcod(iac(i),iac(ja+1))
+                   nbpw(nbpw_pair-1)%cgp_pair = nbpw_cgp_pair
            nbpw(nbpw_pair  )%i = i
            nbpw(nbpw_pair  )%j = ja+2
-           nbpw(nbpw_pair  )%LJcod = ljcod(iac(i),iac(ja+2))
-		   nbpw(nbpw_pair  )%cgp_pair = nbpw_cgp_pair
+           nbpw(nbpw_pair  )%ljcod = ljcod(iac(i),iac(ja+2))
+                   nbpw(nbpw_pair  )%cgp_pair = nbpw_cgp_pair
 
         end do ialoop
      end do jgloop
   end do igloop
-#if defined (PROFILING)
+#if defined (profiling)
 profile(4)%time = profile(4)%time + rtime() - start_loop_time
 #endif
 
@@ -6196,233 +6167,233 @@ end subroutine nbpwlis2_box
 !-----------------------------------------------------------------------
 subroutine nbpwlis2_box_lrf
   ! local variables
-  integer						:: i,ig,jg,ia,ja,i3,j3,ig_atom, inside
-  real(8)						:: rcut2,r2
-  real(8)						:: dx, dy,dz
-  !LRF
-  real(8)						:: RcLRF2, field0, field1, field2
-  real(8)						:: dr(3)
-  integer						:: jg_cgp, j, inside_LRF, is3
-  real(8)						:: boxshiftx, boxshifty, boxshiftz
+  integer                                               :: i,ig,jg,ia,ja,i3,j3,ig_atom, inside
+  real(8)                                               :: rcut2,r2
+  real(8)                                               :: dx, dy,dz
+  !lrf
+  real(8)                                               :: rclrf2, field0, field1, field2
+  real(8)                                               :: dr(3)
+  integer                                               :: jg_cgp, j, inside_lrf, is3
+  real(8)                                               :: boxshiftx, boxshifty, boxshiftz
   
   ! for periodic boundary conditions
-  !	This routine makes a list of non-bonded solute-solvent atom pairs
-  !	excluding Q-atoms.
-#if defined (PROFILING)
-real(8)						:: start_loop_time
+  !     this routine makes a list of non-bonded solute-solvent atom pairs
+  !     excluding q-atoms.
+#if defined (profiling)
+real(8)                                         :: start_loop_time
 start_loop_time = rtime()
 #endif
 
   nbpw_pair = 0
   nbpw_cgp_pair = 0
-  rcut2 = Rcpw*Rcpw
-  RcLRF2 = RcLRF*RcLRF
+  rcut2 = rcpw*rcpw
+  rclrf2 = rclrf*rclrf
 
 igloop:  do ig = calculation_assignment%pw%start, calculation_assignment%pw%end
 jgloop:    do jg = 1, nwat
-        		ja = nat_solute + 3*jg-2
-				j3 = 3*ja-3
+                        ja = nat_solute + 3*jg-2
+                                j3 = 3*ja-3
 
-				!	      --- outside cutoff ? ---
-				inside = 0
-				inside_LRF = 0
-				ig_atom = cgp(ig)%first
-     	        	 do while ((ig_atom .le. cgp(ig)%last) .and. (inside .eq. 0))
-           			 i = cgpatom(ig_atom)
-          			 i3 = 3*i-3
+                                !             --- outside cutoff ? ---
+                                inside = 0
+                                inside_lrf = 0
+                                ig_atom = cgp(ig)%first
+                         do while ((ig_atom .le. cgp(ig)%last) .and. (inside .eq. 0))
+                                 i = cgpatom(ig_atom)
+                                 i3 = 3*i-3
 
-					 dx = x(i3+1) - x(j3+1)
-					 dy = x(i3+2) - x(j3+2)
-					 dz = x(i3+3) - x(j3+3)
-					 dx = dx - boxlength(1)*nint( dx*inv_boxl(1) )
-					 dy = dy - boxlength(2)*nint( dy*inv_boxl(2) )
-					 dz = dz - boxlength(3)*nint( dz*inv_boxl(3) )
-	     			 r2 = dx**2 + dy**2 + dz**2
-		   
-          			 if ( r2 .le. rcut2 ) then
-					   ! inside cutoff, raise the flag
-					   inside = 1
-					   if (nbpw_cgp_pair .eq. size(nbpw_cgp, 1)) call reallocate_nbpw_cgp
-					   nbpw_cgp_pair = nbpw_cgp_pair + 1
-					   nbpw_cgp(nbpw_cgp_pair)%i = i
-					   nbpw_cgp(nbpw_cgp_pair)%j = ja
-					 elseif (r2 <= RcLRF2) then
-    			     inside_LRF = 1
-			         end if
+                                         dx = x(i3+1) - x(j3+1)
+                                         dy = x(i3+2) - x(j3+2)
+                                         dz = x(i3+3) - x(j3+3)
+                                         dx = dx - boxlength(1)*nint( dx*inv_boxl(1) )
+                                         dy = dy - boxlength(2)*nint( dy*inv_boxl(2) )
+                                         dz = dz - boxlength(3)*nint( dz*inv_boxl(3) )
+                                 r2 = dx**2 + dy**2 + dz**2
+                   
+                                 if ( r2 .le. rcut2 ) then
+                                           ! inside cutoff, raise the flag
+                                           inside = 1
+                                           if (nbpw_cgp_pair .eq. size(nbpw_cgp, 1)) call reallocate_nbpw_cgp
+                                           nbpw_cgp_pair = nbpw_cgp_pair + 1
+                                           nbpw_cgp(nbpw_cgp_pair)%i = i
+                                           nbpw_cgp(nbpw_cgp_pair)%j = ja
+                                         elseif (r2 <= rclrf2) then
+                             inside_lrf = 1
+                                 end if
 
-		             ig_atom = ig_atom + 1 !ia = ia + 1
+                             ig_atom = ig_atom + 1 !ia = ia + 1
                      end do
 
-	  if (inside .eq. 1) then
+          if (inside .eq. 1) then
 
 ialoop: do ia = cgp(ig)%first, cgp(ig)%last
 
-           !	         --- q-atom ? ---
+           !             --- q-atom ? ---
            i = cgpatom(ia)
            if ( iqatom(i)/=0 ) cycle ialoop
 
-		   ! if out of space then make more space
-		   if (nbpw_pair > calculation_assignment%pw%max-3) call reallocate_nonbondlist_pw
+                   ! if out of space then make more space
+                   if (nbpw_pair > calculation_assignment%pw%max-3) call reallocate_nonbondlist_pw
 
            nbpw_pair = nbpw_pair + 3
            nbpw(nbpw_pair-2)%i = i
            nbpw(nbpw_pair-2)%j = ja 
-           nbpw(nbpw_pair-2)%LJcod = ljcod(iac(i),iac(ja))
-		   nbpw(nbpw_pair-2)%cgp_pair = nbpw_cgp_pair
+           nbpw(nbpw_pair-2)%ljcod = ljcod(iac(i),iac(ja))
+                   nbpw(nbpw_pair-2)%cgp_pair = nbpw_cgp_pair
            nbpw(nbpw_pair-1)%i = i
            nbpw(nbpw_pair-1)%j = ja+1
-           nbpw(nbpw_pair-1)%LJcod = ljcod(iac(i),iac(ja+1))
-		   nbpw(nbpw_pair-1)%cgp_pair = nbpw_cgp_pair
+           nbpw(nbpw_pair-1)%ljcod = ljcod(iac(i),iac(ja+1))
+                   nbpw(nbpw_pair-1)%cgp_pair = nbpw_cgp_pair
            nbpw(nbpw_pair  )%i = i
            nbpw(nbpw_pair  )%j = ja+2
-           nbpw(nbpw_pair  )%LJcod = ljcod(iac(i),iac(ja+2))
-		   nbpw(nbpw_pair  )%cgp_pair = nbpw_cgp_pair
+           nbpw(nbpw_pair  )%ljcod = ljcod(iac(i),iac(ja+2))
+                   nbpw(nbpw_pair  )%cgp_pair = nbpw_cgp_pair
 
         end do ialoop
-      elseif((inside_LRF ==1) .and. (inside == 0)) then   
-                ! outside pw-cutoff but inside LRF cut-off: use LRF
-		!solut : solvent
-		jg_cgp = iwhich_cgp(ja)
-		
-		boxshiftx = x(i3+1) - lrf(jg_cgp)%cgp_cent(1)
-		boxshifty = x(i3+2) - lrf(jg_cgp)%cgp_cent(2)
-		boxshiftz = x(i3+3) - lrf(jg_cgp)%cgp_cent(3)
+      elseif((inside_lrf ==1) .and. (inside == 0)) then   
+                ! outside pw-cutoff but inside lrf cut-off: use lrf
+                !solut : solvent
+                jg_cgp = iwhich_cgp(ja)
+                
+                boxshiftx = x(i3+1) - lrf(jg_cgp)%cgp_cent(1)
+                boxshifty = x(i3+2) - lrf(jg_cgp)%cgp_cent(2)
+                boxshiftz = x(i3+3) - lrf(jg_cgp)%cgp_cent(3)
 
-		boxshiftx = boxlength(1)*nint( boxshiftx*inv_boxl(1) )
-		boxshifty = boxlength(2)*nint( boxshifty*inv_boxl(2) )
-		boxshiftz = boxlength(3)*nint( boxshiftz*inv_boxl(3) )
+                boxshiftx = boxlength(1)*nint( boxshiftx*inv_boxl(1) )
+                boxshifty = boxlength(2)*nint( boxshifty*inv_boxl(2) )
+                boxshiftz = boxlength(3)*nint( boxshiftz*inv_boxl(3) )
 
 ialoop2: do ia = cgp(ig)%first, cgp(ig)%last
           i = cgpatom(ia)
 
           ! skip q-atoms
           if ( iqatom(i)/=0 ) cycle
-		  is3 = i*3-3
-		  
-		  !jg = ncgp + iw
-   		  ! calculate dr and (d)r2
-		  dr(1) = x(is3+1) - lrf(jg_cgp)%cgp_cent(1) - boxshiftx
-		  dr(2) = x(is3+2) - lrf(jg_cgp)%cgp_cent(2) - boxshifty
-		  dr(3) = x(is3+3) - lrf(jg_cgp)%cgp_cent(3) - boxshiftz
-	   	  		  	  	
-		  r2 = dr(1)*dr(1) + dr(2)*dr(2) + dr(3)*dr(3)
+                  is3 = i*3-3
+                  
+                  !jg = ncgp + iw
+                  ! calculate dr and (d)r2
+                  dr(1) = x(is3+1) - lrf(jg_cgp)%cgp_cent(1) - boxshiftx
+                  dr(2) = x(is3+2) - lrf(jg_cgp)%cgp_cent(2) - boxshifty
+                  dr(3) = x(is3+3) - lrf(jg_cgp)%cgp_cent(3) - boxshiftz
+                                                
+                  r2 = dr(1)*dr(1) + dr(2)*dr(2) + dr(3)*dr(3)
 
           ! calculate lrf parameters for the charge group
-		  field0=crg(i)/(r2*sqrt(r2))
-		  lrf(jg_cgp)%phi0=lrf(jg_cgp)%phi0+field0*r2
-		  lrf(jg_cgp)%phi1(1)=lrf(jg_cgp)%phi1(1)-field0*dr(1)
-		  lrf(jg_cgp)%phi1(2)=lrf(jg_cgp)%phi1(2)-field0*dr(2)
+                  field0=crg(i)/(r2*sqrt(r2))
+                  lrf(jg_cgp)%phi0=lrf(jg_cgp)%phi0+field0*r2
+                  lrf(jg_cgp)%phi1(1)=lrf(jg_cgp)%phi1(1)-field0*dr(1)
+                  lrf(jg_cgp)%phi1(2)=lrf(jg_cgp)%phi1(2)-field0*dr(2)
           lrf(jg_cgp)%phi1(3)=lrf(jg_cgp)%phi1(3)-field0*dr(3)
-		  field1=3.*field0/r2
-		  lrf(jg_cgp)%phi2(1)=lrf(jg_cgp)%phi2(1)+field1*dr(1)*dr(1)-field0
-		  lrf(jg_cgp)%phi2(2)=lrf(jg_cgp)%phi2(2)+field1*dr(1)*dr(2)
-		  lrf(jg_cgp)%phi2(3)=lrf(jg_cgp)%phi2(3)+field1*dr(1)*dr(3)
-		  lrf(jg_cgp)%phi2(4)=lrf(jg_cgp)%phi2(4)+field1*dr(2)*dr(1)
-		  lrf(jg_cgp)%phi2(5)=lrf(jg_cgp)%phi2(5)+field1*dr(2)*dr(2)-field0
-		  lrf(jg_cgp)%phi2(6)=lrf(jg_cgp)%phi2(6)+field1*dr(2)*dr(3)
-		  lrf(jg_cgp)%phi2(7)=lrf(jg_cgp)%phi2(7)+field1*dr(3)*dr(1)
-		  lrf(jg_cgp)%phi2(8)=lrf(jg_cgp)%phi2(8)+field1*dr(3)*dr(2)
-		  lrf(jg_cgp)%phi2(9)=lrf(jg_cgp)%phi2(9)+field1*dr(3)*dr(3)-field0
-		  field2=-field1/r2
-		  lrf(jg_cgp)%phi3(1 )=lrf(jg_cgp)%phi3(1 )+field2*(5.*dr(1)*dr(1)*dr(1)-r2*3.*dr(1))
-		  lrf(jg_cgp)%phi3(2 )=lrf(jg_cgp)%phi3(2 )+field2*(5.*dr(1)*dr(1)*dr(2)-r2*dr(2))
-		  lrf(jg_cgp)%phi3(3 )=lrf(jg_cgp)%phi3(3 )+field2*(5.*dr(1)*dr(1)*dr(3)-r2*dr(3))
-		  lrf(jg_cgp)%phi3(4 )=lrf(jg_cgp)%phi3(4 )+field2*(5.*dr(1)*dr(2)*dr(1)-r2*dr(2))
-		  lrf(jg_cgp)%phi3(5 )=lrf(jg_cgp)%phi3(5 )+field2*(5.*dr(1)*dr(2)*dr(2)-r2*dr(1))
-		  lrf(jg_cgp)%phi3(6 )=lrf(jg_cgp)%phi3(6 )+field2*(5.*dr(1)*dr(2)*dr(3))
-		  lrf(jg_cgp)%phi3(7 )=lrf(jg_cgp)%phi3(7 )+field2*(5.*dr(1)*dr(3)*dr(1)-r2*dr(3))
-		  lrf(jg_cgp)%phi3(8 )=lrf(jg_cgp)%phi3(8 )+field2*(5.*dr(1)*dr(3)*dr(2))
-		  lrf(jg_cgp)%phi3(9 )=lrf(jg_cgp)%phi3(9 )+field2*(5.*dr(1)*dr(3)*dr(3)-r2*dr(1))
-		  lrf(jg_cgp)%phi3(10)=lrf(jg_cgp)%phi3(10)+field2*(5.*dr(2)*dr(1)*dr(1)-r2*dr(2))
-		  lrf(jg_cgp)%phi3(11)=lrf(jg_cgp)%phi3(11)+field2*(5.*dr(2)*dr(1)*dr(2)-r2*dr(1))
-		  lrf(jg_cgp)%phi3(12)=lrf(jg_cgp)%phi3(12)+field2*(5.*dr(2)*dr(1)*dr(3))
-		  lrf(jg_cgp)%phi3(13)=lrf(jg_cgp)%phi3(13)+field2*(5.*dr(2)*dr(2)*dr(1)-r2*dr(1))
-		  lrf(jg_cgp)%phi3(14)=lrf(jg_cgp)%phi3(14)+field2*(5.*dr(2)*dr(2)*dr(2)-r2*3.*dr(2))
-		  lrf(jg_cgp)%phi3(15)=lrf(jg_cgp)%phi3(15)+field2*(5.*dr(2)*dr(2)*dr(3)-r2*dr(3))
-		  lrf(jg_cgp)%phi3(16)=lrf(jg_cgp)%phi3(16)+field2*(5.*dr(2)*dr(3)*dr(1))
-		  lrf(jg_cgp)%phi3(17)=lrf(jg_cgp)%phi3(17)+field2*(5.*dr(2)*dr(3)*dr(2)-r2*dr(3))
-		  lrf(jg_cgp)%phi3(18)=lrf(jg_cgp)%phi3(18)+field2*(5.*dr(2)*dr(3)*dr(3)-r2*dr(2))
-		  lrf(jg_cgp)%phi3(19)=lrf(jg_cgp)%phi3(19)+field2*(5.*dr(3)*dr(1)*dr(1)-r2*dr(3))
-		  lrf(jg_cgp)%phi3(20)=lrf(jg_cgp)%phi3(20)+field2*(5.*dr(3)*dr(1)*dr(2))
-		  lrf(jg_cgp)%phi3(21)=lrf(jg_cgp)%phi3(21)+field2*(5.*dr(3)*dr(1)*dr(3)-r2*dr(1))
-		  lrf(jg_cgp)%phi3(22)=lrf(jg_cgp)%phi3(22)+field2*(5.*dr(3)*dr(2)*dr(1))
-		  lrf(jg_cgp)%phi3(23)=lrf(jg_cgp)%phi3(23)+field2*(5.*dr(3)*dr(2)*dr(2)-r2*dr(3))
-		  lrf(jg_cgp)%phi3(24)=lrf(jg_cgp)%phi3(24)+field2*(5.*dr(3)*dr(2)*dr(3)-r2*dr(2))
-		  lrf(jg_cgp)%phi3(25)=lrf(jg_cgp)%phi3(25)+field2*(5.*dr(3)*dr(3)*dr(1)-r2*dr(1))
-		  lrf(jg_cgp)%phi3(26)=lrf(jg_cgp)%phi3(26)+field2*(5.*dr(3)*dr(3)*dr(2)-r2*dr(2))
-		  lrf(jg_cgp)%phi3(27)=lrf(jg_cgp)%phi3(27)+field2*(5.*dr(3)*dr(3)*dr(3)-r2*3.*dr(3))
-		 enddo ialoop2
+                  field1=3.*field0/r2
+                  lrf(jg_cgp)%phi2(1)=lrf(jg_cgp)%phi2(1)+field1*dr(1)*dr(1)-field0
+                  lrf(jg_cgp)%phi2(2)=lrf(jg_cgp)%phi2(2)+field1*dr(1)*dr(2)
+                  lrf(jg_cgp)%phi2(3)=lrf(jg_cgp)%phi2(3)+field1*dr(1)*dr(3)
+                  lrf(jg_cgp)%phi2(4)=lrf(jg_cgp)%phi2(4)+field1*dr(2)*dr(1)
+                  lrf(jg_cgp)%phi2(5)=lrf(jg_cgp)%phi2(5)+field1*dr(2)*dr(2)-field0
+                  lrf(jg_cgp)%phi2(6)=lrf(jg_cgp)%phi2(6)+field1*dr(2)*dr(3)
+                  lrf(jg_cgp)%phi2(7)=lrf(jg_cgp)%phi2(7)+field1*dr(3)*dr(1)
+                  lrf(jg_cgp)%phi2(8)=lrf(jg_cgp)%phi2(8)+field1*dr(3)*dr(2)
+                  lrf(jg_cgp)%phi2(9)=lrf(jg_cgp)%phi2(9)+field1*dr(3)*dr(3)-field0
+                  field2=-field1/r2
+                  lrf(jg_cgp)%phi3(1 )=lrf(jg_cgp)%phi3(1 )+field2*(5.*dr(1)*dr(1)*dr(1)-r2*3.*dr(1))
+                  lrf(jg_cgp)%phi3(2 )=lrf(jg_cgp)%phi3(2 )+field2*(5.*dr(1)*dr(1)*dr(2)-r2*dr(2))
+                  lrf(jg_cgp)%phi3(3 )=lrf(jg_cgp)%phi3(3 )+field2*(5.*dr(1)*dr(1)*dr(3)-r2*dr(3))
+                  lrf(jg_cgp)%phi3(4 )=lrf(jg_cgp)%phi3(4 )+field2*(5.*dr(1)*dr(2)*dr(1)-r2*dr(2))
+                  lrf(jg_cgp)%phi3(5 )=lrf(jg_cgp)%phi3(5 )+field2*(5.*dr(1)*dr(2)*dr(2)-r2*dr(1))
+                  lrf(jg_cgp)%phi3(6 )=lrf(jg_cgp)%phi3(6 )+field2*(5.*dr(1)*dr(2)*dr(3))
+                  lrf(jg_cgp)%phi3(7 )=lrf(jg_cgp)%phi3(7 )+field2*(5.*dr(1)*dr(3)*dr(1)-r2*dr(3))
+                  lrf(jg_cgp)%phi3(8 )=lrf(jg_cgp)%phi3(8 )+field2*(5.*dr(1)*dr(3)*dr(2))
+                  lrf(jg_cgp)%phi3(9 )=lrf(jg_cgp)%phi3(9 )+field2*(5.*dr(1)*dr(3)*dr(3)-r2*dr(1))
+                  lrf(jg_cgp)%phi3(10)=lrf(jg_cgp)%phi3(10)+field2*(5.*dr(2)*dr(1)*dr(1)-r2*dr(2))
+                  lrf(jg_cgp)%phi3(11)=lrf(jg_cgp)%phi3(11)+field2*(5.*dr(2)*dr(1)*dr(2)-r2*dr(1))
+                  lrf(jg_cgp)%phi3(12)=lrf(jg_cgp)%phi3(12)+field2*(5.*dr(2)*dr(1)*dr(3))
+                  lrf(jg_cgp)%phi3(13)=lrf(jg_cgp)%phi3(13)+field2*(5.*dr(2)*dr(2)*dr(1)-r2*dr(1))
+                  lrf(jg_cgp)%phi3(14)=lrf(jg_cgp)%phi3(14)+field2*(5.*dr(2)*dr(2)*dr(2)-r2*3.*dr(2))
+                  lrf(jg_cgp)%phi3(15)=lrf(jg_cgp)%phi3(15)+field2*(5.*dr(2)*dr(2)*dr(3)-r2*dr(3))
+                  lrf(jg_cgp)%phi3(16)=lrf(jg_cgp)%phi3(16)+field2*(5.*dr(2)*dr(3)*dr(1))
+                  lrf(jg_cgp)%phi3(17)=lrf(jg_cgp)%phi3(17)+field2*(5.*dr(2)*dr(3)*dr(2)-r2*dr(3))
+                  lrf(jg_cgp)%phi3(18)=lrf(jg_cgp)%phi3(18)+field2*(5.*dr(2)*dr(3)*dr(3)-r2*dr(2))
+                  lrf(jg_cgp)%phi3(19)=lrf(jg_cgp)%phi3(19)+field2*(5.*dr(3)*dr(1)*dr(1)-r2*dr(3))
+                  lrf(jg_cgp)%phi3(20)=lrf(jg_cgp)%phi3(20)+field2*(5.*dr(3)*dr(1)*dr(2))
+                  lrf(jg_cgp)%phi3(21)=lrf(jg_cgp)%phi3(21)+field2*(5.*dr(3)*dr(1)*dr(3)-r2*dr(1))
+                  lrf(jg_cgp)%phi3(22)=lrf(jg_cgp)%phi3(22)+field2*(5.*dr(3)*dr(2)*dr(1))
+                  lrf(jg_cgp)%phi3(23)=lrf(jg_cgp)%phi3(23)+field2*(5.*dr(3)*dr(2)*dr(2)-r2*dr(3))
+                  lrf(jg_cgp)%phi3(24)=lrf(jg_cgp)%phi3(24)+field2*(5.*dr(3)*dr(2)*dr(3)-r2*dr(2))
+                  lrf(jg_cgp)%phi3(25)=lrf(jg_cgp)%phi3(25)+field2*(5.*dr(3)*dr(3)*dr(1)-r2*dr(1))
+                  lrf(jg_cgp)%phi3(26)=lrf(jg_cgp)%phi3(26)+field2*(5.*dr(3)*dr(3)*dr(2)-r2*dr(2))
+                  lrf(jg_cgp)%phi3(27)=lrf(jg_cgp)%phi3(27)+field2*(5.*dr(3)*dr(3)*dr(3)-r2*3.*dr(3))
+                 enddo ialoop2
 
-		!solvent : solut	
-		boxshiftx = x(j3+1) - lrf(ig)%cgp_cent(1)
-		boxshifty = x(j3+2) - lrf(ig)%cgp_cent(2)
-		boxshiftz = x(j3+3) - lrf(ig)%cgp_cent(3)
+                !solvent : solut        
+                boxshiftx = x(j3+1) - lrf(ig)%cgp_cent(1)
+                boxshifty = x(j3+2) - lrf(ig)%cgp_cent(2)
+                boxshiftz = x(j3+3) - lrf(ig)%cgp_cent(3)
 
-		boxshiftx = boxlength(1)*nint( boxshiftx*inv_boxl(1) )
-		boxshifty = boxlength(2)*nint( boxshifty*inv_boxl(2) )
-		boxshiftz = boxlength(3)*nint( boxshiftz*inv_boxl(3) )
+                boxshiftx = boxlength(1)*nint( boxshiftx*inv_boxl(1) )
+                boxshifty = boxlength(2)*nint( boxshifty*inv_boxl(2) )
+                boxshiftz = boxlength(3)*nint( boxshiftz*inv_boxl(3) )
 
 jaloop2: do ja = 1, 3
-		  j = nat_solute + 3*jg-3 + ja
-		  j3 = j*3-3
+                  j = nat_solute + 3*jg-3 + ja
+                  j3 = j*3-3
 
-		  ! calculate dr and (d)r2
-		  dr(1) = x(j3+1) - lrf(ig)%cgp_cent(1) - boxshiftx
-		  dr(2) = x(j3+2) - lrf(ig)%cgp_cent(2) - boxshifty
-		  dr(3) = x(j3+3) - lrf(ig)%cgp_cent(3) - boxshiftz
-		  
-	      r2 = dr(1)*dr(1) + dr(2)*dr(2) + dr(3)*dr(3)
+                  ! calculate dr and (d)r2
+                  dr(1) = x(j3+1) - lrf(ig)%cgp_cent(1) - boxshiftx
+                  dr(2) = x(j3+2) - lrf(ig)%cgp_cent(2) - boxshifty
+                  dr(3) = x(j3+3) - lrf(ig)%cgp_cent(3) - boxshiftz
+                  
+              r2 = dr(1)*dr(1) + dr(2)*dr(2) + dr(3)*dr(3)
 
-		  ! calculate lrf for the water molecule
-		  field0=crg(j)/(r2*sqrt(r2))
-		  lrf(ig)%phi0=lrf(ig)%phi0+field0*r2
-		  lrf(ig)%phi1(1)=lrf(ig)%phi1(1)-field0*dr(1)
-		  lrf(ig)%phi1(2)=lrf(ig)%phi1(2)-field0*dr(2)
-		  lrf(ig)%phi1(3)=lrf(ig)%phi1(3)-field0*dr(3)
-		  field1=3.*field0/r2
-		  lrf(ig)%phi2(1)=lrf(ig)%phi2(1)+field1*dr(1)*dr(1)-field0
-		  lrf(ig)%phi2(2)=lrf(ig)%phi2(2)+field1*dr(1)*dr(2)
-		  lrf(ig)%phi2(3)=lrf(ig)%phi2(3)+field1*dr(1)*dr(3)
-		  lrf(ig)%phi2(4)=lrf(ig)%phi2(4)+field1*dr(2)*dr(1)
-		  lrf(ig)%phi2(5)=lrf(ig)%phi2(5)+field1*dr(2)*dr(2)-field0
-		  lrf(ig)%phi2(6)=lrf(ig)%phi2(6)+field1*dr(2)*dr(3)
-		  lrf(ig)%phi2(7)=lrf(ig)%phi2(7)+field1*dr(3)*dr(1)
-		  lrf(ig)%phi2(8)=lrf(ig)%phi2(8)+field1*dr(3)*dr(2)
-		  lrf(ig)%phi2(9)=lrf(ig)%phi2(9)+field1*dr(3)*dr(3)-field0
-		  field2=-field1/r2
-		  lrf(ig)%phi3(1 )=lrf(ig)%phi3(1 )+field2*(5.*dr(1)*dr(1)*dr(1)-r2*3.*dr(1))
-		  lrf(ig)%phi3(2 )=lrf(ig)%phi3(2 )+field2*(5.*dr(1)*dr(1)*dr(2)-r2*dr(2))
-		  lrf(ig)%phi3(3 )=lrf(ig)%phi3(3 )+field2*(5.*dr(1)*dr(1)*dr(3)-r2*dr(3))
-		  lrf(ig)%phi3(4 )=lrf(ig)%phi3(4 )+field2*(5.*dr(1)*dr(2)*dr(1)-r2*dr(2))
-		  lrf(ig)%phi3(5 )=lrf(ig)%phi3(5 )+field2*(5.*dr(1)*dr(2)*dr(2)-r2*dr(1))
-		  lrf(ig)%phi3(6 )=lrf(ig)%phi3(6 )+field2*(5.*dr(1)*dr(2)*dr(3))
-		  lrf(ig)%phi3(7 )=lrf(ig)%phi3(7 )+field2*(5.*dr(1)*dr(3)*dr(1)-r2*dr(3))
-		  lrf(ig)%phi3(8 )=lrf(ig)%phi3(8 )+field2*(5.*dr(1)*dr(3)*dr(2))
-		  lrf(ig)%phi3(9 )=lrf(ig)%phi3(9 )+field2*(5.*dr(1)*dr(3)*dr(3)-r2*dr(1))
-		  lrf(ig)%phi3(10)=lrf(ig)%phi3(10)+field2*(5.*dr(2)*dr(1)*dr(1)-r2*dr(2))
-		  lrf(ig)%phi3(11)=lrf(ig)%phi3(11)+field2*(5.*dr(2)*dr(1)*dr(2)-r2*dr(1))
-		  lrf(ig)%phi3(12)=lrf(ig)%phi3(12)+field2*(5.*dr(2)*dr(1)*dr(3))
-		  lrf(ig)%phi3(13)=lrf(ig)%phi3(13)+field2*(5.*dr(2)*dr(2)*dr(1)-r2*dr(1))
-		  lrf(ig)%phi3(14)=lrf(ig)%phi3(14)+field2*(5.*dr(2)*dr(2)*dr(2)-r2*3.*dr(2))
-		  lrf(ig)%phi3(15)=lrf(ig)%phi3(15)+field2*(5.*dr(2)*dr(2)*dr(3)-r2*dr(3))
-		  lrf(ig)%phi3(16)=lrf(ig)%phi3(16)+field2*(5.*dr(2)*dr(3)*dr(1))
-		  lrf(ig)%phi3(17)=lrf(ig)%phi3(17)+field2*(5.*dr(2)*dr(3)*dr(2)-r2*dr(3))
-		  lrf(ig)%phi3(18)=lrf(ig)%phi3(18)+field2*(5.*dr(2)*dr(3)*dr(3)-r2*dr(2))
-		  lrf(ig)%phi3(19)=lrf(ig)%phi3(19)+field2*(5.*dr(3)*dr(1)*dr(1)-r2*dr(3))
-		  lrf(ig)%phi3(20)=lrf(ig)%phi3(20)+field2*(5.*dr(3)*dr(1)*dr(2))
-		  lrf(ig)%phi3(21)=lrf(ig)%phi3(21)+field2*(5.*dr(3)*dr(1)*dr(3)-r2*dr(1))
-		  lrf(ig)%phi3(22)=lrf(ig)%phi3(22)+field2*(5.*dr(3)*dr(2)*dr(1))
-		  lrf(ig)%phi3(23)=lrf(ig)%phi3(23)+field2*(5.*dr(3)*dr(2)*dr(2)-r2*dr(3))
-		  lrf(ig)%phi3(24)=lrf(ig)%phi3(24)+field2*(5.*dr(3)*dr(2)*dr(3)-r2*dr(2))
-		  lrf(ig)%phi3(25)=lrf(ig)%phi3(25)+field2*(5.*dr(3)*dr(3)*dr(1)-r2*dr(1))
-		  lrf(ig)%phi3(26)=lrf(ig)%phi3(26)+field2*(5.*dr(3)*dr(3)*dr(2)-r2*dr(2))
-		  lrf(ig)%phi3(27)=lrf(ig)%phi3(27)+field2*(5.*dr(3)*dr(3)*dr(3)-r2*3.*dr(3))
+                  ! calculate lrf for the water molecule
+                  field0=crg(j)/(r2*sqrt(r2))
+                  lrf(ig)%phi0=lrf(ig)%phi0+field0*r2
+                  lrf(ig)%phi1(1)=lrf(ig)%phi1(1)-field0*dr(1)
+                  lrf(ig)%phi1(2)=lrf(ig)%phi1(2)-field0*dr(2)
+                  lrf(ig)%phi1(3)=lrf(ig)%phi1(3)-field0*dr(3)
+                  field1=3.*field0/r2
+                  lrf(ig)%phi2(1)=lrf(ig)%phi2(1)+field1*dr(1)*dr(1)-field0
+                  lrf(ig)%phi2(2)=lrf(ig)%phi2(2)+field1*dr(1)*dr(2)
+                  lrf(ig)%phi2(3)=lrf(ig)%phi2(3)+field1*dr(1)*dr(3)
+                  lrf(ig)%phi2(4)=lrf(ig)%phi2(4)+field1*dr(2)*dr(1)
+                  lrf(ig)%phi2(5)=lrf(ig)%phi2(5)+field1*dr(2)*dr(2)-field0
+                  lrf(ig)%phi2(6)=lrf(ig)%phi2(6)+field1*dr(2)*dr(3)
+                  lrf(ig)%phi2(7)=lrf(ig)%phi2(7)+field1*dr(3)*dr(1)
+                  lrf(ig)%phi2(8)=lrf(ig)%phi2(8)+field1*dr(3)*dr(2)
+                  lrf(ig)%phi2(9)=lrf(ig)%phi2(9)+field1*dr(3)*dr(3)-field0
+                  field2=-field1/r2
+                  lrf(ig)%phi3(1 )=lrf(ig)%phi3(1 )+field2*(5.*dr(1)*dr(1)*dr(1)-r2*3.*dr(1))
+                  lrf(ig)%phi3(2 )=lrf(ig)%phi3(2 )+field2*(5.*dr(1)*dr(1)*dr(2)-r2*dr(2))
+                  lrf(ig)%phi3(3 )=lrf(ig)%phi3(3 )+field2*(5.*dr(1)*dr(1)*dr(3)-r2*dr(3))
+                  lrf(ig)%phi3(4 )=lrf(ig)%phi3(4 )+field2*(5.*dr(1)*dr(2)*dr(1)-r2*dr(2))
+                  lrf(ig)%phi3(5 )=lrf(ig)%phi3(5 )+field2*(5.*dr(1)*dr(2)*dr(2)-r2*dr(1))
+                  lrf(ig)%phi3(6 )=lrf(ig)%phi3(6 )+field2*(5.*dr(1)*dr(2)*dr(3))
+                  lrf(ig)%phi3(7 )=lrf(ig)%phi3(7 )+field2*(5.*dr(1)*dr(3)*dr(1)-r2*dr(3))
+                  lrf(ig)%phi3(8 )=lrf(ig)%phi3(8 )+field2*(5.*dr(1)*dr(3)*dr(2))
+                  lrf(ig)%phi3(9 )=lrf(ig)%phi3(9 )+field2*(5.*dr(1)*dr(3)*dr(3)-r2*dr(1))
+                  lrf(ig)%phi3(10)=lrf(ig)%phi3(10)+field2*(5.*dr(2)*dr(1)*dr(1)-r2*dr(2))
+                  lrf(ig)%phi3(11)=lrf(ig)%phi3(11)+field2*(5.*dr(2)*dr(1)*dr(2)-r2*dr(1))
+                  lrf(ig)%phi3(12)=lrf(ig)%phi3(12)+field2*(5.*dr(2)*dr(1)*dr(3))
+                  lrf(ig)%phi3(13)=lrf(ig)%phi3(13)+field2*(5.*dr(2)*dr(2)*dr(1)-r2*dr(1))
+                  lrf(ig)%phi3(14)=lrf(ig)%phi3(14)+field2*(5.*dr(2)*dr(2)*dr(2)-r2*3.*dr(2))
+                  lrf(ig)%phi3(15)=lrf(ig)%phi3(15)+field2*(5.*dr(2)*dr(2)*dr(3)-r2*dr(3))
+                  lrf(ig)%phi3(16)=lrf(ig)%phi3(16)+field2*(5.*dr(2)*dr(3)*dr(1))
+                  lrf(ig)%phi3(17)=lrf(ig)%phi3(17)+field2*(5.*dr(2)*dr(3)*dr(2)-r2*dr(3))
+                  lrf(ig)%phi3(18)=lrf(ig)%phi3(18)+field2*(5.*dr(2)*dr(3)*dr(3)-r2*dr(2))
+                  lrf(ig)%phi3(19)=lrf(ig)%phi3(19)+field2*(5.*dr(3)*dr(1)*dr(1)-r2*dr(3))
+                  lrf(ig)%phi3(20)=lrf(ig)%phi3(20)+field2*(5.*dr(3)*dr(1)*dr(2))
+                  lrf(ig)%phi3(21)=lrf(ig)%phi3(21)+field2*(5.*dr(3)*dr(1)*dr(3)-r2*dr(1))
+                  lrf(ig)%phi3(22)=lrf(ig)%phi3(22)+field2*(5.*dr(3)*dr(2)*dr(1))
+                  lrf(ig)%phi3(23)=lrf(ig)%phi3(23)+field2*(5.*dr(3)*dr(2)*dr(2)-r2*dr(3))
+                  lrf(ig)%phi3(24)=lrf(ig)%phi3(24)+field2*(5.*dr(3)*dr(2)*dr(3)-r2*dr(2))
+                  lrf(ig)%phi3(25)=lrf(ig)%phi3(25)+field2*(5.*dr(3)*dr(3)*dr(1)-r2*dr(1))
+                  lrf(ig)%phi3(26)=lrf(ig)%phi3(26)+field2*(5.*dr(3)*dr(3)*dr(2)-r2*dr(2))
+                  lrf(ig)%phi3(27)=lrf(ig)%phi3(27)+field2*(5.*dr(3)*dr(3)*dr(3)-r2*3.*dr(3))
          enddo jaloop2
       end if
 
      end do jgloop
   end do igloop
-#if defined (PROFILING)
+#if defined (profiling)
 profile(4)%time = profile(4)%time + rtime() - start_loop_time
 #endif
 
@@ -6430,24 +6401,24 @@ end subroutine nbpwlis2_box_lrf
 !-----------------------------------------------------------------------
 subroutine nbpwlis2_lrf
 ! local variables
-integer						:: i,j,ig,iw,jg,ia,ja,i3,j3,inside,is,is3
-real(8)						:: rcut2,r2,field0,field1,field2
-real(8)						:: dr(3)
-real(8)						::	RcLRF2
-!	This routine makes a list of non-bonded solute-solvent atom pairs
-!	excluding Q-atoms.
-#if defined (PROFILING)
-real(8)						:: start_loop_time
+integer                                         :: i,j,ig,iw,jg,ia,ja,i3,j3,inside,is,is3
+real(8)                                         :: rcut2,r2,field0,field1,field2
+real(8)                                         :: dr(3)
+real(8)                                         ::      rclrf2
+!       this routine makes a list of non-bonded solute-solvent atom pairs
+!       excluding q-atoms.
+#if defined (profiling)
+real(8)                                         :: start_loop_time
 start_loop_time = rtime()
 #endif
 
 nbpw_pair = 0
-rcut2 = Rcpw*Rcpw
-RcLRF2 = RcLRF*RcLRF
+rcut2 = rcpw*rcpw
+rclrf2 = rclrf*rclrf
 
 igloop:  do ig = calculation_assignment%pw%start, calculation_assignment%pw%end
 
-!	   --- excluded group ? ---
+!          --- excluded group ? ---
 is = cgp(ig)%iswitch
 if ( excl(is) ) cycle igloop
 is3 = 3*is-3
@@ -6458,7 +6429,7 @@ ja = nat_solute + 3*iw-2
 if(excl(ja)) cycle iwloop ! skip excluded waters
 j3 = 3*ja-3
 
-!	      --- outside cutoff ? ---
+!             --- outside cutoff ? ---
         inside = 0
         ia = cgp(ig)%first
         do while ((ia .le. cgp(ig)%last) .and. (inside .eq. 0))
@@ -6481,7 +6452,7 @@ if ( inside .eq. 1 ) then
 
 ialoop:       do ia = cgp(ig)%first, cgp(ig)%last
 
-      !	            --- q-atom ? ---
+      !             --- q-atom ? ---
       i = cgpatom(ia)
       if ( iqatom(i)/=0 ) cycle ialoop
 
@@ -6491,22 +6462,22 @@ ialoop:       do ia = cgp(ig)%first, cgp(ig)%last
       nbpw_pair = nbpw_pair + 3
       nbpw(nbpw_pair-2)%i = i
       nbpw(nbpw_pair-2)%j = ja 
-      nbpw(nbpw_pair-2)%LJcod = ljcod(iac(i),iac(ja))
+      nbpw(nbpw_pair-2)%ljcod = ljcod(iac(i),iac(ja))
       nbpw(nbpw_pair-1)%i = i
       nbpw(nbpw_pair-1)%j = ja+1
-      nbpw(nbpw_pair-1)%LJcod = ljcod(iac(i),iac(ja+1))
+      nbpw(nbpw_pair-1)%ljcod = ljcod(iac(i),iac(ja+1))
       nbpw(nbpw_pair  )%i = i
       nbpw(nbpw_pair  )%j = ja+2
-      nbpw(nbpw_pair  )%LJcod = ljcod(iac(i),iac(ja+2))
+      nbpw(nbpw_pair  )%ljcod = ljcod(iac(i),iac(ja+2))
 
    end do ialoop
 
-elseif(r2 <= RcLRF2) then   
-                ! outside pw-cutoff but inside LRF cut-off: use LRF
+elseif(r2 <= rclrf2) then   
+                ! outside pw-cutoff but inside lrf cut-off: use lrf
 
 ialoop2:      do ia = cgp(ig)%first, cgp(ig)%last
 
-      !	             --- q-atom ? ---
+      !              --- q-atom ? ---
       i = cgpatom(ia)
       if ( iqatom(i)/=0 ) cycle ialoop2
 
@@ -6561,7 +6532,7 @@ ialoop2:      do ia = cgp(ig)%first, cgp(ig)%last
       lrf(jg)%phi3(24)=lrf(jg)%phi3(24) +field2*(5.*dr(3)*dr(2)*dr(3)-r2*dr(2))
       lrf(jg)%phi3(25)=lrf(jg)%phi3(25) +field2*(5.*dr(3)*dr(3)*dr(1)-r2*dr(1))
       lrf(jg)%phi3(26)=lrf(jg)%phi3(26) +field2*(5.*dr(3)*dr(3)*dr(2)-r2*dr(2))
-      lrf(jg)%phi3(27)=lrf(jg)%phi3(27) 	+field2*(5.*dr(3)*dr(3)*dr(3)-r2*3.*dr(3))
+      lrf(jg)%phi3(27)=lrf(jg)%phi3(27)         +field2*(5.*dr(3)*dr(3)*dr(3)-r2*3.*dr(3))
 
    end do ialoop2
 
@@ -6627,7 +6598,7 @@ end if
 end do iwloop
 
 end do igloop
-#if defined (PROFILING)
+#if defined (profiling)
 profile(4)%time = profile(4)%time + rtime() - start_loop_time
 #endif
 
@@ -6637,23 +6608,23 @@ end subroutine nbpwlis2_lrf
 
 subroutine nbpwlist
 ! local variables
-integer						:: i,ig,jg,ia,ja,i3,j3
-real(8)						:: rcut2,r2
-integer						:: LJ_code
+integer                                         :: i,ig,jg,ia,ja,i3,j3
+real(8)                                         :: rcut2,r2
+integer                                         :: lj_code
 
 
 ! for use with spherical boundary
 
-!	This routine makes a list of non-bonded solute-solvent atom pairs
-!	excluding Q-atoms.
-#if defined (PROFILING)
-real(8)						:: start_loop_time
+!       this routine makes a list of non-bonded solute-solvent atom pairs
+!       excluding q-atoms.
+#if defined (profiling)
+real(8)                                         :: start_loop_time
 start_loop_time = rtime()
 #endif
 
 ! reset nbpw_pair
 nbpw_pair = 0
-rcut2 = Rcpw*Rcpw
+rcut2 = rcpw*rcpw
 
 igloop: do ig = calculation_assignment%pw%start, calculation_assignment%pw%end
 ! for every charge group:
@@ -6683,132 +6654,132 @@ ialoop: do ia = cgp(ig)%first, cgp(ig)%last
         ! find the atom index of the atom in the charge group
 i = cgpatom(ia)
 
-!	skip q-atoms
+!       skip q-atoms
         if ( iqatom(i)/=0 ) cycle ialoop
 
         ! if out of space then make more space
         if (nbpw_pair .gt. calculation_assignment%pw%max - 3) call reallocate_nonbondlist_pw
 
-jaloop:	do ja = nat_solute + 3*jg-2, nat_solute + 3*jg
+jaloop: do ja = nat_solute + 3*jg-2, nat_solute + 3*jg
           ! for every atom of the water molecule:
 
-          ! calculate LJ_code for the pair
-          LJ_code = ljcod(iac(i),iac(ja))
+          ! calculate lj_code for the pair
+          lj_code = ljcod(iac(i),iac(ja))
 
           ! skip pairs with zero interaction
           if((crg(i) * crg(ja) == 0.) &
                   .and. &
-                  (iaclib(iac(i))%avdw(LJ_code)*iaclib(iac(ja))%avdw(LJ_code) == 0.) &
+                  (iaclib(iac(i))%avdw(lj_code)*iaclib(iac(ja))%avdw(lj_code) == 0.) &
                   .and. &
-                  (iaclib(iac(i))%bvdw(LJ_code)*iaclib(iac(ja))%bvdw(LJ_code) == 0.)) &
+                  (iaclib(iac(i))%bvdw(lj_code)*iaclib(iac(ja))%bvdw(lj_code) == 0.)) &
                   cycle jaloop
 
           ! add the pair
           nbpw_pair = nbpw_pair + 1
           nbpw(nbpw_pair)%i = i
           nbpw(nbpw_pair)%j = ja 
-          nbpw(nbpw_pair)%LJcod = LJ_code
+          nbpw(nbpw_pair)%ljcod = lj_code
         end do jaloop
 end do ialoop
 end do jgloop
 end do igloop
-#if defined (PROFILING)
+#if defined (profiling)
 profile(4)%time = profile(4)%time + rtime() - start_loop_time
 #endif
 
 end subroutine nbpwlist
 
 !-----------------------------------------------------------------------
-!******PWadded 2001-10-18
+!******pwadded 2001-10-18
 
 subroutine nbpwlist_box
   ! local variables
-  integer						:: i,ig,jg,ia,ja,i3,j3,ig_sw,jg_sw
-  real(8)						:: rcut2,r2
-  integer						:: LJ_code
-  real(8)						:: dx, dy, dz
+  integer                                               :: i,ig,jg,ia,ja,i3,j3,ig_sw,jg_sw
+  real(8)                                               :: rcut2,r2
+  integer                                               :: lj_code
+  real(8)                                               :: dx, dy, dz
 
-  ! For use with periodic boundary conditions
-  !	This routine makes a list of non-bonded solute-solvent atom pairs
-  !	excluding Q-atoms.
-#if defined (PROFILING)
-real(8)						:: start_loop_time
+  ! for use with periodic boundary conditions
+  !     this routine makes a list of non-bonded solute-solvent atom pairs
+  !     excluding q-atoms.
+#if defined (profiling)
+real(8)                                         :: start_loop_time
 start_loop_time = rtime()
 #endif
 
   ! reset nbpw_pair
   nbpw_pair = 0
   nbpw_cgp_pair = 0
-  rcut2 = Rcpw*Rcpw
+  rcut2 = rcpw*rcpw
 
 igloop: do ig = calculation_assignment%pw%start, calculation_assignment%pw%end
-	! for every charge group:
+        ! for every charge group:
     ig_sw = cgp(ig)%iswitch
     i3 = 3*ig_sw-3
 
 jgloop: do jg = 1, nwat
-	  ! for every water molecule:
+          ! for every water molecule:
 
       jg_sw = nat_solute + 3*jg-2
 
-	  j3 = 3*jg_sw-3
-	  dx = x(i3+1) - x(j3+1)
-	  dy = x(i3+2) - x(j3+2)
-	  dz = x(i3+3) - x(j3+3)
-	  dx = dx - boxlength(1)*nint( dx*inv_boxl(1) )
-	  dy = dy - boxlength(2)*nint( dy*inv_boxl(2) )
-	  dz = dz - boxlength(3)*nint( dz*inv_boxl(3) )
-	  r2 = dx**2 + dy**2 + dz**2
+          j3 = 3*jg_sw-3
+          dx = x(i3+1) - x(j3+1)
+          dy = x(i3+2) - x(j3+2)
+          dz = x(i3+3) - x(j3+3)
+          dx = dx - boxlength(1)*nint( dx*inv_boxl(1) )
+          dy = dy - boxlength(2)*nint( dy*inv_boxl(2) )
+          dz = dz - boxlength(3)*nint( dz*inv_boxl(3) )
+          r2 = dx**2 + dy**2 + dz**2
 
       ! skip water outside cutoff
       if ( r2 .gt. rcut2 ) cycle jgloop
 
-	  !inside cut-off
-	  !check if charge group pair list is big enough
-	  if(nbpw_cgp_pair .eq. size(nbpw_cgp, 1) ) call reallocate_nbpw_cgp
+          !inside cut-off
+          !check if charge group pair list is big enough
+          if(nbpw_cgp_pair .eq. size(nbpw_cgp, 1) ) call reallocate_nbpw_cgp
 
-	  nbpw_cgp_pair = nbpw_cgp_pair + 1
-	  nbpw_cgp(nbpw_cgp_pair)%i = ig_sw  !solute
-	  nbpw_cgp(nbpw_cgp_pair)%j = jg_sw  !water
+          nbpw_cgp_pair = nbpw_cgp_pair + 1
+          nbpw_cgp(nbpw_cgp_pair)%i = ig_sw  !solute
+          nbpw_cgp(nbpw_cgp_pair)%j = jg_sw  !water
 
 ialoop: do ia = cgp(ig)%first, cgp(ig)%last
-	    ! for every atom in the charge group:
+            ! for every atom in the charge group:
 
-		! find the atom index of the atom in the charge group
+                ! find the atom index of the atom in the charge group
         i = cgpatom(ia)
 
-       !	skip q-atoms
-		if ( iqatom(i)/=0 ) cycle ialoop
+       !        skip q-atoms
+                if ( iqatom(i)/=0 ) cycle ialoop
 
-		! if out of space then make more space
-		if (nbpw_pair .gt. calculation_assignment%pw%max - 3) call reallocate_nonbondlist_pw
+                ! if out of space then make more space
+                if (nbpw_pair .gt. calculation_assignment%pw%max - 3) call reallocate_nonbondlist_pw
                    
-jaloop:	do ja = nat_solute + 3*jg-2, nat_solute + 3*jg
-  		  ! for every atom of the water molecule:
+jaloop: do ja = nat_solute + 3*jg-2, nat_solute + 3*jg
+                  ! for every atom of the water molecule:
 
-		  ! calculate LJ_code for the pair
-		  LJ_code = ljcod(iac(i),iac(ja))
+                  ! calculate lj_code for the pair
+                  lj_code = ljcod(iac(i),iac(ja))
 
-		  ! skip pairs with zero interaction
-		  if((crg(i) * crg(ja) == 0.) &
-  			  .and. &
-			  (iaclib(iac(i))%avdw(LJ_code)*iaclib(iac(ja))%avdw(LJ_code) == 0.) &
-			  .and. &
-			  (iaclib(iac(i))%bvdw(LJ_code)*iaclib(iac(ja))%bvdw(LJ_code) == 0.)) &
-			  cycle jaloop
+                  ! skip pairs with zero interaction
+                  if((crg(i) * crg(ja) == 0.) &
+                          .and. &
+                          (iaclib(iac(i))%avdw(lj_code)*iaclib(iac(ja))%avdw(lj_code) == 0.) &
+                          .and. &
+                          (iaclib(iac(i))%bvdw(lj_code)*iaclib(iac(ja))%bvdw(lj_code) == 0.)) &
+                          cycle jaloop
 
-		  ! add the pair
-		  nbpw_pair = nbpw_pair + 1
-		  nbpw(nbpw_pair)%i = i
-		  nbpw(nbpw_pair)%j = ja 
-		  nbpw(nbpw_pair)%LJcod = LJ_code
-		  nbpw(nbpw_pair)%cgp_pair = nbpw_cgp_pair
-		  !write(*,'(a, i8, a, i7)') 'pw-pair ', nbpw_pair, ' belongs to charge group ' , nbpw(nbpw_pair)%cgp_pair
-		end do jaloop
+                  ! add the pair
+                  nbpw_pair = nbpw_pair + 1
+                  nbpw(nbpw_pair)%i = i
+                  nbpw(nbpw_pair)%j = ja 
+                  nbpw(nbpw_pair)%ljcod = lj_code
+                  nbpw(nbpw_pair)%cgp_pair = nbpw_cgp_pair
+                  !write(*,'(a, i8, a, i7)') 'pw-pair ', nbpw_pair, ' belongs to charge group ' , nbpw(nbpw_pair)%cgp_pair
+                end do jaloop
       end do ialoop
     end do jgloop
   end do igloop
-#if defined (PROFILING)
+#if defined (profiling)
 profile(4)%time = profile(4)%time + rtime() - start_loop_time
 #endif
 
@@ -6817,24 +6788,24 @@ end subroutine nbpwlist_box
 
 subroutine nbpwlist_lrf
 ! local variables
-integer						:: i,j,ig,iw,jg,ia,ja,i3,j3,is,is3
-real(8)						:: rcut2,r2,field0,field1,field2
-real(8)						:: dr(3)
-integer						:: LJ_code
-real(8)						::	RcLRF2
+integer                                         :: i,j,ig,iw,jg,ia,ja,i3,j3,is,is3
+real(8)                                         :: rcut2,r2,field0,field1,field2
+real(8)                                         :: dr(3)
+integer                                         :: lj_code
+real(8)                                         ::      rclrf2
 
-#if defined (PROFILING)
-real(8)						:: start_loop_time
+#if defined (profiling)
+real(8)                                         :: start_loop_time
 start_loop_time = rtime()
 #endif
 
-!	This routine makes a list of non-bonded solute-solvent atom pairs
-!	excluding Q-atoms.
+!       this routine makes a list of non-bonded solute-solvent atom pairs
+!       excluding q-atoms.
 
 ! reset nbpw_pair
 nbpw_pair = 0
-rcut2 = Rcpw*Rcpw
-RcLRF2 = RcLRF*RcLRF
+rcut2 = rcpw*rcpw
+rclrf2 = rclrf*rclrf
 
 igloop: do ig = calculation_assignment%pw%start, calculation_assignment%pw%end
 ! for every charge group:
@@ -6867,29 +6838,29 @@ ialoop: do ia = cgp(ig)%first, cgp(ig)%last
           ! if out of space then make more space
           if (nbpw_pair .gt. calculation_assignment%pw%max - 3) call reallocate_nonbondlist_pw
 
-jaloop:	  do ja = nat_solute + 3*iw-2, nat_solute + 3*iw
-                ! calculate the LJ_code of the pair
-                LJ_code = ljcod(iac(i),iac(ja))
+jaloop:   do ja = nat_solute + 3*iw-2, nat_solute + 3*iw
+                ! calculate the lj_code of the pair
+                lj_code = ljcod(iac(i),iac(ja))
 
                 ! skip pairs with zero interaction
                 if((crg(i) * crg(ja) == 0.) &
                         .and. &
-                        (iaclib(iac(i))%avdw(LJ_code)*iaclib(iac(ja))%avdw(LJ_code) == 0.) &
+                        (iaclib(iac(i))%avdw(lj_code)*iaclib(iac(ja))%avdw(lj_code) == 0.) &
                         .and. &
-                        (iaclib(iac(i))%bvdw(LJ_code)*iaclib(iac(ja))%bvdw(LJ_code) == 0.)) &
+                        (iaclib(iac(i))%bvdw(lj_code)*iaclib(iac(ja))%bvdw(lj_code) == 0.)) &
                         cycle jaloop
 
                 ! add the pair
                 nbpw_pair = nbpw_pair + 1
                 nbpw(nbpw_pair)%i = i
                 nbpw(nbpw_pair)%j = ja 
-                nbpw(nbpw_pair)%LJcod = LJ_code
-!TMP                nbpw_per_cgp(ig) = nbpw_per_cgp(ig) + 1
+                nbpw(nbpw_pair)%ljcod = lj_code
+!tmp                nbpw_per_cgp(ig) = nbpw_per_cgp(ig) + 1
           end do jaloop
 end do ialoop
 
-elseif(r2 <= RcLRF2) then   
-                ! outside pw-cutoff but inside LRF cut-off: use LRF
+elseif(r2 <= rclrf2) then   
+                ! outside pw-cutoff but inside lrf cut-off: use lrf
 
 ialoop2: do ia = cgp(ig)%first, cgp(ig)%last
   i = cgpatom(ia)
@@ -7015,249 +6986,249 @@ end if
 end do iwloop 
 end do igloop
 
-#if defined (PROFILING)
+#if defined (profiling)
 profile(4)%time = profile(4)%time + rtime() - start_loop_time
 #endif
 
 end subroutine nbpwlist_lrf
-!---------------LRF version of PW PBC-----------------------
+!---------------lrf version of pw pbc-----------------------
 subroutine nbpwlist_box_lrf
   ! local variables
-  integer						:: i,ig,jg,ia,ja,i3,j3,ig_sw,jg_sw
-  real(8)						:: rcut2,r2
-  integer						:: LJ_code
-  real(8)						:: dx, dy, dz
-  ! LRF
-  real(8)						:: RcLRF2, field0, field1, field2
-  real(8)						:: dr(3)
-  integer						:: jg_cgp, j, is3
-  real(8)						:: boxshiftx, boxshifty, boxshiftz
+  integer                                               :: i,ig,jg,ia,ja,i3,j3,ig_sw,jg_sw
+  real(8)                                               :: rcut2,r2
+  integer                                               :: lj_code
+  real(8)                                               :: dx, dy, dz
+  ! lrf
+  real(8)                                               :: rclrf2, field0, field1, field2
+  real(8)                                               :: dr(3)
+  integer                                               :: jg_cgp, j, is3
+  real(8)                                               :: boxshiftx, boxshifty, boxshiftz
 
-#if defined (PROFILING)
+#if defined (profiling)
 real(8)                                         :: start_loop_time
 start_loop_time = rtime()
 #endif
 
-  ! For use with periodic boundary conditions
-  !	This routine makes a list of non-bonded solute-solvent atom pairs
-  !	excluding Q-atoms.
+  ! for use with periodic boundary conditions
+  !     this routine makes a list of non-bonded solute-solvent atom pairs
+  !     excluding q-atoms.
 
   ! reset nbpw_pair
   nbpw_pair = 0
   nbpw_cgp_pair = 0
-  rcut2 = Rcpw*Rcpw
-  RcLRF2 = RcLRF*RcLRF
+  rcut2 = rcpw*rcpw
+  rclrf2 = rclrf*rclrf
 
 igloop: do ig = calculation_assignment%pw%start, calculation_assignment%pw%end
-	! for every charge group:
+        ! for every charge group:
     ig_sw = cgp(ig)%iswitch
     i3 = 3*ig_sw-3
 
 jgloop: do jg = 1, nwat
-	  ! for every water molecule:
+          ! for every water molecule:
 
       jg_sw = nat_solute + 3*jg-2
 
-	  j3 = 3*jg_sw-3
-	  dx = x(i3+1) - x(j3+1)
-	  dy = x(i3+2) - x(j3+2)
-	  dz = x(i3+3) - x(j3+3)
-	  dx = dx - boxlength(1)*nint( dx*inv_boxl(1) )
-	  dy = dy - boxlength(2)*nint( dy*inv_boxl(2) )
-	  dz = dz - boxlength(3)*nint( dz*inv_boxl(3) )
-	  r2 = dx**2 + dy**2 + dz**2
+          j3 = 3*jg_sw-3
+          dx = x(i3+1) - x(j3+1)
+          dy = x(i3+2) - x(j3+2)
+          dz = x(i3+3) - x(j3+3)
+          dx = dx - boxlength(1)*nint( dx*inv_boxl(1) )
+          dy = dy - boxlength(2)*nint( dy*inv_boxl(2) )
+          dz = dz - boxlength(3)*nint( dz*inv_boxl(3) )
+          r2 = dx**2 + dy**2 + dz**2
 
       ! skip water outside cutoff
       if ( r2 .le. rcut2 ) then
 
-	  !inside cut-off
-	  !check if charge group pair list is big enough
-	  if(nbpw_cgp_pair .eq. size(nbpw_cgp, 1) ) call reallocate_nbpw_cgp
+          !inside cut-off
+          !check if charge group pair list is big enough
+          if(nbpw_cgp_pair .eq. size(nbpw_cgp, 1) ) call reallocate_nbpw_cgp
 
-	  nbpw_cgp_pair = nbpw_cgp_pair + 1
-	  nbpw_cgp(nbpw_cgp_pair)%i = ig_sw  !solute
-	  nbpw_cgp(nbpw_cgp_pair)%j = jg_sw  !water
+          nbpw_cgp_pair = nbpw_cgp_pair + 1
+          nbpw_cgp(nbpw_cgp_pair)%i = ig_sw  !solute
+          nbpw_cgp(nbpw_cgp_pair)%j = jg_sw  !water
 
 ialoop: do ia = cgp(ig)%first, cgp(ig)%last
-	      ! for every atom in the charge group:
+              ! for every atom in the charge group:
 
-		  ! find the atom index of the atom in the charge group
+                  ! find the atom index of the atom in the charge group
           i = cgpatom(ia)
 
-          !	skip q-atoms
-		  if ( iqatom(i)/=0 ) cycle ialoop
+          !     skip q-atoms
+                  if ( iqatom(i)/=0 ) cycle ialoop
 
-		  ! if out of space then make more space
-		  if (nbpw_pair .gt. calculation_assignment%pw%max - 3) call reallocate_nonbondlist_pw
+                  ! if out of space then make more space
+                  if (nbpw_pair .gt. calculation_assignment%pw%max - 3) call reallocate_nonbondlist_pw
                    
-jaloop:	  do ja = nat_solute + 3*jg-2, nat_solute + 3*jg
-  		    ! for every atom of the water molecule:
+jaloop:   do ja = nat_solute + 3*jg-2, nat_solute + 3*jg
+                    ! for every atom of the water molecule:
 
-		    ! calculate LJ_code for the pair
-		    LJ_code = ljcod(iac(i),iac(ja))
+                    ! calculate lj_code for the pair
+                    lj_code = ljcod(iac(i),iac(ja))
 
-		    ! skip pairs with zero interaction
-		    if((crg(i) * crg(ja) == 0.) &
-  			    .and. &
-			    (iaclib(iac(i))%avdw(LJ_code)*iaclib(iac(ja))%avdw(LJ_code) == 0.) &
-			    .and. &
-			    (iaclib(iac(i))%bvdw(LJ_code)*iaclib(iac(ja))%bvdw(LJ_code) == 0.)) &
-			    cycle jaloop
+                    ! skip pairs with zero interaction
+                    if((crg(i) * crg(ja) == 0.) &
+                            .and. &
+                            (iaclib(iac(i))%avdw(lj_code)*iaclib(iac(ja))%avdw(lj_code) == 0.) &
+                            .and. &
+                            (iaclib(iac(i))%bvdw(lj_code)*iaclib(iac(ja))%bvdw(lj_code) == 0.)) &
+                            cycle jaloop
 
-		    ! add the pair
-		    nbpw_pair = nbpw_pair + 1
-		    nbpw(nbpw_pair)%i = i
-		    nbpw(nbpw_pair)%j = ja 
-		    nbpw(nbpw_pair)%LJcod = LJ_code
-		    nbpw(nbpw_pair)%cgp_pair = nbpw_cgp_pair
-		    !write(*,'(a, i8, a, i7)') 'pw-pair ', nbpw_pair, ' belongs to charge group ' , nbpw(nbpw_pair)%cgp_pair
-		  end do jaloop
+                    ! add the pair
+                    nbpw_pair = nbpw_pair + 1
+                    nbpw(nbpw_pair)%i = i
+                    nbpw(nbpw_pair)%j = ja 
+                    nbpw(nbpw_pair)%ljcod = lj_code
+                    nbpw(nbpw_pair)%cgp_pair = nbpw_cgp_pair
+                    !write(*,'(a, i8, a, i7)') 'pw-pair ', nbpw_pair, ' belongs to charge group ' , nbpw(nbpw_pair)%cgp_pair
+                  end do jaloop
         end do ialoop
 
-      elseif(r2 <= RcLRF2) then   
-                ! outside pw-cutoff but inside LRF cut-off: use LRF
-		!solut : solvent
-		jg_cgp = iwhich_cgp(jg_sw)
-		
-		boxshiftx = x(i3+1) - lrf(jg_cgp)%cgp_cent(1)
-		boxshifty = x(i3+2) - lrf(jg_cgp)%cgp_cent(2)
-		boxshiftz = x(i3+3) - lrf(jg_cgp)%cgp_cent(3)
+      elseif(r2 <= rclrf2) then   
+                ! outside pw-cutoff but inside lrf cut-off: use lrf
+                !solut : solvent
+                jg_cgp = iwhich_cgp(jg_sw)
+                
+                boxshiftx = x(i3+1) - lrf(jg_cgp)%cgp_cent(1)
+                boxshifty = x(i3+2) - lrf(jg_cgp)%cgp_cent(2)
+                boxshiftz = x(i3+3) - lrf(jg_cgp)%cgp_cent(3)
 
-		boxshiftx = boxlength(1)*nint( boxshiftx*inv_boxl(1) )
-		boxshifty = boxlength(2)*nint( boxshifty*inv_boxl(2) )
-		boxshiftz = boxlength(3)*nint( boxshiftz*inv_boxl(3) )
+                boxshiftx = boxlength(1)*nint( boxshiftx*inv_boxl(1) )
+                boxshifty = boxlength(2)*nint( boxshifty*inv_boxl(2) )
+                boxshiftz = boxlength(3)*nint( boxshiftz*inv_boxl(3) )
 
 ialoop2: do ia = cgp(ig)%first, cgp(ig)%last
           i = cgpatom(ia)
 
           ! skip q-atoms
           if ( iqatom(i)/=0 ) cycle
-		  is3 = i*3-3
-		  
-		  !jg = ncgp + iw
+                  is3 = i*3-3
+                  
+                  !jg = ncgp + iw
           
-		  ! calculate dr and (d)r2
-		  dr(1) = x(is3+1) - lrf(jg_cgp)%cgp_cent(1) - boxshiftx
-		  dr(2) = x(is3+2) - lrf(jg_cgp)%cgp_cent(2) - boxshifty
-		  dr(3) = x(is3+3) - lrf(jg_cgp)%cgp_cent(3) - boxshiftz
-	   	  		  	  	
-		  r2 = dr(1)*dr(1) + dr(2)*dr(2) + dr(3)*dr(3)
+                  ! calculate dr and (d)r2
+                  dr(1) = x(is3+1) - lrf(jg_cgp)%cgp_cent(1) - boxshiftx
+                  dr(2) = x(is3+2) - lrf(jg_cgp)%cgp_cent(2) - boxshifty
+                  dr(3) = x(is3+3) - lrf(jg_cgp)%cgp_cent(3) - boxshiftz
+                                                
+                  r2 = dr(1)*dr(1) + dr(2)*dr(2) + dr(3)*dr(3)
 
           ! calculate lrf parameters for the charge group
-		  field0=crg(i)/(r2*sqrt(r2))
-		  lrf(jg_cgp)%phi0=lrf(jg_cgp)%phi0+field0*r2
-		  lrf(jg_cgp)%phi1(1)=lrf(jg_cgp)%phi1(1)-field0*dr(1)
-		  lrf(jg_cgp)%phi1(2)=lrf(jg_cgp)%phi1(2)-field0*dr(2)
+                  field0=crg(i)/(r2*sqrt(r2))
+                  lrf(jg_cgp)%phi0=lrf(jg_cgp)%phi0+field0*r2
+                  lrf(jg_cgp)%phi1(1)=lrf(jg_cgp)%phi1(1)-field0*dr(1)
+                  lrf(jg_cgp)%phi1(2)=lrf(jg_cgp)%phi1(2)-field0*dr(2)
           lrf(jg_cgp)%phi1(3)=lrf(jg_cgp)%phi1(3)-field0*dr(3)
-		  field1=3.*field0/r2
-		  lrf(jg_cgp)%phi2(1)=lrf(jg_cgp)%phi2(1)+field1*dr(1)*dr(1)-field0
-		  lrf(jg_cgp)%phi2(2)=lrf(jg_cgp)%phi2(2)+field1*dr(1)*dr(2)
-		  lrf(jg_cgp)%phi2(3)=lrf(jg_cgp)%phi2(3)+field1*dr(1)*dr(3)
-		  lrf(jg_cgp)%phi2(4)=lrf(jg_cgp)%phi2(4)+field1*dr(2)*dr(1)
-		  lrf(jg_cgp)%phi2(5)=lrf(jg_cgp)%phi2(5)+field1*dr(2)*dr(2)-field0
-		  lrf(jg_cgp)%phi2(6)=lrf(jg_cgp)%phi2(6)+field1*dr(2)*dr(3)
-		  lrf(jg_cgp)%phi2(7)=lrf(jg_cgp)%phi2(7)+field1*dr(3)*dr(1)
-		  lrf(jg_cgp)%phi2(8)=lrf(jg_cgp)%phi2(8)+field1*dr(3)*dr(2)
-		  lrf(jg_cgp)%phi2(9)=lrf(jg_cgp)%phi2(9)+field1*dr(3)*dr(3)-field0
-		  field2=-field1/r2
-		  lrf(jg_cgp)%phi3(1 )=lrf(jg_cgp)%phi3(1 )+field2*(5.*dr(1)*dr(1)*dr(1)-r2*3.*dr(1))
-		  lrf(jg_cgp)%phi3(2 )=lrf(jg_cgp)%phi3(2 )+field2*(5.*dr(1)*dr(1)*dr(2)-r2*dr(2))
-		  lrf(jg_cgp)%phi3(3 )=lrf(jg_cgp)%phi3(3 )+field2*(5.*dr(1)*dr(1)*dr(3)-r2*dr(3))
-		  lrf(jg_cgp)%phi3(4 )=lrf(jg_cgp)%phi3(4 )+field2*(5.*dr(1)*dr(2)*dr(1)-r2*dr(2))
-		  lrf(jg_cgp)%phi3(5 )=lrf(jg_cgp)%phi3(5 )+field2*(5.*dr(1)*dr(2)*dr(2)-r2*dr(1))
-		  lrf(jg_cgp)%phi3(6 )=lrf(jg_cgp)%phi3(6 )+field2*(5.*dr(1)*dr(2)*dr(3))
-		  lrf(jg_cgp)%phi3(7 )=lrf(jg_cgp)%phi3(7 )+field2*(5.*dr(1)*dr(3)*dr(1)-r2*dr(3))
-		  lrf(jg_cgp)%phi3(8 )=lrf(jg_cgp)%phi3(8 )+field2*(5.*dr(1)*dr(3)*dr(2))
-		  lrf(jg_cgp)%phi3(9 )=lrf(jg_cgp)%phi3(9 )+field2*(5.*dr(1)*dr(3)*dr(3)-r2*dr(1))
-		  lrf(jg_cgp)%phi3(10)=lrf(jg_cgp)%phi3(10)+field2*(5.*dr(2)*dr(1)*dr(1)-r2*dr(2))
-		  lrf(jg_cgp)%phi3(11)=lrf(jg_cgp)%phi3(11)+field2*(5.*dr(2)*dr(1)*dr(2)-r2*dr(1))
-		  lrf(jg_cgp)%phi3(12)=lrf(jg_cgp)%phi3(12)+field2*(5.*dr(2)*dr(1)*dr(3))
-		  lrf(jg_cgp)%phi3(13)=lrf(jg_cgp)%phi3(13)+field2*(5.*dr(2)*dr(2)*dr(1)-r2*dr(1))
-		  lrf(jg_cgp)%phi3(14)=lrf(jg_cgp)%phi3(14)+field2*(5.*dr(2)*dr(2)*dr(2)-r2*3.*dr(2))
-		  lrf(jg_cgp)%phi3(15)=lrf(jg_cgp)%phi3(15)+field2*(5.*dr(2)*dr(2)*dr(3)-r2*dr(3))
-		  lrf(jg_cgp)%phi3(16)=lrf(jg_cgp)%phi3(16)+field2*(5.*dr(2)*dr(3)*dr(1))
-		  lrf(jg_cgp)%phi3(17)=lrf(jg_cgp)%phi3(17)+field2*(5.*dr(2)*dr(3)*dr(2)-r2*dr(3))
-		  lrf(jg_cgp)%phi3(18)=lrf(jg_cgp)%phi3(18)+field2*(5.*dr(2)*dr(3)*dr(3)-r2*dr(2))
-		  lrf(jg_cgp)%phi3(19)=lrf(jg_cgp)%phi3(19)+field2*(5.*dr(3)*dr(1)*dr(1)-r2*dr(3))
-		  lrf(jg_cgp)%phi3(20)=lrf(jg_cgp)%phi3(20)+field2*(5.*dr(3)*dr(1)*dr(2))
-		  lrf(jg_cgp)%phi3(21)=lrf(jg_cgp)%phi3(21)+field2*(5.*dr(3)*dr(1)*dr(3)-r2*dr(1))
-		  lrf(jg_cgp)%phi3(22)=lrf(jg_cgp)%phi3(22)+field2*(5.*dr(3)*dr(2)*dr(1))
-		  lrf(jg_cgp)%phi3(23)=lrf(jg_cgp)%phi3(23)+field2*(5.*dr(3)*dr(2)*dr(2)-r2*dr(3))
-		  lrf(jg_cgp)%phi3(24)=lrf(jg_cgp)%phi3(24)+field2*(5.*dr(3)*dr(2)*dr(3)-r2*dr(2))
-		  lrf(jg_cgp)%phi3(25)=lrf(jg_cgp)%phi3(25)+field2*(5.*dr(3)*dr(3)*dr(1)-r2*dr(1))
-		  lrf(jg_cgp)%phi3(26)=lrf(jg_cgp)%phi3(26)+field2*(5.*dr(3)*dr(3)*dr(2)-r2*dr(2))
-		  lrf(jg_cgp)%phi3(27)=lrf(jg_cgp)%phi3(27)+field2*(5.*dr(3)*dr(3)*dr(3)-r2*3.*dr(3))
-		 enddo ialoop2
+                  field1=3.*field0/r2
+                  lrf(jg_cgp)%phi2(1)=lrf(jg_cgp)%phi2(1)+field1*dr(1)*dr(1)-field0
+                  lrf(jg_cgp)%phi2(2)=lrf(jg_cgp)%phi2(2)+field1*dr(1)*dr(2)
+                  lrf(jg_cgp)%phi2(3)=lrf(jg_cgp)%phi2(3)+field1*dr(1)*dr(3)
+                  lrf(jg_cgp)%phi2(4)=lrf(jg_cgp)%phi2(4)+field1*dr(2)*dr(1)
+                  lrf(jg_cgp)%phi2(5)=lrf(jg_cgp)%phi2(5)+field1*dr(2)*dr(2)-field0
+                  lrf(jg_cgp)%phi2(6)=lrf(jg_cgp)%phi2(6)+field1*dr(2)*dr(3)
+                  lrf(jg_cgp)%phi2(7)=lrf(jg_cgp)%phi2(7)+field1*dr(3)*dr(1)
+                  lrf(jg_cgp)%phi2(8)=lrf(jg_cgp)%phi2(8)+field1*dr(3)*dr(2)
+                  lrf(jg_cgp)%phi2(9)=lrf(jg_cgp)%phi2(9)+field1*dr(3)*dr(3)-field0
+                  field2=-field1/r2
+                  lrf(jg_cgp)%phi3(1 )=lrf(jg_cgp)%phi3(1 )+field2*(5.*dr(1)*dr(1)*dr(1)-r2*3.*dr(1))
+                  lrf(jg_cgp)%phi3(2 )=lrf(jg_cgp)%phi3(2 )+field2*(5.*dr(1)*dr(1)*dr(2)-r2*dr(2))
+                  lrf(jg_cgp)%phi3(3 )=lrf(jg_cgp)%phi3(3 )+field2*(5.*dr(1)*dr(1)*dr(3)-r2*dr(3))
+                  lrf(jg_cgp)%phi3(4 )=lrf(jg_cgp)%phi3(4 )+field2*(5.*dr(1)*dr(2)*dr(1)-r2*dr(2))
+                  lrf(jg_cgp)%phi3(5 )=lrf(jg_cgp)%phi3(5 )+field2*(5.*dr(1)*dr(2)*dr(2)-r2*dr(1))
+                  lrf(jg_cgp)%phi3(6 )=lrf(jg_cgp)%phi3(6 )+field2*(5.*dr(1)*dr(2)*dr(3))
+                  lrf(jg_cgp)%phi3(7 )=lrf(jg_cgp)%phi3(7 )+field2*(5.*dr(1)*dr(3)*dr(1)-r2*dr(3))
+                  lrf(jg_cgp)%phi3(8 )=lrf(jg_cgp)%phi3(8 )+field2*(5.*dr(1)*dr(3)*dr(2))
+                  lrf(jg_cgp)%phi3(9 )=lrf(jg_cgp)%phi3(9 )+field2*(5.*dr(1)*dr(3)*dr(3)-r2*dr(1))
+                  lrf(jg_cgp)%phi3(10)=lrf(jg_cgp)%phi3(10)+field2*(5.*dr(2)*dr(1)*dr(1)-r2*dr(2))
+                  lrf(jg_cgp)%phi3(11)=lrf(jg_cgp)%phi3(11)+field2*(5.*dr(2)*dr(1)*dr(2)-r2*dr(1))
+                  lrf(jg_cgp)%phi3(12)=lrf(jg_cgp)%phi3(12)+field2*(5.*dr(2)*dr(1)*dr(3))
+                  lrf(jg_cgp)%phi3(13)=lrf(jg_cgp)%phi3(13)+field2*(5.*dr(2)*dr(2)*dr(1)-r2*dr(1))
+                  lrf(jg_cgp)%phi3(14)=lrf(jg_cgp)%phi3(14)+field2*(5.*dr(2)*dr(2)*dr(2)-r2*3.*dr(2))
+                  lrf(jg_cgp)%phi3(15)=lrf(jg_cgp)%phi3(15)+field2*(5.*dr(2)*dr(2)*dr(3)-r2*dr(3))
+                  lrf(jg_cgp)%phi3(16)=lrf(jg_cgp)%phi3(16)+field2*(5.*dr(2)*dr(3)*dr(1))
+                  lrf(jg_cgp)%phi3(17)=lrf(jg_cgp)%phi3(17)+field2*(5.*dr(2)*dr(3)*dr(2)-r2*dr(3))
+                  lrf(jg_cgp)%phi3(18)=lrf(jg_cgp)%phi3(18)+field2*(5.*dr(2)*dr(3)*dr(3)-r2*dr(2))
+                  lrf(jg_cgp)%phi3(19)=lrf(jg_cgp)%phi3(19)+field2*(5.*dr(3)*dr(1)*dr(1)-r2*dr(3))
+                  lrf(jg_cgp)%phi3(20)=lrf(jg_cgp)%phi3(20)+field2*(5.*dr(3)*dr(1)*dr(2))
+                  lrf(jg_cgp)%phi3(21)=lrf(jg_cgp)%phi3(21)+field2*(5.*dr(3)*dr(1)*dr(3)-r2*dr(1))
+                  lrf(jg_cgp)%phi3(22)=lrf(jg_cgp)%phi3(22)+field2*(5.*dr(3)*dr(2)*dr(1))
+                  lrf(jg_cgp)%phi3(23)=lrf(jg_cgp)%phi3(23)+field2*(5.*dr(3)*dr(2)*dr(2)-r2*dr(3))
+                  lrf(jg_cgp)%phi3(24)=lrf(jg_cgp)%phi3(24)+field2*(5.*dr(3)*dr(2)*dr(3)-r2*dr(2))
+                  lrf(jg_cgp)%phi3(25)=lrf(jg_cgp)%phi3(25)+field2*(5.*dr(3)*dr(3)*dr(1)-r2*dr(1))
+                  lrf(jg_cgp)%phi3(26)=lrf(jg_cgp)%phi3(26)+field2*(5.*dr(3)*dr(3)*dr(2)-r2*dr(2))
+                  lrf(jg_cgp)%phi3(27)=lrf(jg_cgp)%phi3(27)+field2*(5.*dr(3)*dr(3)*dr(3)-r2*3.*dr(3))
+                 enddo ialoop2
 
-		!solvent : solut	
-		boxshiftx = x(j3+1) - lrf(ig)%cgp_cent(1)
-		boxshifty = x(j3+2) - lrf(ig)%cgp_cent(2)
-		boxshiftz = x(j3+3) - lrf(ig)%cgp_cent(3)
+                !solvent : solut        
+                boxshiftx = x(j3+1) - lrf(ig)%cgp_cent(1)
+                boxshifty = x(j3+2) - lrf(ig)%cgp_cent(2)
+                boxshiftz = x(j3+3) - lrf(ig)%cgp_cent(3)
 
-		boxshiftx = boxlength(1)*nint( boxshiftx*inv_boxl(1) )
-		boxshifty = boxlength(2)*nint( boxshifty*inv_boxl(2) )
-		boxshiftz = boxlength(3)*nint( boxshiftz*inv_boxl(3) )
+                boxshiftx = boxlength(1)*nint( boxshiftx*inv_boxl(1) )
+                boxshifty = boxlength(2)*nint( boxshifty*inv_boxl(2) )
+                boxshiftz = boxlength(3)*nint( boxshiftz*inv_boxl(3) )
 
 jaloop2: do ja = 1, 3
-		  j = nat_solute + 3*jg-3 + ja
-		  j3 = j*3-3
+                  j = nat_solute + 3*jg-3 + ja
+                  j3 = j*3-3
 
-				  ! calculate dr and (d)r2
-		  dr(1) = x(j3+1) - lrf(ig)%cgp_cent(1) - boxshiftx
-		  dr(2) = x(j3+2) - lrf(ig)%cgp_cent(2) - boxshifty
-		  dr(3) = x(j3+3) - lrf(ig)%cgp_cent(3) - boxshiftz
-		  
-	      r2 = dr(1)*dr(1) + dr(2)*dr(2) + dr(3)*dr(3)
+                                  ! calculate dr and (d)r2
+                  dr(1) = x(j3+1) - lrf(ig)%cgp_cent(1) - boxshiftx
+                  dr(2) = x(j3+2) - lrf(ig)%cgp_cent(2) - boxshifty
+                  dr(3) = x(j3+3) - lrf(ig)%cgp_cent(3) - boxshiftz
+                  
+              r2 = dr(1)*dr(1) + dr(2)*dr(2) + dr(3)*dr(3)
 
-				  ! calculate lrf for the water molecule
-		  field0=crg(j)/(r2*sqrt(r2))
-		  lrf(ig)%phi0=lrf(ig)%phi0+field0*r2
-		  lrf(ig)%phi1(1)=lrf(ig)%phi1(1)-field0*dr(1)
-		  lrf(ig)%phi1(2)=lrf(ig)%phi1(2)-field0*dr(2)
-		  lrf(ig)%phi1(3)=lrf(ig)%phi1(3)-field0*dr(3)
-		  field1=3.*field0/r2
-		  lrf(ig)%phi2(1)=lrf(ig)%phi2(1)+field1*dr(1)*dr(1)-field0
-		  lrf(ig)%phi2(2)=lrf(ig)%phi2(2)+field1*dr(1)*dr(2)
-		  lrf(ig)%phi2(3)=lrf(ig)%phi2(3)+field1*dr(1)*dr(3)
-		  lrf(ig)%phi2(4)=lrf(ig)%phi2(4)+field1*dr(2)*dr(1)
-		  lrf(ig)%phi2(5)=lrf(ig)%phi2(5)+field1*dr(2)*dr(2)-field0
-		  lrf(ig)%phi2(6)=lrf(ig)%phi2(6)+field1*dr(2)*dr(3)
-		  lrf(ig)%phi2(7)=lrf(ig)%phi2(7)+field1*dr(3)*dr(1)
-		  lrf(ig)%phi2(8)=lrf(ig)%phi2(8)+field1*dr(3)*dr(2)
-		  lrf(ig)%phi2(9)=lrf(ig)%phi2(9)+field1*dr(3)*dr(3)-field0
-		  field2=-field1/r2
-		  lrf(ig)%phi3(1 )=lrf(ig)%phi3(1 )+field2*(5.*dr(1)*dr(1)*dr(1)-r2*3.*dr(1))
-		  lrf(ig)%phi3(2 )=lrf(ig)%phi3(2 )+field2*(5.*dr(1)*dr(1)*dr(2)-r2*dr(2))
-		  lrf(ig)%phi3(3 )=lrf(ig)%phi3(3 )+field2*(5.*dr(1)*dr(1)*dr(3)-r2*dr(3))
-		  lrf(ig)%phi3(4 )=lrf(ig)%phi3(4 )+field2*(5.*dr(1)*dr(2)*dr(1)-r2*dr(2))
-		  lrf(ig)%phi3(5 )=lrf(ig)%phi3(5 )+field2*(5.*dr(1)*dr(2)*dr(2)-r2*dr(1))
-		  lrf(ig)%phi3(6 )=lrf(ig)%phi3(6 )+field2*(5.*dr(1)*dr(2)*dr(3))
-		  lrf(ig)%phi3(7 )=lrf(ig)%phi3(7 )+field2*(5.*dr(1)*dr(3)*dr(1)-r2*dr(3))
-		  lrf(ig)%phi3(8 )=lrf(ig)%phi3(8 )+field2*(5.*dr(1)*dr(3)*dr(2))
-		  lrf(ig)%phi3(9 )=lrf(ig)%phi3(9 )+field2*(5.*dr(1)*dr(3)*dr(3)-r2*dr(1))
-		  lrf(ig)%phi3(10)=lrf(ig)%phi3(10)+field2*(5.*dr(2)*dr(1)*dr(1)-r2*dr(2))
-		  lrf(ig)%phi3(11)=lrf(ig)%phi3(11)+field2*(5.*dr(2)*dr(1)*dr(2)-r2*dr(1))
-		  lrf(ig)%phi3(12)=lrf(ig)%phi3(12)+field2*(5.*dr(2)*dr(1)*dr(3))
-		  lrf(ig)%phi3(13)=lrf(ig)%phi3(13)+field2*(5.*dr(2)*dr(2)*dr(1)-r2*dr(1))
-		  lrf(ig)%phi3(14)=lrf(ig)%phi3(14)+field2*(5.*dr(2)*dr(2)*dr(2)-r2*3.*dr(2))
-		  lrf(ig)%phi3(15)=lrf(ig)%phi3(15)+field2*(5.*dr(2)*dr(2)*dr(3)-r2*dr(3))
-		  lrf(ig)%phi3(16)=lrf(ig)%phi3(16)+field2*(5.*dr(2)*dr(3)*dr(1))
-		  lrf(ig)%phi3(17)=lrf(ig)%phi3(17)+field2*(5.*dr(2)*dr(3)*dr(2)-r2*dr(3))
-		  lrf(ig)%phi3(18)=lrf(ig)%phi3(18)+field2*(5.*dr(2)*dr(3)*dr(3)-r2*dr(2))
-		  lrf(ig)%phi3(19)=lrf(ig)%phi3(19)+field2*(5.*dr(3)*dr(1)*dr(1)-r2*dr(3))
-		  lrf(ig)%phi3(20)=lrf(ig)%phi3(20)+field2*(5.*dr(3)*dr(1)*dr(2))
-		  lrf(ig)%phi3(21)=lrf(ig)%phi3(21)+field2*(5.*dr(3)*dr(1)*dr(3)-r2*dr(1))
-		  lrf(ig)%phi3(22)=lrf(ig)%phi3(22)+field2*(5.*dr(3)*dr(2)*dr(1))
-		  lrf(ig)%phi3(23)=lrf(ig)%phi3(23)+field2*(5.*dr(3)*dr(2)*dr(2)-r2*dr(3))
-		  lrf(ig)%phi3(24)=lrf(ig)%phi3(24)+field2*(5.*dr(3)*dr(2)*dr(3)-r2*dr(2))
-		  lrf(ig)%phi3(25)=lrf(ig)%phi3(25)+field2*(5.*dr(3)*dr(3)*dr(1)-r2*dr(1))
-		  lrf(ig)%phi3(26)=lrf(ig)%phi3(26)+field2*(5.*dr(3)*dr(3)*dr(2)-r2*dr(2))
-		  lrf(ig)%phi3(27)=lrf(ig)%phi3(27)+field2*(5.*dr(3)*dr(3)*dr(3)-r2*3.*dr(3))
+                                  ! calculate lrf for the water molecule
+                  field0=crg(j)/(r2*sqrt(r2))
+                  lrf(ig)%phi0=lrf(ig)%phi0+field0*r2
+                  lrf(ig)%phi1(1)=lrf(ig)%phi1(1)-field0*dr(1)
+                  lrf(ig)%phi1(2)=lrf(ig)%phi1(2)-field0*dr(2)
+                  lrf(ig)%phi1(3)=lrf(ig)%phi1(3)-field0*dr(3)
+                  field1=3.*field0/r2
+                  lrf(ig)%phi2(1)=lrf(ig)%phi2(1)+field1*dr(1)*dr(1)-field0
+                  lrf(ig)%phi2(2)=lrf(ig)%phi2(2)+field1*dr(1)*dr(2)
+                  lrf(ig)%phi2(3)=lrf(ig)%phi2(3)+field1*dr(1)*dr(3)
+                  lrf(ig)%phi2(4)=lrf(ig)%phi2(4)+field1*dr(2)*dr(1)
+                  lrf(ig)%phi2(5)=lrf(ig)%phi2(5)+field1*dr(2)*dr(2)-field0
+                  lrf(ig)%phi2(6)=lrf(ig)%phi2(6)+field1*dr(2)*dr(3)
+                  lrf(ig)%phi2(7)=lrf(ig)%phi2(7)+field1*dr(3)*dr(1)
+                  lrf(ig)%phi2(8)=lrf(ig)%phi2(8)+field1*dr(3)*dr(2)
+                  lrf(ig)%phi2(9)=lrf(ig)%phi2(9)+field1*dr(3)*dr(3)-field0
+                  field2=-field1/r2
+                  lrf(ig)%phi3(1 )=lrf(ig)%phi3(1 )+field2*(5.*dr(1)*dr(1)*dr(1)-r2*3.*dr(1))
+                  lrf(ig)%phi3(2 )=lrf(ig)%phi3(2 )+field2*(5.*dr(1)*dr(1)*dr(2)-r2*dr(2))
+                  lrf(ig)%phi3(3 )=lrf(ig)%phi3(3 )+field2*(5.*dr(1)*dr(1)*dr(3)-r2*dr(3))
+                  lrf(ig)%phi3(4 )=lrf(ig)%phi3(4 )+field2*(5.*dr(1)*dr(2)*dr(1)-r2*dr(2))
+                  lrf(ig)%phi3(5 )=lrf(ig)%phi3(5 )+field2*(5.*dr(1)*dr(2)*dr(2)-r2*dr(1))
+                  lrf(ig)%phi3(6 )=lrf(ig)%phi3(6 )+field2*(5.*dr(1)*dr(2)*dr(3))
+                  lrf(ig)%phi3(7 )=lrf(ig)%phi3(7 )+field2*(5.*dr(1)*dr(3)*dr(1)-r2*dr(3))
+                  lrf(ig)%phi3(8 )=lrf(ig)%phi3(8 )+field2*(5.*dr(1)*dr(3)*dr(2))
+                  lrf(ig)%phi3(9 )=lrf(ig)%phi3(9 )+field2*(5.*dr(1)*dr(3)*dr(3)-r2*dr(1))
+                  lrf(ig)%phi3(10)=lrf(ig)%phi3(10)+field2*(5.*dr(2)*dr(1)*dr(1)-r2*dr(2))
+                  lrf(ig)%phi3(11)=lrf(ig)%phi3(11)+field2*(5.*dr(2)*dr(1)*dr(2)-r2*dr(1))
+                  lrf(ig)%phi3(12)=lrf(ig)%phi3(12)+field2*(5.*dr(2)*dr(1)*dr(3))
+                  lrf(ig)%phi3(13)=lrf(ig)%phi3(13)+field2*(5.*dr(2)*dr(2)*dr(1)-r2*dr(1))
+                  lrf(ig)%phi3(14)=lrf(ig)%phi3(14)+field2*(5.*dr(2)*dr(2)*dr(2)-r2*3.*dr(2))
+                  lrf(ig)%phi3(15)=lrf(ig)%phi3(15)+field2*(5.*dr(2)*dr(2)*dr(3)-r2*dr(3))
+                  lrf(ig)%phi3(16)=lrf(ig)%phi3(16)+field2*(5.*dr(2)*dr(3)*dr(1))
+                  lrf(ig)%phi3(17)=lrf(ig)%phi3(17)+field2*(5.*dr(2)*dr(3)*dr(2)-r2*dr(3))
+                  lrf(ig)%phi3(18)=lrf(ig)%phi3(18)+field2*(5.*dr(2)*dr(3)*dr(3)-r2*dr(2))
+                  lrf(ig)%phi3(19)=lrf(ig)%phi3(19)+field2*(5.*dr(3)*dr(1)*dr(1)-r2*dr(3))
+                  lrf(ig)%phi3(20)=lrf(ig)%phi3(20)+field2*(5.*dr(3)*dr(1)*dr(2))
+                  lrf(ig)%phi3(21)=lrf(ig)%phi3(21)+field2*(5.*dr(3)*dr(1)*dr(3)-r2*dr(1))
+                  lrf(ig)%phi3(22)=lrf(ig)%phi3(22)+field2*(5.*dr(3)*dr(2)*dr(1))
+                  lrf(ig)%phi3(23)=lrf(ig)%phi3(23)+field2*(5.*dr(3)*dr(2)*dr(2)-r2*dr(3))
+                  lrf(ig)%phi3(24)=lrf(ig)%phi3(24)+field2*(5.*dr(3)*dr(2)*dr(3)-r2*dr(2))
+                  lrf(ig)%phi3(25)=lrf(ig)%phi3(25)+field2*(5.*dr(3)*dr(3)*dr(1)-r2*dr(1))
+                  lrf(ig)%phi3(26)=lrf(ig)%phi3(26)+field2*(5.*dr(3)*dr(3)*dr(2)-r2*dr(2))
+                  lrf(ig)%phi3(27)=lrf(ig)%phi3(27)+field2*(5.*dr(3)*dr(3)*dr(3)-r2*3.*dr(3))
          enddo jaloop2
       end if
     end do jgloop
   end do igloop
-#if defined (PROFILING)
+#if defined (profiling)
 profile(4)%time = profile(4)%time + rtime() - start_loop_time
 #endif    
 
@@ -7265,7 +7236,7 @@ end subroutine nbpwlist_box_lrf
 !-------------------------------------------------------------------------------------
 subroutine make_qconn
 
-integer						::	 i, iq, is, ia
+integer                                         ::       i, iq, is, ia
 
 allocate(qconn(nstates,nat_solute, nqat))
 qconn(:,:,:) = 9
@@ -7309,9 +7280,9 @@ end subroutine make_qconn
 
 recursive subroutine find_bonded(origin, current, level, state)
 !args
-integer, intent(in)			::	origin, current, level, state
+integer, intent(in)                     ::      origin, current, level, state
 !locals
-integer						::	b, newcurrent, newlevel
+integer                                         ::      b, newcurrent, newlevel
 
 !find q-atom connectivity using the bond list and the q-bond list
 !shaken bonds (code -1) must be taken into account, but not 
@@ -7370,11 +7341,11 @@ end subroutine find_bonded
 
 integer function nbqq_count()
 
-integer						::	iq, j, jq, is
+integer                                         ::      iq, j, jq, is
 
 nbqq_pair(:) = 0
 
-!count Q-Q
+!count q-q
 do iq = 1, nqat - 1
         do jq = iq + 1, nqat
                 do is = 1, nstates
@@ -7384,11 +7355,11 @@ do iq = 1, nqat - 1
                 end do
         end do
 end do
-!count Q-non-Q
+!count q-non-q
 do j = 1, nat_solute
         if(iqatom(j) > 0) cycle
         if(any(qconn(:,j,:) <= 3)) then 
-                !bonded or angled to at least one Q-atom in any state
+                !bonded or angled to at least one q-atom in any state
                 do iq = 1, nqat
                         do is = 1, nstates
                                 if(qconn(is, j, iq) >= 4) then
@@ -7405,13 +7376,13 @@ end function nbqq_count
 !---------------------------------------------------------------------------------
 
 subroutine nbqqlist
-integer						::	iq, j, jq, is, i, k,l
+integer                                         ::      iq, j, jq, is, i, k,l
 real(8)                     :: el_scale
 logical                     :: set
 
 nbqq_pair(:) = 0
 
-!list Q-Q
+!list q-q
 do iq = 1, nqat - 1
    do jq = iq + 1, nqat
        j = iqseq(jq)
@@ -7423,47 +7394,47 @@ do iq = 1, nqat - 1
                    nbqq(nbqq_pair(is),is)%jq = jq
 
                    if(qconn(is, j, iq) == 4) then
-                         nbqq(nbqq_pair(is),is)%LJcod = 3
+                         nbqq(nbqq_pair(is),is)%ljcod = 3
                    elseif(.not. qvdw_flag) then
-                         nbqq(nbqq_pair(is),is)%LJcod = ljcod(iac(iqseq(iq)),iac(j))
+                         nbqq(nbqq_pair(is),is)%ljcod = ljcod(iac(iqseq(iq)),iac(j))
                    else
-                         nbqq(nbqq_pair(is),is)%LJcod = 1
+                         nbqq(nbqq_pair(is),is)%ljcod = 1
                          do i = 1, nqexpnb
                            if ((iq == iqexpnb(i) .and.  &
                              jq == jqexpnb(i))  .or. &
                              ( jq == iqexpnb(i) .and. &
                              iq == jqexpnb(i)))  then
-                                  nbqq(nbqq_pair(is),is)%LJcod = 2
+                                  nbqq(nbqq_pair(is),is)%ljcod = 2
                                   exit
                            end if
                          end do
                    end if !if (qconn = 4)
-				   if (nel_scale .eq. 0) then
+                                   if (nel_scale .eq. 0) then
                      nbqq(nbqq_pair(is),is)%el_scale = 1.0
-				   else
-  				     set=.false.
-				     do i=1,nel_scale
+                                   else
+                                     set=.false.
+                                     do i=1,nel_scale
                        k=qq_el_scale(i)%iqat
                        l=qq_el_scale(i)%jqat
                        if ((iq == k .and. jq == l) .or. &
                          (iq == l .and. jq == k)) then
                            nbqq(nbqq_pair(is),is)%el_scale = qq_el_scale(i)%el_scale
-						   set=.true.
-						   exit
+                                                   set=.true.
+                                                   exit
                        end if
                        if (.not. set) nbqq(nbqq_pair(is),is)%el_scale = 1.0
-				     end do
-				   end if
+                                     end do
+                                   end if
            end if !if (qconn > 3)
        end do
    end do
 end do
 
-!list Q-non-Q
+!list q-non-q
 do j = 1, nat_solute
         if(iqatom(j) > 0) cycle
         if(any(qconn(:,j,:) <= 3)) then 
-                !bonded or angled to at least one Q-atom
+                !bonded or angled to at least one q-atom
                 do iq = 1, nqat
                         do is = 1, nstates
                                 if(qconn(is, j, iq) >= 4) then
@@ -7471,13 +7442,13 @@ do j = 1, nat_solute
                                         nbqq(nbqq_pair(is),is)%iq = iq
                                         nbqq(nbqq_pair(is),is)%j = j
                                         nbqq(nbqq_pair(is),is)%jq = 0
-										nbqq(nbqq_pair(is),is)%el_scale=1.0
+                                                                                nbqq(nbqq_pair(is),is)%el_scale=1.0
                                         if(qconn(is, j, iq) == 4) then
-                                                nbqq(nbqq_pair(is),is)%LJcod = 3
+                                                nbqq(nbqq_pair(is),is)%ljcod = 3
                                         elseif(qvdw_flag) then
-                                                nbqq(nbqq_pair(is),is)%LJcod = 1
+                                                nbqq(nbqq_pair(is),is)%ljcod = 1
                                         else
-                                                nbqq(nbqq_pair(is),is)%LJcod = ljcod(iac(iqseq(iq)),iac(j))
+                                                nbqq(nbqq_pair(is),is)%ljcod = ljcod(iac(iqseq(iq)),iac(j))
                                         end if
                                 end if
                         end do
@@ -7488,37 +7459,37 @@ end do
 end subroutine nbqqlist
 
 !-----------------------------------------------------------------------
-!******PWchanged 2001-10-01
+!******pwchanged 2001-10-01
 subroutine nbqp_count(nqp, nqpcgp)
 ! arguments
-integer						:: nqp
-integer						:: nqpcgp(:)
+integer                                         :: nqp
+integer                                         :: nqpcgp(:)
 
 ! local variables
-integer						:: ig,ia,i,j,iq,i3
-real(8)						:: rcut2,r2
+integer                                         :: ig,ia,i,j,iq,i3
+real(8)                                         :: rcut2,r2
 
-!******PWadded variables 2001-10-01
+!******pwadded variables 2001-10-01
 
-real(8)						:: dx, dy, dz
+real(8)                                         :: dx, dy, dz
 
-!	This routine counts non-bonded atom pairs involving
-!	*one* Q-atom and *one* non-Q-atom, where the latter is *not connected*
-!	(meaning not bonded or angled) to any Q-atom.
+!       this routine counts non-bonded atom pairs involving
+!       *one* q-atom and *one* non-q-atom, where the latter is *not connected*
+!       (meaning not bonded or angled) to any q-atom.
 !
-!	( i , j ) pairs correspond to
-!	( iq, j ) with first index being a Q-atom with the *Q-atom numbering*, &
-!	          and the second index is the non-Q-atom.
+!       ( i , j ) pairs correspond to
+!       ( iq, j ) with first index being a q-atom with the *q-atom numbering*, &
+!                 and the second index is the non-q-atom.
 
 
 nqp = 0
-rcut2 = Rcq*Rcq
+rcut2 = rcq*rcq
 
 
 
 if(nqat==0) return
 
-! --- solute - Q-atoms
+! --- solute - q-atoms
 
 igloop: do ig = 1, ncgp_solute
 
@@ -7526,12 +7497,12 @@ nqpcgp(ig) = 0
 
 ! skip if excluded group
 ia = cgp(ig)%iswitch
-if ( .not. use_PBC .and. excl(ia) ) cycle igloop
+if ( .not. use_pbc .and. excl(ia) ) cycle igloop
 i3 = 3*ia-3
 
-!******PWadded if 2001-10-01
+!******pwadded if 2001-10-01
 
-if( .not. use_PBC ) then
+if( .not. use_pbc ) then
 r2 = ( x(i3+1) - xpcent(1) )**2 &
         +( x(i3+2) - xpcent(2) )**2 &
         +( x(i3+3) - xpcent(3) )**2
@@ -7564,37 +7535,37 @@ end do igloop
 end subroutine nbqp_count
 
 !-----------------------------------------------------------------------
-!******PWchanged 2001-10-01
+!******pwchanged 2001-10-01
 subroutine nbqw_count(nqw, nqwmol)
 ! arguments
-integer						:: nqw
-integer						:: nqwmol(:)
+integer                                         :: nqw
+integer                                         :: nqwmol(:)
 
 ! local variables
-integer						:: ig,ia,i,j,iq,i3
-real(8)						:: rcut2,r2
+integer                                         :: ig,ia,i,j,iq,i3
+real(8)                                         :: rcut2,r2
 
-!******PWadded variables
+!******pwadded variables
 
-real(8)						:: dx, dy, dz
+real(8)                                         :: dx, dy, dz
 
-!	This routine counts water molecules that interact with q-atoms
+!       this routine counts water molecules that interact with q-atoms
 nqw = 0
-rcut2 = Rcq*Rcq
+rcut2 = rcq*rcq
 
 
 if(nqat==0) return
 
-! --- solvent - Q-atoms
+! --- solvent - q-atoms
 
 iwloop: do ig = 1, nwat
 nqwmol(ig) = 0
 ia = nat_solute + 3*ig-2
-if(.not. use_PBC .and. excl(ia)) cycle iwloop ! skip excluded waters
+if(.not. use_pbc .and. excl(ia)) cycle iwloop ! skip excluded waters
 i3 = 3*ia-3
 
-!******PWadded if-statement 2001-10-01
-if( .not. use_PBC ) then
+!******pwadded if-statement 2001-10-01
+if( .not. use_pbc ) then
         r2 = ( x(i3+1) - xpcent(1) )**2 &
                 +( x(i3+2) - xpcent(2) )**2 &
                 +( x(i3+3) - xpcent(3) )**2
@@ -7621,27 +7592,27 @@ end subroutine nbqw_count
 
 subroutine nbqplis2
 ! local variables
-integer						:: ig,ia,i,j,iq,i3,nl,inside
-real(8)						:: rcut2,r2
-integer						:: xspec
-logical, save					:: list_done
+integer                                         :: ig,ia,i,j,iq,i3,nl,inside
+real(8)                                         :: rcut2,r2
+integer                                         :: xspec
+logical, save                                   :: list_done
 
 
-!	This routine makes a list of non-bonded atom pairs involving
-!	*one* Q-atom and *one* non-Q-atom, where the latter is *not connected*
-!	(meaning not bonded or angled) to any Q-atom.
+!       this routine makes a list of non-bonded atom pairs involving
+!       *one* q-atom and *one* non-q-atom, where the latter is *not connected*
+!       (meaning not bonded or angled) to any q-atom.
 !
-!	( i , j ) pairs correspond to
-!	( iq, j ) with first index being a Q-atom with the *Q-atom numbering*, &
-!	          and the second index is the non-Q-atom.
+!       ( i , j ) pairs correspond to
+!       ( iq, j ) with first index being a q-atom with the *q-atom numbering*, &
+!                 and the second index is the non-q-atom.
 
 ! uses the global variables:
-!  nbqs_pair, Rcq, cgp, excl, cgpatom, x, xpcent, nqat, iqseq, 
+!  nbqs_pair, rcq, cgp, excl, cgpatom, x, xpcent, nqat, iqseq, 
 !  qconn, calculation_assignment%qs%max, nbqs, ljcod, nwat, nat_solute
 
 !don't remake pair list if q-atoms interact with all solute atoms (rcq>rexcl_o)
 !and list already made
-#if defined (PROFILING)
+#if defined (profiling)
 real(8)                                         :: start_loop_time
 start_loop_time = rtime()
 #endif
@@ -7652,13 +7623,13 @@ start_loop_time = rtime()
 if(list_done .and. rcq > rexcl_o) return
 
 nbqp_pair = 0
-rcut2 = Rcq*Rcq
+rcut2 = rcq*rcq
 
 
 if(nqat == 0) return
 
 
-! --- solute - Q-atoms
+! --- solute - q-atoms
 
 igloop: do ig = calculation_assignment%qp%start, calculation_assignment%qp%end
 ! for every assigned charge group:
@@ -7704,22 +7675,22 @@ qaloop: do iq = 1, nqat
         nbqp_pair = nbqp_pair + 1
         nbqp(nbqp_pair)%i = iq
         nbqp(nbqp_pair)%j = i
-        nbqp(nbqp_pair)%LJcod = ljcod(iac(i),iac(iqseq(iq)))
+        nbqp(nbqp_pair)%ljcod = ljcod(iac(i),iac(iqseq(iq)))
 
-        ! adjust LJcod for neighbors
+        ! adjust ljcod for neighbors
         ! check only first state, should be same for all in this list
-        if(qconn(1, i, iq) == 4) nbqp(nbqp_pair)%LJcod = 3
+        if(qconn(1, i, iq) == 4) nbqp(nbqp_pair)%ljcod = 3
 
-        !store special q-LJ code = 1,1,3 for normal code = 1,2,3 resp.
-        nbqp(nbqp_pair)%qLJcod = nbqp(nbqp_pair)%LJcod
-        if(nbqp(nbqp_pair)%qLJcod == 2) nbqp(nbqp_pair)%qLJcod = 1
+        !store special q-lj code = 1,1,3 for normal code = 1,2,3 resp.
+        nbqp(nbqp_pair)%qljcod = nbqp(nbqp_pair)%ljcod
+        if(nbqp(nbqp_pair)%qljcod == 2) nbqp(nbqp_pair)%qljcod = 1
 
   end do qaloop
 end do ialoop
 end do igloop
 
 list_done = .true. !save this value
-#if defined (PROFILING)
+#if defined (profiling)
 profile(5)%time = profile(5)%time + rtime() - start_loop_time
 #endif
 
@@ -7731,24 +7702,24 @@ end subroutine nbqplis2
 
 subroutine nbqplis2_box
 !  ! local variables
-  integer						:: ig,ia,i,j,iq,i3,nl,inside,ig_atom
-  real(8)						:: rcut2,r2
-  integer						:: xspec
-  real(8)						:: dx, dy, dz
+  integer                                               :: ig,ia,i,j,iq,i3,nl,inside,ig_atom
+  real(8)                                               :: rcut2,r2
+  integer                                               :: xspec
+  real(8)                                               :: dx, dy, dz
  
   ! for periodic boundary conditions
-  !	This routine makes a list of non-bonded atom pairs involving
-  !	*one* Q-atom and *one* non-Q-atom, where the latter is *not connected*
-  !	(meaning not bonded or angled) to any Q-atom.
+  !     this routine makes a list of non-bonded atom pairs involving
+  !     *one* q-atom and *one* non-q-atom, where the latter is *not connected*
+  !     (meaning not bonded or angled) to any q-atom.
   !
-  !	( i , j ) pairs correspond to
-  !	( iq, j ) with first index being a Q-atom with the *Q-atom numbering*, &
-  !	          and the second index is the non-Q-atom.
+  !     ( i , j ) pairs correspond to
+  !     ( iq, j ) with first index being a q-atom with the *q-atom numbering*, &
+  !               and the second index is the non-q-atom.
 
   ! uses the global variables:
-  !  nbqs_pair, Rcq, cgp, excl, cgpatom, x, xpcent, nqat, iqseq, 
+  !  nbqs_pair, rcq, cgp, excl, cgpatom, x, xpcent, nqat, iqseq, 
   !  qconn, calculation_assignment%qs%max, nbqs, ljcod, nwat, nat_solute
-#if defined (PROFILING)
+#if defined (profiling)
 real(8)                                         :: start_loop_time
 start_loop_time = rtime()
 #endif
@@ -7756,74 +7727,74 @@ start_loop_time = rtime()
 
   nbqp_pair = 0
   nbqp_cgp_pair = 0
-  rcut2 = Rcq*Rcq
-	
+  rcut2 = rcq*rcq
+        
   if(nqat == 0) return
 
- ! --- solute - Q-atoms
+ ! --- solute - q-atoms
 
 igloop: do ig = calculation_assignment%qp%start, calculation_assignment%qp%end
     ! for every assigned charge group:
 
-	! check cutoff
-	inside = 0
-	ig_atom = cgp(ig)%first
-	do while ((ig_atom .le. cgp(ig)%last) .and. (inside .eq. 0))
-	  i = cgpatom(ig_atom)
-	  i3 = 3*i-3
+        ! check cutoff
+        inside = 0
+        ig_atom = cgp(ig)%first
+        do while ((ig_atom .le. cgp(ig)%last) .and. (inside .eq. 0))
+          i = cgpatom(ig_atom)
+          i3 = 3*i-3
 
-  	dx = x(i3+1) - x(3*qswitch-2)
-	dy = x(i3+2) - x(3*qswitch-1)
-	dz = x(i3+3) - x(3*qswitch)
-	dx = dx - boxlength(1)*nint( dx*inv_boxl(1) )
-	dy = dy - boxlength(2)*nint( dy*inv_boxl(2) )
-	dz = dz - boxlength(3)*nint( dz*inv_boxl(3) )
-	r2 = dx**2 + dy**2 + dz**2
+        dx = x(i3+1) - x(3*qswitch-2)
+        dy = x(i3+2) - x(3*qswitch-1)
+        dz = x(i3+3) - x(3*qswitch)
+        dx = dx - boxlength(1)*nint( dx*inv_boxl(1) )
+        dy = dy - boxlength(2)*nint( dy*inv_boxl(2) )
+        dz = dz - boxlength(3)*nint( dz*inv_boxl(3) )
+        r2 = dx**2 + dy**2 + dz**2
 
-	  if ( r2 .le. rcut2 ) then
-		inside = 1
+          if ( r2 .le. rcut2 ) then
+                inside = 1
 
-		if(nbqp_cgp_pair .eq. size(nbqp_cgp, 1) ) call reallocate_nbqp_cgp
-		nbqp_cgp_pair = nbqp_cgp_pair + 1
-		nbqp_cgp(nbqp_cgp_pair)%i = i !leave %j empty, equals qswitch
-	  end if
+                if(nbqp_cgp_pair .eq. size(nbqp_cgp, 1) ) call reallocate_nbqp_cgp
+                nbqp_cgp_pair = nbqp_cgp_pair + 1
+                nbqp_cgp(nbqp_cgp_pair)%i = i !leave %j empty, equals qswitch
+          end if
 
-	  ig_atom = ig_atom + 1 !ia = ia + 1
-	end do
-	if (inside .eq. 0) cycle igloop
+          ig_atom = ig_atom + 1 !ia = ia + 1
+        end do
+        if (inside .eq. 0) cycle igloop
 
 ialoop: do ia = cgp(ig)%first, cgp(ig)%last
-	  i = cgpatom(ia)
+          i = cgpatom(ia)
 
-	  ! check if already on qq list
-	  if(any(qconn(:,i,:) <= 3)) cycle ialoop
+          ! check if already on qq list
+          if(any(qconn(:,i,:) <= 3)) cycle ialoop
 
-		! if out of space then make more space
-		if (nbqp_pair .ge. calculation_assignment%qp%max-nqat) call reallocate_nonbondlist_qp
+                ! if out of space then make more space
+                if (nbqp_pair .ge. calculation_assignment%qp%max-nqat) call reallocate_nonbondlist_qp
 qaloop: do iq = 1, nqat
 
-		!check special exclusions
-		!is already done in make_qconn
+                !check special exclusions
+                !is already done in make_qconn
 
-		! store the pair
-		nbqp_pair = nbqp_pair + 1
-		nbqp(nbqp_pair)%i = iq
-		nbqp(nbqp_pair)%j = i
-		nbqp(nbqp_pair)%LJcod = ljcod(iac(i),iac(iqseq(iq)))
-		nbqp(nbqp_pair)%cgp_pair = nbqp_cgp_pair
+                ! store the pair
+                nbqp_pair = nbqp_pair + 1
+                nbqp(nbqp_pair)%i = iq
+                nbqp(nbqp_pair)%j = i
+                nbqp(nbqp_pair)%ljcod = ljcod(iac(i),iac(iqseq(iq)))
+                nbqp(nbqp_pair)%cgp_pair = nbqp_cgp_pair
 
-		! adjust LJcod for neighbors
-		! check only first state, should be same for all in this list
-		if(qconn(1, i, iq) == 4) nbqp(nbqp_pair)%LJcod = 3
-		
-		!store special q-LJ code = 1,1,3 for normal code = 1,2,3 resp.
-		nbqp(nbqp_pair)%qLJcod = nbqp(nbqp_pair)%LJcod
-		if(nbqp(nbqp_pair)%qLJcod == 2) nbqp(nbqp_pair)%qLJcod = 1
+                ! adjust ljcod for neighbors
+                ! check only first state, should be same for all in this list
+                if(qconn(1, i, iq) == 4) nbqp(nbqp_pair)%ljcod = 3
+                
+                !store special q-lj code = 1,1,3 for normal code = 1,2,3 resp.
+                nbqp(nbqp_pair)%qljcod = nbqp(nbqp_pair)%ljcod
+                if(nbqp(nbqp_pair)%qljcod == 2) nbqp(nbqp_pair)%qljcod = 1
 
-	  end do qaloop
-	end do ialoop
+          end do qaloop
+        end do ialoop
   end do igloop
-#if defined (PROFILING)
+#if defined (profiling)
 profile(5)%time = profile(5)%time + rtime() - start_loop_time
 #endif
 
@@ -7832,28 +7803,28 @@ end subroutine nbqplis2_box
 
 subroutine nbqplist
 ! local variables
-integer						:: ig,ia,i,j,iq,i3,nl
-real(8)						:: rcut2,r2
-integer						::	xspec
-logical, save				::	list_done = .false.
+integer                                         :: ig,ia,i,j,iq,i3,nl
+real(8)                                         :: rcut2,r2
+integer                                         ::      xspec
+logical, save                           ::      list_done = .false.
 
-#if defined (PROFILING)
-real(8)						:: start_loop_time
+#if defined (profiling)
+real(8)                                         :: start_loop_time
 start_loop_time = rtime()
 #endif
 
 
-!For spherical boundary	
-!	This routine makes a list of non-bonded atom pairs involving
-!	*one* Q-atom and *one* non-Q-atom, where the latter is *not connected*
-!	(meaning not bonded or angled) to any Q-atom.
+!for spherical boundary 
+!       this routine makes a list of non-bonded atom pairs involving
+!       *one* q-atom and *one* non-q-atom, where the latter is *not connected*
+!       (meaning not bonded or angled) to any q-atom.
 !
-!	( i , j ) pairs correspond to
-!	( iq, j ) with first index being a Q-atom with the *Q-atom numbering*, &
-!	          and the second index is the non-Q-atom.
+!       ( i , j ) pairs correspond to
+!       ( iq, j ) with first index being a q-atom with the *q-atom numbering*, &
+!                 and the second index is the non-q-atom.
 
 ! global variables used:
-!  nbqs_pair, Rcq, cgp, excl, x, xpcent, cgpatom, nqat, iqseq,
+!  nbqs_pair, rcq, cgp, excl, x, xpcent, cgpatom, nqat, iqseq,
 !  calculation_assignment%qp%max, nbqs, ljcod, nwat, nat_solute
 
 !don't remake pair list if q-atoms interact with all solute atoms (rcq>rexcl_o)
@@ -7861,11 +7832,11 @@ start_loop_time = rtime()
 if(list_done .and. rcq > rexcl_o) return
 
 nbqp_pair = 0
-rcut2 = Rcq*Rcq
+rcut2 = rcq*rcq
 
 if(nqat==0) return
 
-! --- solute - Q-atoms
+! --- solute - q-atoms
 
 igloop: do ig = calculation_assignment%qp%start, calculation_assignment%qp%end
 
@@ -7899,23 +7870,23 @@ qaloop: do iq = 1, nqat
         nbqp_pair = nbqp_pair + 1
         nbqp(nbqp_pair)%i = iq
         nbqp(nbqp_pair)%j = i
-        nbqp(nbqp_pair)%LJcod = ljcod(iac(i),iac(iqseq(iq)))
+        nbqp(nbqp_pair)%ljcod = ljcod(iac(i),iac(iqseq(iq)))
 
-        ! adjust LJcod for neighbors
+        ! adjust ljcod for neighbors
         ! check only first state, should be same for all in this list
-        if(qconn(1, i, iq) == 4) nbqp(nbqp_pair)%LJcod = 3
+        if(qconn(1, i, iq) == 4) nbqp(nbqp_pair)%ljcod = 3
 
-        !store special q-LJ code = 1,1,3 for normal code = 1,2,3 resp.
-        nbqp(nbqp_pair)%qLJcod = nbqp(nbqp_pair)%LJcod
-        if(nbqp(nbqp_pair)%qLJcod == 2) nbqp(nbqp_pair)%qLJcod = 1
+        !store special q-lj code = 1,1,3 for normal code = 1,2,3 resp.
+        nbqp(nbqp_pair)%qljcod = nbqp(nbqp_pair)%ljcod
+        if(nbqp(nbqp_pair)%qljcod == 2) nbqp(nbqp_pair)%qljcod = 1
   end do qaloop
-!TMP        nbqp_per_cgp(ig) = nbqp_per_cgp(ig) + nqat
+!tmp        nbqp_per_cgp(ig) = nbqp_per_cgp(ig) + nqat
 end do ialoop
 end do igloop
 
 list_done = .true. !save this value
 
-#if defined (PROFILING)
+#if defined (profiling)
 profile(5)%time = profile(5)%time + rtime() - start_loop_time
 #endif
 
@@ -7923,98 +7894,98 @@ end subroutine nbqplist
 
 !-----------------------------------------------------------------------
 
-!******PWadded 2001-10-18
+!******pwadded 2001-10-18
 subroutine nbqplist_box
   ! local variables
-  integer						:: ig,ia,i,j,iq,i3,nl,ig_sw
-  real(8)						:: rcut2,r2
-  integer						::	xspec
-  real(8)						:: dx, dy, dz
-  integer						:: ga, gb
+  integer                                               :: ig,ia,i,j,iq,i3,nl,ig_sw
+  real(8)                                               :: rcut2,r2
+  integer                                               ::      xspec
+  real(8)                                               :: dx, dy, dz
+  integer                                               :: ga, gb
 
-#if defined (PROFILING)
+#if defined (profiling)
 real(8)                                         :: start_loop_time
 start_loop_time = rtime()
 #endif
 
-  !For periodic boundary conditions	
-  !	This routine makes a list of non-bonded atom pairs involving
-  !	*one* Q-atom and *one* non-Q-atom, where the latter is *not connected*
-  !	(meaning not bonded or angled) to any Q-atom.
+  !for periodic boundary conditions     
+  !     this routine makes a list of non-bonded atom pairs involving
+  !     *one* q-atom and *one* non-q-atom, where the latter is *not connected*
+  !     (meaning not bonded or angled) to any q-atom.
   !
-  !	( i , j ) pairs correspond to
-  !	( iq, j ) with first index being a Q-atom with the *Q-atom numbering*, &
-  !	          and the second index is the non-Q-atom.
+  !     ( i , j ) pairs correspond to
+  !     ( iq, j ) with first index being a q-atom with the *q-atom numbering*, &
+  !               and the second index is the non-q-atom.
 
   ! global variables used:
-  !  nbqs_pair, Rcq, cgp, x, xpcent, cgpatom, nqat, iqseq,
+  !  nbqs_pair, rcq, cgp, x, xpcent, cgpatom, nqat, iqseq,
   !  calculation_assignment%qs%max, nbqs, ljcod, nwat, nat_solute
 
 
   nbqp_pair = 0
   nbqp_cgp_pair = 0
-  rcut2 = Rcq*Rcq
+  rcut2 = rcq*rcq
 
   if(nqat==0) return
 
-  ! --- solute - Q-atoms
+  ! --- solute - q-atoms
 igloop: do ig = calculation_assignment%qp%start, calculation_assignment%qp%end
 
-	ig_sw = cgp(ig)%iswitch
-	
-	i3 = 3*ig_sw-3
-	dx = x(i3+1) - x(3*qswitch-2)
-	dy = x(i3+2) - x(3*qswitch-1)
-	dz = x(i3+3) - x(3*qswitch)
-	dx = dx - boxlength(1)*nint( dx*inv_boxl(1) )
-	dy = dy - boxlength(2)*nint( dy*inv_boxl(2) )
-	dz = dz - boxlength(3)*nint( dz*inv_boxl(3) )
-	r2 = dx**2 + dy**2 + dz**2
+        ig_sw = cgp(ig)%iswitch
+        
+        i3 = 3*ig_sw-3
+        dx = x(i3+1) - x(3*qswitch-2)
+        dy = x(i3+2) - x(3*qswitch-1)
+        dz = x(i3+3) - x(3*qswitch)
+        dx = dx - boxlength(1)*nint( dx*inv_boxl(1) )
+        dy = dy - boxlength(2)*nint( dy*inv_boxl(2) )
+        dz = dz - boxlength(3)*nint( dz*inv_boxl(3) )
+        r2 = dx**2 + dy**2 + dz**2
 
-	! skip if outside cutoff
-	if ( r2 .gt. rcut2 ) cycle igloop
+        ! skip if outside cutoff
+        if ( r2 .gt. rcut2 ) cycle igloop
 
-	if( nbqp_cgp_pair .eq. size(nbqp_cgp, 1) ) call reallocate_nbqp_cgp
-	
-	nbqp_cgp_pair = nbqp_cgp_pair + 1
-	nbqp_cgp(nbqp_cgp_pair)%i = ig_sw
-	
+        if( nbqp_cgp_pair .eq. size(nbqp_cgp, 1) ) call reallocate_nbqp_cgp
+        
+        nbqp_cgp_pair = nbqp_cgp_pair + 1
+        nbqp_cgp(nbqp_cgp_pair)%i = ig_sw
+        
 
 ialoop: do ia = cgp(ig)%first, cgp(ig)%last
 
-	  i = cgpatom(ia)
+          i = cgpatom(ia)
 
-	  ! check if already on qq list
-	  if(any(qconn(:,i,:) <= 3)) cycle ialoop
+          ! check if already on qq list
+          if(any(qconn(:,i,:) <= 3)) cycle ialoop
 
           ! if out of space then make more space
           if (nbqp_pair .ge. calculation_assignment%qp%max-nqat) call reallocate_nonbondlist_qp
 qaloop: do iq = 1, nqat
 
-		
-		!check special exclusions
-		!is already done in make_qconn
+                
+                !check special exclusions
+                !is already done in make_qconn
 
-		! add the pair
-		nbqp_pair = nbqp_pair + 1
-		nbqp(nbqp_pair)%i = iq
-		nbqp(nbqp_pair)%j = i
-		nbqp(nbqp_pair)%LJcod = ljcod(iac(i),iac(iqseq(iq)))
-		nbqp(nbqp_pair)%cgp_pair = nbqp_cgp_pair
-		
-		! adjust LJcod for neighbors
-		! check only first state, should be same for all in this list
-		if(qconn(1, i, iq) == 4) nbqp(nbqp_pair)%LJcod = 3
-		
-		!store special q-LJ code = 1,1,3 for normal code = 1,2,3 resp.
-		nbqp(nbqp_pair)%qLJcod = nbqp(nbqp_pair)%LJcod
-		if(nbqp(nbqp_pair)%qLJcod == 2) nbqp(nbqp_pair)%qLJcod = 1
+                ! add the pair
+                nbqp_pair = nbqp_pair + 1
+                nbqp(nbqp_pair)%i = iq
+                nbqp(nbqp_pair)%j = i
+                nbqp(nbqp_pair)%ljcod = ljcod(iac(i),iac(iqseq(iq)))
+                nbqp(nbqp_pair)%cgp_pair = nbqp_cgp_pair
+                
+                ! adjust ljcod for neighbors
+                ! check only first state, should be same for all in this list
+                if(qconn(1, i, iq) == 4) nbqp(nbqp_pair)%ljcod = 3
+                
+                !store special q-lj code = 1,1,3 for normal code = 1,2,3 resp.
+                nbqp(nbqp_pair)%qljcod = nbqp(nbqp_pair)%ljcod
+                if(nbqp(nbqp_pair)%qljcod == 2) nbqp(nbqp_pair)%qljcod = 1
 
-	  end do qaloop
-	end do ialoop
+          end do qaloop
+        end do ialoop
    end do igloop
 
-#if defined (PROFILING)
+#if defined (profiling)
 profile(5)%time = profile(5)%time + rtime() - start_loop_time
 #endif
 
@@ -8024,28 +7995,28 @@ end subroutine nbqplist_box
 subroutine nbqwlist
 
 ! local variables
-integer						:: ig,ia,i,i3
-real(8)						:: rcut2,r2
+integer                                         :: ig,ia,i,i3
+real(8)                                         :: rcut2,r2
 
 
-!	This routine makes a list of water molecules within rcq from xpcent,
+!       this routine makes a list of water molecules within rcq from xpcent,
 ! i.e. the q-atom - water non-bond lists which implicitly includes all
 ! q-atoms with all atoms of the listed water
 ! waters may not have bonded interactions with q-atoms !
-#if defined (PROFILING)
+#if defined (profiling)
 real(8)                                         :: start_loop_time
 start_loop_time = rtime()
 #endif
 
 
 
-!We don't have to remake the list if q-atoms interact with all waters
+!we don't have to remake the list if q-atoms interact with all waters
 !(rcq > rexcl_o) and list already made (nbwq_pair >0)
 if(rcq > rexcl_o .and. nbqw_pair > 0) return
 
 
 nbqw_pair = 0
-rcut2 = Rcq*Rcq
+rcut2 = rcq*rcq
 
 
 if(nqat==0) return
@@ -8069,7 +8040,7 @@ if ( r2 <= rcut2 ) then
         nbqw(nbqw_pair) = nat_solute + 3*ig-2
 end if
 end do iwloop
-#if defined (PROFILING)
+#if defined (profiling)
 profile(6)%time = profile(6)%time + rtime() - start_loop_time
 #endif
 
@@ -8077,83 +8048,83 @@ end subroutine nbqwlist
 
 !-----------------------------------------------------------------------
 
-!******PWadded 2001-10-18
+!******pwadded 2001-10-18
 subroutine nbqwlist_box
 
   ! local variables
-  integer						:: ig,ia,i,i3
-  real(8)						:: rcut2,r2
-  real(8)						:: dx, dy, dz
+  integer                                               :: ig,ia,i,i3
+  real(8)                                               :: rcut2,r2
+  real(8)                                               :: dx, dy, dz
 
-  !	This routine makes a list of water molecules within rcq from xswitch,
+  !     this routine makes a list of water molecules within rcq from xswitch,
   ! i.e. the q-atom - water non-bond lists which implicitly includes all
   ! q-atoms with all atoms of the listed water
   ! waters may not have bonded interactions with q-atoms !
-#if defined (PROFILING)
+#if defined (profiling)
 real(8)                                         :: start_loop_time
 start_loop_time = rtime()
 #endif
 
 
-	nbqw_pair = 0
-	rcut2 = Rcq*Rcq
+        nbqw_pair = 0
+        rcut2 = rcq*rcq
 
-	if(nqat==0) return
+        if(nqat==0) return
 
 iwloop: do ig = calculation_assignment%qw%start, calculation_assignment%qw%end
-	ia = nat_solute + 3*ig-2
-	i3 = 3*ia-3
+        ia = nat_solute + 3*ig-2
+        i3 = 3*ia-3
 
-	dx = x(i3+1) - x(3*qswitch-2)
-	dy = x(i3+2) - x(3*qswitch-1)
-	dz = x(i3+3) - x(3*qswitch)
-	dx = dx - boxlength(1)*nint( dx*inv_boxl(1) )
-	dy = dy - boxlength(2)*nint( dy*inv_boxl(2) )
-	dz = dz - boxlength(3)*nint( dz*inv_boxl(3) )
-	r2 = dx**2 + dy**2 + dz**2
+        dx = x(i3+1) - x(3*qswitch-2)
+        dy = x(i3+2) - x(3*qswitch-1)
+        dz = x(i3+3) - x(3*qswitch)
+        dx = dx - boxlength(1)*nint( dx*inv_boxl(1) )
+        dy = dy - boxlength(2)*nint( dy*inv_boxl(2) )
+        dz = dz - boxlength(3)*nint( dz*inv_boxl(3) )
+        r2 = dx**2 + dy**2 + dz**2
 
-	! store if inside cutoff
-	if ( r2 <= rcut2 ) then
-		nbqw_pair = nbqw_pair + 1
-		nbqw(nbqw_pair) = nat_solute + 3*ig-2
-	end if
+        ! store if inside cutoff
+        if ( r2 <= rcut2 ) then
+                nbqw_pair = nbqw_pair + 1
+                nbqw(nbqw_pair) = nat_solute + 3*ig-2
+        end if
   end do iwloop
-#if defined (PROFILING)
+#if defined (profiling)
 profile(6)%time = profile(6)%time + rtime() - start_loop_time
 #endif
 
 end subroutine nbqwlist_box
 !-------------------------------------------------------------------------------------
-!******PWchanged 2001-10-01
+!******pwchanged 2001-10-01
 subroutine nbww_count(nww, nwwmol)
 ! arguments
-integer						:: nww
-integer						:: nwwmol(:)
+integer                                         :: nww
+integer                                         :: nwwmol(:)
 
 ! local variables
-integer						:: iw,jw,ia,ja,i3,j3
-real(8)						:: rcut2,r2
+integer                                         :: iw,jw,ia,ja,i3,j3
+real(8)                                         :: rcut2,r2
 
-!******PWadded variables		
+!******pwadded variables                
 
-real(8)						:: dx, dy, dz
+real(8)                                         :: dx, dy, dz
 
-! This routine counts non-bonded solvent-solvent atom pairs.
+! this routine counts non-bonded solvent-solvent atom pairs.
 
 nww = 0
-rcut2 = Rcww*Rcww
+rcut2 = rcww*rcww
 
 iwloop: do iw = 1, nwat
 nwwmol(iw) = 0
 
 ia = nat_solute + 3*iw-2
-if(.not. use_PBC .and. excl(ia)) cycle iwloop ! skip excluded waters
+if(.not. use_pbc .and. excl(ia)) cycle iwloop ! skip excluded waters
 
 i3 = 3*ia-3
 
 jwloop: do jw = 1, nwat
   ja = nat_solute + 3*jw-2
-  if(.not. use_PBC .and. excl(ja)) cycle jwloop ! skip excluded waters
+  if(.not. use_pbc .and. excl(ja)) cycle jwloop ! skip excluded waters
 
   j3 = 3*ja-3
 
@@ -8162,9 +8133,9 @@ jwloop: do jw = 1, nwat
            ((iw .lt. jw) .and. (mod(iw+jw,2) .eq. 1)) .or. &
            (iw .eq. jw)) &
            cycle jwloop
-  !******PWadded if 2001-10-01
+  !******pwadded if 2001-10-01
 
-  if( use_PBC ) then
+  if( use_pbc ) then
         dx = x(i3+1) - x(j3+1)
         dy = x(i3+2) - x(j3+2)
         dz = x(i3+3) - x(j3+3)
@@ -8190,14 +8161,14 @@ end subroutine nbww_count
 !-----------------------------------------------------------------------
 subroutine nbwwlist
 ! local variables
-integer						:: iw,jw,ia,ja,i3,j3
-real(8)						:: rcut2,r2
+integer                                         :: iw,jw,ia,ja,i3,j3
+real(8)                                         :: rcut2,r2
 
-! This routine makes a list of non-bonded solvent-solvent atom pairs
+! this routine makes a list of non-bonded solvent-solvent atom pairs
 
 ! uses the global variables:
-!  nbww_pair, Rcww, nat_solute, excl, nwat, x, nbww, calculation_assignment%ww%max,nbww_true_pair
-#if defined (PROFILING)
+!  nbww_pair, rcww, nat_solute, excl, nwat, x, nbww, calculation_assignment%ww%max,nbww_true_pair
+#if defined (profiling)
 real(8)                                         :: start_loop_time
 start_loop_time = rtime()
 #endif
@@ -8205,7 +8176,7 @@ start_loop_time = rtime()
 
 nbww_pair = 0
 nbww_true_pair=0
-rcut2 = Rcww*Rcww
+rcut2 = rcww*rcww
 
 iwloop: do iw = calculation_assignment%ww%start, calculation_assignment%ww%end
 
@@ -8214,7 +8185,7 @@ ia = nat_solute + 3*iw-2
         if (.not.excl(ia)) then
         i3 = 3*ia-3
 
-jwloop:		do jw=1, nwat
+jwloop:         do jw=1, nwat
 
                   ja = nat_solute + 3*jw-2
                   if (excl(ja)) cycle jwloop ! skip excluded waters
@@ -8235,7 +8206,7 @@ jwloop:		do jw=1, nwat
                                 nbww_pair = nbww_pair + 1
                                 nbww(nbww_pair) = ja
                 end if
-                        ! if out of space then make more space	
+                        ! if out of space then make more space  
                         if (nbww_pair .ge. calculation_assignment%ww%max) then
                                 call reallocate_nonbondlist_ww
                         end if
@@ -8245,26 +8216,26 @@ jwloop:		do jw=1, nwat
         ! now mark the end of the list of molecules interacting with molecule iw
         ! by means of a zero element in the list
         nbww_pair = nbww_pair + 1
-        nbww(nbww_pair) = 0	
+        nbww(nbww_pair) = 0     
 end do iwloop
-#if defined (PROFILING)
+#if defined (profiling)
 profile(2)%time = profile(2)%time + rtime() - start_loop_time
 #endif
 
 end subroutine nbwwlist
-!------------PWadded 2001-10-18------------------------------------------
+!------------pwadded 2001-10-18------------------------------------------
 subroutine nbwwlist_box
 
 ! local variables
-integer						:: iw,jw,ia,ja,i3,j3
-real(8)						:: rcut2,r2
-real(8)						:: dx, dy, dz
+integer                                         :: iw,jw,ia,ja,i3,j3
+real(8)                                         :: rcut2,r2
+real(8)                                         :: dx, dy, dz
 
 ! for periodic boundary conditions
-! This routine makes a list of non-bonded solvent-solvent atom pairs
+! this routine makes a list of non-bonded solvent-solvent atom pairs
 ! uses the global variables:
-!  nbww_pair, Rcww, nat_solute, excl, nwat, x, nbww, calculation_assignment%ww%max,nbww_true_pair
-#if defined (PROFILING)
+!  nbww_pair, rcww, nat_solute, excl, nwat, x, nbww, calculation_assignment%ww%max,nbww_true_pair
+#if defined (profiling)
 real(8)                                         :: start_loop_time
 start_loop_time = rtime()
 #endif
@@ -8272,14 +8243,14 @@ start_loop_time = rtime()
 
 nbww_true_pair = 0
 nbww_pair = 0
-rcut2 = Rcww*Rcww
+rcut2 = rcww*rcww
 
 iwloop: do iw = calculation_assignment%ww%start, calculation_assignment%ww%end
 
         ia = nat_solute + 3*iw-2
         i3 = 3*ia-3
 
-jwloop:		do jw=1, nwat
+jwloop:         do jw=1, nwat
 
                         ja = nat_solute + 3*jw-2
                         j3 = 3*ja-3
@@ -8305,7 +8276,7 @@ jwloop:		do jw=1, nwat
                                 nbww(nbww_pair) = ja
                         end if
 
-                        ! if out of space then make more space	
+                        ! if out of space then make more space  
                         if (nbww_pair .ge. calculation_assignment%ww%max) then
                                 call reallocate_nonbondlist_ww
                         end if
@@ -8315,9 +8286,9 @@ jwloop:		do jw=1, nwat
         ! now mark the end of the list of molecules interacting with molecule iw
         ! by means of a zero element in the list
         nbww_pair = nbww_pair + 1
-        nbww(nbww_pair) = 0	
+        nbww(nbww_pair) = 0     
 end do iwloop
-#if defined (PROFILING)
+#if defined (profiling)
 profile(2)%time = profile(2)%time + rtime() - start_loop_time
 #endif
 
@@ -8327,20 +8298,20 @@ end subroutine nbwwlist_box
 
 subroutine nbwwlist_lrf
 ! local variables
-integer						:: i,j,ig,jg,iw,jw,ia,ja,i3,j3,is,is3
-real(8)						:: rcut2,r2,field0,field1,field2
-real(8)						:: dr(3)
-real(8)						::	RcLRF2
+integer                                         :: i,j,ig,jg,iw,jw,ia,ja,i3,j3,is,is3
+real(8)                                         :: rcut2,r2,field0,field1,field2
+real(8)                                         :: dr(3)
+real(8)                                         ::      rclrf2
 
-#if defined (PROFILING)
-real(8)						:: start_loop_time
+#if defined (profiling)
+real(8)                                         :: start_loop_time
 start_loop_time = rtime()
 #endif
 
-!	This routine makes a list of non-bonded solvent-solvent atom pairs.
+!       this routine makes a list of non-bonded solvent-solvent atom pairs.
 
 ! uses the global variables:
-!  nbww_pair, Rcww, nwat, nat_solute, excl, x, nbww, ncgp, lrf, crg, calculation_assignment%ww%max,nbww_true_pair
+!  nbww_pair, rcww, nwat, nat_solute, excl, x, nbww, ncgp, lrf, crg, calculation_assignment%ww%max,nbww_true_pair
 
 
 
@@ -8349,8 +8320,8 @@ start_loop_time = rtime()
 
 nbww_true_pair=0
 nbww_pair = 0
-rcut2 = Rcww*Rcww
-RcLRF2 = RcLRF*RcLRF
+rcut2 = rcww*rcww
+rclrf2 = rclrf*rclrf
 
 iwloop: do iw = calculation_assignment%ww%start, calculation_assignment%ww%end
 is  = nat_solute + 3*iw-2
@@ -8375,10 +8346,10 @@ r2 = ( x(is3+1) -x(j3+1) )**2 &
   if ( r2 .le. rcut2 ) then
         ! inside cutoff: add the pair
         nbww_pair = nbww_pair + 1
-        nbww_true_pair = nbww_true_pair + 9  !To get explicit no. of interactions
+        nbww_true_pair = nbww_true_pair + 9  !to get explicit no. of interactions
         nbww(nbww_pair) = ja 
-  elseif(r2 <= RcLRF2) then
-        ! outside ww-cutoff but inside LRF cut-off: use LRF
+  elseif(r2 <= rclrf2) then
+        ! outside ww-cutoff but inside lrf cut-off: use lrf
         do ia=1,3
           i = nat_solute+iw*3-3+ia
           i3 = i*3-3
@@ -8503,40 +8474,40 @@ end if !if ia not excluded
  !now mark the end of the list of molecules interacting with molecule iw
  !by means of a zero element in the list
  nbww_pair = nbww_pair + 1
- nbww(nbww_pair) = 0	
+ nbww(nbww_pair) = 0    
 
 end do iwloop
 
-#if defined (PROFILING)
+#if defined (profiling)
 profile(2)%time = profile(2)%time + rtime() - start_loop_time
 #endif
 
 end subroutine nbwwlist_lrf
-!--------------LRF version of PW PBC-----------------------------------
+!--------------lrf version of pw pbc-----------------------------------
 subroutine nbwwlist_box_lrf
 ! local variables
-integer						:: i,j,ig,jg,iw,jw,ia,ja,i3,j3,is,is3
-real(8)						:: rcut2,r2,field0,field1,field2
-real(8)						:: dr(3)
-real(8)						::	RcLRF2
-real(8)						::  dx, dy, dz
+integer                                         :: i,j,ig,jg,iw,jw,ia,ja,i3,j3,is,is3
+real(8)                                         :: rcut2,r2,field0,field1,field2
+real(8)                                         :: dr(3)
+real(8)                                         ::      rclrf2
+real(8)                                         ::  dx, dy, dz
 real(8)                     :: boxshiftx, boxshifty, boxshiftz  
 
-#if defined (PROFILING)
+#if defined (profiling)
 real(8)                                         :: start_loop_time
 start_loop_time = rtime()
 #endif
 
 
-!	This routine makes a list of non-bonded solvent-solvent atom pairs.
+!       this routine makes a list of non-bonded solvent-solvent atom pairs.
 
 ! uses the global variables:
-!  nbww_pair, Rcww, nwat, nat_solute, excl, x, nbww, ncgp, lrf, crg, calculation_assignment%ww%max,nbww_true_pair
+!  nbww_pair, rcww, nwat, nat_solute, excl, x, nbww, ncgp, lrf, crg, calculation_assignment%ww%max,nbww_true_pair
 
 nbww_true_pair=0
 nbww_pair = 0
-rcut2 = Rcww*Rcww
-RcLRF2 = RcLRF*RcLRF
+rcut2 = rcww*rcww
+rclrf2 = rclrf*rclrf
 
 iwloop: do iw = calculation_assignment%ww%start, calculation_assignment%ww%end
 is  = nat_solute + 3*iw-2
@@ -8565,23 +8536,23 @@ r2 = dx*dx + dy*dy + dz*dz
   if ( r2 .le. rcut2 ) then
         ! inside cutoff: add the pair
         nbww_pair = nbww_pair + 1
-        nbww_true_pair = nbww_true_pair + 9  !To get explicit no. of interactions
+        nbww_true_pair = nbww_true_pair + 9  !to get explicit no. of interactions
         nbww(nbww_pair) = ja 
-  elseif(r2 <= RcLRF2) then
-        ! outside ww-cutoff but inside LRF cut-off: use LRF
+  elseif(r2 <= rclrf2) then
+        ! outside ww-cutoff but inside lrf cut-off: use lrf
         
-		!iw interaction     
-	    jg = iwhich_cgp(ja)
-		
-		boxshiftx = x(is3+1) -lrf(jg)%cgp_cent(1)
-		boxshifty = x(is3+2) -lrf(jg)%cgp_cent(2)
-		boxshiftz = x(is3+3) -lrf(jg)%cgp_cent(3)
+                !iw interaction     
+            jg = iwhich_cgp(ja)
+                
+                boxshiftx = x(is3+1) -lrf(jg)%cgp_cent(1)
+                boxshifty = x(is3+2) -lrf(jg)%cgp_cent(2)
+                boxshiftz = x(is3+3) -lrf(jg)%cgp_cent(3)
 
-		boxshiftx = boxlength(1)*nint( boxshiftx*inv_boxl(1) )
-		boxshifty = boxlength(2)*nint( boxshifty*inv_boxl(2) )
-		boxshiftz = boxlength(3)*nint( boxshiftz*inv_boxl(3) )
+                boxshiftx = boxlength(1)*nint( boxshiftx*inv_boxl(1) )
+                boxshifty = boxlength(2)*nint( boxshifty*inv_boxl(2) )
+                boxshiftz = boxlength(3)*nint( boxshiftz*inv_boxl(3) )
 
-		do ia=1,3
+                do ia=1,3
           i = nat_solute+iw*3-3+ia
           i3 = i*3-3
           !jg = ncgp + jw
@@ -8591,7 +8562,7 @@ r2 = dx*dx + dy*dy + dz*dz
           dr(2) = x(i3+2) - lrf(jg)%cgp_cent(2) - boxshifty
           dr(3) = x(i3+3) - lrf(jg)%cgp_cent(3) - boxshiftz
           
-		  r2 = dr(1)*dr(1) + dr(2)*dr(2) + dr(3)*dr(3)
+                  r2 = dr(1)*dr(1) + dr(2)*dr(2) + dr(3)*dr(3)
 
           field0=crg(i)/(r2*sqrt(r2))
           lrf(jg)%phi0=lrf(jg)%phi0+field0*r2
@@ -8639,17 +8610,17 @@ r2 = dx*dx + dy*dy + dz*dz
           lrf(jg)%phi3(26)=lrf(jg)%phi3(26)+field2*(5.*dr(3)*dr(3)*dr(2)-r2*dr(2))
           lrf(jg)%phi3(27)=lrf(jg)%phi3(27)+field2*(5.*dr(3)*dr(3)*dr(3)-r2*3.*dr(3))
         enddo
-		
-		!jw interaction
-		ig = iwhich_cgp(is)
-		
-		boxshiftx = x(j3+1) -lrf(ig)%cgp_cent(1)
-		boxshifty = x(j3+2) -lrf(ig)%cgp_cent(2)
-		boxshiftz = x(j3+3) -lrf(ig)%cgp_cent(3)
+                
+                !jw interaction
+                ig = iwhich_cgp(is)
+                
+                boxshiftx = x(j3+1) -lrf(ig)%cgp_cent(1)
+                boxshifty = x(j3+2) -lrf(ig)%cgp_cent(2)
+                boxshiftz = x(j3+3) -lrf(ig)%cgp_cent(3)
 
-		boxshiftx = boxlength(1)*nint( boxshiftx*inv_boxl(1) )
-		boxshifty = boxlength(2)*nint( boxshifty*inv_boxl(2) )
-		boxshiftz = boxlength(3)*nint( boxshiftz*inv_boxl(3) )
+                boxshiftx = boxlength(1)*nint( boxshiftx*inv_boxl(1) )
+                boxshifty = boxlength(2)*nint( boxshifty*inv_boxl(2) )
+                boxshiftz = boxlength(3)*nint( boxshiftz*inv_boxl(3) )
 
         do ja = 1, 3
           j = nat_solute + 3*jw-3 + ja
@@ -8715,27 +8686,27 @@ end do jwloop
  !now mark the end of the list of molecules interacting with molecule iw
  !by means of a zero element in the list
  nbww_pair = nbww_pair + 1
- nbww(nbww_pair) = 0	
+ nbww(nbww_pair) = 0    
 
 end do iwloop
-#if defined (PROFILING)
+#if defined (profiling)
 profile(2)%time = profile(2)%time + rtime() - start_loop_time
 #endif
 
 end subroutine nbwwlist_box_lrf
 !---------------------------------------------------------------------------
 subroutine nbmonitorlist
-!set LJ code for the atom pairs in the selected atom groups to be monitored
+!set lj code for the atom pairs in the selected atom groups to be monitored
 ! local variables
-integer         :: i,j,ig,jg,ia,ja,i3,j3,nl,istate,LJ_code,maxingroups,par, atomnri
-integer         :: grpi,grpj,atomi,atomj,qq_pair,aLJ,bLJ
+integer         :: i,j,ig,jg,ia,ja,i3,j3,nl,istate,lj_code,maxingroups,par, atomnri
+integer         :: grpi,grpj,atomi,atomj,qq_pair,alj,blj
 
 
 if (monitor_group_pairs == 0) return
 
 !check the size of the largest group
 maxingroups=maxval(monitor_atom_group(:)%n)
-allocate (special_LJcod(nstates,maxingroups,maxingroups,monitor_group_pairs))
+allocate (special_ljcod(nstates,maxingroups,maxingroups,monitor_group_pairs))
 
 do par=1,monitor_group_pairs
     grpi=monitor_group_pair(par)%i      
@@ -8749,24 +8720,24 @@ do par=1,monitor_group_pairs
                       call die('two paired monitor atom groups contain the same atom')
               end if
               do istate=1,nstates
-                      !starting guess = use LJ_code matrix for topology atom types
-                      LJ_code = ljcod(iac(atomi),iac(atomj))
-                      if(qvdw_flag .and. LJ_code == 2) then
+                      !starting guess = use lj_code matrix for topology atom types
+                      lj_code = ljcod(iac(atomi),iac(atomj))
+                      if(qvdw_flag .and. lj_code == 2) then
                          if((iqatom(atomi) /= 0 .and. iqatom(atomj) == 0) .or.  &
                             (iqatom(atomj)/= 0 .and. iqatom(atomi) == 0)) then
-                            !can't use code 2 between q and non-q when Q-atom
-                            !types are used. Q-Type 2 params are for exp. 
-                            !repulsion, not LJ!
-                            LJ_code = 1
+                            !can't use code 2 between q and non-q when q-atom
+                            !types are used. q-type 2 params are for exp. 
+                            !repulsion, not lj!
+                            lj_code = 1
                           end if
                       end if
-                      !Are atoms of pair in 1-4 position?
+                      !are atoms of pair in 1-4 position?
                       if(iqatom(atomi) == 0 .and. iqatom(atomj) == 0) then !neither atom is q_atom
                         if (abs(atomj-atomi) .le. max_nbr_range ) then
                           if (atomi .gt. atomj ) then
-                            if ( list14(atomi-atomj, atomi) ) LJ_code = 3 !3 means 1-4
+                            if ( list14(atomi-atomj, atomi) ) lj_code = 3 !3 means 1-4
                           else
-                            if ( list14(atomj-atomi, atomj) ) LJ_code = 3
+                            if ( list14(atomj-atomi, atomj) ) lj_code = 3
                           end if
                         else
                           do nl = 1, n14long
@@ -8774,153 +8745,153 @@ do par=1,monitor_group_pairs
                               .and. list14long(2, nl) .eq. atomj) .or. &
                                (list14long(1, nl) .eq. atomj &
                               .and. list14long(2, nl) .eq. atomi)) then
-                                  LJ_code = 3
+                                  lj_code = 3
                             endif
                           end do
-                        endif	!kolla 1-4 interaktioner
-                      else	!at least one is Q-atom
-                            !check Q-Q pairlist to find LJ-code
+                        endif   !kolla 1-4 interaktioner
+                      else      !at least one is q-atom
+                            !check q-q pairlist to find lj-code
                         do qq_pair = 1, nbqq_pair(istate)
-                          atomnri=iqseq(nbqq(qq_pair,istate)%iq)         !Find atom number from qatom number
+                          atomnri=iqseq(nbqq(qq_pair,istate)%iq)         !find atom number from qatom number
                           if((atomnri == atomi .and. &     
                               nbqq(qq_pair,istate)%j == atomj ) .or. &
                              (nbqq(qq_pair,istate)%j == atomi .and. &
                               atomnri == atomj)) then   
-                              LJ_code = nbqq(qq_pair,istate)%LJcod
-                                 exit	
+                              lj_code = nbqq(qq_pair,istate)%ljcod
+                                 exit   
                           end if
                         end do
                            !if not found here then the first guess should be used
                       end if
-                                special_LJcod(istate,i,j,par)=LJ_code
+                                special_ljcod(istate,i,j,par)=lj_code
               end do !nstates
       end do   ! monitor_atom_group j
     end do  !monitor_atom_group i
 end do  !par
 end subroutine nbmonitorlist
 
-!---------------------------------------------------------------------------------------------------------		   
+!---------------------------------------------------------------------------------------------------------                 
 
 subroutine nonbond_monitor
 !monitor nonbonded energies between selected groups of atoms
 
 real(8)  :: dx1,dx2,dx3,r,r2,r6
-integer	 :: i,j,istate,LJ_code,par
-integer	 :: grpi,grpj,atomi,atomj,qatomi,qatomj,qq_pair, iaci,iacj
-real(8)  :: aLJi,bLJi,aLJj,bLJj,qi,qj, Vel,Vvdw,Vwel,Vwvdw,Vwsum
+integer  :: i,j,istate,lj_code,par
+integer  :: grpi,grpj,atomi,atomj,qatomi,qatomj,qq_pair, iaci,iacj
+real(8)  :: alji,blji,aljj,bljj,qi,qj, vel,vvdw,vwel,vwvdw,vwsum
 real(8)  :: r6_hc    !  softcore variables
 integer  :: sc_1,sc_2     !  softcore variables, sc_1 is the first index in sc_lookup (the qatom)
 logical  :: do_sc    !  softcore variables,   do_sc is a boolean to determine if softcore should be done
-					! do_sc is true when atom i or j is a qatom  (and qvdw is true)
+                                        ! do_sc is true when atom i or j is a qatom  (and qvdw is true)
 
 
 do par=1,monitor_group_pairs
 
         grpi=monitor_group_pair(par)%i      
         grpj=monitor_group_pair(par)%j 
-        monitor_group_pair(par)%Vel(:)=0
-        monitor_group_pair(par)%Vlj(:)=0
-        monitor_group_pair(par)%Vwel = 0
-        monitor_group_pair(par)%Vwlj = 0
-        monitor_group_pair(par)%Vwsum= 0     
+        monitor_group_pair(par)%vel(:)=0
+        monitor_group_pair(par)%vlj(:)=0
+        monitor_group_pair(par)%vwel = 0
+        monitor_group_pair(par)%vwlj = 0
+        monitor_group_pair(par)%vwsum= 0     
 
         do i=1,monitor_atom_group(grpi)%n
             
-			atomi=monitor_atom_group(grpi)%atom(i)
+                        atomi=monitor_atom_group(grpi)%atom(i)
             qatomi = iqatom(atomi)
-			qi   = crg(atomi)
-			iaci = iac(atomi)
+                        qi   = crg(atomi)
+                        iaci = iac(atomi)
             
-			    do j=1,monitor_atom_group(grpj)%n
+                            do j=1,monitor_atom_group(grpj)%n
             
-			            atomj=monitor_atom_group(grpj)%atom(j)  
+                                    atomj=monitor_atom_group(grpj)%atom(j)  
                         qatomj = iqatom(atomj)
                         iacj = iac(atomj)
                         qj   = crg(atomj)
                         dx1  = x(3*atomi-2)-x(3*atomj-2)      ! calculate the distance
                         dx2  = x(3*atomi-1)-x(3*atomj-1)
                         dx3  = x(3*atomi)-x(3*atomj)
-						
-						
-						if (use_PBC) then
-							dx1 = dx1 - boxlength(1)*nint( dx1*inv_boxl(1) )
-							dx2 = dx2 - boxlength(2)*nint( dx2*inv_boxl(2) )
-							dx3 = dx3 - boxlength(3)*nint( dx3*inv_boxl(3) )
-						end if
+                                                
+                                                
+                                                if (use_pbc) then
+                                                        dx1 = dx1 - boxlength(1)*nint( dx1*inv_boxl(1) )
+                                                        dx2 = dx2 - boxlength(2)*nint( dx2*inv_boxl(2) )
+                                                        dx3 = dx3 - boxlength(3)*nint( dx3*inv_boxl(3) )
+                                                end if
 
                         r2   = dx1*dx1 + dx2*dx2 + dx3*dx3
-                        r    = SQRT(1/r2) 
+                        r    = sqrt(1/r2) 
                         r6   = r2*r2*r2
-						r6_hc= r6   !needed for softcore
-  						r6   = 1._8/r6
+                                                r6_hc= r6   !needed for softcore
+                                                r6   = 1._8/r6
             
-			            do istate=1,nstates			
-								do_sc = .false.  !default is no softcore
+                                    do istate=1,nstates                 
+                                                                do_sc = .false.  !default is no softcore
 
-								LJ_code  = special_LJcod(istate,i,j,par)
-                                aLJi=iaclib(iaci)%avdw(LJ_code)
-                                bLJi=iaclib(iaci)%bvdw(LJ_code)
-                                aLJj=iaclib(iacj)%avdw(LJ_code)
-                                bLJj=iaclib(iacj)%bvdw(LJ_code)   
+                                                                lj_code  = special_ljcod(istate,i,j,par)
+                                alji=iaclib(iaci)%avdw(lj_code)
+                                blji=iaclib(iaci)%bvdw(lj_code)
+                                aljj=iaclib(iacj)%avdw(lj_code)
+                                bljj=iaclib(iacj)%bvdw(lj_code)   
                                 if (qatomi /= 0) qi = qcrg(qatomi,istate) 
                                 if (qatomj /= 0) qj = qcrg(qatomj,istate) 
                                 if (qvdw_flag) then
                                         if (qatomi/=0) then
                                                 iaci = qiac(qatomi,istate)
-                                                aLJi = qavdw(iaci,LJ_code)
-                                                bLJi = qbvdw(iaci,LJ_code)
+                                                alji = qavdw(iaci,lj_code)
+                                                blji = qbvdw(iaci,lj_code)
 
 
-												do_sc = .true.   ! atom i is a q-atom, softcore on
-												sc_1 = qatomi    ! the first index in sc_lookup should be a qatom number
+                                                                                                do_sc = .true.   ! atom i is a q-atom, softcore on
+                                                                                                sc_1 = qatomi    ! the first index in sc_lookup should be a qatom number
 
-										else
-												
-												sc_2 = iaci      ! atom i was not a qatom, put atom code i in the second sc_lookup index
+                                                                                else
+                                                                                                
+                                                                                                sc_2 = iaci      ! atom i was not a qatom, put atom code i in the second sc_lookup index
 
-                                        endif	
+                                        endif   
 
 
-                                        if (qatomj/=0) then					
-                                                iacj  = qiac(qatomj,istate)			
-                                                aLJj  = qavdw(iacj,LJ_code)			
-                                                bLJj  = qbvdw(iacj,LJ_code)
+                                        if (qatomj/=0) then                                     
+                                                iacj  = qiac(qatomj,istate)                     
+                                                aljj  = qavdw(iacj,lj_code)                     
+                                                bljj  = qbvdw(iacj,lj_code)
 
-												if (do_sc) then   ! do_sc is true if atom i is a qatom
-													sc_2 = qatomj + natyps  ! qatomi is sc_1
-												else
-													do_sc = .true.  ! atom i was not a qatom but j is, softcore on
-													sc_1 = qatomj	! qatom j should be the first index
-												end if
+                                                                                                if (do_sc) then   ! do_sc is true if atom i is a qatom
+                                                                                                        sc_2 = qatomj + natyps  ! qatomi is sc_1
+                                                                                                else
+                                                                                                        do_sc = .true.  ! atom i was not a qatom but j is, softcore on
+                                                                                                        sc_1 = qatomj   ! qatom j should be the first index
+                                                                                                end if
 
-										else
-											sc_2 = iacj    ! atom j is not a qatom, should be index 2
-										
-												
+                                                                                else
+                                                                                        sc_2 = iacj    ! atom j is not a qatom, should be index 2
+                                                                                
+                                                                                                
                                         endif
-										
-										if (do_sc) then  ! calculate softcore r6
-											r6 = r6_hc + sc_lookup (sc_1,sc_2,istate)
-											r6 = 1._8/r6
-										end if	 
-                                endif										
-                                Vel  = qi*qj*r	
+                                                                                
+                                                                                if (do_sc) then  ! calculate softcore r6
+                                                                                        r6 = r6_hc + sc_lookup (sc_1,sc_2,istate)
+                                                                                        r6 = 1._8/r6
+                                                                                end if   
+                                endif                                                                           
+                                vel  = qi*qj*r  
                                 if(ivdw_rule==1) then !geometric comb. rule
-                                        Vvdw = aLJi*aLJj*r6*r6-bLJi*bLJj*r6
+                                        vvdw = alji*aljj*r6*r6-blji*bljj*r6
                                 else !arithmetic
-                                        Vvdw = bLJi * bLJj * (aLJi+aLJj)**6 * r6 * &
-                                                ((aLJi+aLJj)**6 * r6 - 2.0)
+                                        vvdw = blji * bljj * (alji+aljj)**6 * r6 * &
+                                                ((alji+aljj)**6 * r6 - 2.0)
                                 endif
                                 !add up for this pair of atom groups
-                                monitor_group_pair(par)%Vel(istate)= monitor_group_pair(par)%Vel(istate)+Vel
-                                monitor_group_pair(par)%Vlj(istate)= monitor_group_pair(par)%Vlj(istate)+Vvdw
-                        end do	!nstates
+                                monitor_group_pair(par)%vel(istate)= monitor_group_pair(par)%vel(istate)+vel
+                                monitor_group_pair(par)%vlj(istate)= monitor_group_pair(par)%vlj(istate)+vvdw
+                        end do  !nstates
                 end do   ! monitor_atom_group j
         end do  !monitor_atom_group i
         !calc lambda-weighted sum
-        monitor_group_pair(par)%Vwel=dot_product(monitor_group_pair(par)%Vel(1:nstates),EQ(1:nstates)%lambda)
-        monitor_group_pair(par)%Vwlj=dot_product(monitor_group_pair(par)%Vlj(1:nstates),EQ(1:nstates)%lambda)
-        monitor_group_pair(par)%Vwsum= monitor_group_pair(par)%Vwlj+monitor_group_pair(par)%Vwel
+        monitor_group_pair(par)%vwel=dot_product(monitor_group_pair(par)%vel(1:nstates),eq(1:nstates)%lambda)
+        monitor_group_pair(par)%vwlj=dot_product(monitor_group_pair(par)%vlj(1:nstates),eq(1:nstates)%lambda)
+        monitor_group_pair(par)%vwsum= monitor_group_pair(par)%vwlj+monitor_group_pair(par)%vwel
 end do !par
 
 end subroutine nonbond_monitor
@@ -8929,16 +8900,16 @@ end subroutine nonbond_monitor
 
 subroutine nonbon2_pp
 ! local variables
-integer						:: ip
-real(8)						:: aLJa,bLJa,dx1a,dx2a,dx3a,r2a,ra,r6a
-real(8)						:: aLJb,bLJb,dx1b,dx2b,dx3b,r2b,rb,r6b
-real(8)						:: Vela,V_aa,V_ba,dva
-real(8)						:: Velb,V_ab,V_bb,dvb
-type(NB_TYPE), pointer		:: pa
-type(NB_TYPE), pointer		:: pb
+integer                                         :: ip
+real(8)                                         :: alja,blja,dx1a,dx2a,dx3a,r2a,ra,r6a
+real(8)                                         :: aljb,bljb,dx1b,dx2b,dx3b,r2b,rb,r6b
+real(8)                                         :: vela,v_aa,v_ba,dva
+real(8)                                         :: velb,v_ab,v_bb,dvb
+type(nb_type), pointer          :: pa
+type(nb_type), pointer          :: pb
 
 ! global variables used:
-!  iaclib, x, crg, el14_scale, d, E
+!  iaclib, x, crg, el14_scale, d, e
 
 do ip = 1, nbpp_pair - 1, 2
 ! for every second pair:
@@ -8947,15 +8918,15 @@ do ip = 1, nbpp_pair - 1, 2
 pa => nbpp(ip)
 pb => nbpp(ip+1)
 
-! calculate aLJ and bLJ
-aLJa  = iaclib(iac(pa%i))%avdw(pa%LJcod)+iaclib(iac(pa%j))%avdw(pa%LJcod)
-aLJb  = iaclib(iac(pb%i))%avdw(pb%LJcod)+iaclib(iac(pb%j))%avdw(pb%LJcod)
-bLJa  = iaclib(iac(pa%i))%bvdw(pa%LJcod)*iaclib(iac(pa%j))%bvdw(pa%LJcod)
-bLJb  = iaclib(iac(pb%i))%bvdw(pb%LJcod)*iaclib(iac(pb%j))%bvdw(pb%LJcod)
-aLJa  = aLJa*aLJa
-aLJb  = aLJb*aLJb
-aLJa  = aLJa*aLJa*aLJa
-aLJb  = aLJb*aLJb*aLJb
+! calculate alj and blj
+alja  = iaclib(iac(pa%i))%avdw(pa%ljcod)+iaclib(iac(pa%j))%avdw(pa%ljcod)
+aljb  = iaclib(iac(pb%i))%avdw(pb%ljcod)+iaclib(iac(pb%j))%avdw(pb%ljcod)
+blja  = iaclib(iac(pa%i))%bvdw(pa%ljcod)*iaclib(iac(pa%j))%bvdw(pa%ljcod)
+bljb  = iaclib(iac(pb%i))%bvdw(pb%ljcod)*iaclib(iac(pb%j))%bvdw(pb%ljcod)
+alja  = alja*alja
+aljb  = aljb*aljb
+alja  = alja*alja*alja
+aljb  = aljb*aljb*aljb
 
 ! calculate dx, r and r2
 dx1a  = x(pa%j*3-2) - x(pa%i*3-2)
@@ -8973,21 +8944,21 @@ rb = sqrt(r2b)
 r6a   = r2a*r2a*r2a
 r6b   = r2b*r2b*r2b
 
-! calculate Vel and dv
-Vela  = crg(pa%i)*crg(pa%j)*ra  
-Velb  = crg(pb%i)*crg(pb%j)*rb  
-if ( pa%LJcod .eq. 3 ) then
-  Vela = Vela*el14_scale
+! calculate vel and dv
+vela  = crg(pa%i)*crg(pa%j)*ra  
+velb  = crg(pb%i)*crg(pb%j)*rb  
+if ( pa%ljcod .eq. 3 ) then
+  vela = vela*el14_scale
 end if
-if ( pb%LJcod .eq. 3 ) then
-  Velb = Velb*el14_scale
+if ( pb%ljcod .eq. 3 ) then
+  velb = velb*el14_scale
 end if
-V_aa  = bLJa*aLJa*aLJa*r6a*r6a 
-V_ab  = bLJb*aLJb*aLJb*r6b*r6b 
-V_ba  = 2.0*bLJa*aLJa*r6a
-V_bb  = 2.0*bLJb*aLJb*r6b
-dva   = r2a*( -Vela -12.*V_aa +6.*V_ba )
-dvb   = r2b*( -Velb -12.*V_ab +6.*V_bb )
+v_aa  = blja*alja*alja*r6a*r6a 
+v_ab  = bljb*aljb*aljb*r6b*r6b 
+v_ba  = 2.0*blja*alja*r6a
+v_bb  = 2.0*bljb*aljb*r6b
+dva   = r2a*( -vela -12.*v_aa +6.*v_ba )
+dvb   = r2b*( -velb -12.*v_ab +6.*v_bb )
 
 ! update d
 d(pa%i*3-2) = d(pa%i*3-2) - dva*dx1a
@@ -9004,18 +8975,18 @@ d(pa%j*3-0) = d(pa%j*3-0) + dva*dx3a
 d(pb%j*3-0) = d(pb%j*3-0) + dvb*dx3b
 
 ! update energies
-E%pp%el  = E%pp%el + Vela + Velb
-E%pp%vdw = E%pp%vdw + V_aa - V_ba + V_ab - V_bb
+e%pp%el  = e%pp%el + vela + velb
+e%pp%vdw = e%pp%vdw + v_aa - v_ba + v_ab - v_bb
 end do
 
 if (ip .eq. nbpp_pair) then
 ! the last pair:
 
 pa => nbpp(ip)
-aLJa  = iaclib(iac(pa%i))%avdw(pa%LJcod)+iaclib(iac(pa%j))%avdw(pa%LJcod)
-bLJa  = iaclib(iac(pa%i))%bvdw(pa%LJcod)*iaclib(iac(pa%j))%bvdw(pa%LJcod)
-aLJa  = aLJa*aLJa
-aLJa  = aLJa*aLJa*aLJa
+alja  = iaclib(iac(pa%i))%avdw(pa%ljcod)+iaclib(iac(pa%j))%avdw(pa%ljcod)
+blja  = iaclib(iac(pa%i))%bvdw(pa%ljcod)*iaclib(iac(pa%j))%bvdw(pa%ljcod)
+alja  = alja*alja
+alja  = alja*alja*alja
 
 dx1a  = x(pa%j*3-2) - x(pa%i*3-2)
 dx2a  = x(pa%j*3-1) - x(pa%i*3-1)
@@ -9026,12 +8997,12 @@ ra = sqrt(r2a)
 
 r6a   = r2a*r2a*r2a
 
-Vela  = crg(pa%i)*crg(pa%j)*ra
-if ( pa%LJcod .eq. 3 ) Vela = Vela*el14_scale
+vela  = crg(pa%i)*crg(pa%j)*ra
+if ( pa%ljcod .eq. 3 ) vela = vela*el14_scale
 
-V_aa  = bLJa*aLJa*aLJa*r6a*r6a 
-V_ba  = 2.0*bLJa*aLJa*r6a
-dva   = r2a*( -Vela -12.*V_aa +6.*V_ba )
+v_aa  = blja*alja*alja*r6a*r6a 
+v_ba  = 2.0*blja*alja*r6a
+dva   = r2a*( -vela -12.*v_aa +6.*v_ba )
 
 d(pa%i*3-2) = d(pa%i*3-2) - dva*dx1a
 d(pa%i*3-1) = d(pa%i*3-1) - dva*dx2a
@@ -9040,8 +9011,8 @@ d(pa%j*3-2) = d(pa%j*3-2) + dva*dx1a
 d(pa%j*3-1) = d(pa%j*3-1) + dva*dx2a
 d(pa%j*3-0) = d(pa%j*3-0) + dva*dx3a
 
-E%pp%el  = E%pp%el + Vela 
-E%pp%vdw = E%pp%vdw + V_aa - V_ba 
+e%pp%el  = e%pp%el + vela 
+e%pp%vdw = e%pp%vdw + v_aa - v_ba 
 end if
 
 end subroutine nonbon2_pp
@@ -9049,93 +9020,93 @@ end subroutine nonbon2_pp
 !------------------------------------------------------------------------
 subroutine nonbon2_pp_box
   ! local variables
-  integer						:: ip, ga, gb, group
-  real(8)						:: aLJa,bLJa,dx1a,dx2a,dx3a,r2a,ra,r6a
-  real(8)						:: aLJb,bLJb,dx1b,dx2b,dx3b,r2b,rb,r6b
-  real(8)						:: Vela,V_aa,V_ba,dva
-  real(8)						:: Velb,V_ab,V_bb,dvb
-  type(NB_TYPE), pointer		:: pa
-  type(NB_TYPE), pointer		:: pb
+  integer                                               :: ip, ga, gb, group
+  real(8)                                               :: alja,blja,dx1a,dx2a,dx3a,r2a,ra,r6a
+  real(8)                                               :: aljb,bljb,dx1b,dx2b,dx3b,r2b,rb,r6b
+  real(8)                                               :: vela,v_aa,v_ba,dva
+  real(8)                                               :: velb,v_ab,v_bb,dvb
+  type(nb_type), pointer                :: pa
+  type(nb_type), pointer                :: pb
 
  ! global variables used:
-  !  iaclib, x, crg, el14_scale, d, E
+  !  iaclib, x, crg, el14_scale, d, e
 
 
-	do group = 1, nbpp_cgp_pair
-		ga = nbpp_cgp(group)%i !atom index for the two switching atoms
-		gb = nbpp_cgp(group)%j
+        do group = 1, nbpp_cgp_pair
+                ga = nbpp_cgp(group)%i !atom index for the two switching atoms
+                gb = nbpp_cgp(group)%j
 
-		!the distance between the two switching atoms
-		dx1a = x(3*gb-2) - x(3*ga-2)
-		dx2a = x(3*gb-1) - x(3*ga-1)
-		dx3a = x(3*gb  ) - x(3*ga  )
+                !the distance between the two switching atoms
+                dx1a = x(3*gb-2) - x(3*ga-2)
+                dx2a = x(3*gb-1) - x(3*ga-1)
+                dx3a = x(3*gb  ) - x(3*ga  )
 
-		nbpp_cgp(group)%x = boxlength(1)*nint( dx1a*inv_boxl(1) )
-		nbpp_cgp(group)%y = boxlength(2)*nint( dx2a*inv_boxl(2) )	
-		nbpp_cgp(group)%z = boxlength(3)*nint( dx3a*inv_boxl(3) )
+                nbpp_cgp(group)%x = boxlength(1)*nint( dx1a*inv_boxl(1) )
+                nbpp_cgp(group)%y = boxlength(2)*nint( dx2a*inv_boxl(2) )       
+                nbpp_cgp(group)%z = boxlength(3)*nint( dx3a*inv_boxl(3) )
 
-	end do
+        end do
 
   do ip = 1, nbpp_pair - 1, 2
     ! for every second pair:
 
-	! init pointers
-	pa => nbpp(ip)
-	pb => nbpp(ip+1)
-	ga = pa%cgp_pair
-	gb = pb%cgp_pair
+        ! init pointers
+        pa => nbpp(ip)
+        pb => nbpp(ip+1)
+        ga = pa%cgp_pair
+        gb = pb%cgp_pair
 
-	! calculate aLJ and bLJ
-    aLJa  = iaclib(iac(pa%i))%avdw(pa%LJcod)+iaclib(iac(pa%j))%avdw(pa%LJcod)
-    aLJb  = iaclib(iac(pb%i))%avdw(pb%LJcod)+iaclib(iac(pb%j))%avdw(pb%LJcod)
-    bLJa  = iaclib(iac(pa%i))%bvdw(pa%LJcod)*iaclib(iac(pa%j))%bvdw(pa%LJcod)
-    bLJb  = iaclib(iac(pb%i))%bvdw(pb%LJcod)*iaclib(iac(pb%j))%bvdw(pb%LJcod)
-    aLJa  = aLJa*aLJa
-    aLJb  = aLJb*aLJb
-    aLJa  = aLJa*aLJa*aLJa
-    aLJb  = aLJb*aLJb*aLJb
+        ! calculate alj and blj
+    alja  = iaclib(iac(pa%i))%avdw(pa%ljcod)+iaclib(iac(pa%j))%avdw(pa%ljcod)
+    aljb  = iaclib(iac(pb%i))%avdw(pb%ljcod)+iaclib(iac(pb%j))%avdw(pb%ljcod)
+    blja  = iaclib(iac(pa%i))%bvdw(pa%ljcod)*iaclib(iac(pa%j))%bvdw(pa%ljcod)
+    bljb  = iaclib(iac(pb%i))%bvdw(pb%ljcod)*iaclib(iac(pb%j))%bvdw(pb%ljcod)
+    alja  = alja*alja
+    aljb  = aljb*aljb
+    alja  = alja*alja*alja
+    aljb  = aljb*aljb*aljb
 
-	! calculate dx, r and r2
+        ! calculate dx, r and r2
     dx1a  = x(pa%j*3-2) - x(pa%i*3-2)
     dx1b  = x(pb%j*3-2) - x(pb%i*3-2)
     dx2a  = x(pa%j*3-1) - x(pa%i*3-1)
     dx2b  = x(pb%j*3-1) - x(pb%i*3-1)
     dx3a  = x(pa%j*3-0) - x(pa%i*3-0)
     dx3b  = x(pb%j*3-0) - x(pb%i*3-0)
-	dx1a = dx1a - nbpp_cgp(ga)%x         
-	dx1b = dx1b - nbpp_cgp(gb)%x 
-	dx2a = dx2a - nbpp_cgp(ga)%y    
-	dx2b = dx2b - nbpp_cgp(gb)%y                
-	dx3a = dx3a - nbpp_cgp(ga)%z  
-	dx3b = dx3b - nbpp_cgp(gb)%z   
-	
+        dx1a = dx1a - nbpp_cgp(ga)%x         
+        dx1b = dx1b - nbpp_cgp(gb)%x 
+        dx2a = dx2a - nbpp_cgp(ga)%y    
+        dx2b = dx2b - nbpp_cgp(gb)%y                
+        dx3a = dx3a - nbpp_cgp(ga)%z  
+        dx3b = dx3b - nbpp_cgp(gb)%z   
+        
 
 
     r2a   = 1./(dx1a*dx1a + dx2a*dx2a + dx3a*dx3a)
     r2b   = 1./(dx1b*dx1b + dx2b*dx2b + dx3b*dx3b)
-	ra = sqrt(r2a)
-	rb = sqrt(r2b) 
+        ra = sqrt(r2a)
+        rb = sqrt(r2b) 
 
     r6a   = r2a*r2a*r2a
     r6b   = r2b*r2b*r2b
 
-	! calculate Vel and dv
-    Vela  = crg(pa%i)*crg(pa%j)*ra  
-    Velb  = crg(pb%i)*crg(pb%j)*rb  
-    if ( pa%LJcod .eq. 3 ) then
-	  Vela = Vela*el14_scale
-	end if
-    if ( pb%LJcod .eq. 3 ) then
-	  Velb = Velb*el14_scale
-	end if
-    V_aa  = bLJa*aLJa*aLJa*r6a*r6a 
-    V_ab  = bLJb*aLJb*aLJb*r6b*r6b 
-    V_ba  = 2.0*bLJa*aLJa*r6a
-    V_bb  = 2.0*bLJb*aLJb*r6b
-    dva   = r2a*( -Vela -12.*V_aa +6.*V_ba )
-    dvb   = r2b*( -Velb -12.*V_ab +6.*V_bb )
+        ! calculate vel and dv
+    vela  = crg(pa%i)*crg(pa%j)*ra  
+    velb  = crg(pb%i)*crg(pb%j)*rb  
+    if ( pa%ljcod .eq. 3 ) then
+          vela = vela*el14_scale
+        end if
+    if ( pb%ljcod .eq. 3 ) then
+          velb = velb*el14_scale
+        end if
+    v_aa  = blja*alja*alja*r6a*r6a 
+    v_ab  = bljb*aljb*aljb*r6b*r6b 
+    v_ba  = 2.0*blja*alja*r6a
+    v_bb  = 2.0*bljb*aljb*r6b
+    dva   = r2a*( -vela -12.*v_aa +6.*v_ba )
+    dvb   = r2b*( -velb -12.*v_ab +6.*v_bb )
 
-	! update d
+        ! update d
     d(pa%i*3-2) = d(pa%i*3-2) - dva*dx1a
     d(pb%i*3-2) = d(pb%i*3-2) - dvb*dx1b
     d(pa%i*3-1) = d(pa%i*3-1) - dva*dx2a
@@ -9149,39 +9120,39 @@ subroutine nonbon2_pp_box
     d(pa%j*3-0) = d(pa%j*3-0) + dva*dx3a
     d(pb%j*3-0) = d(pb%j*3-0) + dvb*dx3b
 
-	! update energies
-    E%pp%el  = E%pp%el + Vela + Velb
-    E%pp%vdw = E%pp%vdw + V_aa - V_ba + V_ab - V_bb
+        ! update energies
+    e%pp%el  = e%pp%el + vela + velb
+    e%pp%vdw = e%pp%vdw + v_aa - v_ba + v_ab - v_bb
   end do
 
   if (ip .eq. nbpp_pair) then
     ! the last pair:
 
-	pa => nbpp(ip)
-	ga = pa%cgp_pair
+        pa => nbpp(ip)
+        ga = pa%cgp_pair
 
-    aLJa  = iaclib(iac(pa%i))%avdw(pa%LJcod)+iaclib(iac(pa%j))%avdw(pa%LJcod)
-    bLJa  = iaclib(iac(pa%i))%bvdw(pa%LJcod)*iaclib(iac(pa%j))%bvdw(pa%LJcod)
-    aLJa  = aLJa*aLJa
-    aLJa  = aLJa*aLJa*aLJa
+    alja  = iaclib(iac(pa%i))%avdw(pa%ljcod)+iaclib(iac(pa%j))%avdw(pa%ljcod)
+    blja  = iaclib(iac(pa%i))%bvdw(pa%ljcod)*iaclib(iac(pa%j))%bvdw(pa%ljcod)
+    alja  = alja*alja
+    alja  = alja*alja*alja
 
     dx1a  = x(pa%j*3-2) - x(pa%i*3-2)
     dx2a  = x(pa%j*3-1) - x(pa%i*3-1)
     dx3a  = x(pa%j*3-0) - x(pa%i*3-0)
-	dx1a = dx1a - nbpp_cgp(ga)%x  
-	dx2a = dx2a - nbpp_cgp(ga)%y  
-	dx3a = dx3a - nbpp_cgp(ga)%z  
+        dx1a = dx1a - nbpp_cgp(ga)%x  
+        dx2a = dx2a - nbpp_cgp(ga)%y  
+        dx3a = dx3a - nbpp_cgp(ga)%z  
 
 
     r2a   = 1./(dx1a*dx1a + dx2a*dx2a + dx3a*dx3a)
-	ra = sqrt(r2a)
+        ra = sqrt(r2a)
     r6a   = r2a*r2a*r2a
 
-   Vela  = crg(pa%i)*crg(pa%j)*ra
-    if ( pa%LJcod .eq. 3 ) Vela = Vela*el14_scale
-    V_aa  = bLJa*aLJa*aLJa*r6a*r6a 
-    V_ba  = 2.0*bLJa*aLJa*r6a
-    dva   = r2a*( -Vela -12.*V_aa +6.*V_ba )
+   vela  = crg(pa%i)*crg(pa%j)*ra
+    if ( pa%ljcod .eq. 3 ) vela = vela*el14_scale
+    v_aa  = blja*alja*alja*r6a*r6a 
+    v_ba  = 2.0*blja*alja*r6a
+    dva   = r2a*( -vela -12.*v_aa +6.*v_ba )
 
     d(pa%i*3-2) = d(pa%i*3-2) - dva*dx1a
     d(pa%i*3-1) = d(pa%i*3-1) - dva*dx2a
@@ -9190,8 +9161,8 @@ subroutine nonbon2_pp_box
     d(pa%j*3-1) = d(pa%j*3-1) + dva*dx2a
     d(pa%j*3-0) = d(pa%j*3-0) + dva*dx3a
 
-    E%pp%el  = E%pp%el + Vela 
-    E%pp%vdw = E%pp%vdw + V_aa - V_ba 
+    e%pp%el  = e%pp%el + vela 
+    e%pp%vdw = e%pp%vdw + v_aa - v_ba 
   end if
 
 end subroutine nonbon2_pp_box
@@ -9199,12 +9170,12 @@ end subroutine nonbon2_pp_box
 
 subroutine nonbon2_pw
 ! local variables
-integer						:: ip,i,j,i3,j3,iaci,iacj,iLJ
-real(8)						:: aLJ,bLJ,dx1,dx2,dx3,r2,r,r6,r12
-real(8)						:: Vel,V_a,V_b,dv
+integer                                         :: ip,i,j,i3,j3,iaci,iacj,ilj
+real(8)                                         :: alj,blj,dx1,dx2,dx3,r2,r,r6,r12
+real(8)                                         :: vel,v_a,v_b,dv
 
 ! global variables used:
-!  iac, crg, iaclib, x, d, E
+!  iac, crg, iaclib, x, d, e
 
 do ip = 1, nbpw_pair
 ! for every assigned pair:
@@ -9214,13 +9185,13 @@ i3   = i*3-3
 j3   = j*3-3
 iaci = iac(i)
 iacj = iac(j)
-iLJ  = nbpw(ip)%LJcod
+ilj  = nbpw(ip)%ljcod
 crg(i)   = crg(i)
 crg(j)   = crg(j)
-aLJ  = iaclib(iaci)%avdw(iLJ)+iaclib(iacj)%avdw(iLJ)
-bLJ  = iaclib(iaci)%bvdw(iLJ)*iaclib(iacj)%bvdw(iLJ)
-aLJ  = aLJ*aLJ
-aLJ  = aLJ*aLJ*aLJ
+alj  = iaclib(iaci)%avdw(ilj)+iaclib(iacj)%avdw(ilj)
+blj  = iaclib(iaci)%bvdw(ilj)*iaclib(iacj)%bvdw(ilj)
+alj  = alj*alj
+alj  = alj*alj*alj
 
 ! calculate dx and r
 dx1  = x(j3+1) - x(i3+1)
@@ -9233,11 +9204,11 @@ r    = sqrt ( r2 )
 r6   = r2*r2*r2
 r12  = r6*r6
 
-! calculate Vel and dv
-Vel  = crg(i)*crg(j)*r
-V_a  = bLJ*aLJ*aLJ*r12 
-V_b  = 2.0*bLJ*aLJ*r6
-dv   = r2*( -Vel -12.*V_a +6.*V_b )
+! calculate vel and dv
+vel  = crg(i)*crg(j)*r
+v_a  = blj*alj*alj*r12 
+v_b  = 2.0*blj*alj*r6
+dv   = r2*( -vel -12.*v_a +6.*v_b )
 
 ! update forces
 d(i3+1) = d(i3+1) - dv*dx1
@@ -9248,8 +9219,8 @@ d(j3+2) = d(j3+2) + dv*dx2
 d(j3+3) = d(j3+3) + dv*dx3
 
 ! update energies
-E%pw%el  = E%pw%el + Vel       
-E%pw%vdw = E%pw%vdw + V_a - V_b
+e%pw%el  = e%pw%el + vel       
+e%pw%vdw = e%pw%vdw + v_a - v_b
 end do
 
 end subroutine nonbon2_pw
@@ -9258,82 +9229,82 @@ end subroutine nonbon2_pw
 
 subroutine nonbon2_pw_box
   ! local variables
-  integer						:: ip,i,j,i3,j3,iaci,iacj,iLJ
-  real(8)						:: aLJ,bLJ,dx1,dx2,dx3,r2,r,r6,r12
-  real(8)						:: Vel,V_a,V_b,dv
-  integer						:: group, ga, gb
+  integer                                               :: ip,i,j,i3,j3,iaci,iacj,ilj
+  real(8)                                               :: alj,blj,dx1,dx2,dx3,r2,r,r6,r12
+  real(8)                                               :: vel,v_a,v_b,dv
+  integer                                               :: group, ga, gb
 
   ! global variables used:
-  !  iac, crg, iaclib, x, d, E
+  !  iac, crg, iaclib, x, d, e
 
 
    !compute the peridocal shift for every charge group pair
-	do group = 1, nbpw_cgp_pair
-		ga = nbpw_cgp(group)%i !atom index for solute switching atom
-		gb = nbpw_cgp(group)%j  !atom index for the solvent switching atom
+        do group = 1, nbpw_cgp_pair
+                ga = nbpw_cgp(group)%i !atom index for solute switching atom
+                gb = nbpw_cgp(group)%j  !atom index for the solvent switching atom
 
-		!the distance between the two switching atoms
-		dx1 = x(3*gb-2) - x(3*ga-2)
-		dx2 = x(3*gb-1) - x(3*ga-1)
-		dx3 = x(3*gb  ) - x(3*ga  )
+                !the distance between the two switching atoms
+                dx1 = x(3*gb-2) - x(3*ga-2)
+                dx2 = x(3*gb-1) - x(3*ga-1)
+                dx3 = x(3*gb  ) - x(3*ga  )
 
-		nbpw_cgp(group)%x = boxlength(1)*nint( dx1*inv_boxl(1) )
-		nbpw_cgp(group)%y = boxlength(2)*nint( dx2*inv_boxl(2) )	
-		nbpw_cgp(group)%z = boxlength(3)*nint( dx3*inv_boxl(3) )
+                nbpw_cgp(group)%x = boxlength(1)*nint( dx1*inv_boxl(1) )
+                nbpw_cgp(group)%y = boxlength(2)*nint( dx2*inv_boxl(2) )        
+                nbpw_cgp(group)%z = boxlength(3)*nint( dx3*inv_boxl(3) )
 
-	end do
+        end do
 
 
   do ip = 1, nbpw_pair
-	! for every assigned pair:
+        ! for every assigned pair:
 
-	i    = nbpw(ip)%i !solute atom 
-	j    = nbpw(ip)%j !solvent atom
-	group = nbpw(ip)%cgp_pair
-	i3   = i*3-3
-	j3   = j*3-3
-	iaci = iac(i)
-	iacj = iac(j)
-	iLJ  = nbpw(ip)%LJcod
-	crg(i)   = crg(i)
-	crg(j)   = crg(j)
-	aLJ  = iaclib(iaci)%avdw(iLJ)+iaclib(iacj)%avdw(iLJ)
-	bLJ  = iaclib(iaci)%bvdw(iLJ)*iaclib(iacj)%bvdw(iLJ)
-	aLJ  = aLJ*aLJ
-	aLJ  = aLJ*aLJ*aLJ
+        i    = nbpw(ip)%i !solute atom 
+        j    = nbpw(ip)%j !solvent atom
+        group = nbpw(ip)%cgp_pair
+        i3   = i*3-3
+        j3   = j*3-3
+        iaci = iac(i)
+        iacj = iac(j)
+        ilj  = nbpw(ip)%ljcod
+        crg(i)   = crg(i)
+        crg(j)   = crg(j)
+        alj  = iaclib(iaci)%avdw(ilj)+iaclib(iacj)%avdw(ilj)
+        blj  = iaclib(iaci)%bvdw(ilj)*iaclib(iacj)%bvdw(ilj)
+        alj  = alj*alj
+        alj  = alj*alj*alj
 
-	! calculate dx and r
-	dx1  = x(j3+1) - x(i3+1)
-	dx2  = x(j3+2) - x(i3+2)
-	dx3  = x(j3+3) - x(i3+3)
-	dx1 = dx1 - nbpw_cgp(group)%x  
-	dx2 = dx2 - nbpw_cgp(group)%y  
-	dx3 = dx3 - nbpw_cgp(group)%z  
-	
+        ! calculate dx and r
+        dx1  = x(j3+1) - x(i3+1)
+        dx2  = x(j3+2) - x(i3+2)
+        dx3  = x(j3+3) - x(i3+3)
+        dx1 = dx1 - nbpw_cgp(group)%x  
+        dx2 = dx2 - nbpw_cgp(group)%y  
+        dx3 = dx3 - nbpw_cgp(group)%z  
+        
 
-	r2   = dx1*dx1 + dx2*dx2 + dx3*dx3
-	r2   = 1./r2
-	r    = sqrt ( r2 ) 
-	r6   = r2*r2*r2
-	r12  = r6*r6
+        r2   = dx1*dx1 + dx2*dx2 + dx3*dx3
+        r2   = 1./r2
+        r    = sqrt ( r2 ) 
+        r6   = r2*r2*r2
+        r12  = r6*r6
 
-	! calculate Vel and dv
-	Vel  = crg(i)*crg(j)*r
-	V_a  = bLJ*aLJ*aLJ*r12 
-	V_b  = 2.0*bLJ*aLJ*r6
-	dv   = r2*( -Vel -12.*V_a +6.*V_b )
+        ! calculate vel and dv
+        vel  = crg(i)*crg(j)*r
+        v_a  = blj*alj*alj*r12 
+        v_b  = 2.0*blj*alj*r6
+        dv   = r2*( -vel -12.*v_a +6.*v_b )
 
-	! update forces
-	d(i3+1) = d(i3+1) - dv*dx1
-	d(i3+2) = d(i3+2) - dv*dx2
-	d(i3+3) = d(i3+3) - dv*dx3
-	d(j3+1) = d(j3+1) + dv*dx1
-	d(j3+2) = d(j3+2) + dv*dx2
-	d(j3+3) = d(j3+3) + dv*dx3
+        ! update forces
+        d(i3+1) = d(i3+1) - dv*dx1
+        d(i3+2) = d(i3+2) - dv*dx2
+        d(i3+3) = d(i3+3) - dv*dx3
+        d(j3+1) = d(j3+1) + dv*dx1
+        d(j3+2) = d(j3+2) + dv*dx2
+        d(j3+3) = d(j3+3) + dv*dx3
 
-	! update energies
-	E%pw%el  = E%pw%el + Vel       
-	E%pw%vdw = E%pw%vdw + V_a - V_b
+        ! update energies
+        e%pw%el  = e%pw%el + vel       
+        e%pw%vdw = e%pw%vdw + v_a - v_b
   end do
 
 end subroutine nonbon2_pw_box
@@ -9342,10 +9313,10 @@ end subroutine nonbon2_pw_box
 
 subroutine nonbon2_qq
 ! local variables
-integer						:: istate
-integer						:: ip,iq,jq,i,j,k,i3,j3,iaci,iacj,iLJ
-real(8)						:: qi,qj,aLJ,bLJ,dx1,dx2,dx3,r2,r,r6,r12,r6_hc
-real(8)						:: Vel,V_a,V_b,dv,el_scale
+integer                                         :: istate
+integer                                         :: ip,iq,jq,i,j,k,i3,j3,iaci,iacj,ilj
+real(8)                                         :: qi,qj,alj,blj,dx1,dx2,dx3,r2,r,r6,r12,r6_hc
+real(8)                                         :: vel,v_a,v_b,dv,el_scale
 
 do istate = 1, nstates
 ! for every state:
@@ -9359,7 +9330,7 @@ do ip = 1, nbqq_pair(istate)
   jq   = nbqq(ip,istate)%jq
   i3   = i*3-3
   j3   = j*3-3
-  iLJ  = nbqq(ip,istate)%LJcod
+  ilj  = nbqq(ip,istate)%ljcod
   qi   = qcrg(iq,istate)
   el_scale = nbqq(ip,istate)%el_scale
 
@@ -9367,8 +9338,8 @@ do ip = 1, nbqq_pair(istate)
   if (.not. qvdw_flag) then
         iaci = iac(i)
         iacj = iac(j)
-        aLJ  = iaclib(iaci)%avdw(iLJ)+iaclib(iacj)%avdw(iLJ)
-        bLJ  = iaclib(iaci)%bvdw(iLJ)*iaclib(iacj)%bvdw(iLJ)
+        alj  = iaclib(iaci)%avdw(ilj)+iaclib(iacj)%avdw(ilj)
+        blj  = iaclib(iaci)%bvdw(ilj)*iaclib(iacj)%bvdw(ilj)
         if ( jq /= 0) then
           qj = qcrg(jq,istate)
         else
@@ -9376,25 +9347,25 @@ do ip = 1, nbqq_pair(istate)
         end if
   else
         iaci = qiac(iq,istate)
-        aLJ  = qavdw(iaci,iLJ)
-        bLJ  = qbvdw(iaci,iLJ)
+        alj  = qavdw(iaci,ilj)
+        blj  = qbvdw(iaci,ilj)
         if ( jq /= 0) then
           iacj = qiac(jq,istate)
           qj   = qcrg(jq,istate)
-          if ( iLJ .eq. 2 ) then
-                aLJ = aLJ*qavdw(iacj,iLJ)
+          if ( ilj .eq. 2 ) then
+                alj = alj*qavdw(iacj,ilj)
           else
-                aLJ = aLJ+qavdw(iacj,iLJ)
+                alj = alj+qavdw(iacj,ilj)
           end if
-          bLJ = bLJ*qbvdw(iacj,iLJ)
+          blj = blj*qbvdw(iacj,ilj)
         else
-          if ( iLJ .eq. 2 ) then
-                aLJ  = qavdw(iaci,1)
-                bLJ  = qbvdw(iaci,1)
+          if ( ilj .eq. 2 ) then
+                alj  = qavdw(iaci,1)
+                blj  = qbvdw(iaci,1)
           end if
           iacj = iac(j)
-          aLJ = aLJ+iaclib(iacj)%avdw(iLJ)
-          bLJ = bLJ*iaclib(iacj)%bvdw(iLJ)
+          alj = alj+iaclib(iacj)%avdw(ilj)
+          blj = blj*iaclib(iacj)%bvdw(ilj)
           qj = crg(j)
         end if
   end if
@@ -9412,19 +9383,19 @@ do ip = 1, nbqq_pair(istate)
   r    = sqrt ( r2 ) 
   r12  = r6*r6
 
-  ! calculate Vel, V_a, V_b and dv
-  Vel  = qi*qj*r*el_scale
-  if ( iLJ .eq. 3 ) Vel = Vel*el14_scale
-  if (qvdw_flag .and. jq /= 0 .and. iLJ .eq. 2 ) then
-        V_a = aLJ*exp(-bLJ/r)
-        V_b = 0.0
-        dv  = r2*( -Vel -bLJ*V_a/r )*EQ(istate)%lambda
+  ! calculate vel, v_a, v_b and dv
+  vel  = qi*qj*r*el_scale
+  if ( ilj .eq. 3 ) vel = vel*el14_scale
+  if (qvdw_flag .and. jq /= 0 .and. ilj .eq. 2 ) then
+        v_a = alj*exp(-blj/r)
+        v_b = 0.0
+        dv  = r2*( -vel -blj*v_a/r )*eq(istate)%lambda
   else
-        aLJ  = aLJ*aLJ
-        aLJ  = aLJ*aLJ*aLJ
-        V_a  = bLJ*aLJ*aLJ*r12 
-        V_b  = 2.0*bLJ*aLJ*r6
-        dv  = r2*( -Vel -(12.*V_a -6.*V_b)*r6*r6_hc )*EQ(istate)%lambda
+        alj  = alj*alj
+        alj  = alj*alj*alj
+        v_a  = blj*alj*alj*r12 
+        v_b  = 2.0*blj*alj*r6
+        dv  = r2*( -vel -(12.*v_a -6.*v_b)*r6*r6_hc )*eq(istate)%lambda
   endif
 
   ! update forces
@@ -9437,11 +9408,11 @@ do ip = 1, nbqq_pair(istate)
 
   ! update energies
   if ( jq /= 0 ) then
-        EQ(istate)%qq%el  = EQ(istate)%qq%el + Vel
-        EQ(istate)%qq%vdw = EQ(istate)%qq%vdw + V_a - V_b
+        eq(istate)%qq%el  = eq(istate)%qq%el + vel
+        eq(istate)%qq%vdw = eq(istate)%qq%vdw + v_a - v_b
   else
-        EQ(istate)%qp%el  = EQ(istate)%qp%el + Vel
-        EQ(istate)%qp%vdw = EQ(istate)%qp%vdw + V_a - V_b
+        eq(istate)%qp%el  = eq(istate)%qp%el + vel
+        eq(istate)%qp%vdw = eq(istate)%qp%vdw + v_a - v_b
   end if
 end do ! ip
 
@@ -9451,10 +9422,10 @@ end subroutine nonbon2_qq
 !-----------------------------------------------------------------------
 subroutine nonbon2_qq_lib_charges
 ! local variables
-integer						:: istate
-integer						:: ip,iq,jq,i,j,k,i3,j3,iaci,iacj,iLJ
-real(8)						:: qi,qj,aLJ,bLJ,dx1,dx2,dx3,r2,r,r6,r12,r6_hc
-real(8)						:: Vel,V_a,V_b,dv,el_scale
+integer                                         :: istate
+integer                                         :: ip,iq,jq,i,j,k,i3,j3,iaci,iacj,ilj
+real(8)                                         :: qi,qj,alj,blj,dx1,dx2,dx3,r2,r,r6,r12,r6_hc
+real(8)                                         :: vel,v_a,v_b,dv,el_scale
 
 do istate = 1, nstates
 ! for every state:
@@ -9468,36 +9439,36 @@ do ip = 1, nbqq_pair(istate)
   jq   = nbqq(ip,istate)%jq
   i3   = i*3-3
   j3   = j*3-3
-  iLJ  = nbqq(ip,istate)%LJcod
+  ilj  = nbqq(ip,istate)%ljcod
   qi   = crg(i)
   el_scale = nbqq(ip,istate)%el_scale
 
   if (.not. qvdw_flag) then
         iaci = iac(i)
         iacj = iac(j)
-        aLJ  = iaclib(iaci)%avdw(iLJ)+iaclib(iacj)%avdw(iLJ)
-        bLJ  = iaclib(iaci)%bvdw(iLJ)*iaclib(iacj)%bvdw(iLJ)
+        alj  = iaclib(iaci)%avdw(ilj)+iaclib(iacj)%avdw(ilj)
+        blj  = iaclib(iaci)%bvdw(ilj)*iaclib(iacj)%bvdw(ilj)
         qj = crg(j)
   else
         iaci = qiac(iq,istate)
-        aLJ  = qavdw(iaci,iLJ)
-        bLJ  = qbvdw(iaci,iLJ)
+        alj  = qavdw(iaci,ilj)
+        blj  = qbvdw(iaci,ilj)
         if ( jq /= 0) then
           iacj = qiac(jq,istate)
-          if ( iLJ .eq. 2 ) then
-                aLJ = aLJ*qavdw(iacj,iLJ)
+          if ( ilj .eq. 2 ) then
+                alj = alj*qavdw(iacj,ilj)
           else
-                aLJ = aLJ+qavdw(iacj,iLJ)
+                alj = alj+qavdw(iacj,ilj)
           end if
-          bLJ = bLJ*qbvdw(iacj,iLJ)
+          blj = blj*qbvdw(iacj,ilj)
         else
-          if ( iLJ .eq. 2 ) then
-                aLJ  = qavdw(iaci,1)
-                bLJ  = qbvdw(iaci,1)
+          if ( ilj .eq. 2 ) then
+                alj  = qavdw(iaci,1)
+                blj  = qbvdw(iaci,1)
           end if
           iacj = iac(j)
-          aLJ = aLJ+iaclib(iacj)%avdw(iLJ)
-          bLJ = bLJ*iaclib(iacj)%bvdw(iLJ)
+          alj = alj+iaclib(iacj)%avdw(ilj)
+          blj = blj*iaclib(iacj)%bvdw(ilj)
         end if
         qj = crg(j)
   end if
@@ -9515,24 +9486,24 @@ do ip = 1, nbqq_pair(istate)
   r2   = 1./r2
   r    = sqrt ( r2 ) 
 
-  ! calculate Vel, V_a, V_b and dv
-  Vel  = qi*qj*r*el_scale
-  if ( iLJ .eq. 3 ) Vel = Vel*el14_scale
-  if (qvdw_flag .and. jq /= 0 .and. iLJ .eq. 2 ) then
-        V_a = aLJ*exp(-bLJ/r)
-        V_b = qbvdw(iaci,1)*qbvdw(iacj,1)*r6
-        dv  = r2*( -Vel -bLJ*V_a/r +6.*V_b )*EQ(istate)%lambda
+  ! calculate vel, v_a, v_b and dv
+  vel  = qi*qj*r*el_scale
+  if ( ilj .eq. 3 ) vel = vel*el14_scale
+  if (qvdw_flag .and. jq /= 0 .and. ilj .eq. 2 ) then
+        v_a = alj*exp(-blj/r)
+        v_b = qbvdw(iaci,1)*qbvdw(iacj,1)*r6
+        dv  = r2*( -vel -blj*v_a/r +6.*v_b )*eq(istate)%lambda
         !
         ! ---       change here to exclude 1/r6 attraction
         !
-        !	       V_b = 0.0
-        !	       dv  = r2*( -Vel -bLJ*V_a/r )*EQ(istate)%lambda
+        !              v_b = 0.0
+        !              dv  = r2*( -vel -blj*v_a/r )*eq(istate)%lambda
   else
-        aLJ  = aLJ*aLJ
-        aLJ  = aLJ*aLJ*aLJ
-        V_a  = bLJ*aLJ*aLJ*r12 
-        V_b  = 2.0*bLJ*aLJ*r6
-        dv  = r2*( -Vel -(12.*V_a -6.*V_b)*r6*r6_hc )*EQ(istate)%lambda
+        alj  = alj*alj
+        alj  = alj*alj*alj
+        v_a  = blj*alj*alj*r12 
+        v_b  = 2.0*blj*alj*r6
+        dv  = r2*( -vel -(12.*v_a -6.*v_b)*r6*r6_hc )*eq(istate)%lambda
   endif
 
   ! update forces
@@ -9545,11 +9516,11 @@ do ip = 1, nbqq_pair(istate)
 
   ! update energies
   if ( jq /= 0 ) then
-        EQ(istate)%qq%el  = EQ(istate)%qq%el + Vel
-        EQ(istate)%qq%vdw = EQ(istate)%qq%vdw + V_a - V_b
+        eq(istate)%qq%el  = eq(istate)%qq%el + vel
+        eq(istate)%qq%vdw = eq(istate)%qq%vdw + v_a - v_b
   else
-        EQ(istate)%qp%el  = EQ(istate)%qp%el + Vel
-        EQ(istate)%qp%vdw = EQ(istate)%qp%vdw + V_a - V_b
+        eq(istate)%qp%el  = eq(istate)%qp%el + vel
+        eq(istate)%qp%vdw = eq(istate)%qp%vdw + v_a - v_b
   end if
 end do ! ip
 
@@ -9560,13 +9531,13 @@ end subroutine nonbon2_qq_lib_charges
 
 subroutine nonbon2_qp
 ! local variables
-integer						:: ip,iq,i,j,i3,j3,iaci,iacj,iLJ
-integer						:: istate
-real(8)						:: aLJ,bLJ,dx1,dx2,dx3,r2,r,r6,r6_hc
-real(8)						:: Vel,V_a,V_b,dv
+integer                                         :: ip,iq,i,j,i3,j3,iaci,iacj,ilj
+integer                                         :: istate
+real(8)                                         :: alj,blj,dx1,dx2,dx3,r2,r,r6,r6_hc
+real(8)                                         :: vel,v_a,v_b,dv
 
 ! global variables used:
-!  iqseq, iac, crg, x, nstates, qvdw_flag, iaclib, qiac, qavdw, qbvdw, qcrg, el14_scale, EQ, d, nat_solute
+!  iqseq, iac, crg, x, nstates, qvdw_flag, iaclib, qiac, qavdw, qbvdw, qcrg, el14_scale, eq, d, nat_solute
 
 do ip = 1, nbqp_pair
 ! for every assigned q-s pair:
@@ -9578,7 +9549,7 @@ j    = nbqp(ip)%j
 i3   = i*3-3
 j3   = j*3-3
 iacj = iac(j)
-iLJ  = nbqp(ip)%LJcod
+ilj  = nbqp(ip)%ljcod
 
 
 dx1  = x(j3+1) - x(i3+1)
@@ -9599,36 +9570,36 @@ r    = sqrt(r2)
 do istate = 1, nstates
   ! for every state:
 
-  ! calculate iaci, aLJ and bLJ
+  ! calculate iaci, alj and blj
   if (.not. qvdw_flag) then
         iaci = iac(i)
-        aLJ  = iaclib(iaci)%avdw(iLJ)
-        bLJ  = iaclib(iaci)%bvdw(iLJ)
-		r6 = 1._8/r6_hc
+        alj  = iaclib(iaci)%avdw(ilj)
+        blj  = iaclib(iaci)%bvdw(ilj)
+                r6 = 1._8/r6_hc
   else
         iaci = qiac(iq,istate)
-		if ( iLJ .eq. 2 ) then
-          aLJ  = qavdw(iaci,1)
-          bLJ  = qbvdw(iaci,1)
+                if ( ilj .eq. 2 ) then
+          alj  = qavdw(iaci,1)
+          blj  = qbvdw(iaci,1)
         else
-          aLJ  = qavdw(iaci,iLJ)
-          bLJ  = qbvdw(iaci,iLJ)
-		end if
+          alj  = qavdw(iaci,ilj)
+          blj  = qbvdw(iaci,ilj)
+                end if
 
-		r6 = r6_hc + sc_lookup(iq,iacj,istate) !this is softcore
-		r6 = 1._8/r6
+                r6 = r6_hc + sc_lookup(iq,iacj,istate) !this is softcore
+                r6 = 1._8/r6
   end if
-  aLJ = aLJ+iaclib(iacj)%avdw(iLJ)
-  bLJ = bLJ*iaclib(iacj)%bvdw(iLJ)
-  aLJ  = aLJ*aLJ
-  aLJ  = aLJ*aLJ*aLJ
+  alj = alj+iaclib(iacj)%avdw(ilj)
+  blj = blj*iaclib(iacj)%bvdw(ilj)
+  alj  = alj*alj
+  alj  = alj*alj*alj
 
-  ! calculate qi, Vel, V_a, V_b and dv
-  Vel  = qcrg(iq,istate)*crg(j)*r
-  if ( iLJ .eq. 3 ) Vel = Vel*el14_scale
-  V_a  = bLJ*aLJ*aLJ*r6*r6
-  V_b  = 2.0*bLJ*aLJ*r6
-  dv   = r2*( -Vel -(12.*V_a -6.*V_b)*r6*r6_hc )*EQ(istate)%lambda   !softcore r6*r6_hc is (r^6/(r^6+alpha))
+  ! calculate qi, vel, v_a, v_b and dv
+  vel  = qcrg(iq,istate)*crg(j)*r
+  if ( ilj .eq. 3 ) vel = vel*el14_scale
+  v_a  = blj*alj*alj*r6*r6
+  v_b  = 2.0*blj*alj*r6
+  dv   = r2*( -vel -(12.*v_a -6.*v_b)*r6*r6_hc )*eq(istate)%lambda   !softcore r6*r6_hc is (r^6/(r^6+alpha))
 
   ! update forces
   d(i3+1) = d(i3+1) - dv*dx1
@@ -9639,114 +9610,114 @@ do istate = 1, nstates
   d(j3+3) = d(j3+3) + dv*dx3
 
   ! update q-protein or q-water energies
-        EQ(istate)%qp%el  = EQ(istate)%qp%el + Vel
-        EQ(istate)%qp%vdw = EQ(istate)%qp%vdw + V_a - V_b
+        eq(istate)%qp%el  = eq(istate)%qp%el + vel
+        eq(istate)%qp%vdw = eq(istate)%qp%vdw + v_a - v_b
 end do ! istate
 
 end do
 end subroutine nonbon2_qp
 !-----------------------------------------------------------------------
 
-!******PWadded 2001-10-23
+!******pwadded 2001-10-23
 subroutine nonbon2_qp_box
   ! local variables
-  integer						:: ip,iq,i,j,i3,j3,iaci,iacj,iLJ
-  integer						:: istate
-  real(8)						:: aLJ,bLJ,dx1,dx2,dx3,r2,r,r6,r6_hc
-  real(8)						:: Vel,V_a,V_b,dv
-  integer						:: group, gr, ia
+  integer                                               :: ip,iq,i,j,i3,j3,iaci,iacj,ilj
+  integer                                               :: istate
+  real(8)                                               :: alj,blj,dx1,dx2,dx3,r2,r,r6,r6_hc
+  real(8)                                               :: vel,v_a,v_b,dv
+  integer                                               :: group, gr, ia
 
   ! global variables used:
-  !  iqseq, iac, crg, x, nstates, qvdw_flag, iaclib, qiac, qavdw, qbvdw, qcrg, el14_scale, EQ, d, nat_solute
+  !  iqseq, iac, crg, x, nstates, qvdw_flag, iaclib, qiac, qavdw, qbvdw, qcrg, el14_scale, eq, d, nat_solute
 
 
-	!compute the peridocal shift for every charge group pair
-	do gr = 1, nbqp_cgp_pair
-		ia = nbqp_cgp(gr)%i !atom index for the atom
-		
-		!the distance between the two switching atoms
-		dx1 = x(3*ia-2) - x(3*qswitch-2)
-		dx2 = x(3*ia-1) - x(3*qswitch-1)
-		dx3 = x(3*ia  ) - x(3*qswitch  )
+        !compute the peridocal shift for every charge group pair
+        do gr = 1, nbqp_cgp_pair
+                ia = nbqp_cgp(gr)%i !atom index for the atom
+                
+                !the distance between the two switching atoms
+                dx1 = x(3*ia-2) - x(3*qswitch-2)
+                dx2 = x(3*ia-1) - x(3*qswitch-1)
+                dx3 = x(3*ia  ) - x(3*qswitch  )
 
-		nbqp_cgp(gr)%x = boxlength(1)*nint( dx1*inv_boxl(1) )
-		nbqp_cgp(gr)%y = boxlength(2)*nint( dx2*inv_boxl(2) )	
-		nbqp_cgp(gr)%z = boxlength(3)*nint( dx3*inv_boxl(3) )
+                nbqp_cgp(gr)%x = boxlength(1)*nint( dx1*inv_boxl(1) )
+                nbqp_cgp(gr)%y = boxlength(2)*nint( dx2*inv_boxl(2) )   
+                nbqp_cgp(gr)%z = boxlength(3)*nint( dx3*inv_boxl(3) )
 
-	end do
+        end do
 
   do ip = 1, nbqp_pair
-	! for every assigned q-s pair:
+        ! for every assigned q-s pair:
 
-   	! init state-invariant variables:
-	iq   = nbqp(ip)%i
-	i    = iqseq(iq)
-	j    = nbqp(ip)%j
-	i3   = i*3-3
-	j3   = j*3-3
-	iacj = iac(j)
-	iLJ  = nbqp(ip)%LJcod
-	group = nbqp(ip)%cgp_pair
+        ! init state-invariant variables:
+        iq   = nbqp(ip)%i
+        i    = iqseq(iq)
+        j    = nbqp(ip)%j
+        i3   = i*3-3
+        j3   = j*3-3
+        iacj = iac(j)
+        ilj  = nbqp(ip)%ljcod
+        group = nbqp(ip)%cgp_pair
 
-	dx1  = x(j3+1) - x(i3+1)
-	dx2  = x(j3+2) - x(i3+2)
-	dx3  = x(j3+3) - x(i3+3)
-	dx1 = dx1 - nbqp_cgp(group)%x  
-	dx2 = dx2 - nbqp_cgp(group)%y  
-	dx3 = dx3 - nbqp_cgp(group)%z  
-	
+        dx1  = x(j3+1) - x(i3+1)
+        dx2  = x(j3+2) - x(i3+2)
+        dx3  = x(j3+3) - x(i3+3)
+        dx1 = dx1 - nbqp_cgp(group)%x  
+        dx2 = dx2 - nbqp_cgp(group)%y  
+        dx3 = dx3 - nbqp_cgp(group)%z  
+        
 
-	r2   = dx1*dx1 + dx2*dx2 + dx3*dx3
-	r6_hc = r2*r2*r2  !for softcore
+        r2   = dx1*dx1 + dx2*dx2 + dx3*dx3
+        r6_hc = r2*r2*r2  !for softcore
 
-	r2   = 1._8/r2
-	r    = sqrt(r2)
+        r2   = 1._8/r2
+        r    = sqrt(r2)
 
-	do istate = 1, nstates
-	  ! for every state:
+        do istate = 1, nstates
+          ! for every state:
 
-	  ! calculate iaci, aLJ and bLJ
-	  if (.not. qvdw_flag) then
-		iaci = iac(i)
-		aLJ  = iaclib(iaci)%avdw(iLJ)
-		bLJ  = iaclib(iaci)%bvdw(iLJ)
-		r6 = 1._8/r6_hc
-	  else
-		iaci = qiac(iq,istate)
-        if ( iLJ .eq. 2 ) then
-		  aLJ  = qavdw(iaci,1)
-		  bLJ  = qbvdw(iaci,1)
-		else
-		  aLJ  = qavdw(iaci,iLJ)
-		  bLJ  = qbvdw(iaci,iLJ)
+          ! calculate iaci, alj and blj
+          if (.not. qvdw_flag) then
+                iaci = iac(i)
+                alj  = iaclib(iaci)%avdw(ilj)
+                blj  = iaclib(iaci)%bvdw(ilj)
+                r6 = 1._8/r6_hc
+          else
+                iaci = qiac(iq,istate)
+        if ( ilj .eq. 2 ) then
+                  alj  = qavdw(iaci,1)
+                  blj  = qbvdw(iaci,1)
+                else
+                  alj  = qavdw(iaci,ilj)
+                  blj  = qbvdw(iaci,ilj)
         end if
-		r6 = r6_hc + sc_lookup(iq,iacj,istate)
-		r6 = 1._8/r6
-	  end if
-	  aLJ = aLJ+iaclib(iacj)%avdw(iLJ)
-	  bLJ = bLJ*iaclib(iacj)%bvdw(iLJ)
-	  aLJ  = aLJ*aLJ
-	  aLJ  = aLJ*aLJ*aLJ
+                r6 = r6_hc + sc_lookup(iq,iacj,istate)
+                r6 = 1._8/r6
+          end if
+          alj = alj+iaclib(iacj)%avdw(ilj)
+          blj = blj*iaclib(iacj)%bvdw(ilj)
+          alj  = alj*alj
+          alj  = alj*alj*alj
 
-	  ! calculate qi, Vel, V_a, V_b and dv
-	  Vel  = qcrg(iq,istate)*crg(j)*r
-	  if ( iLJ .eq. 3 ) Vel = Vel*el14_scale
-	  V_a  = bLJ*aLJ*aLJ*r6*r6
-	  V_b  = 2.0*bLJ*aLJ*r6
-	  dv   = r2*( -Vel -(12.*V_a -6.*V_b)*r6*r6_hc )*EQ(istate)%lambda
+          ! calculate qi, vel, v_a, v_b and dv
+          vel  = qcrg(iq,istate)*crg(j)*r
+          if ( ilj .eq. 3 ) vel = vel*el14_scale
+          v_a  = blj*alj*alj*r6*r6
+          v_b  = 2.0*blj*alj*r6
+          dv   = r2*( -vel -(12.*v_a -6.*v_b)*r6*r6_hc )*eq(istate)%lambda
 
-	  ! update forces
-	  d(i3+1) = d(i3+1) - dv*dx1
-	  d(i3+2) = d(i3+2) - dv*dx2
-	  d(i3+3) = d(i3+3) - dv*dx3
-	  d(j3+1) = d(j3+1) + dv*dx1
-	  d(j3+2) = d(j3+2) + dv*dx2
-	  d(j3+3) = d(j3+3) + dv*dx3
-	
-	  ! update q-protein or q-water energies
-		EQ(istate)%qp%el  = EQ(istate)%qp%el + Vel
-		EQ(istate)%qp%vdw = EQ(istate)%qp%vdw + V_a - V_b
-	end do ! istate
+          ! update forces
+          d(i3+1) = d(i3+1) - dv*dx1
+          d(i3+2) = d(i3+2) - dv*dx2
+          d(i3+3) = d(i3+3) - dv*dx3
+          d(j3+1) = d(j3+1) + dv*dx1
+          d(j3+2) = d(j3+2) + dv*dx2
+          d(j3+3) = d(j3+3) + dv*dx3
+        
+          ! update q-protein or q-water energies
+                eq(istate)%qp%el  = eq(istate)%qp%el + vel
+                eq(istate)%qp%vdw = eq(istate)%qp%vdw + v_a - v_b
+        end do ! istate
 
   end do
 end subroutine nonbon2_qp_box
@@ -9756,315 +9727,315 @@ end subroutine nonbon2_qp_box
 subroutine nonbon2_qw
 
 ! local variables
-integer						:: jw,iq,i,j,iLJO, iLJH, iaci
-integer						:: istate
-real(8)						::	aLJO, bLJO, aLJH, bLJH
-real(8)						::	dxO, dyO, dzO, dxH1, dyH1, dzH1, dxH2, dyH2, dzH2
-real(8)						::	rO, r2O, r6O, rH1, r2H1, r6H1, rH2, r2H2, r6H2,r6O_hc,r6H1_hc,r6H2_hc
-real(8)						::	VelO, VelH1, VelH2, dvO, dvH1, dvH2
-real(8)						:: V_ao, V_bo, V_ah1, V_bh1, V_ah2, V_bh2 
-real(8), save				::	aO(2), bO(2), aH(2), bH(2)
-integer, save				::	iac_ow, iac_hw
+integer                                         :: jw,iq,i,j,iljo, iljh, iaci
+integer                                         :: istate
+real(8)                                         ::      aljo, bljo, aljh, bljh
+real(8)                                         ::      dxo, dyo, dzo, dxh1, dyh1, dzh1, dxh2, dyh2, dzh2
+real(8)                                         ::      ro, r2o, r6o, rh1, r2h1, r6h1, rh2, r2h2, r6h2,r6o_hc,r6h1_hc,r6h2_hc
+real(8)                                         ::      velo, velh1, velh2, dvo, dvh1, dvh2
+real(8)                                         :: v_ao, v_bo, v_ah1, v_bh1, v_ah2, v_bh2 
+real(8), save                           ::      ao(2), bo(2), ah(2), bh(2)
+integer, save                           ::      iac_ow, iac_hw
 ! global variables used:
-!  iqseq, iac, crg, x, nstates, qvdw_flag, iaclib, qiac, qavdw, qbvdw, qcrg, el14_scale, EQ, d, nat_solute
+!  iqseq, iac, crg, x, nstates, qvdw_flag, iaclib, qiac, qavdw, qbvdw, qcrg, el14_scale, eq, d, nat_solute
 
 if(iac_ow == 0) then !set first time
         iac_ow = iac(nat_solute + 1)
         iac_hw = iac(nat_solute + 2)
-        aO(1:2) = iaclib(iac_ow)%avdw(1:2)
-        bO(1:2) = iaclib(iac_ow)%bvdw(1:2)
-        aH(1:2) = iaclib(iac_hw)%avdw(1:2)
-        bH(1:2) = iaclib(iac_hw)%bvdw(1:2)
+        ao(1:2) = iaclib(iac_ow)%avdw(1:2)
+        bo(1:2) = iaclib(iac_ow)%bvdw(1:2)
+        ah(1:2) = iaclib(iac_hw)%avdw(1:2)
+        bh(1:2) = iaclib(iac_hw)%bvdw(1:2)
 end if
 
 !loop over listed waters
 do jw = 1, nbqw_pair
-        j = nbqw(jw) !top. # of O in water iw
+        j = nbqw(jw) !top. # of o in water iw
         !loop over all q-atoms
         do iq = 1, nqat
                 i = iqseq(iq)
-                dxO  = x(3*j-2) - x(3*i-2)
-                dyO  = x(3*j-1) - x(3*i-1)
-                dzO  = x(3*j  ) - x(3*i  )
-                dxH1 = x(3*j+1) - x(3*i-2)
-                dyH1 = x(3*j+2) - x(3*i-1)
-                dzH1 = x(3*j+3) - x(3*i  )
-                dxH2 = x(3*j+4) - x(3*i-2)
-                dyH2 = x(3*j+5) - x(3*i-1)
-                dzH2 = x(3*j+6) - x(3*i  )
-                r2O  = 1._8/(dxO*dxO + dyO*dyO + dzO*dzO)
-                r2H1 = 1._8/(dxH1*dxH1 + dyH1*dyH1 + dzH1*dzH1)
-                r2H2 = 1._8/(dxH2*dxH2 + dyH2*dyH2 + dzH2*dzH2)
-                rO = sqrt(r2O)
-                r6O = r2O*r2O*r2O
-				r6O_hc = r6O	!softcore
-                rH1 = sqrt(r2H1)
-                r6H1 = r2H1*r2H1*r2H1
-				r6H1_hc = r6H1	!softcore
-                rH2 = sqrt(r2H2)
-                r6H2 = r2H2*r2H2*r2H2
-				r6H2_hc = r6H2	!softcore
+                dxo  = x(3*j-2) - x(3*i-2)
+                dyo  = x(3*j-1) - x(3*i-1)
+                dzo  = x(3*j  ) - x(3*i  )
+                dxh1 = x(3*j+1) - x(3*i-2)
+                dyh1 = x(3*j+2) - x(3*i-1)
+                dzh1 = x(3*j+3) - x(3*i  )
+                dxh2 = x(3*j+4) - x(3*i-2)
+                dyh2 = x(3*j+5) - x(3*i-1)
+                dzh2 = x(3*j+6) - x(3*i  )
+                r2o  = 1._8/(dxo*dxo + dyo*dyo + dzo*dzo)
+                r2h1 = 1._8/(dxh1*dxh1 + dyh1*dyh1 + dzh1*dzh1)
+                r2h2 = 1._8/(dxh2*dxh2 + dyh2*dyh2 + dzh2*dzh2)
+                ro = sqrt(r2o)
+                r6o = r2o*r2o*r2o
+                                r6o_hc = r6o    !softcore
+                rh1 = sqrt(r2h1)
+                r6h1 = r2h1*r2h1*r2h1
+                                r6h1_hc = r6h1  !softcore
+                rh2 = sqrt(r2h2)
+                r6h2 = r2h2*r2h2*r2h2
+                                r6h2_hc = r6h2  !softcore
 
                 iaci = iac(i)
 
                 !reset potential
-                dvO = 0
-                dvH1 = 0
-                dvH2 = 0
-                iLJO = LJcod(iac_ow, iaci)
-                iLJH = LJcod(iac_hw, iaci)
+                dvo = 0
+                dvh1 = 0
+                dvh2 = 0
+                iljo = ljcod(iac_ow, iaci)
+                iljh = ljcod(iac_hw, iaci)
                 if(.not. qvdw_flag) then
-                        !use same LJ params for all states
-                        aLJO  = iaclib(iaci)%avdw(iLJO)+aO(iLJO)
-                        bLJO  = iaclib(iaci)%bvdw(iLJO)*bO(iLJO)
-                        aLJH  = iaclib(iaci)%avdw(iLJH)+aH(iLJH)
-                        bLJH  = iaclib(iaci)%bvdw(iLJH)*bH(iLJH) 
-                        aLJO = aLJO * aLJO
-                        aLJO = aLJO * aLJO * aLJO
-                        aLJH  = aLJH  * aLJH 
-                        aLJH  = aLJH  * aLJH  * aLJH 
-                        V_aO = bLJO*aLJO*aLJO*r6O*r6O 
-                        V_bO = 2.0*bLJO*aLJO*r6O
-                        V_aH1= bLJH*aLJH*aLJH*r6H1*r6H1
-                        V_bH1= 2.0*bLJH*aLJH*r6H1
-                        V_aH2= bLJH*aLJH*aLJH*r6H2*r6H2
-                        V_bH2= 2.0*bLJH*aLJH*r6H2
+                        !use same lj params for all states
+                        aljo  = iaclib(iaci)%avdw(iljo)+ao(iljo)
+                        bljo  = iaclib(iaci)%bvdw(iljo)*bo(iljo)
+                        aljh  = iaclib(iaci)%avdw(iljh)+ah(iljh)
+                        bljh  = iaclib(iaci)%bvdw(iljh)*bh(iljh) 
+                        aljo = aljo * aljo
+                        aljo = aljo * aljo * aljo
+                        aljh  = aljh  * aljh 
+                        aljh  = aljh  * aljh  * aljh 
+                        v_ao = bljo*aljo*aljo*r6o*r6o 
+                        v_bo = 2.0*bljo*aljo*r6o
+                        v_ah1= bljh*aljh*aljh*r6h1*r6h1
+                        v_bh1= 2.0*bljh*aljh*r6h1
+                        v_ah2= bljh*aljh*aljh*r6h2*r6h2
+                        v_bh2= 2.0*bljh*aljh*r6h2
                 end if
                 do istate = 1, nstates ! for every state:
 
-                        ! set new LJ params if Q-atom types are used
+                        ! set new lj params if q-atom types are used
                         if (qvdw_flag) then
 
-								r6O = 1._8/r6O_hc
-								r6O = r6O + sc_lookup(iq,iac_ow,istate)   !softcore
-								r6O = 1._8/r6O
-								r6H1 = 1._8/r6H1_hc
-								r6H1 = r6H1 + sc_lookup(iq,iac_hw,istate)   !softcore
-								r6H1 = 1._8/r6H1
-								r6H2 = 1._8/r6H2_hc
-								r6H2 = r6H2 + sc_lookup(iq,iac_hw,istate)   !softcore
-								r6H2 = 1._8/r6H2
-                                aLJO  = qavdw(qiac(iq,istate),1)+aO(iLJO)
-                                bLJO  = qbvdw(qiac(iq,istate),1)*bO(iLJO)
-                                aLJH  = qavdw(qiac(iq,istate),1)+aH(iLJH)
-                                bLJH  = qbvdw(qiac(iq,istate),1)*bH(iLJH)
-                                aLJO = aLJO * aLJO
-                                aLJO = aLJO * aLJO * aLJO
-                                aLJH  = aLJH  * aLJH 
-                                aLJH  = aLJH  * aLJH  * aLJH 
-                                V_aO = bLJO*aLJO*aLJO*r6O*r6O 
-                                V_bO = 2.0*bLJO*aLJO*r6O
-                                V_aH1= bLJH*aLJH*aLJH*r6H1*r6H1
-                                V_bH1= 2.0*bLJH*aLJH*r6H1
-                                V_aH2= bLJH*aLJH*aLJH*r6H2*r6H2
-                                V_bH2= 2.0*bLJH*aLJH*r6H2
+                                                                r6o = 1._8/r6o_hc
+                                                                r6o = r6o + sc_lookup(iq,iac_ow,istate)   !softcore
+                                                                r6o = 1._8/r6o
+                                                                r6h1 = 1._8/r6h1_hc
+                                                                r6h1 = r6h1 + sc_lookup(iq,iac_hw,istate)   !softcore
+                                                                r6h1 = 1._8/r6h1
+                                                                r6h2 = 1._8/r6h2_hc
+                                                                r6h2 = r6h2 + sc_lookup(iq,iac_hw,istate)   !softcore
+                                                                r6h2 = 1._8/r6h2
+                                aljo  = qavdw(qiac(iq,istate),1)+ao(iljo)
+                                bljo  = qbvdw(qiac(iq,istate),1)*bo(iljo)
+                                aljh  = qavdw(qiac(iq,istate),1)+ah(iljh)
+                                bljh  = qbvdw(qiac(iq,istate),1)*bh(iljh)
+                                aljo = aljo * aljo
+                                aljo = aljo * aljo * aljo
+                                aljh  = aljh  * aljh 
+                                aljh  = aljh  * aljh  * aljh 
+                                v_ao = bljo*aljo*aljo*r6o*r6o 
+                                v_bo = 2.0*bljo*aljo*r6o
+                                v_ah1= bljh*aljh*aljh*r6h1*r6h1
+                                v_bh1= 2.0*bljh*aljh*r6h1
+                                v_ah2= bljh*aljh*aljh*r6h2*r6h2
+                                v_bh2= 2.0*bljh*aljh*r6h2
                         end if
 
 
-                        ! calculate qi, Vel, V_a, V_b and dv
-                        VelO = crg_ow*qcrg(iq,istate)*rO
-                        VelH1 = crg_hw*qcrg(iq,istate)*rH1
-                        VelH2 = crg_hw*qcrg(iq,istate)*rH2
-                        dvO  = dvO  + r2O *( -VelO  -(12.*V_aO  -6.*V_bO )*r6O/r6O_hc)*EQ(istate)%lambda
-                        dvH1 = dvH1 + r2H1*( -VelH1 -(12.*V_aH1 -6.*V_bH1)*r6H1/r6H1_hc)*EQ(istate)%lambda
-                        dvH2 = dvH2 + r2H2*( -VelH2 -(12.*V_aH2 -6.*V_bH2)*r6H2/r6H2_hc)*EQ(istate)%lambda
+                        ! calculate qi, vel, v_a, v_b and dv
+                        velo = crg_ow*qcrg(iq,istate)*ro
+                        velh1 = crg_hw*qcrg(iq,istate)*rh1
+                        velh2 = crg_hw*qcrg(iq,istate)*rh2
+                        dvo  = dvo  + r2o *( -velo  -(12.*v_ao  -6.*v_bo )*r6o/r6o_hc)*eq(istate)%lambda
+                        dvh1 = dvh1 + r2h1*( -velh1 -(12.*v_ah1 -6.*v_bh1)*r6h1/r6h1_hc)*eq(istate)%lambda
+                        dvh2 = dvh2 + r2h2*( -velh2 -(12.*v_ah2 -6.*v_bh2)*r6h2/r6h2_hc)*eq(istate)%lambda
                         ! update q-water energies
-                        EQ(istate)%qw%el  = EQ(istate)%qw%el + VelO + VelH1 + VelH2
-                        EQ(istate)%qw%vdw = EQ(istate)%qw%vdw + V_aO + V_aH1 + V_aH2 - V_bO - V_bH1 - V_bH2 
+                        eq(istate)%qw%el  = eq(istate)%qw%el + velo + velh1 + velh2
+                        eq(istate)%qw%vdw = eq(istate)%qw%vdw + v_ao + v_ah1 + v_ah2 - v_bo - v_bh1 - v_bh2 
                 end do !istate
 
-                ! update forces on Q-atom
-                d(3*i-2) = d(3*i-2) - dvO*dxO - dvH1*dxH1 - dvH2*dxH2
-                d(3*i-1) = d(3*i-1) - dvO*dyO - dvH1*dyH1 - dvH2*dyH2
-                d(3*i  ) = d(3*i  ) - dvO*dzO - dvH1*dzH1 - dvH2*dzH2
+                ! update forces on q-atom
+                d(3*i-2) = d(3*i-2) - dvo*dxo - dvh1*dxh1 - dvh2*dxh2
+                d(3*i-1) = d(3*i-1) - dvo*dyo - dvh1*dyh1 - dvh2*dyh2
+                d(3*i  ) = d(3*i  ) - dvo*dzo - dvh1*dzh1 - dvh2*dzh2
 
                 ! update forces on water
-                d(3*j-2) = d(3*j-2) + dvO*dxO
-                d(3*j-1) = d(3*j-1) + dvO*dyO
-                d(3*j  ) = d(3*j  ) + dvO*dzO
-                d(3*j+1) = d(3*j+1) + dvH1*dxH1
-                d(3*j+2) = d(3*j+2) + dvH1*dyH1
-                d(3*j+3) = d(3*j+3) + dvH1*dzH1
-                d(3*j+4) = d(3*j+4) + dvH2*dxH2
-                d(3*j+5) = d(3*j+5) + dvH2*dyH2
-                d(3*j+6) = d(3*j+6) + dvH2*dzH2
+                d(3*j-2) = d(3*j-2) + dvo*dxo
+                d(3*j-1) = d(3*j-1) + dvo*dyo
+                d(3*j  ) = d(3*j  ) + dvo*dzo
+                d(3*j+1) = d(3*j+1) + dvh1*dxh1
+                d(3*j+2) = d(3*j+2) + dvh1*dyh1
+                d(3*j+3) = d(3*j+3) + dvh1*dzh1
+                d(3*j+4) = d(3*j+4) + dvh2*dxh2
+                d(3*j+5) = d(3*j+5) + dvh2*dyh2
+                d(3*j+6) = d(3*j+6) + dvh2*dzh2
 
         end do !iq
 end do !jw
 end subroutine nonbon2_qw
 
 !-----------------------------------------------------------------------
-!******PWadded 2001-10-23
+!******pwadded 2001-10-23
 subroutine nonbon2_qw_box
-	! local variables
-	integer						:: jw,iq,i,j,iLJO, iLJH, iaci
-	integer						:: istate
-	real(8)						::	aLJO, bLJO, aLJH, bLJH
-	real(8)						::	dxO, dyO, dzO, dxH1, dyH1, dzH1, dxH2, dyH2, dzH2
-	real(8)						::	rO, r2O, r6O, rH1, r2H1, r6H1, rH2, r2H2, r6H2,r6O_hc,r6H1_hc,r6H2_hc
-	real(8)						::	VelO, VelH1, VelH2, dvO, dvH1, dvH2
-	real(8)						:: V_ao, V_bo, V_ah1, V_bh1, V_ah2, V_bh2
-	real(8)						:: boxshiftx, boxshifty, boxshiftz, dx, dy, dz 
-	real(8), save				::	aO(2), bO(2), aH(2), bH(2)
-	integer, save				::	iac_ow, iac_hw
-	! global variables used:
-	!  iqseq, iac, crg, x, nstates, qvdw_flag, iaclib, qiac, qavdw, qbvdw, qcrg, el14_scale, EQ, d, nat_solute
+        ! local variables
+        integer                                         :: jw,iq,i,j,iljo, iljh, iaci
+        integer                                         :: istate
+        real(8)                                         ::      aljo, bljo, aljh, bljh
+        real(8)                                         ::      dxo, dyo, dzo, dxh1, dyh1, dzh1, dxh2, dyh2, dzh2
+        real(8)                                         ::      ro, r2o, r6o, rh1, r2h1, r6h1, rh2, r2h2, r6h2,r6o_hc,r6h1_hc,r6h2_hc
+        real(8)                                         ::      velo, velh1, velh2, dvo, dvh1, dvh2
+        real(8)                                         :: v_ao, v_bo, v_ah1, v_bh1, v_ah2, v_bh2
+        real(8)                                         :: boxshiftx, boxshifty, boxshiftz, dx, dy, dz 
+        real(8), save                           ::      ao(2), bo(2), ah(2), bh(2)
+        integer, save                           ::      iac_ow, iac_hw
+        ! global variables used:
+        !  iqseq, iac, crg, x, nstates, qvdw_flag, iaclib, qiac, qavdw, qbvdw, qcrg, el14_scale, eq, d, nat_solute
   
-	if(iac_ow == 0) then !set first time
-		iac_ow = iac(nat_solute + 1)
-		iac_hw = iac(nat_solute + 2)
-		aO(1:2) = iaclib(iac_ow)%avdw(1:2)
-		bO(1:2) = iaclib(iac_ow)%bvdw(1:2)
-		aH(1:2) = iaclib(iac_hw)%avdw(1:2)
-		bH(1:2) = iaclib(iac_hw)%bvdw(1:2)
-	end if
+        if(iac_ow == 0) then !set first time
+                iac_ow = iac(nat_solute + 1)
+                iac_hw = iac(nat_solute + 2)
+                ao(1:2) = iaclib(iac_ow)%avdw(1:2)
+                bo(1:2) = iaclib(iac_ow)%bvdw(1:2)
+                ah(1:2) = iaclib(iac_hw)%avdw(1:2)
+                bh(1:2) = iaclib(iac_hw)%bvdw(1:2)
+        end if
 
-	!loop over listed waters
-	do jw = 1, nbqw_pair
-		j = nbqw(jw) !top. # of O in water iw
+        !loop over listed waters
+        do jw = 1, nbqw_pair
+                j = nbqw(jw) !top. # of o in water iw
 
-		!compute the periodical shift
-		dx = x(3*j-2) - x(3*qswitch-2)
-		dy = x(3*j-1) - x(3*qswitch-1)
-		dz = x(3*j  ) - x(3*qswitch  )
-		boxshiftx = boxlength(1)*nint(dx*inv_boxl(1))
-		boxshifty = boxlength(2)*nint(dy*inv_boxl(2))
-		boxshiftz = boxlength(3)*nint(dz*inv_boxl(3))
+                !compute the periodical shift
+                dx = x(3*j-2) - x(3*qswitch-2)
+                dy = x(3*j-1) - x(3*qswitch-1)
+                dz = x(3*j  ) - x(3*qswitch  )
+                boxshiftx = boxlength(1)*nint(dx*inv_boxl(1))
+                boxshifty = boxlength(2)*nint(dy*inv_boxl(2))
+                boxshiftz = boxlength(3)*nint(dz*inv_boxl(3))
 
-		!loop over all q-atoms
-		do iq = 1, nqat
-			i = iqseq(iq)
-			dxO  = x(3*j-2) - x(3*i-2)
-			dyO  = x(3*j-1) - x(3*i-1)
-			dzO  = x(3*j  ) - x(3*i  )
-			dxH1 = x(3*j+1) - x(3*i-2)
-			dyH1 = x(3*j+2) - x(3*i-1)
-			dzH1 = x(3*j+3) - x(3*i  )
-			dxH2 = x(3*j+4) - x(3*i-2)
-			dyH2 = x(3*j+5) - x(3*i-1)
-			dzH2 = x(3*j+6) - x(3*i  )
-			dxO = dxO - boxshiftx
-			dyO = dyO - boxshifty  
-			dzO = dzO - boxshiftz  
-			dxH1 = dxH1 - boxshiftx  
-			dyH1 = dyH1 - boxshifty  
-			dzH1 = dzH1 - boxshiftz  
-			dxH2 = dxH2 - boxshiftx 
-			dyH2 = dyH2 - boxshifty  
-			dzH2 = dzH2 - boxshiftz  
-			r2O  = 1._8/(dxO*dxO + dyO*dyO + dzO*dzO)
-			r2H1 = 1._8/(dxH1*dxH1 + dyH1*dyH1 + dzH1*dzH1)
-			r2H2 = 1._8/(dxH2*dxH2 + dyH2*dyH2 + dzH2*dzH2)
-			rO = sqrt(r2O)
-			r6O = r2O*r2O*r2O
-			r6O_hc = r6O    !needed for softcore
-			rH1 = sqrt(r2H1)
-			r6H1 = r2H1*r2H1*r2H1
-			r6H1_hc = r6H1    !needed for softcore
-			rH2 = sqrt(r2H2)
-			r6H2 = r2H2*r2H2*r2H2
-			r6H2_hc = r6H2    !needed for softcore
-			iaci = iac(i)
-			
-			!reset potential
-			dvO = 0
-			dvH1 = 0
-			dvH2 = 0
-			iLJO = LJcod(iac_ow, iaci)
-			iLJH = LJcod(iac_hw, iaci)
-			if(.not. qvdw_flag) then
-				!use same LJ params for all states
-				aLJO  = iaclib(iaci)%avdw(iLJO)+aO(iLJO)
-				bLJO  = iaclib(iaci)%bvdw(iLJO)*bO(iLJO)
-				aLJH  = iaclib(iaci)%avdw(iLJH)+aH(iLJH)
-				bLJH  = iaclib(iaci)%bvdw(iLJH)*bH(iLJH) 
-				aLJO = aLJO * aLJO
-				aLJO = aLJO * aLJO * aLJO
-				aLJH  = aLJH  * aLJH 
-				aLJH  = aLJH  * aLJH  * aLJH 
-				V_aO = bLJO*aLJO*aLJO*r6O*r6O 
-				V_bO = 2.0*bLJO*aLJO*r6O
-				V_aH1= bLJH*aLJH*aLJH*r6H1*r6H1
-				V_bH1= 2.0*bLJH*aLJH*r6H1
-				V_aH2= bLJH*aLJH*aLJH*r6H2*r6H2
-				V_bH2= 2.0*bLJH*aLJH*r6H2
-			end if
-			do istate = 1, nstates ! for every state:
-			
-				! set new LJ params if Q-atom types are used
-				if (qvdw_flag) then
-					r6O = 1._8/r6O_hc
-					r6O = r6O + sc_lookup(iq,iac_ow,istate)   !softcore
-					r6O = 1._8/r6O
-					r6H1 = 1._8/r6H1_hc
-					r6H1 = r6H1 + sc_lookup(iq,iac_hw,istate)   !softcore
-					r6H1 = 1._8/r6H1
-					r6H2 = 1._8/r6H2_hc
-					r6H2 = r6H2 + sc_lookup(iq,iac_hw,istate)   !softcore
-					r6H2 = 1._8/r6H2
-					aLJO  = qavdw(qiac(iq,istate),1)+aO(iLJO)
-					bLJO  = qbvdw(qiac(iq,istate),1)*bO(iLJO)
-					aLJH  = qavdw(qiac(iq,istate),1)+aH(iLJH)
-					bLJH  = qbvdw(qiac(iq,istate),1)*bH(iLJH)
-					aLJO = aLJO * aLJO
-					aLJO = aLJO * aLJO * aLJO
-					aLJH  = aLJH  * aLJH 
-					aLJH  = aLJH  * aLJH  * aLJH 
-					V_aO = bLJO*aLJO*aLJO*r6O*r6O 
-					V_bO = 2.0*bLJO*aLJO*r6O
-					V_aH1= bLJH*aLJH*aLJH*r6H1*r6H1
-					V_bH1= 2.0*bLJH*aLJH*r6H1
-					V_aH2= bLJH*aLJH*aLJH*r6H2*r6H2
-					V_bH2= 2.0*bLJH*aLJH*r6H2
-				end if
+                !loop over all q-atoms
+                do iq = 1, nqat
+                        i = iqseq(iq)
+                        dxo  = x(3*j-2) - x(3*i-2)
+                        dyo  = x(3*j-1) - x(3*i-1)
+                        dzo  = x(3*j  ) - x(3*i  )
+                        dxh1 = x(3*j+1) - x(3*i-2)
+                        dyh1 = x(3*j+2) - x(3*i-1)
+                        dzh1 = x(3*j+3) - x(3*i  )
+                        dxh2 = x(3*j+4) - x(3*i-2)
+                        dyh2 = x(3*j+5) - x(3*i-1)
+                        dzh2 = x(3*j+6) - x(3*i  )
+                        dxo = dxo - boxshiftx
+                        dyo = dyo - boxshifty  
+                        dzo = dzo - boxshiftz  
+                        dxh1 = dxh1 - boxshiftx  
+                        dyh1 = dyh1 - boxshifty  
+                        dzh1 = dzh1 - boxshiftz  
+                        dxh2 = dxh2 - boxshiftx 
+                        dyh2 = dyh2 - boxshifty  
+                        dzh2 = dzh2 - boxshiftz  
+                        r2o  = 1._8/(dxo*dxo + dyo*dyo + dzo*dzo)
+                        r2h1 = 1._8/(dxh1*dxh1 + dyh1*dyh1 + dzh1*dzh1)
+                        r2h2 = 1._8/(dxh2*dxh2 + dyh2*dyh2 + dzh2*dzh2)
+                        ro = sqrt(r2o)
+                        r6o = r2o*r2o*r2o
+                        r6o_hc = r6o    !needed for softcore
+                        rh1 = sqrt(r2h1)
+                        r6h1 = r2h1*r2h1*r2h1
+                        r6h1_hc = r6h1    !needed for softcore
+                        rh2 = sqrt(r2h2)
+                        r6h2 = r2h2*r2h2*r2h2
+                        r6h2_hc = r6h2    !needed for softcore
+                        iaci = iac(i)
+                        
+                        !reset potential
+                        dvo = 0
+                        dvh1 = 0
+                        dvh2 = 0
+                        iljo = ljcod(iac_ow, iaci)
+                        iljh = ljcod(iac_hw, iaci)
+                        if(.not. qvdw_flag) then
+                                !use same lj params for all states
+                                aljo  = iaclib(iaci)%avdw(iljo)+ao(iljo)
+                                bljo  = iaclib(iaci)%bvdw(iljo)*bo(iljo)
+                                aljh  = iaclib(iaci)%avdw(iljh)+ah(iljh)
+                                bljh  = iaclib(iaci)%bvdw(iljh)*bh(iljh) 
+                                aljo = aljo * aljo
+                                aljo = aljo * aljo * aljo
+                                aljh  = aljh  * aljh 
+                                aljh  = aljh  * aljh  * aljh 
+                                v_ao = bljo*aljo*aljo*r6o*r6o 
+                                v_bo = 2.0*bljo*aljo*r6o
+                                v_ah1= bljh*aljh*aljh*r6h1*r6h1
+                                v_bh1= 2.0*bljh*aljh*r6h1
+                                v_ah2= bljh*aljh*aljh*r6h2*r6h2
+                                v_bh2= 2.0*bljh*aljh*r6h2
+                        end if
+                        do istate = 1, nstates ! for every state:
+                        
+                                ! set new lj params if q-atom types are used
+                                if (qvdw_flag) then
+                                        r6o = 1._8/r6o_hc
+                                        r6o = r6o + sc_lookup(iq,iac_ow,istate)   !softcore
+                                        r6o = 1._8/r6o
+                                        r6h1 = 1._8/r6h1_hc
+                                        r6h1 = r6h1 + sc_lookup(iq,iac_hw,istate)   !softcore
+                                        r6h1 = 1._8/r6h1
+                                        r6h2 = 1._8/r6h2_hc
+                                        r6h2 = r6h2 + sc_lookup(iq,iac_hw,istate)   !softcore
+                                        r6h2 = 1._8/r6h2
+                                        aljo  = qavdw(qiac(iq,istate),1)+ao(iljo)
+                                        bljo  = qbvdw(qiac(iq,istate),1)*bo(iljo)
+                                        aljh  = qavdw(qiac(iq,istate),1)+ah(iljh)
+                                        bljh  = qbvdw(qiac(iq,istate),1)*bh(iljh)
+                                        aljo = aljo * aljo
+                                        aljo = aljo * aljo * aljo
+                                        aljh  = aljh  * aljh 
+                                        aljh  = aljh  * aljh  * aljh 
+                                        v_ao = bljo*aljo*aljo*r6o*r6o 
+                                        v_bo = 2.0*bljo*aljo*r6o
+                                        v_ah1= bljh*aljh*aljh*r6h1*r6h1
+                                        v_bh1= 2.0*bljh*aljh*r6h1
+                                        v_ah2= bljh*aljh*aljh*r6h2*r6h2
+                                        v_bh2= 2.0*bljh*aljh*r6h2
+                                end if
 
 
-				! calculate qi, Vel, V_a, V_b and dv
-				VelO = crg_ow*qcrg(iq,istate)*rO
-				VelH1 = crg_hw*qcrg(iq,istate)*rH1
-				VelH2 = crg_hw*qcrg(iq,istate)*rH2
+                                ! calculate qi, vel, v_a, v_b and dv
+                                velo = crg_ow*qcrg(iq,istate)*ro
+                                velh1 = crg_hw*qcrg(iq,istate)*rh1
+                                velh2 = crg_hw*qcrg(iq,istate)*rh2
 
-				dvO  = dvO  + r2O *( -VelO  -(12.*V_aO  -6.*V_bO )*r6O/r6O_hc)*EQ(istate)%lambda    !r6O/r6O_hc softcore
-				dvH1 = dvH1 + r2H1*( -VelH1 -(12.*V_aH1 -6.*V_bH1)*r6H1/r6H1_hc)*EQ(istate)%lambda  !r6H1/r6H1_hc softcore
-				dvH2 = dvH2 + r2H2*( -VelH2 -(12.*V_aH2 -6.*V_bH2)*r6H2/r6H2_hc)*EQ(istate)%lambda  !r6H2/r6H2_hc softcore
-				! update q-water energies
-				EQ(istate)%qw%el  = EQ(istate)%qw%el + VelO + VelH1 + VelH2
-				EQ(istate)%qw%vdw = EQ(istate)%qw%vdw + V_aO + V_aH1 + V_aH2 - V_bO - V_bH1 - V_bH2 
-			end do !istate
-			
-			! update forces on Q-atom
-			d(3*i-2) = d(3*i-2) - dvO*dxO - dvH1*dxH1 - dvH2*dxH2
-			d(3*i-1) = d(3*i-1) - dvO*dyO - dvH1*dyH1 - dvH2*dyH2
-			d(3*i  ) = d(3*i  ) - dvO*dzO - dvH1*dzH1 - dvH2*dzH2
+                                dvo  = dvo  + r2o *( -velo  -(12.*v_ao  -6.*v_bo )*r6o/r6o_hc)*eq(istate)%lambda    !r6o/r6o_hc softcore
+                                dvh1 = dvh1 + r2h1*( -velh1 -(12.*v_ah1 -6.*v_bh1)*r6h1/r6h1_hc)*eq(istate)%lambda  !r6h1/r6h1_hc softcore
+                                dvh2 = dvh2 + r2h2*( -velh2 -(12.*v_ah2 -6.*v_bh2)*r6h2/r6h2_hc)*eq(istate)%lambda  !r6h2/r6h2_hc softcore
+                                ! update q-water energies
+                                eq(istate)%qw%el  = eq(istate)%qw%el + velo + velh1 + velh2
+                                eq(istate)%qw%vdw = eq(istate)%qw%vdw + v_ao + v_ah1 + v_ah2 - v_bo - v_bh1 - v_bh2 
+                        end do !istate
+                        
+                        ! update forces on q-atom
+                        d(3*i-2) = d(3*i-2) - dvo*dxo - dvh1*dxh1 - dvh2*dxh2
+                        d(3*i-1) = d(3*i-1) - dvo*dyo - dvh1*dyh1 - dvh2*dyh2
+                        d(3*i  ) = d(3*i  ) - dvo*dzo - dvh1*dzh1 - dvh2*dzh2
 
-			! update forces on water
-			d(3*j-2) = d(3*j-2) + dvO*dxO
-			d(3*j-1) = d(3*j-1) + dvO*dyO
-			d(3*j  ) = d(3*j  ) + dvO*dzO
-			d(3*j+1) = d(3*j+1) + dvH1*dxH1
-			d(3*j+2) = d(3*j+2) + dvH1*dyH1
-			d(3*j+3) = d(3*j+3) + dvH1*dzH1
-			d(3*j+4) = d(3*j+4) + dvH2*dxH2
-			d(3*j+5) = d(3*j+5) + dvH2*dyH2
-			d(3*j+6) = d(3*j+6) + dvH2*dzH2
+                        ! update forces on water
+                        d(3*j-2) = d(3*j-2) + dvo*dxo
+                        d(3*j-1) = d(3*j-1) + dvo*dyo
+                        d(3*j  ) = d(3*j  ) + dvo*dzo
+                        d(3*j+1) = d(3*j+1) + dvh1*dxh1
+                        d(3*j+2) = d(3*j+2) + dvh1*dyh1
+                        d(3*j+3) = d(3*j+3) + dvh1*dzh1
+                        d(3*j+4) = d(3*j+4) + dvh2*dxh2
+                        d(3*j+5) = d(3*j+5) + dvh2*dyh2
+                        d(3*j+6) = d(3*j+6) + dvh2*dzh2
 
-		end do !iq
-	end do !jw
+                end do !iq
+        end do !jw
 end subroutine nonbon2_qw_box
 
 !----------------------------------------------------------------------------------------------------
 
 subroutine nonbon2_ww
 ! local variables
-integer						:: iw,ip,i,j,i3,j3,ia
-integer						:: iaci,iacj,iLJ,ja
-real(8)						:: aLJ,bLJ
-integer						:: ipstart
-real(8)						:: dx1,dx2,dx3,r2,r,r6,r12
-real(8)						:: Vel,V_a,V_b,dv
+integer                                         :: iw,ip,i,j,i3,j3,ia
+integer                                         :: iaci,iacj,ilj,ja
+real(8)                                         :: alj,blj
+integer                                         :: ipstart
+real(8)                                         :: dx1,dx2,dx3,r2,r,r6,r12
+real(8)                                         :: vel,v_a,v_b,dv
 
 ! global variables used:
-!  nat_solute, iac, crg, ljcod, iaclib, x, d, E
+!  nat_solute, iac, crg, ljcod, iaclib, x, d, e
 
 ipstart = 1
 
@@ -10082,16 +10053,16 @@ do ia = 1, 3
   do while (nbww(ip) .ne. 0)
         ! loop over the interactions with other water molecules
 
-        ! X-O
+        ! x-o
         j    = nbww(ip)
         j3   = j*3-3
         iacj = iac(j)
-        iLJ  = ljcod(iac(i),iac(j))
+        ilj  = ljcod(iac(i),iac(j))
         crg(j)   = crg(j)
-        aLJ  = iaclib(iaci)%avdw(iLJ)+iaclib(iacj)%avdw(iLJ)
-        bLJ  = iaclib(iaci)%bvdw(iLJ)*iaclib(iacj)%bvdw(iLJ)
-        aLJ  = aLJ*aLJ
-        aLJ  = aLJ*aLJ*aLJ
+        alj  = iaclib(iaci)%avdw(ilj)+iaclib(iacj)%avdw(ilj)
+        blj  = iaclib(iaci)%bvdw(ilj)*iaclib(iacj)%bvdw(ilj)
+        alj  = alj*alj
+        alj  = alj*alj*alj
         dx1  = x(j3+1) - x(i3+1)
         dx2  = x(j3+2) - x(i3+2)
         dx3  = x(j3+3) - x(i3+3)
@@ -10100,29 +10071,29 @@ do ia = 1, 3
         r    = sqrt ( r2 ) 
         r6   = r2*r2*r2
         r12  = r6*r6
-        Vel  = crg(i)*crg(j)*r
-        V_a  = bLJ*aLJ*aLJ*r12 
-        V_b  = 2.0*bLJ*aLJ*r6
-        dv   = r2*( -Vel -12.*V_a +6.*V_b )
+        vel  = crg(i)*crg(j)*r
+        v_a  = blj*alj*alj*r12 
+        v_b  = 2.0*blj*alj*r6
+        dv   = r2*( -vel -12.*v_a +6.*v_b )
         d(i3+1) = d(i3+1) - dv*dx1
         d(i3+2) = d(i3+2) - dv*dx2
         d(i3+3) = d(i3+3) - dv*dx3
         d(j3+1) = d(j3+1) + dv*dx1
         d(j3+2) = d(j3+2) + dv*dx2
         d(j3+3) = d(j3+3) + dv*dx3
-        E%ww%el  = E%ww%el + Vel       
-        E%ww%vdw = E%ww%vdw + V_a - V_b
+        e%ww%el  = e%ww%el + vel       
+        e%ww%vdw = e%ww%vdw + v_a - v_b
 
-        ! X-H1
+        ! x-h1
         j    = j + 1
         j3   = j3 + 3
         iacj = iac(j)
-        iLJ  = ljcod(iac(i),iac(j))
+        ilj  = ljcod(iac(i),iac(j))
         crg(j)   = crg(j)
-        aLJ  = iaclib(iaci)%avdw(iLJ)+iaclib(iacj)%avdw(iLJ)
-        bLJ  = iaclib(iaci)%bvdw(iLJ)*iaclib(iacj)%bvdw(iLJ)
-        aLJ  = aLJ*aLJ
-        aLJ  = aLJ*aLJ*aLJ
+        alj  = iaclib(iaci)%avdw(ilj)+iaclib(iacj)%avdw(ilj)
+        blj  = iaclib(iaci)%bvdw(ilj)*iaclib(iacj)%bvdw(ilj)
+        alj  = alj*alj
+        alj  = alj*alj*alj
         dx1  = x(j3+1) - x(i3+1)
         dx2  = x(j3+2) - x(i3+2)
         dx3  = x(j3+3) - x(i3+3)
@@ -10131,29 +10102,29 @@ do ia = 1, 3
         r    = sqrt ( r2 ) 
         r6   = r2*r2*r2
         r12  = r6*r6
-        Vel  = crg(i)*crg(j)*r
-        V_a  = bLJ*aLJ*aLJ*r12 
-        V_b  = 2.0*bLJ*aLJ*r6
-        dv   = r2*( -Vel -12.*V_a +6.*V_b )
+        vel  = crg(i)*crg(j)*r
+        v_a  = blj*alj*alj*r12 
+        v_b  = 2.0*blj*alj*r6
+        dv   = r2*( -vel -12.*v_a +6.*v_b )
         d(i3+1) = d(i3+1) - dv*dx1
         d(i3+2) = d(i3+2) - dv*dx2
         d(i3+3) = d(i3+3) - dv*dx3
         d(j3+1) = d(j3+1) + dv*dx1
         d(j3+2) = d(j3+2) + dv*dx2
         d(j3+3) = d(j3+3) + dv*dx3
-        E%ww%el  = E%ww%el + Vel       
-        E%ww%vdw = E%ww%vdw + V_a - V_b
+        e%ww%el  = e%ww%el + vel       
+        e%ww%vdw = e%ww%vdw + v_a - v_b
 
-        ! X-H2
+        ! x-h2
         j    = j + 1
         j3   = j3 + 3
         iacj = iac(j)
-        iLJ  = ljcod(iac(i),iac(j))
+        ilj  = ljcod(iac(i),iac(j))
         crg(j)   = crg(j)
-        aLJ  = iaclib(iaci)%avdw(iLJ)+iaclib(iacj)%avdw(iLJ)
-        bLJ  = iaclib(iaci)%bvdw(iLJ)*iaclib(iacj)%bvdw(iLJ)
-        aLJ  = aLJ*aLJ
-        aLJ  = aLJ*aLJ*aLJ
+        alj  = iaclib(iaci)%avdw(ilj)+iaclib(iacj)%avdw(ilj)
+        blj  = iaclib(iaci)%bvdw(ilj)*iaclib(iacj)%bvdw(ilj)
+        alj  = alj*alj
+        alj  = alj*alj*alj
         dx1  = x(j3+1) - x(i3+1)
         dx2  = x(j3+2) - x(i3+2)
         dx3  = x(j3+3) - x(i3+3)
@@ -10162,24 +10133,24 @@ do ia = 1, 3
         r    = sqrt ( r2 ) 
         r6   = r2*r2*r2
         r12  = r6*r6
-        Vel  = crg(i)*crg(j)*r
-        V_a  = bLJ*aLJ*aLJ*r12 
-        V_b  = 2.0*bLJ*aLJ*r6
-        dv   = r2*( -Vel -12.*V_a +6.*V_b )
+        vel  = crg(i)*crg(j)*r
+        v_a  = blj*alj*alj*r12 
+        v_b  = 2.0*blj*alj*r6
+        dv   = r2*( -vel -12.*v_a +6.*v_b )
         d(i3+1) = d(i3+1) - dv*dx1
         d(i3+2) = d(i3+2) - dv*dx2
         d(i3+3) = d(i3+3) - dv*dx3
         d(j3+1) = d(j3+1) + dv*dx1
         d(j3+2) = d(j3+2) + dv*dx2
         d(j3+3) = d(j3+3) + dv*dx3
-        E%ww%el  = E%ww%el + Vel       
-        E%ww%vdw = E%ww%vdw + V_a - V_b
+        e%ww%el  = e%ww%el + vel       
+        e%ww%vdw = e%ww%vdw + v_a - v_b
 
         ip = ip + 1
   end do
 end do
 
-ipstart = ip +1						! skip over the 0
+ipstart = ip +1                                         ! skip over the 0
 end do
 
 end subroutine nonbon2_ww
@@ -10187,154 +10158,154 @@ end subroutine nonbon2_ww
 !----------------------------------------------------------------------------------------------------
 subroutine nonbon2_ww_box
   ! local variables
-  integer						:: iw,ip,i,j,i3,j3,ia
-  integer						:: iaci,iacj,iLJ,ja
-  real(8)						:: aLJ,bLJ
-  integer						:: ipstart
-  real(8)						:: dx1,dx2,dx3,r2,r,r6,r12
-  real(8)						:: Vel,V_a,V_b,dv
-  real(8)						:: ds1, ds2, ds3
+  integer                                               :: iw,ip,i,j,i3,j3,ia
+  integer                                               :: iaci,iacj,ilj,ja
+  real(8)                                               :: alj,blj
+  integer                                               :: ipstart
+  real(8)                                               :: dx1,dx2,dx3,r2,r,r6,r12
+  real(8)                                               :: vel,v_a,v_b,dv
+  real(8)                                               :: ds1, ds2, ds3
 
   ! global variables used:
-  !  nat_solute, iac, crg, ljcod, iaclib, x, d, E
+  !  nat_solute, iac, crg, ljcod, iaclib, x, d, e
 
   ipstart = 1
 
   do iw = calculation_assignment%ww%start, calculation_assignment%ww%end
-	! for every assigned water molecule:
+        ! for every assigned water molecule:
 
-	do ia = 1, 3
-	  ! for every atom of the current water molecule:
-	  i    = nat_solute+3*(iw-1)+ia
-	  i3   = i*3-3
-	  iaci = iac(i)
-	  crg(i)   = crg(i)
+        do ia = 1, 3
+          ! for every atom of the current water molecule:
+          i    = nat_solute+3*(iw-1)+ia
+          i3   = i*3-3
+          iaci = iac(i)
+          crg(i)   = crg(i)
 
-	  ip = ipstart
-	  do while (nbww(ip) .ne. 0)
-		! loop over the interactions with other water molecules
+          ip = ipstart
+          do while (nbww(ip) .ne. 0)
+                ! loop over the interactions with other water molecules
 
-		! X-O
-		j    = nbww(ip)
-		j3   = j*3-3
-		iacj = iac(j)
-		iLJ  = ljcod(iac(i),iac(j))
-		crg(j)   = crg(j)
-		aLJ  = iaclib(iaci)%avdw(iLJ)+iaclib(iacj)%avdw(iLJ)
-		bLJ  = iaclib(iaci)%bvdw(iLJ)*iaclib(iacj)%bvdw(iLJ)
-		aLJ  = aLJ*aLJ
-		aLJ  = aLJ*aLJ*aLJ
+                ! x-o
+                j    = nbww(ip)
+                j3   = j*3-3
+                iacj = iac(j)
+                ilj  = ljcod(iac(i),iac(j))
+                crg(j)   = crg(j)
+                alj  = iaclib(iaci)%avdw(ilj)+iaclib(iacj)%avdw(ilj)
+                blj  = iaclib(iaci)%bvdw(ilj)*iaclib(iacj)%bvdw(ilj)
+                alj  = alj*alj
+                alj  = alj*alj*alj
 
-		!distance between this oxygen atom and the oxygen atom of the above watermolecule, iw
-		ds1 = x(j3+1) - x( 3*(nat_solute+3*(iw-1)+1) - 2 )
-		ds2 = x(j3+2) - x( 3*(nat_solute+3*(iw-1)+1) - 1 )
-		ds3 = x(j3+3) - x( 3*(nat_solute+3*(iw-1)+1)     )
-		!the peridic shift
-		ds1 = boxlength(1)*nint( ds1*inv_boxl(1) )
-		ds2 = boxlength(2)*nint( ds2*inv_boxl(2) )
-		ds3 = boxlength(3)*nint( ds3*inv_boxl(3) )
+                !distance between this oxygen atom and the oxygen atom of the above watermolecule, iw
+                ds1 = x(j3+1) - x( 3*(nat_solute+3*(iw-1)+1) - 2 )
+                ds2 = x(j3+2) - x( 3*(nat_solute+3*(iw-1)+1) - 1 )
+                ds3 = x(j3+3) - x( 3*(nat_solute+3*(iw-1)+1)     )
+                !the peridic shift
+                ds1 = boxlength(1)*nint( ds1*inv_boxl(1) )
+                ds2 = boxlength(2)*nint( ds2*inv_boxl(2) )
+                ds3 = boxlength(3)*nint( ds3*inv_boxl(3) )
 
 
-		dx1  = x(j3+1) - x(i3+1)
-		dx2  = x(j3+2) - x(i3+2)
-		dx3  = x(j3+3) - x(i3+3)
-		dx1 = dx1 - ds1
-		dx2 = dx2 - ds2
-		dx3 = dx3 - ds3
+                dx1  = x(j3+1) - x(i3+1)
+                dx2  = x(j3+2) - x(i3+2)
+                dx3  = x(j3+3) - x(i3+3)
+                dx1 = dx1 - ds1
+                dx2 = dx2 - ds2
+                dx3 = dx3 - ds3
 
-		r2   = dx1*dx1 + dx2*dx2 + dx3*dx3
-		r2   = 1./r2
-		r    = sqrt ( r2 ) 
-		r6   = r2*r2*r2
-		r12  = r6*r6
-		Vel  = crg(i)*crg(j)*r
-		V_a  = bLJ*aLJ*aLJ*r12 
-		V_b  = 2.0*bLJ*aLJ*r6
-		dv   = r2*( -Vel -12.*V_a +6.*V_b )
-		d(i3+1) = d(i3+1) - dv*dx1
-		d(i3+2) = d(i3+2) - dv*dx2
-		d(i3+3) = d(i3+3) - dv*dx3
-		d(j3+1) = d(j3+1) + dv*dx1
-		d(j3+2) = d(j3+2) + dv*dx2
-		d(j3+3) = d(j3+3) + dv*dx3
-		E%ww%el  = E%ww%el + Vel       
-		E%ww%vdw = E%ww%vdw + V_a - V_b
+                r2   = dx1*dx1 + dx2*dx2 + dx3*dx3
+                r2   = 1./r2
+                r    = sqrt ( r2 ) 
+                r6   = r2*r2*r2
+                r12  = r6*r6
+                vel  = crg(i)*crg(j)*r
+                v_a  = blj*alj*alj*r12 
+                v_b  = 2.0*blj*alj*r6
+                dv   = r2*( -vel -12.*v_a +6.*v_b )
+                d(i3+1) = d(i3+1) - dv*dx1
+                d(i3+2) = d(i3+2) - dv*dx2
+                d(i3+3) = d(i3+3) - dv*dx3
+                d(j3+1) = d(j3+1) + dv*dx1
+                d(j3+2) = d(j3+2) + dv*dx2
+                d(j3+3) = d(j3+3) + dv*dx3
+                e%ww%el  = e%ww%el + vel       
+                e%ww%vdw = e%ww%vdw + v_a - v_b
 
-		! X-H1
-		j    = j + 1
-		j3   = j3 + 3
-		iacj = iac(j)
-		iLJ  = ljcod(iac(i),iac(j))
-		crg(j)   = crg(j)
-		aLJ  = iaclib(iaci)%avdw(iLJ)+iaclib(iacj)%avdw(iLJ)
-		bLJ  = iaclib(iaci)%bvdw(iLJ)*iaclib(iacj)%bvdw(iLJ)
-		aLJ  = aLJ*aLJ
-		aLJ  = aLJ*aLJ*aLJ
-		dx1  = x(j3+1) - x(i3+1)
-		dx2  = x(j3+2) - x(i3+2)
-		dx3  = x(j3+3) - x(i3+3)
-		dx1 = dx1 - ds1
-		dx2 = dx2 - ds2
-		dx3 = dx3 - ds3
-		
-		r2   = dx1*dx1 + dx2*dx2 + dx3*dx3
-		r2   = 1./r2
-		r    = sqrt ( r2 ) 
-		r6   = r2*r2*r2
-		r12  = r6*r6
-		Vel  = crg(i)*crg(j)*r
-		V_a  = bLJ*aLJ*aLJ*r12 
-		V_b  = 2.0*bLJ*aLJ*r6
-		dv   = r2*( -Vel -12.*V_a +6.*V_b )
-		d(i3+1) = d(i3+1) - dv*dx1
-		d(i3+2) = d(i3+2) - dv*dx2
-		d(i3+3) = d(i3+3) - dv*dx3
-		d(j3+1) = d(j3+1) + dv*dx1
-		d(j3+2) = d(j3+2) + dv*dx2
-		d(j3+3) = d(j3+3) + dv*dx3
-		E%ww%el  = E%ww%el + Vel       
-		E%ww%vdw = E%ww%vdw + V_a - V_b
-		
-		! X-H2
-		j    = j + 1
-		j3   = j3 + 3
-		iacj = iac(j)
-		iLJ  = ljcod(iac(i),iac(j))
-		crg(j)   = crg(j)
-		aLJ  = iaclib(iaci)%avdw(iLJ)+iaclib(iacj)%avdw(iLJ)
-		bLJ  = iaclib(iaci)%bvdw(iLJ)*iaclib(iacj)%bvdw(iLJ)
-		aLJ  = aLJ*aLJ
-		aLJ  = aLJ*aLJ*aLJ
-		dx1  = x(j3+1) - x(i3+1)
-		dx2  = x(j3+2) - x(i3+2)
-		dx3  = x(j3+3) - x(i3+3)
-		dx1 = dx1 - ds1
-		dx2 = dx2 - ds2
-		dx3 = dx3 - ds3
-	
-		r2   = dx1*dx1 + dx2*dx2 + dx3*dx3
-		r2   = 1./r2
-		r    = sqrt ( r2 ) 
-		r6   = r2*r2*r2
-		r12  = r6*r6
-		Vel  = crg(i)*crg(j)*r
-		V_a  = bLJ*aLJ*aLJ*r12 
-		V_b  = 2.0*bLJ*aLJ*r6
-		dv   = r2*( -Vel -12.*V_a +6.*V_b )
-		d(i3+1) = d(i3+1) - dv*dx1
-		d(i3+2) = d(i3+2) - dv*dx2
-		d(i3+3) = d(i3+3) - dv*dx3
-		d(j3+1) = d(j3+1) + dv*dx1
-		d(j3+2) = d(j3+2) + dv*dx2
-		d(j3+3) = d(j3+3) + dv*dx3
-		E%ww%el  = E%ww%el + Vel       
-		E%ww%vdw = E%ww%vdw + V_a - V_b
+                ! x-h1
+                j    = j + 1
+                j3   = j3 + 3
+                iacj = iac(j)
+                ilj  = ljcod(iac(i),iac(j))
+                crg(j)   = crg(j)
+                alj  = iaclib(iaci)%avdw(ilj)+iaclib(iacj)%avdw(ilj)
+                blj  = iaclib(iaci)%bvdw(ilj)*iaclib(iacj)%bvdw(ilj)
+                alj  = alj*alj
+                alj  = alj*alj*alj
+                dx1  = x(j3+1) - x(i3+1)
+                dx2  = x(j3+2) - x(i3+2)
+                dx3  = x(j3+3) - x(i3+3)
+                dx1 = dx1 - ds1
+                dx2 = dx2 - ds2
+                dx3 = dx3 - ds3
+                
+                r2   = dx1*dx1 + dx2*dx2 + dx3*dx3
+                r2   = 1./r2
+                r    = sqrt ( r2 ) 
+                r6   = r2*r2*r2
+                r12  = r6*r6
+                vel  = crg(i)*crg(j)*r
+                v_a  = blj*alj*alj*r12 
+                v_b  = 2.0*blj*alj*r6
+                dv   = r2*( -vel -12.*v_a +6.*v_b )
+                d(i3+1) = d(i3+1) - dv*dx1
+                d(i3+2) = d(i3+2) - dv*dx2
+                d(i3+3) = d(i3+3) - dv*dx3
+                d(j3+1) = d(j3+1) + dv*dx1
+                d(j3+2) = d(j3+2) + dv*dx2
+                d(j3+3) = d(j3+3) + dv*dx3
+                e%ww%el  = e%ww%el + vel       
+                e%ww%vdw = e%ww%vdw + v_a - v_b
+                
+                ! x-h2
+                j    = j + 1
+                j3   = j3 + 3
+                iacj = iac(j)
+                ilj  = ljcod(iac(i),iac(j))
+                crg(j)   = crg(j)
+                alj  = iaclib(iaci)%avdw(ilj)+iaclib(iacj)%avdw(ilj)
+                blj  = iaclib(iaci)%bvdw(ilj)*iaclib(iacj)%bvdw(ilj)
+                alj  = alj*alj
+                alj  = alj*alj*alj
+                dx1  = x(j3+1) - x(i3+1)
+                dx2  = x(j3+2) - x(i3+2)
+                dx3  = x(j3+3) - x(i3+3)
+                dx1 = dx1 - ds1
+                dx2 = dx2 - ds2
+                dx3 = dx3 - ds3
+        
+                r2   = dx1*dx1 + dx2*dx2 + dx3*dx3
+                r2   = 1./r2
+                r    = sqrt ( r2 ) 
+                r6   = r2*r2*r2
+                r12  = r6*r6
+                vel  = crg(i)*crg(j)*r
+                v_a  = blj*alj*alj*r12 
+                v_b  = 2.0*blj*alj*r6
+                dv   = r2*( -vel -12.*v_a +6.*v_b )
+                d(i3+1) = d(i3+1) - dv*dx1
+                d(i3+2) = d(i3+2) - dv*dx2
+                d(i3+3) = d(i3+3) - dv*dx3
+                d(j3+1) = d(j3+1) + dv*dx1
+                d(j3+2) = d(j3+2) + dv*dx2
+                d(j3+3) = d(j3+3) + dv*dx3
+                e%ww%el  = e%ww%el + vel       
+                e%ww%vdw = e%ww%vdw + v_a - v_b
 
-		ip = ip + 1
-	  end do
-	end do
+                ip = ip + 1
+          end do
+        end do
 
-	ipstart = ip +1						! skip over the 0
+        ipstart = ip +1                                         ! skip over the 0
   end do
 
 end subroutine nonbon2_ww_box
@@ -10343,16 +10314,16 @@ end subroutine nonbon2_ww_box
 
 subroutine nonbond_pp
 ! local variables
-integer						:: ip
-type(NB_TYPE), pointer		:: pa, pb
-real(8)						:: dx1a,dx2a,dx3a,r2a,ra,r6a
-real(8)						:: Vela,V_aa,V_ba,dva
-real(8)						:: dx1b,dx2b,dx3b,r2b,rb,r6b
-real(8)						:: Velb,V_ab,V_bb,dvb
+integer                                         :: ip
+type(nb_type), pointer          :: pa, pb
+real(8)                                         :: dx1a,dx2a,dx3a,r2a,ra,r6a
+real(8)                                         :: vela,v_aa,v_ba,dva
+real(8)                                         :: dx1b,dx2b,dx3b,r2b,rb,r6b
+real(8)                                         :: velb,v_ab,v_bb,dvb
 
 ! global variables used:
 
-!  x, crg, el14_scale, iaclib, d, E, 
+!  x, crg, el14_scale, iaclib, d, e, 
 
 
 do ip = 1, nbpp_pair - 1, 2
@@ -10377,26 +10348,26 @@ rb    = sqrt ( r2b )
 r6a   = r2a*r2a*r2a
 r6b   = r2b*r2b*r2b
 
-! calculate Vel and dv
-Vela  = crg(pa%i)*crg(pa%j)*ra
-Velb  = crg(pb%i)*crg(pb%j)*rb
-if ( pa%LJcod .eq. 3 ) then 
-  Vela = Vela*el14_scale
+! calculate vel and dv
+vela  = crg(pa%i)*crg(pa%j)*ra
+velb  = crg(pb%i)*crg(pb%j)*rb
+if ( pa%ljcod .eq. 3 ) then 
+  vela = vela*el14_scale
 end if
-if ( pb%LJcod .eq. 3 ) then
- Velb = Velb*el14_scale
+if ( pb%ljcod .eq. 3 ) then
+ velb = velb*el14_scale
 end if
-V_aa = r6a*r6a*iaclib(iac(pa%i))%avdw(pa%LJcod) &
-        *iaclib(iac(pa%j))%avdw(pa%LJcod)
-V_ab = r6b*r6b*iaclib(iac(pb%i))%avdw(pb%LJcod) &
-        *iaclib(iac(pb%j))%avdw(pb%LJcod)
-V_ba = r6a*iaclib(iac(pa%i))%bvdw(pa%LJcod) &
-        *iaclib(iac(pa%j))%bvdw(pa%LJcod)
-V_bb = r6b*iaclib(iac(pb%i))%bvdw(pb%LJcod) &
-        *iaclib(iac(pb%j))%bvdw(pb%LJcod)
+v_aa = r6a*r6a*iaclib(iac(pa%i))%avdw(pa%ljcod) &
+        *iaclib(iac(pa%j))%avdw(pa%ljcod)
+v_ab = r6b*r6b*iaclib(iac(pb%i))%avdw(pb%ljcod) &
+        *iaclib(iac(pb%j))%avdw(pb%ljcod)
+v_ba = r6a*iaclib(iac(pa%i))%bvdw(pa%ljcod) &
+        *iaclib(iac(pa%j))%bvdw(pa%ljcod)
+v_bb = r6b*iaclib(iac(pb%i))%bvdw(pb%ljcod) &
+        *iaclib(iac(pb%j))%bvdw(pb%ljcod)
 
-dva   = r2a*( -Vela -12.*V_aa +6.*V_ba )
-dvb   = r2b*( -Velb -12.*V_ab +6.*V_bb )
+dva   = r2a*( -vela -12.*v_aa +6.*v_ba )
+dvb   = r2b*( -velb -12.*v_ab +6.*v_bb )
 
 ! update d
 d(pa%i*3-2) = d(pa%i*3-2) - dva*dx1a
@@ -10413,8 +10384,8 @@ d(pa%j*3-0) = d(pa%j*3-0) + dva*dx3a
 d(pb%j*3-0) = d(pb%j*3-0) + dvb*dx3b
 
 ! update energies
-E%pp%el  = E%pp%el + Vela + Velb
-E%pp%vdw = E%pp%vdw + V_aa + V_ab - V_ba - V_bb
+e%pp%el  = e%pp%el + vela + velb
+e%pp%vdw = e%pp%vdw + v_aa + v_ab - v_ba - v_bb
 end do
 
 if (ip .eq. nbpp_pair) then
@@ -10428,11 +10399,11 @@ r2a   = 1./(dx1a*dx1a + dx2a*dx2a + dx3a*dx3a)
 ra   = sqrt(r2a)
 r6a   = r2a*r2a*r2a
 
-Vela  = crg(pa%i)*crg(pa%j)*ra
-if ( pa%LJcod .eq. 3 ) Vela = Vela*el14_scale
-V_aa = r6a*r6a*iaclib(iac(pa%i))%avdw(pa%LJcod)*iaclib(iac(pa%j))%avdw(pa%LJcod)
-V_ba = r6a*iaclib(iac(pa%i))%bvdw(pa%LJcod)*iaclib(iac(pa%j))%bvdw(pa%LJcod)
-dva   = r2a*( -Vela -12.*V_aa +6.*V_ba )
+vela  = crg(pa%i)*crg(pa%j)*ra
+if ( pa%ljcod .eq. 3 ) vela = vela*el14_scale
+v_aa = r6a*r6a*iaclib(iac(pa%i))%avdw(pa%ljcod)*iaclib(iac(pa%j))%avdw(pa%ljcod)
+v_ba = r6a*iaclib(iac(pa%i))%bvdw(pa%ljcod)*iaclib(iac(pa%j))%bvdw(pa%ljcod)
+dva   = r2a*( -vela -12.*v_aa +6.*v_ba )
 
 d(pa%i*3-2) = d(pa%i*3-2) - dva*dx1a
 d(pa%i*3-1) = d(pa%i*3-1) - dva*dx2a
@@ -10441,65 +10412,65 @@ d(pa%j*3-2) = d(pa%j*3-2) + dva*dx1a
 d(pa%j*3-1) = d(pa%j*3-1) + dva*dx2a
 d(pa%j*3-0) = d(pa%j*3-0) + dva*dx3a
 
-E%pp%el  = E%pp%el + Vela 
-E%pp%vdw = E%pp%vdw + V_aa - V_ba 
+e%pp%el  = e%pp%el + vela 
+e%pp%vdw = e%pp%vdw + v_aa - v_ba 
 end if
 
 end subroutine nonbond_pp
 
 !-----------------------------------------------------------------------
-!******PWadded 2001-10-23
+!******pwadded 2001-10-23
 subroutine nonbond_pp_box
   ! local variables
-  integer						:: ip, group, ga, gb
-  type(NB_TYPE), pointer		:: pa, pb
-  real(8)						:: dx1a,dx2a,dx3a,r2a,ra,r6a
-  real(8)						:: Vela,V_aa,V_ba,dva
-  real(8)						:: dx1b,dx2b,dx3b,r2b,rb,r6b
-  real(8)						:: Velb,V_ab,V_bb,dvb
+  integer                                               :: ip, group, ga, gb
+  type(nb_type), pointer                :: pa, pb
+  real(8)                                               :: dx1a,dx2a,dx3a,r2a,ra,r6a
+  real(8)                                               :: vela,v_aa,v_ba,dva
+  real(8)                                               :: dx1b,dx2b,dx3b,r2b,rb,r6b
+  real(8)                                               :: velb,v_ab,v_bb,dvb
 
   ! global variables used:
-  !  x, crg, el14_scale, iaclib, d, E, 
+  !  x, crg, el14_scale, iaclib, d, e, 
 
   !compute the peridocal shift for every charge group pair
-	do group = 1, nbpp_cgp_pair
-		ga = nbpp_cgp(group)%i !atom index for the two switching atoms
-		gb = nbpp_cgp(group)%j
+        do group = 1, nbpp_cgp_pair
+                ga = nbpp_cgp(group)%i !atom index for the two switching atoms
+                gb = nbpp_cgp(group)%j
 
-		!the distance between the two switching atoms
-		dx1a = x(3*gb-2) - x(3*ga-2)
-		dx2a = x(3*gb-1) - x(3*ga-1)
-		dx3a = x(3*gb  ) - x(3*ga  )
+                !the distance between the two switching atoms
+                dx1a = x(3*gb-2) - x(3*ga-2)
+                dx2a = x(3*gb-1) - x(3*ga-1)
+                dx3a = x(3*gb  ) - x(3*ga  )
 
-		nbpp_cgp(group)%x = boxlength(1)*nint( dx1a*inv_boxl(1) )
-		nbpp_cgp(group)%y = boxlength(2)*nint( dx2a*inv_boxl(2) )	
-		nbpp_cgp(group)%z = boxlength(3)*nint( dx3a*inv_boxl(3) )
+                nbpp_cgp(group)%x = boxlength(1)*nint( dx1a*inv_boxl(1) )
+                nbpp_cgp(group)%y = boxlength(2)*nint( dx2a*inv_boxl(2) )       
+                nbpp_cgp(group)%z = boxlength(3)*nint( dx3a*inv_boxl(3) )
 
-	end do
+        end do
 
    do ip = 1, nbpp_pair - 1, 2
     ! for every second pair (two parallel runs to improve performance):
 
-	! set up pointers
-	pa => nbpp(ip)
-	pb => nbpp(ip+1)
-	ga = pa%cgp_pair
-	gb = pb%cgp_pair
+        ! set up pointers
+        pa => nbpp(ip)
+        pb => nbpp(ip+1)
+        ga = pa%cgp_pair
+        gb = pb%cgp_pair
 
-	! calculate the distance r
+        ! calculate the distance r
     dx1a  = x(pa%j*3-2) - x(pa%i*3-2)
     dx1b  = x(pb%j*3-2) - x(pb%i*3-2)
     dx2a  = x(pa%j*3-1) - x(pa%i*3-1)
     dx2b  = x(pb%j*3-1) - x(pb%i*3-1)
     dx3a  = x(pa%j*3-0) - x(pa%i*3-0)
     dx3b  = x(pb%j*3-0) - x(pb%i*3-0)
-	dx1a = dx1a - nbpp_cgp(ga)%x         
-	dx1b = dx1b - nbpp_cgp(gb)%x 
-	dx2a = dx2a - nbpp_cgp(ga)%y    
-	dx2b = dx2b - nbpp_cgp(gb)%y                
-	dx3a = dx3a - nbpp_cgp(ga)%z  
-	dx3b = dx3b - nbpp_cgp(gb)%z   
-	
+        dx1a = dx1a - nbpp_cgp(ga)%x         
+        dx1b = dx1b - nbpp_cgp(gb)%x 
+        dx2a = dx2a - nbpp_cgp(ga)%y    
+        dx2b = dx2b - nbpp_cgp(gb)%y                
+        dx3a = dx3a - nbpp_cgp(ga)%z  
+        dx3b = dx3b - nbpp_cgp(gb)%z   
+        
     r2a   = 1./(dx1a*dx1a + dx2a*dx2a + dx3a*dx3a)
     r2b   = 1./(dx1b*dx1b + dx2b*dx2b + dx3b*dx3b)
     ra    = sqrt ( r2a ) 
@@ -10507,27 +10478,27 @@ subroutine nonbond_pp_box
     r6a   = r2a*r2a*r2a
     r6b   = r2b*r2b*r2b
 
-	! calculate Vel and dv
-    Vela  = crg(pa%i)*crg(pa%j)*ra
-    Velb  = crg(pb%i)*crg(pb%j)*rb
-    if ( pa%LJcod .eq. 3 ) then 
-	  Vela = Vela*el14_scale
-	end if
-	if ( pb%LJcod .eq. 3 ) then
-	  Velb = Velb*el14_scale
-	end if
-	V_aa = r6a*r6a*iaclib(iac(pa%i))%avdw(pa%LJcod) &
-		*iaclib(iac(pa%j))%avdw(pa%LJcod)
-	V_ab = r6b*r6b*iaclib(iac(pb%i))%avdw(pb%LJcod) &
-		*iaclib(iac(pb%j))%avdw(pb%LJcod)
-	V_ba = r6a*iaclib(iac(pa%i))%bvdw(pa%LJcod) &
-		*iaclib(iac(pa%j))%bvdw(pa%LJcod)
-	V_bb = r6b*iaclib(iac(pb%i))%bvdw(pb%LJcod) &
-		*iaclib(iac(pb%j))%bvdw(pb%LJcod)
-    dva   = r2a*( -Vela -12.*V_aa +6.*V_ba )
-    dvb   = r2b*( -Velb -12.*V_ab +6.*V_bb )
+        ! calculate vel and dv
+    vela  = crg(pa%i)*crg(pa%j)*ra
+    velb  = crg(pb%i)*crg(pb%j)*rb
+    if ( pa%ljcod .eq. 3 ) then 
+          vela = vela*el14_scale
+        end if
+        if ( pb%ljcod .eq. 3 ) then
+          velb = velb*el14_scale
+        end if
+        v_aa = r6a*r6a*iaclib(iac(pa%i))%avdw(pa%ljcod) &
+                *iaclib(iac(pa%j))%avdw(pa%ljcod)
+        v_ab = r6b*r6b*iaclib(iac(pb%i))%avdw(pb%ljcod) &
+                *iaclib(iac(pb%j))%avdw(pb%ljcod)
+        v_ba = r6a*iaclib(iac(pa%i))%bvdw(pa%ljcod) &
+                *iaclib(iac(pa%j))%bvdw(pa%ljcod)
+        v_bb = r6b*iaclib(iac(pb%i))%bvdw(pb%ljcod) &
+                *iaclib(iac(pb%j))%bvdw(pb%ljcod)
+    dva   = r2a*( -vela -12.*v_aa +6.*v_ba )
+    dvb   = r2b*( -velb -12.*v_ab +6.*v_bb )
 
-	! update d
+        ! update d
     d(pa%i*3-2) = d(pa%i*3-2) - dva*dx1a
     d(pb%i*3-2) = d(pb%i*3-2) - dvb*dx1b
     d(pa%i*3-1) = d(pa%i*3-1) - dva*dx2a
@@ -10541,44 +10512,44 @@ subroutine nonbond_pp_box
     d(pa%j*3-0) = d(pa%j*3-0) + dva*dx3a
     d(pb%j*3-0) = d(pb%j*3-0) + dvb*dx3b
 
-	! update energies
-    E%pp%el  = E%pp%el + Vela + Velb
-    E%pp%vdw = E%pp%vdw + V_aa + V_ab - V_ba - V_bb
+        ! update energies
+    e%pp%el  = e%pp%el + vela + velb
+    e%pp%vdw = e%pp%vdw + v_aa + v_ab - v_ba - v_bb
   end do
 
   if (ip .eq. nbpp_pair) then
     ! odd #pairs, handle the last pair
-	pa => nbpp(ip)
-	ga = pa%cgp_pair
+        pa => nbpp(ip)
+        ga = pa%cgp_pair
 
-	dx1a  = x(pa%j*3-2) - x(pa%i*3-2)
-	dx2a  = x(pa%j*3-1) - x(pa%i*3-1)
-	dx3a  = x(pa%j*3-0) - x(pa%i*3-0)
-	dx1a = dx1a - nbpp_cgp(ga)%x  
-	dx2a = dx2a - nbpp_cgp(ga)%y  
-	dx3a = dx3a - nbpp_cgp(ga)%z  
-	
-	r2a   = 1./(dx1a*dx1a + dx2a*dx2a + dx3a*dx3a)
-	ra   = sqrt(r2a)
+        dx1a  = x(pa%j*3-2) - x(pa%i*3-2)
+        dx2a  = x(pa%j*3-1) - x(pa%i*3-1)
+        dx3a  = x(pa%j*3-0) - x(pa%i*3-0)
+        dx1a = dx1a - nbpp_cgp(ga)%x  
+        dx2a = dx2a - nbpp_cgp(ga)%y  
+        dx3a = dx3a - nbpp_cgp(ga)%z  
+        
+        r2a   = 1./(dx1a*dx1a + dx2a*dx2a + dx3a*dx3a)
+        ra   = sqrt(r2a)
 
 
-	r6a   = r2a*r2a*r2a
+        r6a   = r2a*r2a*r2a
 
-	Vela  = crg(pa%i)*crg(pa%j)*ra
-	if ( pa%LJcod .eq. 3 ) Vela = Vela*el14_scale
-	V_aa = r6a*r6a*iaclib(iac(pa%i))%avdw(pa%LJcod)*iaclib(iac(pa%j))%avdw(pa%LJcod)
-	V_ba = r6a*iaclib(iac(pa%i))%bvdw(pa%LJcod)*iaclib(iac(pa%j))%bvdw(pa%LJcod)
-	dva   = r2a*( -Vela -12.*V_aa +6.*V_ba )
+        vela  = crg(pa%i)*crg(pa%j)*ra
+        if ( pa%ljcod .eq. 3 ) vela = vela*el14_scale
+        v_aa = r6a*r6a*iaclib(iac(pa%i))%avdw(pa%ljcod)*iaclib(iac(pa%j))%avdw(pa%ljcod)
+        v_ba = r6a*iaclib(iac(pa%i))%bvdw(pa%ljcod)*iaclib(iac(pa%j))%bvdw(pa%ljcod)
+        dva   = r2a*( -vela -12.*v_aa +6.*v_ba )
 
-	d(pa%i*3-2) = d(pa%i*3-2) - dva*dx1a
-	d(pa%i*3-1) = d(pa%i*3-1) - dva*dx2a
-	d(pa%i*3-0) = d(pa%i*3-0) - dva*dx3a
-	d(pa%j*3-2) = d(pa%j*3-2) + dva*dx1a
-	d(pa%j*3-1) = d(pa%j*3-1) + dva*dx2a
-	d(pa%j*3-0) = d(pa%j*3-0) + dva*dx3a
+        d(pa%i*3-2) = d(pa%i*3-2) - dva*dx1a
+        d(pa%i*3-1) = d(pa%i*3-1) - dva*dx2a
+        d(pa%i*3-0) = d(pa%i*3-0) - dva*dx3a
+        d(pa%j*3-2) = d(pa%j*3-2) + dva*dx1a
+        d(pa%j*3-1) = d(pa%j*3-1) + dva*dx2a
+        d(pa%j*3-0) = d(pa%j*3-0) + dva*dx3a
 
-	E%pp%el  = E%pp%el + Vela 
-	E%pp%vdw = E%pp%vdw + V_aa - V_ba 
+        e%pp%el  = e%pp%el + vela 
+        e%pp%vdw = e%pp%vdw + v_aa - v_ba 
   end if
 
 end subroutine nonbond_pp_box
@@ -10587,12 +10558,12 @@ end subroutine nonbond_pp_box
 
 subroutine nonbond_pw
 ! local variables
-integer						:: ip,i,j,i3,j3,iaci,iacj,iLJ
-real(8)						:: aLJ,bLJ,dx1,dx2,dx3,r2,r,r6,r12
-real(8)						:: Vel,V_a,V_b,dv
+integer                                         :: ip,i,j,i3,j3,iaci,iacj,ilj
+real(8)                                         :: alj,blj,dx1,dx2,dx3,r2,r,r6,r12
+real(8)                                         :: vel,v_a,v_b,dv
 
 ! global variables used:
-!  iac, crg, iaclib, x, d, E
+!  iac, crg, iaclib, x, d, e
 
 do ip = 1, nbpw_pair
 ! for every assigned pair:
@@ -10604,9 +10575,9 @@ j3   = j*3-3
 iaci = iac(i)
 iacj = iac(j)
 
-iLJ  = nbpw(ip)%LJcod
-aLJ  = iaclib(iaci)%avdw(iLJ)*iaclib(iacj)%avdw(iLJ)
-bLJ  = iaclib(iaci)%bvdw(iLJ)*iaclib(iacj)%bvdw(iLJ)
+ilj  = nbpw(ip)%ljcod
+alj  = iaclib(iaci)%avdw(ilj)*iaclib(iacj)%avdw(ilj)
+blj  = iaclib(iaci)%bvdw(ilj)*iaclib(iacj)%bvdw(ilj)
 
 ! calculate dx and r
 dx1  = x(j3+1) - x(i3+1)
@@ -10618,11 +10589,11 @@ r    = sqrt ( r2 )
 r6   = r2*r2*r2
 r12  = r6*r6
 
-! calculate Vel and dv
-Vel  = crg(i)*crg(j)*r
-V_a  = aLJ*r12 
-V_b  = bLJ*r6
-dv   = r2*( -Vel -12.*V_a +6.*V_b )
+! calculate vel and dv
+vel  = crg(i)*crg(j)*r
+v_a  = alj*r12 
+v_b  = blj*r6
+dv   = r2*( -vel -12.*v_a +6.*v_b )
 
 ! update forces
 d(i3+1) = d(i3+1) - dv*dx1
@@ -10633,85 +10604,85 @@ d(j3+2) = d(j3+2) + dv*dx2
 d(j3+3) = d(j3+3) + dv*dx3
 
 ! update energies
-E%pw%el  = E%pw%el + Vel       
-E%pw%vdw = E%pw%vdw + V_a - V_b
+e%pw%el  = e%pw%el + vel       
+e%pw%vdw = e%pw%vdw + v_a - v_b
 end do
 end subroutine nonbond_pw
 
 !-----------------------------------------------------------------------
-!******PWadded 2001-10-23
+!******pwadded 2001-10-23
 subroutine nonbond_pw_box
   ! local variables
-  integer						:: ip,i,j,i3,j3,iaci,iacj,iLJ
-  real(8)						:: aLJ,bLJ,dx1,dx2,dx3,r2,r,r6,r12
-  real(8)						:: Vel,V_a,V_b,dv
-  integer						:: group, ga, gb
+  integer                                               :: ip,i,j,i3,j3,iaci,iacj,ilj
+  real(8)                                               :: alj,blj,dx1,dx2,dx3,r2,r,r6,r12
+  real(8)                                               :: vel,v_a,v_b,dv
+  integer                                               :: group, ga, gb
 
   ! global variables used:
-  !  iac, crg, iaclib, x, d, E
+  !  iac, crg, iaclib, x, d, e
 
   !compute the peridocal shift for every charge group pair
-	do group = 1, nbpw_cgp_pair
-		ga = nbpw_cgp(group)%i !atom index for the solute switching atoms
-		gb = nbpw_cgp(group)%j !atom index for the solvent switching atom 
+        do group = 1, nbpw_cgp_pair
+                ga = nbpw_cgp(group)%i !atom index for the solute switching atoms
+                gb = nbpw_cgp(group)%j !atom index for the solvent switching atom 
 
-		!the distance between the two switching atoms
-		dx1 = x(3*gb-2) - x(3*ga-2)
-		dx2 = x(3*gb-1) - x(3*ga-1)
-		dx3 = x(3*gb  ) - x(3*ga  )
+                !the distance between the two switching atoms
+                dx1 = x(3*gb-2) - x(3*ga-2)
+                dx2 = x(3*gb-1) - x(3*ga-1)
+                dx3 = x(3*gb  ) - x(3*ga  )
 
-		nbpw_cgp(group)%x = boxlength(1)*nint( dx1*inv_boxl(1) )
-		nbpw_cgp(group)%y = boxlength(2)*nint( dx2*inv_boxl(2) )	
-		nbpw_cgp(group)%z = boxlength(3)*nint( dx3*inv_boxl(3) )
+                nbpw_cgp(group)%x = boxlength(1)*nint( dx1*inv_boxl(1) )
+                nbpw_cgp(group)%y = boxlength(2)*nint( dx2*inv_boxl(2) )        
+                nbpw_cgp(group)%z = boxlength(3)*nint( dx3*inv_boxl(3) )
 
-	end do
+        end do
 
 
   do ip = 1, nbpw_pair
-	! for every assigned pair:
+        ! for every assigned pair:
 
-	i    = nbpw(ip)%i  ! solute atom 
-	j    = nbpw(ip)%j	! solvent atom 
-	group = nbpw(ip)%cgp_pair 
-	i3   = i*3-3
-	j3   = j*3-3
-	iaci = iac(i)
-	iacj = iac(j)
-	iLJ  = nbpw(ip)%LJcod
-	aLJ  = iaclib(iaci)%avdw(iLJ)*iaclib(iacj)%avdw(iLJ)
-	bLJ  = iaclib(iaci)%bvdw(iLJ)*iaclib(iacj)%bvdw(iLJ)
+        i    = nbpw(ip)%i  ! solute atom 
+        j    = nbpw(ip)%j       ! solvent atom 
+        group = nbpw(ip)%cgp_pair 
+        i3   = i*3-3
+        j3   = j*3-3
+        iaci = iac(i)
+        iacj = iac(j)
+        ilj  = nbpw(ip)%ljcod
+        alj  = iaclib(iaci)%avdw(ilj)*iaclib(iacj)%avdw(ilj)
+        blj  = iaclib(iaci)%bvdw(ilj)*iaclib(iacj)%bvdw(ilj)
 
-	! calculate dx and r
-	dx1  = x(j3+1) - x(i3+1)
-	dx2  = x(j3+2) - x(i3+2)
-	dx3  = x(j3+3) - x(i3+3)
-	dx1 = dx1 - nbpw_cgp(group)%x  
-	dx2 = dx2 - nbpw_cgp(group)%y  
-	dx3 = dx3 - nbpw_cgp(group)%z 
-	
-	r2   = dx1*dx1 + dx2*dx2 + dx3*dx3
-	r2   = 1./r2
-	r    = sqrt ( r2 )
-	r6   = r2*r2*r2
-	r12  = r6*r6
+        ! calculate dx and r
+        dx1  = x(j3+1) - x(i3+1)
+        dx2  = x(j3+2) - x(i3+2)
+        dx3  = x(j3+3) - x(i3+3)
+        dx1 = dx1 - nbpw_cgp(group)%x  
+        dx2 = dx2 - nbpw_cgp(group)%y  
+        dx3 = dx3 - nbpw_cgp(group)%z 
+        
+        r2   = dx1*dx1 + dx2*dx2 + dx3*dx3
+        r2   = 1./r2
+        r    = sqrt ( r2 )
+        r6   = r2*r2*r2
+        r12  = r6*r6
 
-	! calculate Vel and dv
-	Vel  = crg(i)*crg(j)*r
-	V_a  = aLJ*r12 
-	V_b  = bLJ*r6
-	dv   = r2*( -Vel -12.*V_a +6.*V_b )
+        ! calculate vel and dv
+        vel  = crg(i)*crg(j)*r
+        v_a  = alj*r12 
+        v_b  = blj*r6
+        dv   = r2*( -vel -12.*v_a +6.*v_b )
 
-	! update forces
-	d(i3+1) = d(i3+1) - dv*dx1
-	d(i3+2) = d(i3+2) - dv*dx2
-	d(i3+3) = d(i3+3) - dv*dx3
-	d(j3+1) = d(j3+1) + dv*dx1
-	d(j3+2) = d(j3+2) + dv*dx2
-	d(j3+3) = d(j3+3) + dv*dx3
+        ! update forces
+        d(i3+1) = d(i3+1) - dv*dx1
+        d(i3+2) = d(i3+2) - dv*dx2
+        d(i3+3) = d(i3+3) - dv*dx3
+        d(j3+1) = d(j3+1) + dv*dx1
+        d(j3+2) = d(j3+2) + dv*dx2
+        d(j3+3) = d(j3+3) + dv*dx3
 
-	! update energies
-	E%pw%el  = E%pw%el + Vel       
-	E%pw%vdw = E%pw%vdw + V_a - V_b
+        ! update energies
+        e%pw%el  = e%pw%el + vel       
+        e%pw%vdw = e%pw%vdw + v_a - v_b
   end do
 end subroutine nonbond_pw_box
 
@@ -10719,10 +10690,10 @@ end subroutine nonbond_pw_box
 
 subroutine nonbond_qq
 ! local variables
-integer					:: istate, is
-integer					:: ip,iq,jq,i,j,k,i3,j3,iaci,iacj,iLJ
-real(8)					:: qi,qj,aLJ,bLJ,dx1,dx2,dx3,r2,r,r6,r12,r6_hc
-real(8)					:: Vel,V_a,V_b,dv,el_scale
+integer                                 :: istate, is
+integer                                 :: ip,iq,jq,i,j,k,i3,j3,iaci,iacj,ilj
+real(8)                                 :: qi,qj,alj,blj,dx1,dx2,dx3,r2,r,r6,r12,r6_hc
+real(8)                                 :: vel,v_a,v_b,dv,el_scale
 
 do istate = 1, nstates
 ! for every state:
@@ -10736,15 +10707,15 @@ do ip = 1, nbqq_pair(istate)
   jq   = nbqq(ip,istate)%jq  !q-atom number (if any)
   i3   = i*3-3
   j3   = j*3-3
-  iLJ  = nbqq(ip,istate)%LJcod
+  ilj  = nbqq(ip,istate)%ljcod
   qi   = qcrg(iq,istate)
   el_scale = nbqq(ip,istate)%el_scale
 
   if (.not. qvdw_flag) then
         iaci = iac(i)
         iacj = iac(j)
-        aLJ  = iaclib(iaci)%avdw(iLJ)*iaclib(iacj)%avdw(iLJ)
-        bLJ  = iaclib(iaci)%bvdw(iLJ)*iaclib(iacj)%bvdw(iLJ)
+        alj  = iaclib(iaci)%avdw(ilj)*iaclib(iacj)%avdw(ilj)
+        blj  = iaclib(iaci)%bvdw(ilj)*iaclib(iacj)%bvdw(ilj)
 
         if (jq /= 0) then
           qj = qcrg(jq,istate)
@@ -10753,21 +10724,21 @@ do ip = 1, nbqq_pair(istate)
         end if
   else
         iaci = qiac(iq,istate)
-        aLJ  = qavdw(iaci,iLJ)
-        bLJ  = qbvdw(iaci,iLJ)
+        alj  = qavdw(iaci,ilj)
+        blj  = qbvdw(iaci,ilj)
         if (jq /= 0) then
           iacj = qiac(jq,istate)
-          aLJ = aLJ*qavdw(iacj,iLJ)
-          bLJ = bLJ*qbvdw(iacj,iLJ)
+          alj = alj*qavdw(iacj,ilj)
+          blj = blj*qbvdw(iacj,ilj)
           qj = qcrg(jq,istate)
         else
-          if ( iLJ .eq. 2 ) then
-                aLJ  = qavdw(iaci,1)
-                bLJ  = qbvdw(iaci,1)
+          if ( ilj .eq. 2 ) then
+                alj  = qavdw(iaci,1)
+                blj  = qbvdw(iaci,1)
           end if
           iacj = iac(j)
-          aLJ = aLJ*iaclib(iacj)%avdw(iLJ)
-          bLJ = bLJ*iaclib(iacj)%bvdw(iLJ)
+          alj = alj*iaclib(iacj)%avdw(ilj)
+          blj = blj*iaclib(iacj)%bvdw(ilj)
           qj = crg(j)
         end if
 
@@ -10784,24 +10755,24 @@ do ip = 1, nbqq_pair(istate)
   r2   = dx1*dx1 + dx2*dx2 + dx3*dx3
 
   r6_hc   = r2*r2*r2   !hardcore
-  r6   = r2*r2*r2+sc_lookup(iq,natyps+jq,istate)   !Use softcore instead. sc is 0 for hardcore MPA
+  r6   = r2*r2*r2+sc_lookup(iq,natyps+jq,istate)   !use softcore instead. sc is 0 for hardcore mpa
   r6   = 1./r6
   r12  = r6*r6
 
   r2   = 1./r2
   r    = sqrt ( r2 ) 
 
-  ! calculate Vel, V_a, V_b and dv
-  Vel  = qi*qj*r*el_scale
-  if ( iLJ .eq. 3 ) Vel = Vel*el14_scale
-  if (qvdw_flag .and. jq /= 0 .and. iLJ .eq. 2 ) then
-        V_a = aLJ*exp(-bLJ/r)
-        V_b = 0.0
-        dv  = r2*( -Vel -bLJ*V_a/r )*EQ(istate)%lambda
+  ! calculate vel, v_a, v_b and dv
+  vel  = qi*qj*r*el_scale
+  if ( ilj .eq. 3 ) vel = vel*el14_scale
+  if (qvdw_flag .and. jq /= 0 .and. ilj .eq. 2 ) then
+        v_a = alj*exp(-blj/r)
+        v_b = 0.0
+        dv  = r2*( -vel -blj*v_a/r )*eq(istate)%lambda
   else
-        V_a = aLJ*r12 
-        V_b = bLJ*r6
-        dv  = r2*( -Vel - (12.*V_a - 6.*V_b)*r6_hc*r6 )*EQ(istate)%lambda
+        v_a = alj*r12 
+        v_b = blj*r6
+        dv  = r2*( -vel - (12.*v_a - 6.*v_b)*r6_hc*r6 )*eq(istate)%lambda
   endif
 
   ! update forces
@@ -10814,11 +10785,11 @@ do ip = 1, nbqq_pair(istate)
 
   ! update energies
   if ( jq /= 0 ) then
-        EQ(istate)%qq%el  = EQ(istate)%qq%el + Vel
-        EQ(istate)%qq%vdw = EQ(istate)%qq%vdw + V_a - V_b
+        eq(istate)%qq%el  = eq(istate)%qq%el + vel
+        eq(istate)%qq%vdw = eq(istate)%qq%vdw + v_a - v_b
   else
-        EQ(istate)%qp%el  = EQ(istate)%qp%el + Vel
-        EQ(istate)%qp%vdw = EQ(istate)%qp%vdw + V_a - V_b
+        eq(istate)%qp%el  = eq(istate)%qp%el + vel
+        eq(istate)%qp%vdw = eq(istate)%qp%vdw + v_a - v_b
   end if
 end do
 end do
@@ -10831,10 +10802,10 @@ subroutine nonbond_qq_lib_charges
 !solute-surrounding only
 
 ! local variables
-integer					:: istate
-integer					:: ip,iq,jq,i,j,k,i3,j3,iaci,iacj,iLJ
-real(8)					:: qi,qj,aLJ,bLJ,dx1,dx2,dx3,r2,r,r6,r12,r6_hc
-real(8)					:: Vel,V_a,V_b,dv,el_scale
+integer                                 :: istate
+integer                                 :: ip,iq,jq,i,j,k,i3,j3,iaci,iacj,ilj
+real(8)                                 :: qi,qj,alj,blj,dx1,dx2,dx3,r2,r,r6,r12,r6_hc
+real(8)                                 :: vel,v_a,v_b,dv,el_scale
 
 do istate = 1, nstates
 ! for every state:
@@ -10848,12 +10819,12 @@ do ip = 1, nbqq_pair(istate)
   jq   = nbqq(ip,istate)%jq
   i3   = i*3-3
   j3   = j*3-3
-  iLJ  = nbqq(ip,istate)%LJcod
+  ilj  = nbqq(ip,istate)%ljcod
 
   if (jq /= 0) then
-	  qi   = crg(i)   !Use library charges for i
+          qi   = crg(i)   !use library charges for i
   else
-	  qi   = qcrg(iq,istate)   !Since j is not a qatom we need the FEP file charges for i
+          qi   = qcrg(iq,istate)   !since j is not a qatom we need the fep file charges for i
   end if
 
   el_scale = nbqq(ip,istate)%el_scale
@@ -10861,25 +10832,25 @@ do ip = 1, nbqq_pair(istate)
   if (.not. qvdw_flag) then
         iaci = iac(i)
         iacj = iac(j)
-        aLJ  = iaclib(iaci)%avdw(iLJ)*iaclib(iacj)%avdw(iLJ)
-        bLJ  = iaclib(iaci)%bvdw(iLJ)*iaclib(iacj)%bvdw(iLJ)
+        alj  = iaclib(iaci)%avdw(ilj)*iaclib(iacj)%avdw(ilj)
+        blj  = iaclib(iaci)%bvdw(ilj)*iaclib(iacj)%bvdw(ilj)
         qj = crg(j)
   else
         iaci = qiac(iq,istate)
-        aLJ  = qavdw(iaci,iLJ)
-        bLJ  = qbvdw(iaci,iLJ)
+        alj  = qavdw(iaci,ilj)
+        blj  = qbvdw(iaci,ilj)
         if (jq /= 0) then
           iacj = qiac(jq,istate)
-          aLJ = aLJ*qavdw(iacj,iLJ)
-          bLJ = bLJ*qbvdw(iacj,iLJ)
+          alj = alj*qavdw(iacj,ilj)
+          blj = blj*qbvdw(iacj,ilj)
         else
-          if ( iLJ .eq. 2 ) then
-                aLJ  = qavdw(iaci,1)
-                bLJ  = qbvdw(iaci,1)
+          if ( ilj .eq. 2 ) then
+                alj  = qavdw(iaci,1)
+                blj  = qbvdw(iaci,1)
           end if
           iacj = iac(j)
-          aLJ = aLJ*iaclib(iacj)%avdw(iLJ)
-          bLJ = bLJ*iaclib(iacj)%bvdw(iLJ)
+          alj = alj*iaclib(iacj)%avdw(ilj)
+          blj = blj*iaclib(iacj)%bvdw(ilj)
         end if
     qj = crg(j)
   end if
@@ -10891,24 +10862,24 @@ do ip = 1, nbqq_pair(istate)
   r2   = dx1*dx1 + dx2*dx2 + dx3*dx3
 
   r6_hc = r2*r2*r2   !hardcore
-  r6   = r2*r2*r2+sc_lookup(iq,natyps+jq,istate)   !sc_lookup is softcore fix MPA
+  r6   = r2*r2*r2+sc_lookup(iq,natyps+jq,istate)   !sc_lookup is softcore fix mpa
   r6   = 1./r6
   r12  = r6*r6
 
   r2   = 1./r2
   r    = sqrt ( r2 ) 
 
-  ! calculate Vel, V_a, V_b and dv
-  Vel  = qi*qj*r*el_scale
-  if ( iLJ .eq. 3 ) Vel = Vel*el14_scale
-  if (qvdw_flag .and. jq /= 0 .and. iLJ .eq. 2 ) then
-        V_a = aLJ*exp(-bLJ/r)
-        V_b = 0.0
-        dv  = r2*( -Vel -bLJ*V_a/r )*EQ(istate)%lambda
+  ! calculate vel, v_a, v_b and dv
+  vel  = qi*qj*r*el_scale
+  if ( ilj .eq. 3 ) vel = vel*el14_scale
+  if (qvdw_flag .and. jq /= 0 .and. ilj .eq. 2 ) then
+        v_a = alj*exp(-blj/r)
+        v_b = 0.0
+        dv  = r2*( -vel -blj*v_a/r )*eq(istate)%lambda
   else
-        V_a = aLJ*r12 
-        V_b = bLJ*r6
-        dv  = r2*( -Vel -(12.*V_a -6.*V_b)*r6_hc*r6 )*EQ(istate)%lambda
+        v_a = alj*r12 
+        v_b = blj*r6
+        dv  = r2*( -vel -(12.*v_a -6.*v_b)*r6_hc*r6 )*eq(istate)%lambda
   endif
 
   ! update forces
@@ -10921,11 +10892,11 @@ do ip = 1, nbqq_pair(istate)
 
   ! update energies
   if ( jq /= 0 ) then
-        EQ(istate)%qq%el  = EQ(istate)%qq%el + Vel
-        EQ(istate)%qq%vdw = EQ(istate)%qq%vdw + V_a - V_b
+        eq(istate)%qq%el  = eq(istate)%qq%el + vel
+        eq(istate)%qq%vdw = eq(istate)%qq%vdw + v_a - v_b
   else  ! j is not a qatom
-        EQ(istate)%qp%el  = EQ(istate)%qp%el + Vel
-        EQ(istate)%qp%vdw = EQ(istate)%qp%vdw + V_a - V_b
+        eq(istate)%qp%el  = eq(istate)%qp%el + vel
+        eq(istate)%qp%vdw = eq(istate)%qp%vdw + v_a - v_b
   end if
 end do
 end do
@@ -10940,14 +10911,14 @@ subroutine nonbond_qp
 !using standard atom types
 
 ! local variables
-integer						:: ip,iq,i,j,i3,j3,iaci,iacj,iLJ
-integer						:: istate
-real(8)						:: aLJ,bLJ,dx1,dx2,dx3,r2,r,r6
-real(8)						:: Vel,V_a,V_b,dv
+integer                                         :: ip,iq,i,j,i3,j3,iaci,iacj,ilj
+integer                                         :: istate
+real(8)                                         :: alj,blj,dx1,dx2,dx3,r2,r,r6
+real(8)                                         :: vel,v_a,v_b,dv
 
 ! global variables used:
 !  iqseq, iac, crg, x, nstates, qvdw_flag, iaclib, qiac, 
-! qcrg, el14_scale, EQ, d, nat_solute
+! qcrg, el14_scale, eq, d, nat_solute
 
 do ip = 1, nbqp_pair
 ! for every assigned q-s pair:
@@ -10959,7 +10930,7 @@ j    = nbqp(ip)%j
 i3   = i*3-3
 j3   = j*3-3
 iacj = iac(j)
-iLJ  = nbqp(ip)%LJcod
+ilj  = nbqp(ip)%ljcod
 dx1  = x(j3+1) - x(i3+1)
 dx2  = x(j3+2) - x(i3+2)
 dx3  = x(j3+3) - x(i3+3)
@@ -10971,19 +10942,19 @@ r    = sqrt(r2)
 do istate = 1, nstates
   ! for every state:
 
-  ! calculate iaci, aLJ and bLJ
+  ! calculate iaci, alj and blj
         iaci = iac(i)
-        aLJ  = iaclib(iaci)%avdw(iLJ)*iaclib(iacj)%avdw(iLJ)
-        bLJ  = iaclib(iaci)%bvdw(iLJ)*iaclib(iacj)%bvdw(iLJ)
+        alj  = iaclib(iaci)%avdw(ilj)*iaclib(iacj)%avdw(ilj)
+        blj  = iaclib(iaci)%bvdw(ilj)*iaclib(iacj)%bvdw(ilj)
 
-  ! calculate qi, Vel, V_a, V_b and dv
-  Vel  = qcrg(iq,istate)*crg(j)*r
-  if ( iLJ .eq. 3 ) Vel = Vel*el14_scale
+  ! calculate qi, vel, v_a, v_b and dv
+  vel  = qcrg(iq,istate)*crg(j)*r
+  if ( ilj .eq. 3 ) vel = vel*el14_scale
 
 
-  V_a  = aLJ*r6*r6 
-  V_b  = bLJ*r6        
-  dv   = r2*( -Vel -12.*V_a +6.*V_b )*EQ(istate)%lambda
+  v_a  = alj*r6*r6 
+  v_b  = blj*r6        
+  dv   = r2*( -vel -12.*v_a +6.*v_b )*eq(istate)%lambda
 
   ! update forces
   d(i3+1) = d(i3+1) - dv*dx1
@@ -10994,98 +10965,98 @@ do istate = 1, nstates
   d(j3+3) = d(j3+3) + dv*dx3
 
   ! update q-protein energies
-        EQ(istate)%qp%el  = EQ(istate)%qp%el + Vel
-        EQ(istate)%qp%vdw = EQ(istate)%qp%vdw + V_a - V_b
+        eq(istate)%qp%el  = eq(istate)%qp%el + vel
+        eq(istate)%qp%vdw = eq(istate)%qp%vdw + v_a - v_b
 end do ! istate
 
 end do
 end subroutine nonbond_qp
 
 !-----------------------------------------------------------------------
-!******PWadded 2001-10-23
+!******pwadded 2001-10-23
 subroutine nonbond_qp_box
 
-	!calculate non-bonded interactions between q-atom i and  non-q-atoms j
-	!using standard atom types
+        !calculate non-bonded interactions between q-atom i and  non-q-atoms j
+        !using standard atom types
 
   ! local variables
-  integer						:: ip,iq,i,j,i3,j3,iaci,iacj,iLJ
-  integer						:: istate
-  real(8)						:: aLJ,bLJ,dx1,dx2,dx3,r2,r,r6
-  real(8)						:: Vel,V_a,V_b,dv
-  integer						:: group, gr, ia
+  integer                                               :: ip,iq,i,j,i3,j3,iaci,iacj,ilj
+  integer                                               :: istate
+  real(8)                                               :: alj,blj,dx1,dx2,dx3,r2,r,r6
+  real(8)                                               :: vel,v_a,v_b,dv
+  integer                                               :: group, gr, ia
   ! global variables used:
   !  iqseq, iac, crg, x, nstates, qvdw_flag, iaclib, qiac, qavdw, qbvdw, 
-  ! qcrg, el14_scale, EQ, d, nat_solute
+  ! qcrg, el14_scale, eq, d, nat_solute
 
 
-	!compute the peridocal shift for every charge group pair
-	do gr = 1, nbqp_cgp_pair
-		ia = nbqp_cgp(gr)%i !atom index for the switching atom
-		
-		!the distance between the two switching atoms
-		dx1 = x(3*ia-2) - x(3*qswitch-2)
-		dx2 = x(3*ia-1) - x(3*qswitch-1)
-		dx3 = x(3*ia  ) - x(3*qswitch  )
+        !compute the peridocal shift for every charge group pair
+        do gr = 1, nbqp_cgp_pair
+                ia = nbqp_cgp(gr)%i !atom index for the switching atom
+                
+                !the distance between the two switching atoms
+                dx1 = x(3*ia-2) - x(3*qswitch-2)
+                dx2 = x(3*ia-1) - x(3*qswitch-1)
+                dx3 = x(3*ia  ) - x(3*qswitch  )
 
-		nbqp_cgp(gr)%x = boxlength(1)*nint( dx1*inv_boxl(1) )
-		nbqp_cgp(gr)%y = boxlength(2)*nint( dx2*inv_boxl(2) )	
-		nbqp_cgp(gr)%z = boxlength(3)*nint( dx3*inv_boxl(3) )
+                nbqp_cgp(gr)%x = boxlength(1)*nint( dx1*inv_boxl(1) )
+                nbqp_cgp(gr)%y = boxlength(2)*nint( dx2*inv_boxl(2) )   
+                nbqp_cgp(gr)%z = boxlength(3)*nint( dx3*inv_boxl(3) )
 
-	end do
+        end do
 
 
   do ip = 1, nbqp_pair
-	! for every assigned q-s pair:
-	! init state-invariant variables:
-	iq   = nbqp(ip)%i
-	i    = iqseq(iq)
-	j    = nbqp(ip)%j
-	i3   = i*3-3
-	j3   = j*3-3
-	iacj = iac(j)
-	iLJ  = nbqp(ip)%LJcod
-	group = nbqp(ip)%cgp_pair
-	dx1  = x(j3+1) - x(i3+1)
-	dx2  = x(j3+2) - x(i3+2)
-	dx3  = x(j3+3) - x(i3+3)
-	dx1 = dx1 - nbqp_cgp(group)%x  
-	dx2 = dx2 - nbqp_cgp(group)%y  
-	dx3 = dx3 - nbqp_cgp(group)%z  
-	
-	r2   = dx1*dx1 + dx2*dx2 + dx3*dx3
-	r2   = 1./r2
-	r6   = r2*r2*r2   !softcore not needed here. taken care of in nonbond_qp_qvdw_box
-	r    = sqrt(r2)
+        ! for every assigned q-s pair:
+        ! init state-invariant variables:
+        iq   = nbqp(ip)%i
+        i    = iqseq(iq)
+        j    = nbqp(ip)%j
+        i3   = i*3-3
+        j3   = j*3-3
+        iacj = iac(j)
+        ilj  = nbqp(ip)%ljcod
+        group = nbqp(ip)%cgp_pair
+        dx1  = x(j3+1) - x(i3+1)
+        dx2  = x(j3+2) - x(i3+2)
+        dx3  = x(j3+3) - x(i3+3)
+        dx1 = dx1 - nbqp_cgp(group)%x  
+        dx2 = dx2 - nbqp_cgp(group)%y  
+        dx3 = dx3 - nbqp_cgp(group)%z  
+        
+        r2   = dx1*dx1 + dx2*dx2 + dx3*dx3
+        r2   = 1./r2
+        r6   = r2*r2*r2   !softcore not needed here. taken care of in nonbond_qp_qvdw_box
+        r    = sqrt(r2)
 
-	do istate = 1, nstates
-	  ! for every state:
+        do istate = 1, nstates
+          ! for every state:
 
-	  ! calculate iaci, aLJ and bLJ
-		iaci = iac(i)
-		aLJ  = iaclib(iaci)%avdw(iLJ)*iaclib(iacj)%avdw(iLJ)
-		bLJ  = iaclib(iaci)%bvdw(iLJ)*iaclib(iacj)%bvdw(iLJ)
+          ! calculate iaci, alj and blj
+                iaci = iac(i)
+                alj  = iaclib(iaci)%avdw(ilj)*iaclib(iacj)%avdw(ilj)
+                blj  = iaclib(iaci)%bvdw(ilj)*iaclib(iacj)%bvdw(ilj)
 
-	  ! calculate qi, Vel, V_a, V_b and dv
-	  Vel  = qcrg(iq,istate)*crg(j)*r
-	  if ( iLJ .eq. 3 ) Vel = Vel*el14_scale
+          ! calculate qi, vel, v_a, v_b and dv
+          vel  = qcrg(iq,istate)*crg(j)*r
+          if ( ilj .eq. 3 ) vel = vel*el14_scale
 
-	  V_a  = aLJ*r6*r6 
-	  V_b  = bLJ*r6
-	  dv   = r2*( -Vel -12.*V_a +6.*V_b )*EQ(istate)%lambda
+          v_a  = alj*r6*r6 
+          v_b  = blj*r6
+          dv   = r2*( -vel -12.*v_a +6.*v_b )*eq(istate)%lambda
 
-	  ! update forces
-	  d(i3+1) = d(i3+1) - dv*dx1
-	  d(i3+2) = d(i3+2) - dv*dx2
-	  d(i3+3) = d(i3+3) - dv*dx3
-	  d(j3+1) = d(j3+1) + dv*dx1
-	  d(j3+2) = d(j3+2) + dv*dx2
-	  d(j3+3) = d(j3+3) + dv*dx3
+          ! update forces
+          d(i3+1) = d(i3+1) - dv*dx1
+          d(i3+2) = d(i3+2) - dv*dx2
+          d(i3+3) = d(i3+3) - dv*dx3
+          d(j3+1) = d(j3+1) + dv*dx1
+          d(j3+2) = d(j3+2) + dv*dx2
+          d(j3+3) = d(j3+3) + dv*dx3
 
-	  ! update q-protein energies
-		EQ(istate)%qp%el  = EQ(istate)%qp%el + Vel
-		EQ(istate)%qp%vdw = EQ(istate)%qp%vdw + V_a - V_b
-	end do ! istate
+          ! update q-protein energies
+                eq(istate)%qp%el  = eq(istate)%qp%el + vel
+                eq(istate)%qp%vdw = eq(istate)%qp%vdw + v_a - v_b
+        end do ! istate
 
   end do
 end subroutine nonbond_qp_box
@@ -11097,13 +11068,13 @@ subroutine nonbond_qp_qvdw
 !using q-atom types
 
 ! local variables
-integer						:: ip,iq,i,j,i3,j3,iaci,iacj,iLJ,qLJ
-integer						:: istate
-real(8)						:: aLJ,bLJ,dx1,dx2,dx3,r2,r,r6
-real(8)						:: Vel,V_a,V_b,dv,r6_sc
+integer                                         :: ip,iq,i,j,i3,j3,iaci,iacj,ilj,qlj
+integer                                         :: istate
+real(8)                                         :: alj,blj,dx1,dx2,dx3,r2,r,r6
+real(8)                                         :: vel,v_a,v_b,dv,r6_sc
 
 ! global variables used:
-!  iqseq, iac, crg, x, nstates, qvdw_flag, iaclib, qiac, qavdw, qbvdw, qcrg, el14_scale, EQ, d, nat_solute
+!  iqseq, iac, crg, x, nstates, qvdw_flag, iaclib, qiac, qavdw, qbvdw, qcrg, el14_scale, eq, d, nat_solute
 
 
 do ip = 1, nbqp_pair
@@ -11116,8 +11087,8 @@ j    = nbqp(ip)%j
 i3   = i*3-3
 j3   = j*3-3
 iacj = iac(j)
-iLJ  = nbqp(ip)%LJcod
-qLJ  = nbqp(ip)%qLJcod
+ilj  = nbqp(ip)%ljcod
+qlj  = nbqp(ip)%qljcod
 dx1  = x(j3+1) - x(i3+1)
 dx2  = x(j3+2) - x(i3+2)
 dx3  = x(j3+3) - x(i3+3)
@@ -11130,19 +11101,19 @@ r    = sqrt(r2)
 do istate = 1, nstates
         ! for every state:
 
-        ! calculate iaci, aLJ and bLJ
+        ! calculate iaci, alj and blj
         iaci = qiac(iq,istate)
-        aLJ  = qavdw(iaci,qLJ)*iaclib(iacj)%avdw(iLJ)
-        bLJ  = qbvdw(iaci,qLJ)*iaclib(iacj)%bvdw(iLJ)
+        alj  = qavdw(iaci,qlj)*iaclib(iacj)%avdw(ilj)
+        blj  = qbvdw(iaci,qlj)*iaclib(iacj)%bvdw(ilj)
 
-  ! calculate qi, Vel, V_a, V_b and dv
-  Vel  = qcrg(iq,istate)*crg(j)*r
-  if ( iLJ .eq. 3 ) Vel = Vel*el14_scale
+  ! calculate qi, vel, v_a, v_b and dv
+  vel  = qcrg(iq,istate)*crg(j)*r
+  if ( ilj .eq. 3 ) vel = vel*el14_scale
 
-  r6_sc = r6 + sc_lookup(iq,iacj,istate) !sc_lookup is softcore fix MPA
-  V_a  = aLJ/(r6_sc*r6_sc)
-  V_b  = bLJ/(r6_sc)
-  dv   = r2*( -Vel -(12.*V_a -6.*V_b)*(r6/r6_sc) )*EQ(istate)%lambda  !r6 is r^6 not 1/r^6, r6_sc is r^6+sc not 1/(r^6+sc)
+  r6_sc = r6 + sc_lookup(iq,iacj,istate) !sc_lookup is softcore fix mpa
+  v_a  = alj/(r6_sc*r6_sc)
+  v_b  = blj/(r6_sc)
+  dv   = r2*( -vel -(12.*v_a -6.*v_b)*(r6/r6_sc) )*eq(istate)%lambda  !r6 is r^6 not 1/r^6, r6_sc is r^6+sc not 1/(r^6+sc)
 
   ! update forces
   d(i3+1) = d(i3+1) - dv*dx1
@@ -11153,103 +11124,103 @@ do istate = 1, nstates
   d(j3+3) = d(j3+3) + dv*dx3
 
   ! update q-protein energies
-        EQ(istate)%qp%el  = EQ(istate)%qp%el + Vel
-        EQ(istate)%qp%vdw = EQ(istate)%qp%vdw + V_a - V_b
+        eq(istate)%qp%el  = eq(istate)%qp%el + vel
+        eq(istate)%qp%vdw = eq(istate)%qp%vdw + v_a - v_b
 end do ! istate
 
 end do
 end subroutine nonbond_qp_qvdw
 !-----------------------------------------------------------------------
-!******PWadded 2001-10-23
+!******pwadded 2001-10-23
 subroutine nonbond_qp_qvdw_box
-	!calculate nonbonded interactions between q-atom i and non-q-atom j
-	!using q-atom types
+        !calculate nonbonded interactions between q-atom i and non-q-atom j
+        !using q-atom types
 
   ! local variables
-  integer						:: ip,iq,i,j,i3,j3,iaci,iacj,iLJ,qLJ
-  integer						:: istate
-  real(8)						:: aLJ,bLJ,dx1,dx2,dx3,r2,r,r6
-  real(8)						:: Vel,V_a,V_b,dv,r6_sc
-  integer						:: group, gr, ia
+  integer                                               :: ip,iq,i,j,i3,j3,iaci,iacj,ilj,qlj
+  integer                                               :: istate
+  real(8)                                               :: alj,blj,dx1,dx2,dx3,r2,r,r6
+  real(8)                                               :: vel,v_a,v_b,dv,r6_sc
+  integer                                               :: group, gr, ia
 
 
   ! global variables used:
-  !  iqseq, iac, crg, x, nstates, qvdw_flag, iaclib, qiac, qavdw, qbvdw, qcrg, el14_scale, EQ, d, nat_solute
+  !  iqseq, iac, crg, x, nstates, qvdw_flag, iaclib, qiac, qavdw, qbvdw, qcrg, el14_scale, eq, d, nat_solute
 
 
-	!compute the peridocal shift for every charge group pair
-	do gr = 1, nbqp_cgp_pair
-		ia = nbqp_cgp(gr)%i !atom index for the atom
-		
-		!the distance between the two switching atoms
-		dx1 = x(3*ia-2) - x(3*qswitch-2)
-		dx2 = x(3*ia-1) - x(3*qswitch-1)
-		dx3 = x(3*ia  ) - x(3*qswitch  )
+        !compute the peridocal shift for every charge group pair
+        do gr = 1, nbqp_cgp_pair
+                ia = nbqp_cgp(gr)%i !atom index for the atom
+                
+                !the distance between the two switching atoms
+                dx1 = x(3*ia-2) - x(3*qswitch-2)
+                dx2 = x(3*ia-1) - x(3*qswitch-1)
+                dx3 = x(3*ia  ) - x(3*qswitch  )
 
-		nbqp_cgp(gr)%x = boxlength(1)*nint( dx1*inv_boxl(1) )
-		nbqp_cgp(gr)%y = boxlength(2)*nint( dx2*inv_boxl(2) )	
-		nbqp_cgp(gr)%z = boxlength(3)*nint( dx3*inv_boxl(3) )
+                nbqp_cgp(gr)%x = boxlength(1)*nint( dx1*inv_boxl(1) )
+                nbqp_cgp(gr)%y = boxlength(2)*nint( dx2*inv_boxl(2) )   
+                nbqp_cgp(gr)%z = boxlength(3)*nint( dx3*inv_boxl(3) )
 
-	end do
+        end do
 
 
   do ip = 1, nbqp_pair
-	! for every assigned q-s pair:
+        ! for every assigned q-s pair:
 
-	! init state-invariant variables:
-	iq   = nbqp(ip)%i
-	i    = iqseq(iq)
-	j    = nbqp(ip)%j
-	i3   = i*3-3
-	j3   = j*3-3
-	iacj = iac(j)
-	iLJ  = nbqp(ip)%LJcod
-	qLJ  = nbqp(ip)%qLJcod
-	group = nbqp(ip)%cgp_pair
-	
-	dx1  = x(j3+1) - x(i3+1)
-	dx2  = x(j3+2) - x(i3+2)
-	dx3  = x(j3+3) - x(i3+3)
-	dx1 = dx1 - nbqp_cgp(group)%x  
-	dx2 = dx2 - nbqp_cgp(group)%y  
-	dx3 = dx3 - nbqp_cgp(group)%z  
-	
-	r2   = dx1*dx1 + dx2*dx2 + dx3*dx3
+        ! init state-invariant variables:
+        iq   = nbqp(ip)%i
+        i    = iqseq(iq)
+        j    = nbqp(ip)%j
+        i3   = i*3-3
+        j3   = j*3-3
+        iacj = iac(j)
+        ilj  = nbqp(ip)%ljcod
+        qlj  = nbqp(ip)%qljcod
+        group = nbqp(ip)%cgp_pair
+        
+        dx1  = x(j3+1) - x(i3+1)
+        dx2  = x(j3+2) - x(i3+2)
+        dx3  = x(j3+3) - x(i3+3)
+        dx1 = dx1 - nbqp_cgp(group)%x  
+        dx2 = dx2 - nbqp_cgp(group)%y  
+        dx3 = dx3 - nbqp_cgp(group)%z  
+        
+        r2   = dx1*dx1 + dx2*dx2 + dx3*dx3
 
-	r6   = r2*r2*r2
-	r2   = 1./r2
-	r    = sqrt(r2)
+        r6   = r2*r2*r2
+        r2   = 1./r2
+        r    = sqrt(r2)
 
-	do istate = 1, nstates
-		! for every state:
+        do istate = 1, nstates
+                ! for every state:
 
-		! calculate iaci, aLJ and bLJ
-		iaci = qiac(iq,istate)
-		aLJ  = qavdw(iaci,qLJ)*iaclib(iacj)%avdw(iLJ)
-		bLJ  = qbvdw(iaci,qLJ)*iaclib(iacj)%bvdw(iLJ)
+                ! calculate iaci, alj and blj
+                iaci = qiac(iq,istate)
+                alj  = qavdw(iaci,qlj)*iaclib(iacj)%avdw(ilj)
+                blj  = qbvdw(iaci,qlj)*iaclib(iacj)%bvdw(ilj)
 
-	  ! calculate qi, Vel, V_a, V_b and dv
-	  Vel  = qcrg(iq,istate)*crg(j)*r
-	  if ( iLJ .eq. 3 ) Vel = Vel*el14_scale
+          ! calculate qi, vel, v_a, v_b and dv
+          vel  = qcrg(iq,istate)*crg(j)*r
+          if ( ilj .eq. 3 ) vel = vel*el14_scale
 
 
-	  r6_sc = r6 + sc_lookup(iq,iacj,istate)        !sc_lookup is softcore fix MPA
-	  V_a  = aLJ/(r6_sc*r6_sc)
-	  V_b  = bLJ/r6_sc         !sc_lookup is softcore fix MPA
-	  dv   = r2*( -Vel - ( (12.*V_a - 6.*V_b)*(r6/r6_sc) ) )*EQ(istate)%lambda  !r6 is r^6 not 1/r^6, r6_sc is r^6+sc not 1/(r^6+sc)
+          r6_sc = r6 + sc_lookup(iq,iacj,istate)        !sc_lookup is softcore fix mpa
+          v_a  = alj/(r6_sc*r6_sc)
+          v_b  = blj/r6_sc         !sc_lookup is softcore fix mpa
+          dv   = r2*( -vel - ( (12.*v_a - 6.*v_b)*(r6/r6_sc) ) )*eq(istate)%lambda  !r6 is r^6 not 1/r^6, r6_sc is r^6+sc not 1/(r^6+sc)
 
-	  ! update forces
-	  d(i3+1) = d(i3+1) - dv*dx1
-	  d(i3+2) = d(i3+2) - dv*dx2
-	  d(i3+3) = d(i3+3) - dv*dx3
-	  d(j3+1) = d(j3+1) + dv*dx1
-	  d(j3+2) = d(j3+2) + dv*dx2
-	  d(j3+3) = d(j3+3) + dv*dx3
+          ! update forces
+          d(i3+1) = d(i3+1) - dv*dx1
+          d(i3+2) = d(i3+2) - dv*dx2
+          d(i3+3) = d(i3+3) - dv*dx3
+          d(j3+1) = d(j3+1) + dv*dx1
+          d(j3+2) = d(j3+2) + dv*dx2
+          d(j3+3) = d(j3+3) + dv*dx3
 
-	  ! update q-protein energies
-		EQ(istate)%qp%el  = EQ(istate)%qp%el + Vel
-		EQ(istate)%qp%vdw = EQ(istate)%qp%vdw + V_a - V_b
-	end do ! istate
+          ! update q-protein energies
+                eq(istate)%qp%el  = eq(istate)%qp%el + vel
+                eq(istate)%qp%vdw = eq(istate)%qp%vdw + v_a - v_b
+        end do ! istate
 
   end do
 end subroutine nonbond_qp_qvdw_box
@@ -11257,264 +11228,264 @@ end subroutine nonbond_qp_qvdw_box
 !-----------------------------------------------------------------------
 
 subroutine nonbond_qw_spc
-!calculate non-bonded interactions between Q-atoms and SPC water molecules
-!(optimisations rely on LJ params = 0 for water H) using geometric comb. rule
+!calculate non-bonded interactions between q-atoms and spc water molecules
+!(optimisations rely on lj params = 0 for water h) using geometric comb. rule
 
 ! local variables
-integer						:: jw,iq,i,j,iLJ
-integer						:: istate
-real(8)						::	aLJ, bLJ
-real(8)						::	dxO, dyO, dzO, dxH1, dyH1, dzH1, dxH2, dyH2, dzH2
-real(8)						::	rO, r2O, r6O, rH1, r2H1, r6H1, rH2, r2H2, r6H2
-real(8)						::	VelO, VelH1, VelH2, dvO, dvH1, dvH2
-real(8)						::  V_a, V_b, r6O_sc, r6O_hc
-real(8), save				::	aO(2), bO(2)
-integer, save				::	iac_ow = 0, iac_hw = 0
+integer                                         :: jw,iq,i,j,ilj
+integer                                         :: istate
+real(8)                                         ::      alj, blj
+real(8)                                         ::      dxo, dyo, dzo, dxh1, dyh1, dzh1, dxh2, dyh2, dzh2
+real(8)                                         ::      ro, r2o, r6o, rh1, r2h1, r6h1, rh2, r2h2, r6h2
+real(8)                                         ::      velo, velh1, velh2, dvo, dvh1, dvh2
+real(8)                                         ::  v_a, v_b, r6o_sc, r6o_hc
+real(8), save                           ::      ao(2), bo(2)
+integer, save                           ::      iac_ow = 0, iac_hw = 0
 
 ! global variables used:
-!  iqseq, iac, crg, x, nstates, qvdw_flag, iaclib, qiac, qavdw, qbvdw, qcrg, el14_scale, EQ, d, nat_solute
+!  iqseq, iac, crg, x, nstates, qvdw_flag, iaclib, qiac, qavdw, qbvdw, qcrg, el14_scale, eq, d, nat_solute
 
 if(iac_ow == 0) then !set first time
         iac_ow = iac(nat_solute + 1)
         iac_hw = iac(nat_solute + 2)
-        aO(1:2) = iaclib(iac(nat_solute + 1))%avdw(1:2)
-        bO(1:2) = iaclib(iac(nat_solute + 1))%bvdw(1:2)
+        ao(1:2) = iaclib(iac(nat_solute + 1))%avdw(1:2)
+        bo(1:2) = iaclib(iac(nat_solute + 1))%bvdw(1:2)
 end if
 
 !loop over listed waters
 do jw = 1, nbqw_pair
-        j = nbqw(jw) !top. # of O in water iw
+        j = nbqw(jw) !top. # of o in water iw
         !loop over all q-atoms
         do iq = 1, nqat
                 i = iqseq(iq)
-                dxO  = x(3*j-2) - x(3*i-2)
-                dyO  = x(3*j-1) - x(3*i-1)
-                dzO  = x(3*j  ) - x(3*i  )
-                dxH1 = x(3*j+1) - x(3*i-2)
-                dyH1 = x(3*j+2) - x(3*i-1)
-                dzH1 = x(3*j+3) - x(3*i  )
-                dxH2 = x(3*j+4) - x(3*i-2)
-                dyH2 = x(3*j+5) - x(3*i-1)
-                dzH2 = x(3*j+6) - x(3*i  )
-                r2O  = dxO*dxO + dyO*dyO + dzO*dzO
-                rH1  = sqrt(1._8/(dxH1*dxH1 + dyH1*dyH1 + dzH1*dzH1))
-                rH2  = sqrt(1._8/(dxH2*dxH2 + dyH2*dyH2 + dzH2*dzH2))
-                r6O_hc  = r2O*r2O*r2O   !will set r6O to 1/r6O later, needed for softcore
-                r2O  = 1._8/r2O
-                rO   = sqrt(r2O)
-                r2H1 = rH1*rH1
-                r6H1 = r2H1*r2H1*r2H1
-                r2H2 = rH2*rH2
-                r6H2 = r2H2*r2H2*r2H2
+                dxo  = x(3*j-2) - x(3*i-2)
+                dyo  = x(3*j-1) - x(3*i-1)
+                dzo  = x(3*j  ) - x(3*i  )
+                dxh1 = x(3*j+1) - x(3*i-2)
+                dyh1 = x(3*j+2) - x(3*i-1)
+                dzh1 = x(3*j+3) - x(3*i  )
+                dxh2 = x(3*j+4) - x(3*i-2)
+                dyh2 = x(3*j+5) - x(3*i-1)
+                dzh2 = x(3*j+6) - x(3*i  )
+                r2o  = dxo*dxo + dyo*dyo + dzo*dzo
+                rh1  = sqrt(1._8/(dxh1*dxh1 + dyh1*dyh1 + dzh1*dzh1))
+                rh2  = sqrt(1._8/(dxh2*dxh2 + dyh2*dyh2 + dzh2*dzh2))
+                r6o_hc  = r2o*r2o*r2o   !will set r6o to 1/r6o later, needed for softcore
+                r2o  = 1._8/r2o
+                ro   = sqrt(r2o)
+                r2h1 = rh1*rh1
+                r6h1 = r2h1*r2h1*r2h1
+                r2h2 = rh2*rh2
+                r6h2 = r2h2*r2h2*r2h2
 
-		        r6O_sc = r6O_hc   !default is hardcore (i.e. not softcore)  MPA
+                        r6o_sc = r6o_hc   !default is hardcore (i.e. not softcore)  mpa
 
                 !reset potential
-                dvO = 0
-                dvH1 = 0
-                dvH2 = 0
-                iLJ = LJcod(iac_ow, iac(i))
+                dvo = 0
+                dvh1 = 0
+                dvh2 = 0
+                ilj = ljcod(iac_ow, iac(i))
                 if(.not. qvdw_flag) then
-                        !use same LJ params for all states
-						r6O  = 1./r6O_hc     !softcore hack, see comment 15 lines up
-                        aLJ  = iaclib(iac(i))%avdw(iLJ)
-                        bLJ  = iaclib(iac(i))%bvdw(iLJ)
-                        V_a  = aLJ*aO(iLJ)*r6O*r6O 
-                        V_b  = bLJ*bO(iLJ)*r6O
+                        !use same lj params for all states
+                                                r6o  = 1./r6o_hc     !softcore hack, see comment 15 lines up
+                        alj  = iaclib(iac(i))%avdw(ilj)
+                        blj  = iaclib(iac(i))%bvdw(ilj)
+                        v_a  = alj*ao(ilj)*r6o*r6o 
+                        v_b  = blj*bo(ilj)*r6o
                 end if
                 do istate = 1, nstates
                         ! for every state:
-                        ! calculate iaci, aLJ and bLJ
+                        ! calculate iaci, alj and blj
                         if (qvdw_flag) then
-                                aLJ  = qavdw(qiac(iq,istate),1)
-                                bLJ  = qbvdw(qiac(iq,istate),1)
-				                r6O_sc = r6O_hc + sc_lookup(iq,iac_ow,istate)   !softcore  MPA
+                                alj  = qavdw(qiac(iq,istate),1)
+                                blj  = qbvdw(qiac(iq,istate),1)
+                                                r6o_sc = r6o_hc + sc_lookup(iq,iac_ow,istate)   !softcore  mpa
 
-                                V_a  = aLJ*aO(iLJ)/(r6O_sc*r6O_sc)
-                                V_b  = bLJ*bO(iLJ)/(r6O_sc)
+                                v_a  = alj*ao(ilj)/(r6o_sc*r6o_sc)
+                                v_b  = blj*bo(ilj)/(r6o_sc)
                         end if
-                        ! calculate qi, Vel, V_a, V_b and dv
-                        VelO = crg_ow*qcrg(iq,istate)*rO
-                        VelH1 = crg_hw*qcrg(iq,istate)*rH1
-                        VelH2 = crg_hw*qcrg(iq,istate)*rH2
-                        dvO  = dvO  + r2O*( -VelO -( (12.*V_a - 6.*V_b)*(r6O_hc/r6O_sc) ))*EQ(istate)%lambda
-                        dvH1 = dvH1 - r2H1*VelH1*EQ(istate)%lambda
-                        dvH2 = dvH2 - r2H2*VelH2*EQ(istate)%lambda
+                        ! calculate qi, vel, v_a, v_b and dv
+                        velo = crg_ow*qcrg(iq,istate)*ro
+                        velh1 = crg_hw*qcrg(iq,istate)*rh1
+                        velh2 = crg_hw*qcrg(iq,istate)*rh2
+                        dvo  = dvo  + r2o*( -velo -( (12.*v_a - 6.*v_b)*(r6o_hc/r6o_sc) ))*eq(istate)%lambda
+                        dvh1 = dvh1 - r2h1*velh1*eq(istate)%lambda
+                        dvh2 = dvh2 - r2h2*velh2*eq(istate)%lambda
                         ! update q-water energies
-                        EQ(istate)%qw%el  = EQ(istate)%qw%el + VelO + VelH1 + VelH2
-                        EQ(istate)%qw%vdw = EQ(istate)%qw%vdw + V_a - V_b
+                        eq(istate)%qw%el  = eq(istate)%qw%el + velo + velh1 + velh2
+                        eq(istate)%qw%vdw = eq(istate)%qw%vdw + v_a - v_b
                 end do !istate
-				
-				! if qvdw_flag is true, then r6O is not the usual 1/rO^6, but rather rO^6. be careful!!! MPA
-				
-							
-                ! update forces on Q-atom
-                d(3*i-2) = d(3*i-2) - dvO*dxO - dvH1*dxH1 - dvH2*dxH2
-                d(3*i-1) = d(3*i-1) - dvO*dyO - dvH1*dyH1 - dvH2*dyH2
-                d(3*i  ) = d(3*i  ) - dvO*dzO - dvH1*dzH1 - dvH2*dzH2
+                                
+                                ! if qvdw_flag is true, then r6o is not the usual 1/ro^6, but rather ro^6. be careful!!! mpa
+                                
+                                                        
+                ! update forces on q-atom
+                d(3*i-2) = d(3*i-2) - dvo*dxo - dvh1*dxh1 - dvh2*dxh2
+                d(3*i-1) = d(3*i-1) - dvo*dyo - dvh1*dyh1 - dvh2*dyh2
+                d(3*i  ) = d(3*i  ) - dvo*dzo - dvh1*dzh1 - dvh2*dzh2
                 ! update forces on water
-                d(3*j-2) = d(3*j-2) + dvO*dxO
-                d(3*j-1) = d(3*j-1) + dvO*dyO
-                d(3*j  ) = d(3*j  ) + dvO*dzO
-                d(3*j+1) = d(3*j+1) + dvH1*dxH1
-                d(3*j+2) = d(3*j+2) + dvH1*dyH1
-                d(3*j+3) = d(3*j+3) + dvH1*dzH1
-                d(3*j+4) = d(3*j+4) + dvH2*dxH2
-                d(3*j+5) = d(3*j+5) + dvH2*dyH2
-                d(3*j+6) = d(3*j+6) + dvH2*dzH2
+                d(3*j-2) = d(3*j-2) + dvo*dxo
+                d(3*j-1) = d(3*j-1) + dvo*dyo
+                d(3*j  ) = d(3*j  ) + dvo*dzo
+                d(3*j+1) = d(3*j+1) + dvh1*dxh1
+                d(3*j+2) = d(3*j+2) + dvh1*dyh1
+                d(3*j+3) = d(3*j+3) + dvh1*dzh1
+                d(3*j+4) = d(3*j+4) + dvh2*dxh2
+                d(3*j+5) = d(3*j+5) + dvh2*dyh2
+                d(3*j+6) = d(3*j+6) + dvh2*dzh2
 
         end do !iq
 end do !jw
 end subroutine nonbond_qw_spc
 
 !-----------------------------------------------------------------------
-!******PWadded 2001-10-23
+!******pwadded 2001-10-23
 subroutine nonbond_qw_spc_box
-	!calculate non-bonded interactions between Q-atoms and SPC water molecules
-	!(optimisations rely on LJ params = 0 for water H) using geometric comb. rule
+        !calculate non-bonded interactions between q-atoms and spc water molecules
+        !(optimisations rely on lj params = 0 for water h) using geometric comb. rule
 
-	! local variables
-	integer						:: jw,iq,i,j,iLJ
-	integer						:: istate
-	real(8)						::	aLJ, bLJ
-	real(8)						::	dxO, dyO, dzO, dxH1, dyH1, dzH1, dxH2, dyH2, dzH2
-	real(8)						::	rO, r2O, r6O, rH1, r2H1, r6H1, rH2, r2H2, r6H2
-	real(8)						::	VelO, VelH1, VelH2, dvO, dvH1, dvH2
-	real(8)						:: V_a, V_b, r6O_sc, r6O_hc
-	real(8)						:: dx, dy, dz, boxshiftx, boxshifty, boxshiftz
-	real(8), save				::	aO(2), bO(2)
-	integer, save				::	iac_ow = 0, iac_hw = 0
+        ! local variables
+        integer                                         :: jw,iq,i,j,ilj
+        integer                                         :: istate
+        real(8)                                         ::      alj, blj
+        real(8)                                         ::      dxo, dyo, dzo, dxh1, dyh1, dzh1, dxh2, dyh2, dzh2
+        real(8)                                         ::      ro, r2o, r6o, rh1, r2h1, r6h1, rh2, r2h2, r6h2
+        real(8)                                         ::      velo, velh1, velh2, dvo, dvh1, dvh2
+        real(8)                                         :: v_a, v_b, r6o_sc, r6o_hc
+        real(8)                                         :: dx, dy, dz, boxshiftx, boxshifty, boxshiftz
+        real(8), save                           ::      ao(2), bo(2)
+        integer, save                           ::      iac_ow = 0, iac_hw = 0
 
-	! global variables used:
-	!  iqseq, iac, crg, x, nstates, qvdw_flag, iaclib, qiac, qavdw, qbvdw, qcrg, el14_scale, EQ, d, nat_solute
+        ! global variables used:
+        !  iqseq, iac, crg, x, nstates, qvdw_flag, iaclib, qiac, qavdw, qbvdw, qcrg, el14_scale, eq, d, nat_solute
 
-  	if(iac_ow == 0) then !set first time   
-		iac_ow = iac(nat_solute + 1)
-		iac_hw = iac(nat_solute + 2)    ! not used !?
-		aO(1:2) = iaclib(iac(nat_solute + 1))%avdw(1:2)
-		bO(1:2) = iaclib(iac(nat_solute + 1))%bvdw(1:2)
-	end if
+        if(iac_ow == 0) then !set first time   
+                iac_ow = iac(nat_solute + 1)
+                iac_hw = iac(nat_solute + 2)    ! not used !?
+                ao(1:2) = iaclib(iac(nat_solute + 1))%avdw(1:2)
+                bo(1:2) = iaclib(iac(nat_solute + 1))%bvdw(1:2)
+        end if
 
-	!loop over listed waters
-	do jw = 1, nbqw_pair
-		j = nbqw(jw) !top. # of O in water iw
-	
-		!compute the periodical shift
-		dx = x(3*j-2) - x(3*qswitch-2)
-		dy = x(3*j-1) - x(3*qswitch-1)
-		dz = x(3*j  ) - x(3*qswitch  )
-		boxshiftx = boxlength(1)*nint(dx*inv_boxl(1))
-		boxshifty = boxlength(2)*nint(dy*inv_boxl(2))
-		boxshiftz = boxlength(3)*nint(dz*inv_boxl(3))	
-	
-		!loop over all q-atoms
-		do iq = 1, nqat
-			i = iqseq(iq)
-			dxO  = x(3*j-2) - x(3*i-2)
-			dyO  = x(3*j-1) - x(3*i-1)
-			dzO  = x(3*j  ) - x(3*i  )
-			dxH1 = x(3*j+1) - x(3*i-2)
-			dyH1 = x(3*j+2) - x(3*i-1)
-			dzH1 = x(3*j+3) - x(3*i  )
-			dxH2 = x(3*j+4) - x(3*i-2)
-			dyH2 = x(3*j+5) - x(3*i-1)
-			dzH2 = x(3*j+6) - x(3*i  )
-			dxO = dxO - boxshiftx  
-			dyO = dyO - boxshifty  
-			dzO = dzO - boxshiftz  
-			dxH1 = dxH1 - boxshiftx  
-			dyH1 = dyH1 - boxshifty  
-			dzH1 = dzH1 - boxshiftz  
-			dxH2 = dxH2 - boxshiftx  
-			dyH2 = dyH2 - boxshifty  
-			dzH2 = dzH2 - boxshiftz  
+        !loop over listed waters
+        do jw = 1, nbqw_pair
+                j = nbqw(jw) !top. # of o in water iw
+        
+                !compute the periodical shift
+                dx = x(3*j-2) - x(3*qswitch-2)
+                dy = x(3*j-1) - x(3*qswitch-1)
+                dz = x(3*j  ) - x(3*qswitch  )
+                boxshiftx = boxlength(1)*nint(dx*inv_boxl(1))
+                boxshifty = boxlength(2)*nint(dy*inv_boxl(2))
+                boxshiftz = boxlength(3)*nint(dz*inv_boxl(3))   
+        
+                !loop over all q-atoms
+                do iq = 1, nqat
+                        i = iqseq(iq)
+                        dxo  = x(3*j-2) - x(3*i-2)
+                        dyo  = x(3*j-1) - x(3*i-1)
+                        dzo  = x(3*j  ) - x(3*i  )
+                        dxh1 = x(3*j+1) - x(3*i-2)
+                        dyh1 = x(3*j+2) - x(3*i-1)
+                        dzh1 = x(3*j+3) - x(3*i  )
+                        dxh2 = x(3*j+4) - x(3*i-2)
+                        dyh2 = x(3*j+5) - x(3*i-1)
+                        dzh2 = x(3*j+6) - x(3*i  )
+                        dxo = dxo - boxshiftx  
+                        dyo = dyo - boxshifty  
+                        dzo = dzo - boxshiftz  
+                        dxh1 = dxh1 - boxshiftx  
+                        dyh1 = dyh1 - boxshifty  
+                        dzh1 = dzh1 - boxshiftz  
+                        dxh2 = dxh2 - boxshiftx  
+                        dyh2 = dyh2 - boxshifty  
+                        dzh2 = dzh2 - boxshiftz  
 
-			r2O = dxO*dxO + dyO*dyO + dzO*dzO
-			rH1 = sqrt(1._8/(dxH1*dxH1 + dyH1*dyH1 + dzH1*dzH1))
-			rH2 = sqrt(1._8/(dxH2*dxH2 + dyH2*dyH2 + dzH2*dzH2))
-			r6O_hc = r2O*r2O*r2O   !will set r6O = 1/r6O later, need for softcore MPA
-			r2O = 1._8/r2O
-			rO  = sqrt(r2O)
-			r2H1 = rH1*rH1
-			r6H1 = r2H1*r2H1*r2H1
-			r2H2 = rH2*rH2
-			r6H2 = r2H2*r2H2*r2H2
+                        r2o = dxo*dxo + dyo*dyo + dzo*dzo
+                        rh1 = sqrt(1._8/(dxh1*dxh1 + dyh1*dyh1 + dzh1*dzh1))
+                        rh2 = sqrt(1._8/(dxh2*dxh2 + dyh2*dyh2 + dzh2*dzh2))
+                        r6o_hc = r2o*r2o*r2o   !will set r6o = 1/r6o later, need for softcore mpa
+                        r2o = 1._8/r2o
+                        ro  = sqrt(r2o)
+                        r2h1 = rh1*rh1
+                        r6h1 = r2h1*r2h1*r2h1
+                        r2h2 = rh2*rh2
+                        r6h2 = r2h2*r2h2*r2h2
 
-			r6O_sc = r6O_hc   !default is hardcore (i.e. not softcore)  MPA
+                        r6o_sc = r6o_hc   !default is hardcore (i.e. not softcore)  mpa
 
-			!reset potential
-			dvO = 0
-			dvH1 = 0
-			dvH2 = 0
-			iLJ = LJcod(iac_ow, iac(i))
-			if(.not. qvdw_flag) then
-				!use same LJ params for all states
-				aLJ  = iaclib(iac(i))%avdw(iLJ)
-				bLJ  = iaclib(iac(i))%bvdw(iLJ)
-				r6O  = 1._8/r6O_hc   !softcore hack  MPA
-				V_a  = aLJ*aO(iLJ)*r6O*r6O 
-				V_b  = bLJ*bO(iLJ)*r6O
-			end if
-			do istate = 1, nstates
-				! for every state:
+                        !reset potential
+                        dvo = 0
+                        dvh1 = 0
+                        dvh2 = 0
+                        ilj = ljcod(iac_ow, iac(i))
+                        if(.not. qvdw_flag) then
+                                !use same lj params for all states
+                                alj  = iaclib(iac(i))%avdw(ilj)
+                                blj  = iaclib(iac(i))%bvdw(ilj)
+                                r6o  = 1._8/r6o_hc   !softcore hack  mpa
+                                v_a  = alj*ao(ilj)*r6o*r6o 
+                                v_b  = blj*bo(ilj)*r6o
+                        end if
+                        do istate = 1, nstates
+                                ! for every state:
 
-				! calculate iaci, aLJ and bLJ
-				if (qvdw_flag) then
-					aLJ  = qavdw(qiac(iq,istate),1)
-					bLJ  = qbvdw(qiac(iq,istate),1)
-					r6O_sc = r6O_hc + sc_lookup(iq,iac_ow,istate)   !softcore  MPA
+                                ! calculate iaci, alj and blj
+                                if (qvdw_flag) then
+                                        alj  = qavdw(qiac(iq,istate),1)
+                                        blj  = qbvdw(qiac(iq,istate),1)
+                                        r6o_sc = r6o_hc + sc_lookup(iq,iac_ow,istate)   !softcore  mpa
 
-					V_a  = aLJ*aO(iLJ)/(r6O_sc*r6O_sc)
-					V_b  = bLJ*bO(iLJ)/r6O_sc
-				end if
-				! calculate qi, Vel, V_a, V_b and dv
-				VelO = crg_ow*qcrg(iq,istate)*rO
-				VelH1 = crg_hw*qcrg(iq,istate)*rH1
-				VelH2 = crg_hw*qcrg(iq,istate)*rH2
-				dvO  = dvO  + r2O*( -VelO -( (12.*V_a - 6.*V_b)*(r6O_hc/r6O_sc) ))*EQ(istate)%lambda
-				dvH1 = dvH1 - r2H1*VelH1*EQ(istate)%lambda
-				dvH2 = dvH2 - r2H2*VelH2*EQ(istate)%lambda
-				! update q-water energies
-				EQ(istate)%qw%el  = EQ(istate)%qw%el + VelO + VelH1 + VelH2
-				EQ(istate)%qw%vdw = EQ(istate)%qw%vdw + V_a - V_b
-			end do !istate			
-			! update forces on Q-atom
-			d(3*i-2) = d(3*i-2) - dvO*dxO - dvH1*dxH1 - dvH2*dxH2
-			d(3*i-1) = d(3*i-1) - dvO*dyO - dvH1*dyH1 - dvH2*dyH2
-			d(3*i  ) = d(3*i  ) - dvO*dzO - dvH1*dzH1 - dvH2*dzH2
-			! update forces on water
-			d(3*j-2) = d(3*j-2) + dvO*dxO
-			d(3*j-1) = d(3*j-1) + dvO*dyO
-			d(3*j  ) = d(3*j  ) + dvO*dzO
-			d(3*j+1) = d(3*j+1) + dvH1*dxH1
-			d(3*j+2) = d(3*j+2) + dvH1*dyH1
-			d(3*j+3) = d(3*j+3) + dvH1*dzH1
-			d(3*j+4) = d(3*j+4) + dvH2*dxH2
-			d(3*j+5) = d(3*j+5) + dvH2*dyH2
-			d(3*j+6) = d(3*j+6) + dvH2*dzH2
+                                        v_a  = alj*ao(ilj)/(r6o_sc*r6o_sc)
+                                        v_b  = blj*bo(ilj)/r6o_sc
+                                end if
+                                ! calculate qi, vel, v_a, v_b and dv
+                                velo = crg_ow*qcrg(iq,istate)*ro
+                                velh1 = crg_hw*qcrg(iq,istate)*rh1
+                                velh2 = crg_hw*qcrg(iq,istate)*rh2
+                                dvo  = dvo  + r2o*( -velo -( (12.*v_a - 6.*v_b)*(r6o_hc/r6o_sc) ))*eq(istate)%lambda
+                                dvh1 = dvh1 - r2h1*velh1*eq(istate)%lambda
+                                dvh2 = dvh2 - r2h2*velh2*eq(istate)%lambda
+                                ! update q-water energies
+                                eq(istate)%qw%el  = eq(istate)%qw%el + velo + velh1 + velh2
+                                eq(istate)%qw%vdw = eq(istate)%qw%vdw + v_a - v_b
+                        end do !istate                  
+                        ! update forces on q-atom
+                        d(3*i-2) = d(3*i-2) - dvo*dxo - dvh1*dxh1 - dvh2*dxh2
+                        d(3*i-1) = d(3*i-1) - dvo*dyo - dvh1*dyh1 - dvh2*dyh2
+                        d(3*i  ) = d(3*i  ) - dvo*dzo - dvh1*dzh1 - dvh2*dzh2
+                        ! update forces on water
+                        d(3*j-2) = d(3*j-2) + dvo*dxo
+                        d(3*j-1) = d(3*j-1) + dvo*dyo
+                        d(3*j  ) = d(3*j  ) + dvo*dzo
+                        d(3*j+1) = d(3*j+1) + dvh1*dxh1
+                        d(3*j+2) = d(3*j+2) + dvh1*dyh1
+                        d(3*j+3) = d(3*j+3) + dvh1*dzh1
+                        d(3*j+4) = d(3*j+4) + dvh2*dxh2
+                        d(3*j+5) = d(3*j+5) + dvh2*dyh2
+                        d(3*j+6) = d(3*j+6) + dvh2*dzh2
 
-		end do !iq
-	end do !jw
+                end do !iq
+        end do !jw
 end subroutine nonbond_qw_spc_box
 
 !-----------------------------------------------------------------------
 
 subroutine nonbond_qw_3atom
-!calculate non-bonded interactions between Q-atoms and 3-atom solvent molecules
+!calculate non-bonded interactions between q-atoms and 3-atom solvent molecules
 !using geometric comb. rule
 
 ! local variables
-integer						:: jw,iq,i,j,iLJ1, iLJ2, iLJ3, iaci
-integer						:: istate
-real(8)						::	dx1, dy1, dz1, dx2, dy2, dz2, dx3, dy3, dz3
-real(8)						::	r_1, r2_1, r6_1, r_2, r2_2, r6_2, r_3, r2_3, r6_3
-real(8)						::	Vel1, Vel2, Vel3, dv1, dv2, dv3
-real(8)						:: V_a1,V_b1, V_a2, V_b2, V_a3, V_b3,r6_1_sc,r6_2_sc,r6_3_sc,r6_1_hc,r6_2_hc,r6_3_hc
-real(8), save				::	a1(2), b1(2), a2(2), b2(2), a3(2), b3(2)
-integer, save				::	iac1, iac2, iac3
-real, save					::	crg1, crg2, crg3
+integer                                         :: jw,iq,i,j,ilj1, ilj2, ilj3, iaci
+integer                                         :: istate
+real(8)                                         ::      dx1, dy1, dz1, dx2, dy2, dz2, dx3, dy3, dz3
+real(8)                                         ::      r_1, r2_1, r6_1, r_2, r2_2, r6_2, r_3, r2_3, r6_3
+real(8)                                         ::      vel1, vel2, vel3, dv1, dv2, dv3
+real(8)                                         :: v_a1,v_b1, v_a2, v_b2, v_a3, v_b3,r6_1_sc,r6_2_sc,r6_3_sc,r6_1_hc,r6_2_hc,r6_3_hc
+real(8), save                           ::      a1(2), b1(2), a2(2), b2(2), a3(2), b3(2)
+integer, save                           ::      iac1, iac2, iac3
+real, save                                      ::      crg1, crg2, crg3
 ! global variables used:
-!  iqseq, iac, crg, x, nstates, qvdw_flag, iaclib, qiac, qavdw, qbvdw, qcrg, el14_scale, EQ, d, nat_solute
+!  iqseq, iac, crg, x, nstates, qvdw_flag, iaclib, qiac, qavdw, qbvdw, qcrg, el14_scale, eq, d, nat_solute
 
 if(a1(1) == 0.) then !set first time
         iac1 = iac(nat_solute+1)
@@ -11533,7 +11504,7 @@ end if
 
 !loop over listed waters
 do jw = 1, nbqw_pair
-        j = nbqw(jw) !top. # of O in water iw
+        j = nbqw(jw) !top. # of o in water iw
         !loop over all q-atoms
         do iq = 1, nqat
                 i = iqseq(iq)
@@ -11551,63 +11522,63 @@ do jw = 1, nbqw_pair
                 r2_3 = dx3*dx3 + dy3*dy3 + dz3*dz3
                 r6_1_hc = r2_1*r2_1*r2_1   !will set r6 to 1/r6 later, needed for softcore
                 r2_1 = 1._8/r2_1
-				r_1  = sqrt(r2_1)
+                                r_1  = sqrt(r2_1)
                 r6_2_hc = r2_2*r2_2*r2_2   !will set r6 to 1/r6 later, needed for softcore
                 r2_2 = 1._8/r2_2
-				r_2  = sqrt(r2_2)
+                                r_2  = sqrt(r2_2)
                 r6_3_hc = r2_3*r2_3*r2_3   !will set r6 to 1/r6 later, needed for softcore
                 r2_3 = 1._8/r2_3
-				r_3  = sqrt(r2_3)
+                                r_3  = sqrt(r2_3)
 
                 !reset potential
                 dv1 = 0
                 dv2 = 0
                 dv3 = 0
                 iaci = iac(i)
-                iLJ1 = LJcod(iac1, iaci)
-                iLJ2 = LJcod(iac2, iaci)
-                iLJ3 = LJcod(iac3, iaci)
+                ilj1 = ljcod(iac1, iaci)
+                ilj2 = ljcod(iac2, iaci)
+                ilj3 = ljcod(iac3, iaci)
                 if(.not. qvdw_flag) then
-                        !use same LJ params for all states
-						r6_1 = 1._8/r6_1_hc	!softcore hack
-						r6_2 = 1._8/r6_2_hc	!softcore hack
-						r6_3 = 1._8/r6_3_hc	!softcore hack
+                        !use same lj params for all states
+                                                r6_1 = 1._8/r6_1_hc     !softcore hack
+                                                r6_2 = 1._8/r6_2_hc     !softcore hack
+                                                r6_3 = 1._8/r6_3_hc     !softcore hack
 
-                        V_a1  = iaclib(iaci)%avdw(iLJ1)*a1(iLJ1)*r6_1*r6_1 
-                        V_b1  = iaclib(iaci)%bvdw(iLJ1)*b1(iLJ1)*r6_1
-                        V_a2 = iaclib(iaci)%avdw(iLJ2)*a2(iLJ2)*r6_2*r6_2
-                        V_b2 = iaclib(iaci)%bvdw(iLJ2)*b2(iLJ2)*r6_2
-                        V_a3 = iaclib(iaci)%avdw(iLJ3)*a3(iLJ3)*r6_3*r6_3
-                        V_b3 = iaclib(iaci)%bvdw(iLJ3)*b3(iLJ3)*r6_3
+                        v_a1  = iaclib(iaci)%avdw(ilj1)*a1(ilj1)*r6_1*r6_1 
+                        v_b1  = iaclib(iaci)%bvdw(ilj1)*b1(ilj1)*r6_1
+                        v_a2 = iaclib(iaci)%avdw(ilj2)*a2(ilj2)*r6_2*r6_2
+                        v_b2 = iaclib(iaci)%bvdw(ilj2)*b2(ilj2)*r6_2
+                        v_a3 = iaclib(iaci)%avdw(ilj3)*a3(ilj3)*r6_3*r6_3
+                        v_b3 = iaclib(iaci)%bvdw(ilj3)*b3(ilj3)*r6_3
                 end if
                 do istate = 1, nstates
                         ! for every state:
 
-                        ! calculate V_a:s and V_b:s for each state
+                        ! calculate v_a:s and v_b:s for each state
                         if (qvdw_flag) then
-				r6_1_sc = r6_1_hc + sc_lookup(iq,iac1,istate)
-				r6_2_sc = r6_2_hc + sc_lookup(iq,iac2,istate)
-				r6_3_sc = r6_3_hc + sc_lookup(iq,iac3,istate)
-				V_a1 = qavdw(qiac(iq,istate),1)*a1(iLJ1)/(r6_1_sc*r6_1_sc)
-                                V_b1 = qbvdw(qiac(iq,istate),1)*b1(iLJ1)/(r6_1_sc)
-                                V_a2 = qavdw(qiac(iq,istate),1)*a2(iLJ2)/(r6_2_sc*r6_2_sc)
-                                V_b2 = qbvdw(qiac(iq,istate),1)*b2(iLJ2)/(r6_2_sc)
-                                V_a3 = qavdw(qiac(iq,istate),1)*a3(iLJ3)/(r6_3_sc*r6_3_sc)
-                                V_b3 = qbvdw(qiac(iq,istate),1)*b3(iLJ3)/(r6_3_sc)
+                                r6_1_sc = r6_1_hc + sc_lookup(iq,iac1,istate)
+                                r6_2_sc = r6_2_hc + sc_lookup(iq,iac2,istate)
+                                r6_3_sc = r6_3_hc + sc_lookup(iq,iac3,istate)
+                                v_a1 = qavdw(qiac(iq,istate),1)*a1(ilj1)/(r6_1_sc*r6_1_sc)
+                                v_b1 = qbvdw(qiac(iq,istate),1)*b1(ilj1)/(r6_1_sc)
+                                v_a2 = qavdw(qiac(iq,istate),1)*a2(ilj2)/(r6_2_sc*r6_2_sc)
+                                v_b2 = qbvdw(qiac(iq,istate),1)*b2(ilj2)/(r6_2_sc)
+                                v_a3 = qavdw(qiac(iq,istate),1)*a3(ilj3)/(r6_3_sc*r6_3_sc)
+                                v_b3 = qbvdw(qiac(iq,istate),1)*b3(ilj3)/(r6_3_sc)
                         end if
-                        ! calculate  Vel, V_a, V_b and dv
-                        Vel1 = crg1*qcrg(iq,istate)*r_1
-                        Vel2 = crg2*qcrg(iq,istate)*r_2
-                        Vel3 = crg3*qcrg(iq,istate)*r_3
-                        dv1 = dv1 + r2_1*(-Vel1- ((12.*V_a1-6.*V_b1)*(r6_1_hc/r6_1_sc)) )*EQ(istate)%lambda
-                        dv2 = dv2 + r2_2*(-Vel2- ((12.*V_a2-6.*V_b2)*(r6_2_hc/r6_2_sc)) )*EQ(istate)%lambda
-                        dv3 = dv3 + r2_3*(-Vel3- ((12.*V_a3-6.*V_b3)*(r6_3_hc/r6_3_sc)) )*EQ(istate)%lambda
+                        ! calculate  vel, v_a, v_b and dv
+                        vel1 = crg1*qcrg(iq,istate)*r_1
+                        vel2 = crg2*qcrg(iq,istate)*r_2
+                        vel3 = crg3*qcrg(iq,istate)*r_3
+                        dv1 = dv1 + r2_1*(-vel1- ((12.*v_a1-6.*v_b1)*(r6_1_hc/r6_1_sc)) )*eq(istate)%lambda
+                        dv2 = dv2 + r2_2*(-vel2- ((12.*v_a2-6.*v_b2)*(r6_2_hc/r6_2_sc)) )*eq(istate)%lambda
+                        dv3 = dv3 + r2_3*(-vel3- ((12.*v_a3-6.*v_b3)*(r6_3_hc/r6_3_sc)) )*eq(istate)%lambda
                         ! update q-water energies
-                        EQ(istate)%qw%el  = EQ(istate)%qw%el + Vel1 + Vel2 + Vel3
-                        EQ(istate)%qw%vdw = EQ(istate)%qw%vdw + V_a1 - V_b1 &
-                                + V_a2 - V_b2 + V_a3 - V_b3
-                end do !istate			
-                ! update forces on Q-atom
+                        eq(istate)%qw%el  = eq(istate)%qw%el + vel1 + vel2 + vel3
+                        eq(istate)%qw%vdw = eq(istate)%qw%vdw + v_a1 - v_b1 &
+                                + v_a2 - v_b2 + v_a3 - v_b3
+                end do !istate                  
+                ! update forces on q-atom
                 d(3*i-2) = d(3*i-2) - dv1*dx1 - dv2*dx2 - dv3*dx3
                 d(3*i-1) = d(3*i-1) - dv1*dy1 - dv2*dy2 - dv3*dy3
                 d(3*i  ) = d(3*i  ) - dv1*dz1 - dv2*dz2 - dv3*dz3
@@ -11627,177 +11598,177 @@ end do !jw
 end subroutine nonbond_qw_3atom
 
 !-----------------------------------------------------------------------
-!******PWadded 2001-10-23
+!******pwadded 2001-10-23
 subroutine nonbond_qw_3atom_box
-	!calculate non-bonded interactions between Q-atoms and 3-atom solvent molecules
-	!using geometric comb. rule
-	! local variables
-	integer						:: jw,iq,i,j,iLJ1, iLJ2, iLJ3, iaci
-	integer						:: istate
-	real(8)						::	dx1, dy1, dz1, dx2, dy2, dz2, dx3, dy3, dz3
-	real(8)						::	r_1, r2_1, r6_1, r_2, r2_2, r6_2, r_3, r2_3, r6_3
-	real(8)						::	Vel1, Vel2, Vel3, dv1, dv2, dv3
-	real(8)						:: V_a1,V_b1, V_a2, V_b2, V_a3, V_b3,r6_1_sc,r6_2_sc,r6_3_sc,r6_1_hc,r6_2_hc,r6_3_hc
-	real(8)						:: boxshiftx, boxshifty, boxshiftz, dx, dy, dz
-	real(8), save				::	a1(2), b1(2), a2(2), b2(2), a3(2), b3(2)
-	integer, save				::	iac1, iac2, iac3
-	real, save					::	crg1, crg2, crg3
-	! global variables used:
-	!  iqseq, iac, crg, x, nstates, qvdw_flag, iaclib, qiac, qavdw, qbvdw, qcrg, el14_scale, EQ, d, nat_solute
+        !calculate non-bonded interactions between q-atoms and 3-atom solvent molecules
+        !using geometric comb. rule
+        ! local variables
+        integer                                         :: jw,iq,i,j,ilj1, ilj2, ilj3, iaci
+        integer                                         :: istate
+        real(8)                                         ::      dx1, dy1, dz1, dx2, dy2, dz2, dx3, dy3, dz3
+        real(8)                                         ::      r_1, r2_1, r6_1, r_2, r2_2, r6_2, r_3, r2_3, r6_3
+        real(8)                                         ::      vel1, vel2, vel3, dv1, dv2, dv3
+        real(8)                                         :: v_a1,v_b1, v_a2, v_b2, v_a3, v_b3,r6_1_sc,r6_2_sc,r6_3_sc,r6_1_hc,r6_2_hc,r6_3_hc
+        real(8)                                         :: boxshiftx, boxshifty, boxshiftz, dx, dy, dz
+        real(8), save                           ::      a1(2), b1(2), a2(2), b2(2), a3(2), b3(2)
+        integer, save                           ::      iac1, iac2, iac3
+        real, save                                      ::      crg1, crg2, crg3
+        ! global variables used:
+        !  iqseq, iac, crg, x, nstates, qvdw_flag, iaclib, qiac, qavdw, qbvdw, qcrg, el14_scale, eq, d, nat_solute
   
-	if(a1(1) == 0.) then !set first time
-		iac1 = iac(nat_solute+1)
-		iac2 = iac(nat_solute+2)
-		iac3 = iac(nat_solute+3)
-		crg1 = crg(nat_solute+1)
-		crg2 = crg(nat_solute+2)
-		crg3 = crg(nat_solute+3)
-		a1(1:2) = iaclib(iac1)%avdw(1:2)
-		b1(1:2) = iaclib(iac1)%bvdw(1:2)
-		a2(1:2) = iaclib(iac2)%avdw(1:2)
-		b2(1:2) = iaclib(iac2)%bvdw(1:2)
-		a3(1:2) = iaclib(iac3)%avdw(1:2)
-		b3(1:2) = iaclib(iac3)%bvdw(1:2)
-	end if
+        if(a1(1) == 0.) then !set first time
+                iac1 = iac(nat_solute+1)
+                iac2 = iac(nat_solute+2)
+                iac3 = iac(nat_solute+3)
+                crg1 = crg(nat_solute+1)
+                crg2 = crg(nat_solute+2)
+                crg3 = crg(nat_solute+3)
+                a1(1:2) = iaclib(iac1)%avdw(1:2)
+                b1(1:2) = iaclib(iac1)%bvdw(1:2)
+                a2(1:2) = iaclib(iac2)%avdw(1:2)
+                b2(1:2) = iaclib(iac2)%bvdw(1:2)
+                a3(1:2) = iaclib(iac3)%avdw(1:2)
+                b3(1:2) = iaclib(iac3)%bvdw(1:2)
+        end if
 
-	!loop over listed waters
-	do jw = 1, nbqw_pair
-		j = nbqw(jw) !top. # of O in water iw
-		
-		!compute the periodical shift
-		dx = x(3*j-2) - x(3*qswitch-2)
-		dy = x(3*j-1) - x(3*qswitch-1)
-		dz = x(3*j  ) - x(3*qswitch  )
-		boxshiftx = boxlength(1)*nint(dx*inv_boxl(1))
-		boxshifty = boxlength(2)*nint(dy*inv_boxl(2))
-		boxshiftz = boxlength(3)*nint(dz*inv_boxl(3))
-				
-		!loop over all q-atoms
-		do iq = 1, nqat
-			i = iqseq(iq)
-			dx1 = x(3*j-2) - x(3*i-2)
-			dy1 = x(3*j-1) - x(3*i-1)
-			dz1 = x(3*j  ) - x(3*i  )
-			dx2 = x(3*j+1) - x(3*i-2)
-			dy2 = x(3*j+2) - x(3*i-1)
-			dz2 = x(3*j+3) - x(3*i  )
-			dx3 = x(3*j+4) - x(3*i-2)
-			dy3 = x(3*j+5) - x(3*i-1)
-			dz3 = x(3*j+6) - x(3*i  )
-			dx1 = dx1 - boxshiftx  
-			dy1 = dy1 - boxshifty  
-			dz1 = dz1 - boxshiftz  
-			dx2 = dx2 - boxshiftx 
-			dy2 = dy2 - boxshifty 
-			dz2 = dz2 - boxshiftz 		
-			dx3 = dx3 - boxshiftx 
-			dy3 = dy3 - boxshifty 
-			dz3 = dz3 - boxshiftz  
-			
+        !loop over listed waters
+        do jw = 1, nbqw_pair
+                j = nbqw(jw) !top. # of o in water iw
+                
+                !compute the periodical shift
+                dx = x(3*j-2) - x(3*qswitch-2)
+                dy = x(3*j-1) - x(3*qswitch-1)
+                dz = x(3*j  ) - x(3*qswitch  )
+                boxshiftx = boxlength(1)*nint(dx*inv_boxl(1))
+                boxshifty = boxlength(2)*nint(dy*inv_boxl(2))
+                boxshiftz = boxlength(3)*nint(dz*inv_boxl(3))
+                                
+                !loop over all q-atoms
+                do iq = 1, nqat
+                        i = iqseq(iq)
+                        dx1 = x(3*j-2) - x(3*i-2)
+                        dy1 = x(3*j-1) - x(3*i-1)
+                        dz1 = x(3*j  ) - x(3*i  )
+                        dx2 = x(3*j+1) - x(3*i-2)
+                        dy2 = x(3*j+2) - x(3*i-1)
+                        dz2 = x(3*j+3) - x(3*i  )
+                        dx3 = x(3*j+4) - x(3*i-2)
+                        dy3 = x(3*j+5) - x(3*i-1)
+                        dz3 = x(3*j+6) - x(3*i  )
+                        dx1 = dx1 - boxshiftx  
+                        dy1 = dy1 - boxshifty  
+                        dz1 = dz1 - boxshiftz  
+                        dx2 = dx2 - boxshiftx 
+                        dy2 = dy2 - boxshifty 
+                        dz2 = dz2 - boxshiftz           
+                        dx3 = dx3 - boxshiftx 
+                        dy3 = dy3 - boxshifty 
+                        dz3 = dz3 - boxshiftz  
+                        
             r2_1 = dx1*dx1 + dy1*dy1 + dz1*dz1
             r2_2 = dx2*dx2 + dy2*dy2 + dz2*dz2
             r2_3 = dx3*dx3 + dy3*dy3 + dz3*dz3
             r6_1_hc = r2_1*r2_1*r2_1   !will set r6 to 1/r6 later, needed for softcore
             r2_1 = 1._8/r2_1
-			r_1  = sqrt(r2_1)
-			r6_2_hc = r2_2*r2_2*r2_2   !will set r6 to 1/r6 later, needed for softcore
-			r2_2 = 1._8/r2_2
-			r_2  = sqrt(r2_2)
-			r6_3_hc = r2_3*r2_3*r2_3   !will set r6 to 1/r6 later, needed for softcore
-			r2_3 = 1._8/r2_3
-			r_3  = sqrt(r2_3)
+                        r_1  = sqrt(r2_1)
+                        r6_2_hc = r2_2*r2_2*r2_2   !will set r6 to 1/r6 later, needed for softcore
+                        r2_2 = 1._8/r2_2
+                        r_2  = sqrt(r2_2)
+                        r6_3_hc = r2_3*r2_3*r2_3   !will set r6 to 1/r6 later, needed for softcore
+                        r2_3 = 1._8/r2_3
+                        r_3  = sqrt(r2_3)
 
-			!reset potential
-			dv1 = 0
-			dv2 = 0
-			dv3 = 0
-			iaci = iac(i)
-			iLJ1 = LJcod(iac1, iaci)
-			iLJ2 = LJcod(iac2, iaci)
-			iLJ3 = LJcod(iac3, iaci)
-			if(.not. qvdw_flag) then
-				!use same LJ params for all states
-				r6_1 = 1._8/r6_1_hc	!softcore hack
-				r6_2 = 1._8/r6_2_hc	!softcore hack
-				r6_3 = 1._8/r6_3_hc	!softcore hack
+                        !reset potential
+                        dv1 = 0
+                        dv2 = 0
+                        dv3 = 0
+                        iaci = iac(i)
+                        ilj1 = ljcod(iac1, iaci)
+                        ilj2 = ljcod(iac2, iaci)
+                        ilj3 = ljcod(iac3, iaci)
+                        if(.not. qvdw_flag) then
+                                !use same lj params for all states
+                                r6_1 = 1._8/r6_1_hc     !softcore hack
+                                r6_2 = 1._8/r6_2_hc     !softcore hack
+                                r6_3 = 1._8/r6_3_hc     !softcore hack
 
-				V_a1  = iaclib(iaci)%avdw(iLJ1)*a1(iLJ1)*r6_1*r6_1 
-				V_b1  = iaclib(iaci)%bvdw(iLJ1)*b1(iLJ1)*r6_1
-				V_a2 = iaclib(iaci)%avdw(iLJ2)*a2(iLJ2)*r6_2*r6_2
-				V_b2 = iaclib(iaci)%bvdw(iLJ2)*b2(iLJ2)*r6_2
-				V_a3 = iaclib(iaci)%avdw(iLJ3)*a3(iLJ3)*r6_3*r6_3
-				V_b3 = iaclib(iaci)%bvdw(iLJ3)*b3(iLJ3)*r6_3
-			end if
-			do istate = 1, nstates
-				! for every state:
+                                v_a1  = iaclib(iaci)%avdw(ilj1)*a1(ilj1)*r6_1*r6_1 
+                                v_b1  = iaclib(iaci)%bvdw(ilj1)*b1(ilj1)*r6_1
+                                v_a2 = iaclib(iaci)%avdw(ilj2)*a2(ilj2)*r6_2*r6_2
+                                v_b2 = iaclib(iaci)%bvdw(ilj2)*b2(ilj2)*r6_2
+                                v_a3 = iaclib(iaci)%avdw(ilj3)*a3(ilj3)*r6_3*r6_3
+                                v_b3 = iaclib(iaci)%bvdw(ilj3)*b3(ilj3)*r6_3
+                        end if
+                        do istate = 1, nstates
+                                ! for every state:
 
-				! calculate V_a:s and V_b:s for each state
-				if (qvdw_flag) then
-					r6_1_sc = r6_1_hc + sc_lookup(iq,iac1,istate)
-					r6_2_sc = r6_2_hc + sc_lookup(iq,iac2,istate)
-					r6_3_sc = r6_3_hc + sc_lookup(iq,iac3,istate)
-					V_a1 = qavdw(qiac(iq,istate),1)*a1(iLJ1)/(r6_1_sc*r6_1_sc)
-					V_b1 = qbvdw(qiac(iq,istate),1)*b1(iLJ1)/(r6_1_sc)
-					V_a2 = qavdw(qiac(iq,istate),1)*a2(iLJ2)/(r6_2_sc*r6_2_sc)
-					V_b2 = qbvdw(qiac(iq,istate),1)*b2(iLJ2)/(r6_2_sc)
-					V_a3 = qavdw(qiac(iq,istate),1)*a3(iLJ3)/(r6_3_sc*r6_3_sc)
-					V_b3 = qbvdw(qiac(iq,istate),1)*b3(iLJ3)/(r6_3_sc)
+                                ! calculate v_a:s and v_b:s for each state
+                                if (qvdw_flag) then
+                                        r6_1_sc = r6_1_hc + sc_lookup(iq,iac1,istate)
+                                        r6_2_sc = r6_2_hc + sc_lookup(iq,iac2,istate)
+                                        r6_3_sc = r6_3_hc + sc_lookup(iq,iac3,istate)
+                                        v_a1 = qavdw(qiac(iq,istate),1)*a1(ilj1)/(r6_1_sc*r6_1_sc)
+                                        v_b1 = qbvdw(qiac(iq,istate),1)*b1(ilj1)/(r6_1_sc)
+                                        v_a2 = qavdw(qiac(iq,istate),1)*a2(ilj2)/(r6_2_sc*r6_2_sc)
+                                        v_b2 = qbvdw(qiac(iq,istate),1)*b2(ilj2)/(r6_2_sc)
+                                        v_a3 = qavdw(qiac(iq,istate),1)*a3(ilj3)/(r6_3_sc*r6_3_sc)
+                                        v_b3 = qbvdw(qiac(iq,istate),1)*b3(ilj3)/(r6_3_sc)
 
-				end if
-				! calculate  Vel, V_a, V_b and dv
-				Vel1 = crg1*qcrg(iq,istate)*r_1
-				Vel2 = crg2*qcrg(iq,istate)*r_2
-				Vel3 = crg3*qcrg(iq,istate)*r_3
-				dv1 = dv1 + r2_1*(-Vel1- ((12.*V_a1-6.*V_b1)*(r6_1_hc/r6_1_sc)) )*EQ(istate)%lambda
-				dv2 = dv2 + r2_2*(-Vel2- ((12.*V_a2-6.*V_b2)*(r6_2_hc/r6_2_sc)) )*EQ(istate)%lambda
-				dv3 = dv3 + r2_3*(-Vel3- ((12.*V_a3-6.*V_b3)*(r6_3_hc/r6_3_sc)) )*EQ(istate)%lambda
-				! update q-water energies
-				EQ(istate)%qw%el  = EQ(istate)%qw%el + Vel1 + Vel2 + Vel3
-				EQ(istate)%qw%vdw = EQ(istate)%qw%vdw + V_a1 - V_b1 &
-					+ V_a2 - V_b2 + V_a3 - V_b3
-			end do !istate			
-			! update forces on Q-atom
-			d(3*i-2) = d(3*i-2) - dv1*dx1 - dv2*dx2 - dv3*dx3
-			d(3*i-1) = d(3*i-1) - dv1*dy1 - dv2*dy2 - dv3*dy3
-			d(3*i  ) = d(3*i  ) - dv1*dz1 - dv2*dz2 - dv3*dz3
-			! update forces on water
-			d(3*j-2) = d(3*j-2) + dv1*dx1
-			d(3*j-1) = d(3*j-1) + dv1*dy1
-			d(3*j  ) = d(3*j  ) + dv1*dz1
-			d(3*j+1) = d(3*j+1) + dv2*dx2
-			d(3*j+2) = d(3*j+2) + dv2*dy2
-			d(3*j+3) = d(3*j+3) + dv2*dz2
-			d(3*j+4) = d(3*j+4) + dv3*dx3
-			d(3*j+5) = d(3*j+5) + dv3*dy3
-			d(3*j+6) = d(3*j+6) + dv3*dz3
+                                end if
+                                ! calculate  vel, v_a, v_b and dv
+                                vel1 = crg1*qcrg(iq,istate)*r_1
+                                vel2 = crg2*qcrg(iq,istate)*r_2
+                                vel3 = crg3*qcrg(iq,istate)*r_3
+                                dv1 = dv1 + r2_1*(-vel1- ((12.*v_a1-6.*v_b1)*(r6_1_hc/r6_1_sc)) )*eq(istate)%lambda
+                                dv2 = dv2 + r2_2*(-vel2- ((12.*v_a2-6.*v_b2)*(r6_2_hc/r6_2_sc)) )*eq(istate)%lambda
+                                dv3 = dv3 + r2_3*(-vel3- ((12.*v_a3-6.*v_b3)*(r6_3_hc/r6_3_sc)) )*eq(istate)%lambda
+                                ! update q-water energies
+                                eq(istate)%qw%el  = eq(istate)%qw%el + vel1 + vel2 + vel3
+                                eq(istate)%qw%vdw = eq(istate)%qw%vdw + v_a1 - v_b1 &
+                                        + v_a2 - v_b2 + v_a3 - v_b3
+                        end do !istate                  
+                        ! update forces on q-atom
+                        d(3*i-2) = d(3*i-2) - dv1*dx1 - dv2*dx2 - dv3*dx3
+                        d(3*i-1) = d(3*i-1) - dv1*dy1 - dv2*dy2 - dv3*dy3
+                        d(3*i  ) = d(3*i  ) - dv1*dz1 - dv2*dz2 - dv3*dz3
+                        ! update forces on water
+                        d(3*j-2) = d(3*j-2) + dv1*dx1
+                        d(3*j-1) = d(3*j-1) + dv1*dy1
+                        d(3*j  ) = d(3*j  ) + dv1*dz1
+                        d(3*j+1) = d(3*j+1) + dv2*dx2
+                        d(3*j+2) = d(3*j+2) + dv2*dy2
+                        d(3*j+3) = d(3*j+3) + dv2*dz2
+                        d(3*j+4) = d(3*j+4) + dv3*dx3
+                        d(3*j+5) = d(3*j+5) + dv3*dy3
+                        d(3*j+6) = d(3*j+6) + dv3*dz3
 
-		end do !iq
-	end do !jw
+                end do !iq
+        end do !jw
 end subroutine nonbond_qw_3atom_box
 
 !-----------------------------------------------------------------------
 
 subroutine nonbond_ww_spc
 ! local variables
-integer						:: iw,ip,i,j,i3,j3, ia
-integer						:: ipstart
-real(8)						:: rOX, rH1X, rH2X, r2
-real(8)						:: dxOX,  dyOX,  dzOX
-real(8)						:: dxH1X, dyH1X, dzH1X
-real(8)						:: dxH2X, dyH2X, dzH2X
-real(8)						:: Vel,V_a,V_b,dv
-real(8), save					:: A_OO, B_OO
-integer						::	iac_ow, iac_hw
+integer                                         :: iw,ip,i,j,i3,j3, ia
+integer                                         :: ipstart
+real(8)                                         :: rox, rh1x, rh2x, r2
+real(8)                                         :: dxox,  dyox,  dzox
+real(8)                                         :: dxh1x, dyh1x, dzh1x
+real(8)                                         :: dxh2x, dyh2x, dzh2x
+real(8)                                         :: vel,v_a,v_b,dv
+real(8), save                                   :: a_oo, b_oo
+integer                                         ::      iac_ow, iac_hw
 
 ! global variables used:
-!  iaclib, nat_solute, x, crg_ow, E, d, crg_hw
+!  iaclib, nat_solute, x, crg_ow, e, d, crg_hw
 
-if(A_OO == 0) then !initialize 'em!
+if(a_oo == 0) then !initialize 'em!
 iac_ow = iac(nat_solute + 1)
 iac_hw = iac(nat_solute + 2)
-A_OO = iaclib(iac_ow)%avdw(ljcod(iac_ow, iac_ow)) &
+a_oo = iaclib(iac_ow)%avdw(ljcod(iac_ow, iac_ow)) &
         *iaclib(iac_ow)%avdw(ljcod(iac_ow, iac_ow))
-B_OO = iaclib(iac_ow)%bvdw(ljcod(iac_ow, iac_ow)) &
+b_oo = iaclib(iac_ow)%bvdw(ljcod(iac_ow, iac_ow)) &
         *iaclib(iac_ow)%bvdw(ljcod(iac_ow, iac_ow))
 end if
 
@@ -11809,459 +11780,459 @@ ip = ipstart
 do while (nbww(ip) .ne. 0)
   ! consider the pair (nat_solute+3*(iw-1)) - nbww(ip)
 
-  ! --- O - (O,H1,H2) ---
-  i3 = (nat_solute+3*(iw-1))*3+1 !point to x for O in mol. iw
-  j3 = nbww(ip)*3-2 !point to O in interacting mol.
-  ! O - O (X=O)
-  dxOX = x((j3  ))-x((i3  ))
-  dyOX = x((j3+1))-x((i3+1))
-  dzOX = x((j3+2))-x((i3+2))
-  rOX = dxOX*dxOX+dyOX*dyOX+dzOX*dzOX
-  ! O-H1 (X=H1)
+  ! --- o - (o,h1,h2) ---
+  i3 = (nat_solute+3*(iw-1))*3+1 !point to x for o in mol. iw
+  j3 = nbww(ip)*3-2 !point to o in interacting mol.
+  ! o - o (x=o)
+  dxox = x((j3  ))-x((i3  ))
+  dyox = x((j3+1))-x((i3+1))
+  dzox = x((j3+2))-x((i3+2))
+  rox = dxox*dxox+dyox*dyox+dzox*dzox
+  ! o-h1 (x=h1)
   j3 = j3 + 3
 
-  dxH1X = x((j3  ))-x((i3  ))
-  dyH1X = x((j3+1))-x((i3+1))
-  dzH1X = x((j3+2))-x((i3+2))
-  rH1X = dxH1X*dxH1X+dyH1X*dyH1X+dzH1X*dzH1X
-  ! O-H2 (X=H2)
+  dxh1x = x((j3  ))-x((i3  ))
+  dyh1x = x((j3+1))-x((i3+1))
+  dzh1x = x((j3+2))-x((i3+2))
+  rh1x = dxh1x*dxh1x+dyh1x*dyh1x+dzh1x*dzh1x
+  ! o-h2 (x=h2)
   j3 = j3 + 3
-  dxH2X = x((j3  ))-x((i3  ))
-  dyH2X = x((j3+1))-x((i3+1))
-  dzH2X = x((j3+2))-x((i3+2))
-  rH2X = dxH2X*dxH2X+dyH2X*dyH2X+dzH2X*dzH2X
-  rOX=	sqrt(1._8/rOX  )
-  rH1X=	sqrt(1._8/rH1X )
-  rH2X=	sqrt(1._8/rH2X )
-  ! O-O 
-  ! LJ only for O-O
-  r2 = rOX * rOX
-  Vel = crg_ow*crg_ow*rOX
-  V_a  = A_OO*(r2*r2*r2)*(r2*r2*r2)
-  V_b  = B_OO*(r2*r2*r2)
-  E%ww%vdw = E%ww%vdw + V_a-V_B
-  E%ww%el = E%ww%el + Vel
-  dv = r2*( -Vel -12.*V_a +6.*V_b )
-  j3 = j3 - 6 !move pointer back to O in interacting mol.
-  d((i3  )) = d((i3  )) -(dv*dxOX)
-  d((j3  )) = d((j3  )) +(dv*dxOX)
-  d((i3+1)) = d((i3+1)) -(dv*dyOX)
-  d((j3+1)) = d((j3+1)) +(dv*dyOX)
-  d((i3+2)) = d((i3+2)) -(dv*dzOX)
-  d((j3+2)) = d((j3+2)) +(dv*dzOX)
-  ! O-H1 
-  r2 = rH1X * rH1X
-  Vel = crg_ow*crg_hw*rH1X
-  E%ww%el = E%ww%el + Vel
-  dv   = r2*( -Vel)
-  j3 = j3 +3 !point to H1 in j-molecule
-  d((i3  )) = d((i3  )) -(dv*dxH1X)
-  d((j3  )) = d((j3  )) +(dv*dxH1X)
-  d((i3+1)) = d((i3+1)) -(dv*dyH1X)
-  d((j3+1)) = d((j3+1)) +(dv*dyH1X)
-  d((i3+2)) = d((i3+2)) -(dv*dzH1X)
-  d((j3+2)) = d((j3+2)) +(dv*dzH1X)
-  ! O-H2
-  r2 = rH2X * rH2X
-  Vel = crg_ow*crg_hw*rH2X
-  E%ww%el = E%ww%el + Vel
-  dv   = r2*( -Vel)
-  j3 = j3 +3 !point to H2 in j-molecule
-  d((i3  )) = d((i3  )) -(dv*dxH2X)
-  d((j3  )) = d((j3  )) +(dv*dxH2X)
-  d((i3+1)) = d((i3+1)) -(dv*dyH2X)
-  d((j3+1)) = d((j3+1)) +(dv*dyH2X)
-  d((i3+2)) = d((i3+2)) -(dv*dzH2X)
-  d((j3+2)) = d((j3+2)) +(dv*dzH2X)
+  dxh2x = x((j3  ))-x((i3  ))
+  dyh2x = x((j3+1))-x((i3+1))
+  dzh2x = x((j3+2))-x((i3+2))
+  rh2x = dxh2x*dxh2x+dyh2x*dyh2x+dzh2x*dzh2x
+  rox=  sqrt(1._8/rox  )
+  rh1x= sqrt(1._8/rh1x )
+  rh2x= sqrt(1._8/rh2x )
+  ! o-o 
+  ! lj only for o-o
+  r2 = rox * rox
+  vel = crg_ow*crg_ow*rox
+  v_a  = a_oo*(r2*r2*r2)*(r2*r2*r2)
+  v_b  = b_oo*(r2*r2*r2)
+  e%ww%vdw = e%ww%vdw + v_a-v_b
+  e%ww%el = e%ww%el + vel
+  dv = r2*( -vel -12.*v_a +6.*v_b )
+  j3 = j3 - 6 !move pointer back to o in interacting mol.
+  d((i3  )) = d((i3  )) -(dv*dxox)
+  d((j3  )) = d((j3  )) +(dv*dxox)
+  d((i3+1)) = d((i3+1)) -(dv*dyox)
+  d((j3+1)) = d((j3+1)) +(dv*dyox)
+  d((i3+2)) = d((i3+2)) -(dv*dzox)
+  d((j3+2)) = d((j3+2)) +(dv*dzox)
+  ! o-h1 
+  r2 = rh1x * rh1x
+  vel = crg_ow*crg_hw*rh1x
+  e%ww%el = e%ww%el + vel
+  dv   = r2*( -vel)
+  j3 = j3 +3 !point to h1 in j-molecule
+  d((i3  )) = d((i3  )) -(dv*dxh1x)
+  d((j3  )) = d((j3  )) +(dv*dxh1x)
+  d((i3+1)) = d((i3+1)) -(dv*dyh1x)
+  d((j3+1)) = d((j3+1)) +(dv*dyh1x)
+  d((i3+2)) = d((i3+2)) -(dv*dzh1x)
+  d((j3+2)) = d((j3+2)) +(dv*dzh1x)
+  ! o-h2
+  r2 = rh2x * rh2x
+  vel = crg_ow*crg_hw*rh2x
+  e%ww%el = e%ww%el + vel
+  dv   = r2*( -vel)
+  j3 = j3 +3 !point to h2 in j-molecule
+  d((i3  )) = d((i3  )) -(dv*dxh2x)
+  d((j3  )) = d((j3  )) +(dv*dxh2x)
+  d((i3+1)) = d((i3+1)) -(dv*dyh2x)
+  d((j3+1)) = d((j3+1)) +(dv*dyh2x)
+  d((i3+2)) = d((i3+2)) -(dv*dzh2x)
+  d((j3+2)) = d((j3+2)) +(dv*dzh2x)
 
-  ! --- H1 - (O,H1,H2) ---
-  i3 = i3 + 3 !point to x for H1 in mol. iw
-  j3 = nbww(ip)*3-2 !point to O in j-mol.
-  ! H1 - O (X=O)
-  dxOX = x((j3  ))-x((i3  ))
-  dyOX = x((j3+1))-x((i3+1))
-  dzOX = x((j3+2))-x((i3+2))
-  rOX = dxOX*dxOX+dyOX*dyOX+dzOX*dzOX
-  ! H1-H1 (X=H1)
+  ! --- h1 - (o,h1,h2) ---
+  i3 = i3 + 3 !point to x for h1 in mol. iw
+  j3 = nbww(ip)*3-2 !point to o in j-mol.
+  ! h1 - o (x=o)
+  dxox = x((j3  ))-x((i3  ))
+  dyox = x((j3+1))-x((i3+1))
+  dzox = x((j3+2))-x((i3+2))
+  rox = dxox*dxox+dyox*dyox+dzox*dzox
+  ! h1-h1 (x=h1)
   j3 = j3 + 3
-  dxH1X = x((j3  ))-x((i3  ))
-  dyH1X = x((j3+1))-x((i3+1))
-  dzH1X = x((j3+2))-x((i3+2))
-  rH1X = dxH1X*dxH1X+dyH1X*dyH1X+dzH1X*dzH1X
-  ! H1-H2 (X=H2)
+  dxh1x = x((j3  ))-x((i3  ))
+  dyh1x = x((j3+1))-x((i3+1))
+  dzh1x = x((j3+2))-x((i3+2))
+  rh1x = dxh1x*dxh1x+dyh1x*dyh1x+dzh1x*dzh1x
+  ! h1-h2 (x=h2)
   j3 = j3 + 3
-  dxH2X = x((j3  ))-x((i3  ))
-  dyH2X = x((j3+1))-x((i3+1))
-  dzH2X = x((j3+2))-x((i3+2))
-  rH2X = dxH2X*dxH2X+dyH2X*dyH2X+dzH2X*dzH2X
-  rOX=	sqrt(1._8/rOX  )
-  rH1X=	sqrt(1._8/rH1X )
-  rH2X=	sqrt(1._8/rH2X )
-  ! H1-O 
-  r2 = rOX * rOX
-  Vel = crg_hw*crg_ow*rOX
-  E%ww%el = E%ww%el + Vel
-  dv   = r2*( -Vel)
-  j3 = j3 - 6 !move pointer back to O in j-mol.
-  d((i3  )) = d((i3  )) -(dv*dxOX)
-  d((j3  )) = d((j3  )) +(dv*dxOX)
-  d((i3+1)) = d((i3+1)) -(dv*dyOX)
-  d((j3+1)) = d((j3+1)) +(dv*dyOX)
-  d((i3+2)) = d((i3+2)) -(dv*dzOX)
-  d((j3+2)) = d((j3+2)) +(dv*dzOX)
-  ! H1-H1 
-  r2 = rH1X * rH1X
-  Vel = crg_hw*crg_hw*rH1X
-  E%ww%el = E%ww%el + Vel
-  dv   = r2*( -Vel)
-  j3 = j3 +3 !point to H1 in j-molecule
-  d((i3  )) = d((i3  )) -(dv*dxH1X)
-  d((j3  )) = d((j3  )) +(dv*dxH1X)
-  d((i3+1)) = d((i3+1)) -(dv*dyH1X)
-  d((j3+1)) = d((j3+1)) +(dv*dyH1X)
-  d((i3+2)) = d((i3+2)) -(dv*dzH1X)
-  d((j3+2)) = d((j3+2)) +(dv*dzH1X)
-  ! H1-H2
-  r2 = rH2X * rH2X
-  Vel = crg_hw*crg_hw*rH2X
-  E%ww%el = E%ww%el + Vel
-  dv   = r2*( -Vel)
-  j3 = j3 +3 !point to H2 in j-molecule
-  d((i3  )) = d((i3  )) -(dv*dxH2X)
-  d((j3  )) = d((j3  )) +(dv*dxH2X)
-  d((i3+1)) = d((i3+1)) -(dv*dyH2X)
-  d((j3+1)) = d((j3+1)) +(dv*dyH2X)
-  d((i3+2)) = d((i3+2)) -(dv*dzH2X)
-  d((j3+2)) = d((j3+2)) +(dv*dzH2X)
+  dxh2x = x((j3  ))-x((i3  ))
+  dyh2x = x((j3+1))-x((i3+1))
+  dzh2x = x((j3+2))-x((i3+2))
+  rh2x = dxh2x*dxh2x+dyh2x*dyh2x+dzh2x*dzh2x
+  rox=  sqrt(1._8/rox  )
+  rh1x= sqrt(1._8/rh1x )
+  rh2x= sqrt(1._8/rh2x )
+  ! h1-o 
+  r2 = rox * rox
+  vel = crg_hw*crg_ow*rox
+  e%ww%el = e%ww%el + vel
+  dv   = r2*( -vel)
+  j3 = j3 - 6 !move pointer back to o in j-mol.
+  d((i3  )) = d((i3  )) -(dv*dxox)
+  d((j3  )) = d((j3  )) +(dv*dxox)
+  d((i3+1)) = d((i3+1)) -(dv*dyox)
+  d((j3+1)) = d((j3+1)) +(dv*dyox)
+  d((i3+2)) = d((i3+2)) -(dv*dzox)
+  d((j3+2)) = d((j3+2)) +(dv*dzox)
+  ! h1-h1 
+  r2 = rh1x * rh1x
+  vel = crg_hw*crg_hw*rh1x
+  e%ww%el = e%ww%el + vel
+  dv   = r2*( -vel)
+  j3 = j3 +3 !point to h1 in j-molecule
+  d((i3  )) = d((i3  )) -(dv*dxh1x)
+  d((j3  )) = d((j3  )) +(dv*dxh1x)
+  d((i3+1)) = d((i3+1)) -(dv*dyh1x)
+  d((j3+1)) = d((j3+1)) +(dv*dyh1x)
+  d((i3+2)) = d((i3+2)) -(dv*dzh1x)
+  d((j3+2)) = d((j3+2)) +(dv*dzh1x)
+  ! h1-h2
+  r2 = rh2x * rh2x
+  vel = crg_hw*crg_hw*rh2x
+  e%ww%el = e%ww%el + vel
+  dv   = r2*( -vel)
+  j3 = j3 +3 !point to h2 in j-molecule
+  d((i3  )) = d((i3  )) -(dv*dxh2x)
+  d((j3  )) = d((j3  )) +(dv*dxh2x)
+  d((i3+1)) = d((i3+1)) -(dv*dyh2x)
+  d((j3+1)) = d((j3+1)) +(dv*dyh2x)
+  d((i3+2)) = d((i3+2)) -(dv*dzh2x)
+  d((j3+2)) = d((j3+2)) +(dv*dzh2x)
 
-  ! --- H2 - (O,H1,H2) ---
-  i3 = i3 + 3 !point to x for H2 in mol. iw
-  j3 = nbww(ip)*3-2 !point to O in j-mol.
-  ! H2 - O (X=O)
-  dxOX = x((j3  ))-x((i3  ))
-  dyOX = x((j3+1))-x((i3+1))
-  dzOX = x((j3+2))-x((i3+2))
-  rOX = dxOX*dxOX+dyOX*dyOX+dzOX*dzOX
-  ! H2-H1 (X=H1)
+  ! --- h2 - (o,h1,h2) ---
+  i3 = i3 + 3 !point to x for h2 in mol. iw
+  j3 = nbww(ip)*3-2 !point to o in j-mol.
+  ! h2 - o (x=o)
+  dxox = x((j3  ))-x((i3  ))
+  dyox = x((j3+1))-x((i3+1))
+  dzox = x((j3+2))-x((i3+2))
+  rox = dxox*dxox+dyox*dyox+dzox*dzox
+  ! h2-h1 (x=h1)
   j3 = j3 + 3
-  dxH1X = x((j3  ))-x((i3  ))
-  dyH1X = x((j3+1))-x((i3+1))
-  dzH1X = x((j3+2))-x((i3+2))
-  rH1X = dxH1X*dxH1X+dyH1X*dyH1X+dzH1X*dzH1X
-  ! H2-H2 (X=H2)
+  dxh1x = x((j3  ))-x((i3  ))
+  dyh1x = x((j3+1))-x((i3+1))
+  dzh1x = x((j3+2))-x((i3+2))
+  rh1x = dxh1x*dxh1x+dyh1x*dyh1x+dzh1x*dzh1x
+  ! h2-h2 (x=h2)
   j3 = j3 + 3
-  dxH2X = x((j3  ))-x((i3  ))
-  dyH2X = x((j3+1))-x((i3+1))
-  dzH2X = x((j3+2))-x((i3+2))
-  rH2X = dxH2X*dxH2X+dyH2X*dyH2X+dzH2X*dzH2X
-  rOX=	sqrt(1._8/rOX  )
-  rH1X=	sqrt(1._8/rH1X )
-  rH2X=	sqrt(1._8/rH2X )
-  ! H2-O 
-  r2 = rOX * rOX
-  Vel = crg_hw*crg_ow*rOX
-  E%ww%el = E%ww%el + Vel
-  dv   = r2*( -Vel)
-  j3 = j3 - 6 !move pointer back to O in j-mol.
-  d((i3  )) = d((i3  )) -(dv*dxOX)
-  d((j3  )) = d((j3  )) +(dv*dxOX)
-  d((i3+1)) = d((i3+1)) -(dv*dyOX)
-  d((j3+1)) = d((j3+1)) +(dv*dyOX)
-  d((i3+2)) = d((i3+2)) -(dv*dzOX)
-  d((j3+2)) = d((j3+2)) +(dv*dzOX)
-  ! H2-H1 
-  r2 = rH1X * rH1X
-  Vel = crg_hw*crg_hw*rH1X
-  E%ww%el = E%ww%el + Vel
-  dv   = r2*( -Vel)
-  j3 = j3 +3 !point to H1 in j-molecule
-  d((i3  )) = d((i3  )) -(dv*dxH1X)
-  d((j3  )) = d((j3  )) +(dv*dxH1X)
-  d((i3+1)) = d((i3+1)) -(dv*dyH1X)
-  d((j3+1)) = d((j3+1)) +(dv*dyH1X)
-  d((i3+2)) = d((i3+2)) -(dv*dzH1X)
-  d((j3+2)) = d((j3+2)) +(dv*dzH1X)
-  ! H2-H2
-  r2 = rH2X * rH2X
-  Vel = crg_hw*crg_hw*rH2X
-  E%ww%el = E%ww%el + Vel
-  dv   = r2*( -Vel)
-  j3 = j3 +3 !point to H2 in j-molecule
-  d((i3  )) = d((i3  )) -(dv*dxH2X)
-  d((j3  )) = d((j3  )) +(dv*dxH2X)
-  d((i3+1)) = d((i3+1)) -(dv*dyH2X)
-  d((j3+1)) = d((j3+1)) +(dv*dyH2X)
-  d((i3+2)) = d((i3+2)) -(dv*dzH2X)
-  d((j3+2)) = d((j3+2)) +(dv*dzH2X)
+  dxh2x = x((j3  ))-x((i3  ))
+  dyh2x = x((j3+1))-x((i3+1))
+  dzh2x = x((j3+2))-x((i3+2))
+  rh2x = dxh2x*dxh2x+dyh2x*dyh2x+dzh2x*dzh2x
+  rox=  sqrt(1._8/rox  )
+  rh1x= sqrt(1._8/rh1x )
+  rh2x= sqrt(1._8/rh2x )
+  ! h2-o 
+  r2 = rox * rox
+  vel = crg_hw*crg_ow*rox
+  e%ww%el = e%ww%el + vel
+  dv   = r2*( -vel)
+  j3 = j3 - 6 !move pointer back to o in j-mol.
+  d((i3  )) = d((i3  )) -(dv*dxox)
+  d((j3  )) = d((j3  )) +(dv*dxox)
+  d((i3+1)) = d((i3+1)) -(dv*dyox)
+  d((j3+1)) = d((j3+1)) +(dv*dyox)
+  d((i3+2)) = d((i3+2)) -(dv*dzox)
+  d((j3+2)) = d((j3+2)) +(dv*dzox)
+  ! h2-h1 
+  r2 = rh1x * rh1x
+  vel = crg_hw*crg_hw*rh1x
+  e%ww%el = e%ww%el + vel
+  dv   = r2*( -vel)
+  j3 = j3 +3 !point to h1 in j-molecule
+  d((i3  )) = d((i3  )) -(dv*dxh1x)
+  d((j3  )) = d((j3  )) +(dv*dxh1x)
+  d((i3+1)) = d((i3+1)) -(dv*dyh1x)
+  d((j3+1)) = d((j3+1)) +(dv*dyh1x)
+  d((i3+2)) = d((i3+2)) -(dv*dzh1x)
+  d((j3+2)) = d((j3+2)) +(dv*dzh1x)
+  ! h2-h2
+  r2 = rh2x * rh2x
+  vel = crg_hw*crg_hw*rh2x
+  e%ww%el = e%ww%el + vel
+  dv   = r2*( -vel)
+  j3 = j3 +3 !point to h2 in j-molecule
+  d((i3  )) = d((i3  )) -(dv*dxh2x)
+  d((j3  )) = d((j3  )) +(dv*dxh2x)
+  d((i3+1)) = d((i3+1)) -(dv*dyh2x)
+  d((j3+1)) = d((j3+1)) +(dv*dyh2x)
+  d((i3+2)) = d((i3+2)) -(dv*dzh2x)
+  d((j3+2)) = d((j3+2)) +(dv*dzh2x)
 
   ip = ip + 1
 end do ! while ip
 
 ! skip the gap
-ipstart = ip + 1			
+ipstart = ip + 1                        
 end do ! iw
 
 end subroutine nonbond_ww_spc
 
 !-----------------------------------------------------------------------
-!******PWadded 2001-10-23
+!******pwadded 2001-10-23
 subroutine nonbond_ww_spc_box
   ! local variables
-  integer						:: iw,ip,i,j,i3,j3, ia
-  integer						:: ipstart
-  real(8)						:: rOX, rH1X, rH2X, r2
-  real(8)						:: dxOX,  dyOX,  dzOX
-  real(8)						:: dxH1X, dyH1X, dzH1X
-  real(8)						:: dxH2X, dyH2X, dzH2X
-  real(8)						:: Vel,V_a,V_b,dv
-  real(8), save					:: A_OO, B_OO
-  integer						::	iac_ow, iac_hw
-  real(8)						:: boxshiftx, boxshifty, boxshiftz
+  integer                                               :: iw,ip,i,j,i3,j3, ia
+  integer                                               :: ipstart
+  real(8)                                               :: rox, rh1x, rh2x, r2
+  real(8)                                               :: dxox,  dyox,  dzox
+  real(8)                                               :: dxh1x, dyh1x, dzh1x
+  real(8)                                               :: dxh2x, dyh2x, dzh2x
+  real(8)                                               :: vel,v_a,v_b,dv
+  real(8), save                                 :: a_oo, b_oo
+  integer                                               ::      iac_ow, iac_hw
+  real(8)                                               :: boxshiftx, boxshifty, boxshiftz
 
   ! global variables used:
-  !  iaclib, nat_solute, x, crg_ow, E, d, crg_hw
+  !  iaclib, nat_solute, x, crg_ow, e, d, crg_hw
 
-  if(A_OO == 0) then !initialize 'em!
-	iac_ow = iac(nat_solute + 1)
-	iac_hw = iac(nat_solute + 2)
-	A_OO = iaclib(iac_ow)%avdw(ljcod(iac_ow, iac_ow)) &
-		*iaclib(iac_ow)%avdw(ljcod(iac_ow, iac_ow))
-	B_OO = iaclib(iac_ow)%bvdw(ljcod(iac_ow, iac_ow)) &
-		*iaclib(iac_ow)%bvdw(ljcod(iac_ow, iac_ow))
+  if(a_oo == 0) then !initialize 'em!
+        iac_ow = iac(nat_solute + 1)
+        iac_hw = iac(nat_solute + 2)
+        a_oo = iaclib(iac_ow)%avdw(ljcod(iac_ow, iac_ow)) &
+                *iaclib(iac_ow)%avdw(ljcod(iac_ow, iac_ow))
+        b_oo = iaclib(iac_ow)%bvdw(ljcod(iac_ow, iac_ow)) &
+                *iaclib(iac_ow)%bvdw(ljcod(iac_ow, iac_ow))
   end if
 
   ipstart = 1
 
   do iw = calculation_assignment%ww%start, calculation_assignment%ww%end
-	ip = ipstart
+        ip = ipstart
 
-	do while (nbww(ip) .ne. 0)
-	  ! consider the pair (nat_solute+3*(iw-1)) - nbww(ip)
+        do while (nbww(ip) .ne. 0)
+          ! consider the pair (nat_solute+3*(iw-1)) - nbww(ip)
 
-	  ! --- O - (O,H1,H2) ---
-	  i3 = (nat_solute+3*(iw-1))*3+1 !point to x for O in mol. iw
-	  j3 = nbww(ip)*3-2 !point to O in interacting mol.
-	  ! O - O (X=O)
-	  dxOX = x((j3  ))-x((i3  ))
-	  dyOX = x((j3+1))-x((i3+1))
-	  dzOX = x((j3+2))-x((i3+2))
-	  !the periodical shift
-	  boxshiftx = boxlength(1)*nint( dxOX*inv_boxl(1) )
-	  boxshifty = boxlength(2)*nint( dyOX*inv_boxl(2) )
-	  boxshiftz = boxlength(3)*nint( dzOX*inv_boxl(3) )
-	  ! O-H1 (X=H1)
-	  j3 = j3 + 3
-	  dxH1X = x((j3  ))-x((i3  ))
-	  dyH1X = x((j3+1))-x((i3+1))
-	  dzH1X = x((j3+2))-x((i3+2))
-	  ! O-H2 (X=H2)
-	  j3 = j3 + 3
-	  dxH2X = x((j3  ))-x((i3  ))
-	  dyH2X = x((j3+1))-x((i3+1))
-	  dzH2X = x((j3+2))-x((i3+2))
-	  dxOX = dxOX - boxshiftx
-	  dyOX = dyOX - boxshifty
-	  dzOX = dzOX - boxshiftz
-	  dxH1X = dxH1X - boxshiftx
-	  dyH1X = dyH1X - boxshifty
-	  dzH1X = dzH1X - boxshiftz
-	  dxH2X = dxH2X - boxshiftx
-	  dyH2X = dyH2X - boxshifty
-	  dzH2X = dzH2X - boxshiftz
+          ! --- o - (o,h1,h2) ---
+          i3 = (nat_solute+3*(iw-1))*3+1 !point to x for o in mol. iw
+          j3 = nbww(ip)*3-2 !point to o in interacting mol.
+          ! o - o (x=o)
+          dxox = x((j3  ))-x((i3  ))
+          dyox = x((j3+1))-x((i3+1))
+          dzox = x((j3+2))-x((i3+2))
+          !the periodical shift
+          boxshiftx = boxlength(1)*nint( dxox*inv_boxl(1) )
+          boxshifty = boxlength(2)*nint( dyox*inv_boxl(2) )
+          boxshiftz = boxlength(3)*nint( dzox*inv_boxl(3) )
+          ! o-h1 (x=h1)
+          j3 = j3 + 3
+          dxh1x = x((j3  ))-x((i3  ))
+          dyh1x = x((j3+1))-x((i3+1))
+          dzh1x = x((j3+2))-x((i3+2))
+          ! o-h2 (x=h2)
+          j3 = j3 + 3
+          dxh2x = x((j3  ))-x((i3  ))
+          dyh2x = x((j3+1))-x((i3+1))
+          dzh2x = x((j3+2))-x((i3+2))
+          dxox = dxox - boxshiftx
+          dyox = dyox - boxshifty
+          dzox = dzox - boxshiftz
+          dxh1x = dxh1x - boxshiftx
+          dyh1x = dyh1x - boxshifty
+          dzh1x = dzh1x - boxshiftz
+          dxh2x = dxh2x - boxshiftx
+          dyh2x = dyh2x - boxshifty
+          dzh2x = dzh2x - boxshiftz
 
-	  rOX = dxOX*dxOX + dyOX*dyOX + dzOX*dzOX
-	  rH1X = dxH1X*dxH1X + dyH1X*dyH1X + dzH1X*dzH1X
-	  rH2X = dxH2X*dxH2X + dyH2X*dyH2X + dzH2X*dzH2X
+          rox = dxox*dxox + dyox*dyox + dzox*dzox
+          rh1x = dxh1x*dxh1x + dyh1x*dyh1x + dzh1x*dzh1x
+          rh2x = dxh2x*dxh2x + dyh2x*dyh2x + dzh2x*dzh2x
 
-	  rOX=	sqrt(1._8/rOX  )
-	  rH1X=	sqrt(1._8/rH1X )
-	  rH2X=	sqrt(1._8/rH2X )
-	  ! O-O 
-	  ! LJ only for O-O
-	  r2 = rOX * rOX
-	  Vel = crg_ow*crg_ow*rOX
-	  V_a  = A_OO*(r2*r2*r2)*(r2*r2*r2)
-	  V_b  = B_OO*(r2*r2*r2)
-	  E%ww%vdw = E%ww%vdw + V_a-V_B
-	  E%ww%el = E%ww%el + Vel
-	  dv = r2*( -Vel -12.*V_a +6.*V_b )
-	  j3 = j3 - 6 !move pointer back to O in interacting mol.
-	  d((i3  )) = d((i3  )) -(dv*dxOX)
-	  d((j3  )) = d((j3  )) +(dv*dxOX)
-	  d((i3+1)) = d((i3+1)) -(dv*dyOX)
-	  d((j3+1)) = d((j3+1)) +(dv*dyOX)
-	  d((i3+2)) = d((i3+2)) -(dv*dzOX)
-	  d((j3+2)) = d((j3+2)) +(dv*dzOX)
-	  ! O-H1 
-	  r2 = rH1X * rH1X
-	  Vel = crg_ow*crg_hw*rH1X
-	  E%ww%el = E%ww%el + Vel
-	  dv   = r2*( -Vel)
-	  j3 = j3 +3 !point to H1 in j-molecule
-	  d((i3  )) = d((i3  )) -(dv*dxH1X)
-	  d((j3  )) = d((j3  )) +(dv*dxH1X)
-	  d((i3+1)) = d((i3+1)) -(dv*dyH1X)
-	  d((j3+1)) = d((j3+1)) +(dv*dyH1X)
-	  d((i3+2)) = d((i3+2)) -(dv*dzH1X)
-	  d((j3+2)) = d((j3+2)) +(dv*dzH1X)
-	  ! O-H2
-	  r2 = rH2X * rH2X
-	  Vel = crg_ow*crg_hw*rH2X
-	  E%ww%el = E%ww%el + Vel
-	  dv   = r2*( -Vel)
-	  j3 = j3 +3 !point to H2 in j-molecule
-	  d((i3  )) = d((i3  )) -(dv*dxH2X)
-	  d((j3  )) = d((j3  )) +(dv*dxH2X)
-	  d((i3+1)) = d((i3+1)) -(dv*dyH2X)
-	  d((j3+1)) = d((j3+1)) +(dv*dyH2X)
-	  d((i3+2)) = d((i3+2)) -(dv*dzH2X)
-	  d((j3+2)) = d((j3+2)) +(dv*dzH2X)
-			
-	  ! --- H1 - (O,H1,H2) ---
-	  i3 = i3 + 3 !point to x for H1 in mol. iw
-	  j3 = nbww(ip)*3-2 !point to O in j-mol.
-	  ! H1 - O (X=O)
-	  dxOX = x((j3  ))-x((i3  ))
-	  dyOX = x((j3+1))-x((i3+1))
-	  dzOX = x((j3+2))-x((i3+2))
-	  ! H1-H1 (X=H1)
-	  j3 = j3 + 3
-	  dxH1X = x((j3  ))-x((i3  ))
-	  dyH1X = x((j3+1))-x((i3+1))
-	  dzH1X = x((j3+2))-x((i3+2))
-	  ! H1-H2 (X=H2)
-	  j3 = j3 + 3
-	  dxH2X = x((j3  ))-x((i3  ))
-	  dyH2X = x((j3+1))-x((i3+1))
-	  dzH2X = x((j3+2))-x((i3+2))
-	  dxOX = dxOX - boxshiftx
-	  dyOX = dyOX - boxshifty
-	  dzOX = dzOX - boxshiftz
-	  dxH1X = dxH1X - boxshiftx
-	  dyH1X = dyH1X - boxshifty
-	  dzH1X = dzH1X - boxshiftz
-	  dxH2X = dxH2X - boxshiftx
-	  dyH2X = dyH2X - boxshifty
-	  dzH2X = dzH2X - boxshiftz
+          rox=  sqrt(1._8/rox  )
+          rh1x= sqrt(1._8/rh1x )
+          rh2x= sqrt(1._8/rh2x )
+          ! o-o 
+          ! lj only for o-o
+          r2 = rox * rox
+          vel = crg_ow*crg_ow*rox
+          v_a  = a_oo*(r2*r2*r2)*(r2*r2*r2)
+          v_b  = b_oo*(r2*r2*r2)
+          e%ww%vdw = e%ww%vdw + v_a-v_b
+          e%ww%el = e%ww%el + vel
+          dv = r2*( -vel -12.*v_a +6.*v_b )
+          j3 = j3 - 6 !move pointer back to o in interacting mol.
+          d((i3  )) = d((i3  )) -(dv*dxox)
+          d((j3  )) = d((j3  )) +(dv*dxox)
+          d((i3+1)) = d((i3+1)) -(dv*dyox)
+          d((j3+1)) = d((j3+1)) +(dv*dyox)
+          d((i3+2)) = d((i3+2)) -(dv*dzox)
+          d((j3+2)) = d((j3+2)) +(dv*dzox)
+          ! o-h1 
+          r2 = rh1x * rh1x
+          vel = crg_ow*crg_hw*rh1x
+          e%ww%el = e%ww%el + vel
+          dv   = r2*( -vel)
+          j3 = j3 +3 !point to h1 in j-molecule
+          d((i3  )) = d((i3  )) -(dv*dxh1x)
+          d((j3  )) = d((j3  )) +(dv*dxh1x)
+          d((i3+1)) = d((i3+1)) -(dv*dyh1x)
+          d((j3+1)) = d((j3+1)) +(dv*dyh1x)
+          d((i3+2)) = d((i3+2)) -(dv*dzh1x)
+          d((j3+2)) = d((j3+2)) +(dv*dzh1x)
+          ! o-h2
+          r2 = rh2x * rh2x
+          vel = crg_ow*crg_hw*rh2x
+          e%ww%el = e%ww%el + vel
+          dv   = r2*( -vel)
+          j3 = j3 +3 !point to h2 in j-molecule
+          d((i3  )) = d((i3  )) -(dv*dxh2x)
+          d((j3  )) = d((j3  )) +(dv*dxh2x)
+          d((i3+1)) = d((i3+1)) -(dv*dyh2x)
+          d((j3+1)) = d((j3+1)) +(dv*dyh2x)
+          d((i3+2)) = d((i3+2)) -(dv*dzh2x)
+          d((j3+2)) = d((j3+2)) +(dv*dzh2x)
+                        
+          ! --- h1 - (o,h1,h2) ---
+          i3 = i3 + 3 !point to x for h1 in mol. iw
+          j3 = nbww(ip)*3-2 !point to o in j-mol.
+          ! h1 - o (x=o)
+          dxox = x((j3  ))-x((i3  ))
+          dyox = x((j3+1))-x((i3+1))
+          dzox = x((j3+2))-x((i3+2))
+          ! h1-h1 (x=h1)
+          j3 = j3 + 3
+          dxh1x = x((j3  ))-x((i3  ))
+          dyh1x = x((j3+1))-x((i3+1))
+          dzh1x = x((j3+2))-x((i3+2))
+          ! h1-h2 (x=h2)
+          j3 = j3 + 3
+          dxh2x = x((j3  ))-x((i3  ))
+          dyh2x = x((j3+1))-x((i3+1))
+          dzh2x = x((j3+2))-x((i3+2))
+          dxox = dxox - boxshiftx
+          dyox = dyox - boxshifty
+          dzox = dzox - boxshiftz
+          dxh1x = dxh1x - boxshiftx
+          dyh1x = dyh1x - boxshifty
+          dzh1x = dzh1x - boxshiftz
+          dxh2x = dxh2x - boxshiftx
+          dyh2x = dyh2x - boxshifty
+          dzh2x = dzh2x - boxshiftz
 
-	  rOX = dxOX*dxOX + dyOX*dyOX + dzOX*dzOX
-	  rH1X = dxH1X*dxH1X + dyH1X*dyH1X + dzH1X*dzH1X
-	  rH2X = dxH2X*dxH2X + dyH2X*dyH2X + dzH2X*dzH2X
-	  rOX=	sqrt(1._8/rOX  )
-	  rH1X=	sqrt(1._8/rH1X )
-	  rH2X=	sqrt(1._8/rH2X )
-	  ! H1-O 
-	  r2 = rOX * rOX
-	  Vel = crg_hw*crg_ow*rOX
-	  E%ww%el = E%ww%el + Vel
-	  dv   = r2*( -Vel)
-	  j3 = j3 - 6 !move pointer back to O in j-mol.
-	  d((i3  )) = d((i3  )) -(dv*dxOX)
-	  d((j3  )) = d((j3  )) +(dv*dxOX)
-	  d((i3+1)) = d((i3+1)) -(dv*dyOX)
-	  d((j3+1)) = d((j3+1)) +(dv*dyOX)
-	  d((i3+2)) = d((i3+2)) -(dv*dzOX)
-	  d((j3+2)) = d((j3+2)) +(dv*dzOX)
-  ! H1-H1 
-	  r2 = rH1X * rH1X
-	  Vel = crg_hw*crg_hw*rH1X
-	  E%ww%el = E%ww%el + Vel
-	  dv   = r2*( -Vel)
-	  j3 = j3 +3 !point to H1 in j-molecule
-	  d((i3  )) = d((i3  )) -(dv*dxH1X)
-	  d((j3  )) = d((j3  )) +(dv*dxH1X)
-	  d((i3+1)) = d((i3+1)) -(dv*dyH1X)
-	  d((j3+1)) = d((j3+1)) +(dv*dyH1X)
-	  d((i3+2)) = d((i3+2)) -(dv*dzH1X)
-	  d((j3+2)) = d((j3+2)) +(dv*dzH1X)
-	  ! H1-H2
-	  r2 = rH2X * rH2X
-	  Vel = crg_hw*crg_hw*rH2X
-	  E%ww%el = E%ww%el + Vel
-	  dv   = r2*( -Vel)
-	  j3 = j3 +3 !point to H2 in j-molecule
-	  d((i3  )) = d((i3  )) -(dv*dxH2X)
-	  d((j3  )) = d((j3  )) +(dv*dxH2X)
-	  d((i3+1)) = d((i3+1)) -(dv*dyH2X)
-	  d((j3+1)) = d((j3+1)) +(dv*dyH2X)
-	  d((i3+2)) = d((i3+2)) -(dv*dzH2X)
-	  d((j3+2)) = d((j3+2)) +(dv*dzH2X)
-			
-	  ! --- H2 - (O,H1,H2) ---
-	  i3 = i3 + 3 !point to x for H2 in mol. iw
-	  j3 = nbww(ip)*3-2 !point to O in j-mol.
-	  ! H2 - O (X=O)
-	  dxOX = x((j3  ))-x((i3  ))
-	  dyOX = x((j3+1))-x((i3+1))
-	  dzOX = x((j3+2))-x((i3+2))
-	  ! H2-H1 (X=H1)
-	  j3 = j3 + 3
-	  dxH1X = x((j3  ))-x((i3  ))
-	  dyH1X = x((j3+1))-x((i3+1))
-	  dzH1X = x((j3+2))-x((i3+2))
-	  ! H2-H2 (X=H2)
-	  j3 = j3 + 3
-	  dxH2X = x((j3  ))-x((i3  ))
-	  dyH2X = x((j3+1))-x((i3+1))
-	  dzH2X = x((j3+2))-x((i3+2))
-	  dxOX = dxOX - boxshiftx
-	  dyOX = dyOX - boxshifty
-	  dzOX = dzOX - boxshiftz
-	  dxH1X = dxH1X - boxshiftx
-	  dyH1X = dyH1X - boxshifty
-	  dzH1X = dzH1X - boxshiftz
-	  dxH2X = dxH2X - boxshiftx
-	  dyH2X = dyH2X - boxshifty
-	  dzH2X = dzH2X - boxshiftz
+          rox = dxox*dxox + dyox*dyox + dzox*dzox
+          rh1x = dxh1x*dxh1x + dyh1x*dyh1x + dzh1x*dzh1x
+          rh2x = dxh2x*dxh2x + dyh2x*dyh2x + dzh2x*dzh2x
+          rox=  sqrt(1._8/rox  )
+          rh1x= sqrt(1._8/rh1x )
+          rh2x= sqrt(1._8/rh2x )
+          ! h1-o 
+          r2 = rox * rox
+          vel = crg_hw*crg_ow*rox
+          e%ww%el = e%ww%el + vel
+          dv   = r2*( -vel)
+          j3 = j3 - 6 !move pointer back to o in j-mol.
+          d((i3  )) = d((i3  )) -(dv*dxox)
+          d((j3  )) = d((j3  )) +(dv*dxox)
+          d((i3+1)) = d((i3+1)) -(dv*dyox)
+          d((j3+1)) = d((j3+1)) +(dv*dyox)
+          d((i3+2)) = d((i3+2)) -(dv*dzox)
+          d((j3+2)) = d((j3+2)) +(dv*dzox)
+  ! h1-h1 
+          r2 = rh1x * rh1x
+          vel = crg_hw*crg_hw*rh1x
+          e%ww%el = e%ww%el + vel
+          dv   = r2*( -vel)
+          j3 = j3 +3 !point to h1 in j-molecule
+          d((i3  )) = d((i3  )) -(dv*dxh1x)
+          d((j3  )) = d((j3  )) +(dv*dxh1x)
+          d((i3+1)) = d((i3+1)) -(dv*dyh1x)
+          d((j3+1)) = d((j3+1)) +(dv*dyh1x)
+          d((i3+2)) = d((i3+2)) -(dv*dzh1x)
+          d((j3+2)) = d((j3+2)) +(dv*dzh1x)
+          ! h1-h2
+          r2 = rh2x * rh2x
+          vel = crg_hw*crg_hw*rh2x
+          e%ww%el = e%ww%el + vel
+          dv   = r2*( -vel)
+          j3 = j3 +3 !point to h2 in j-molecule
+          d((i3  )) = d((i3  )) -(dv*dxh2x)
+          d((j3  )) = d((j3  )) +(dv*dxh2x)
+          d((i3+1)) = d((i3+1)) -(dv*dyh2x)
+          d((j3+1)) = d((j3+1)) +(dv*dyh2x)
+          d((i3+2)) = d((i3+2)) -(dv*dzh2x)
+          d((j3+2)) = d((j3+2)) +(dv*dzh2x)
+                        
+          ! --- h2 - (o,h1,h2) ---
+          i3 = i3 + 3 !point to x for h2 in mol. iw
+          j3 = nbww(ip)*3-2 !point to o in j-mol.
+          ! h2 - o (x=o)
+          dxox = x((j3  ))-x((i3  ))
+          dyox = x((j3+1))-x((i3+1))
+          dzox = x((j3+2))-x((i3+2))
+          ! h2-h1 (x=h1)
+          j3 = j3 + 3
+          dxh1x = x((j3  ))-x((i3  ))
+          dyh1x = x((j3+1))-x((i3+1))
+          dzh1x = x((j3+2))-x((i3+2))
+          ! h2-h2 (x=h2)
+          j3 = j3 + 3
+          dxh2x = x((j3  ))-x((i3  ))
+          dyh2x = x((j3+1))-x((i3+1))
+          dzh2x = x((j3+2))-x((i3+2))
+          dxox = dxox - boxshiftx
+          dyox = dyox - boxshifty
+          dzox = dzox - boxshiftz
+          dxh1x = dxh1x - boxshiftx
+          dyh1x = dyh1x - boxshifty
+          dzh1x = dzh1x - boxshiftz
+          dxh2x = dxh2x - boxshiftx
+          dyh2x = dyh2x - boxshifty
+          dzh2x = dzh2x - boxshiftz
 
-	  rOX = dxOX*dxOX + dyOX*dyOX + dzOX*dzOX
-	  rH1X = dxH1X*dxH1X + dyH1X*dyH1X + dzH1X*dzH1X
-	  rH2X = dxH2X*dxH2X + dyH2X*dyH2X + dzH2X*dzH2X
-	  rOX=	sqrt(1._8/rOX  )
-	  rH1X=	sqrt(1._8/rH1X )
-	  rH2X=	sqrt(1._8/rH2X )
-	  ! H2-O 
-	  r2 = rOX * rOX
-	  Vel = crg_hw*crg_ow*rOX
-	  E%ww%el = E%ww%el + Vel
-	  dv   = r2*( -Vel)
-	  j3 = j3 - 6 !move pointer back to O in j-mol.
-	  d((i3  )) = d((i3  )) -(dv*dxOX)
-	  d((j3  )) = d((j3  )) +(dv*dxOX)
-	  d((i3+1)) = d((i3+1)) -(dv*dyOX)
-	  d((j3+1)) = d((j3+1)) +(dv*dyOX)
-	  d((i3+2)) = d((i3+2)) -(dv*dzOX)
-	  d((j3+2)) = d((j3+2)) +(dv*dzOX)
-	  ! H2-H1 
-	  r2 = rH1X * rH1X
-	  Vel = crg_hw*crg_hw*rH1X
-	  E%ww%el = E%ww%el + Vel
-	  dv   = r2*( -Vel)
-	  j3 = j3 +3 !point to H1 in j-molecule
-	  d((i3  )) = d((i3  )) -(dv*dxH1X)
-	  d((j3  )) = d((j3  )) +(dv*dxH1X)
-	  d((i3+1)) = d((i3+1)) -(dv*dyH1X)
-	  d((j3+1)) = d((j3+1)) +(dv*dyH1X)
-	  d((i3+2)) = d((i3+2)) -(dv*dzH1X)
-	  d((j3+2)) = d((j3+2)) +(dv*dzH1X)
-	  ! H2-H2
-	  r2 = rH2X * rH2X
-	  Vel = crg_hw*crg_hw*rH2X
-	  E%ww%el = E%ww%el + Vel
-	  dv   = r2*( -Vel)
-	  j3 = j3 +3 !point to H2 in j-molecule
-	  d((i3  )) = d((i3  )) -(dv*dxH2X)
-	  d((j3  )) = d((j3  )) +(dv*dxH2X)
-	  d((i3+1)) = d((i3+1)) -(dv*dyH2X)
-	  d((j3+1)) = d((j3+1)) +(dv*dyH2X)
-	  d((i3+2)) = d((i3+2)) -(dv*dzH2X)
-	  d((j3+2)) = d((j3+2)) +(dv*dzH2X)
-			
-	  ip = ip + 1
-	end do ! while ip
+          rox = dxox*dxox + dyox*dyox + dzox*dzox
+          rh1x = dxh1x*dxh1x + dyh1x*dyh1x + dzh1x*dzh1x
+          rh2x = dxh2x*dxh2x + dyh2x*dyh2x + dzh2x*dzh2x
+          rox=  sqrt(1._8/rox  )
+          rh1x= sqrt(1._8/rh1x )
+          rh2x= sqrt(1._8/rh2x )
+          ! h2-o 
+          r2 = rox * rox
+          vel = crg_hw*crg_ow*rox
+          e%ww%el = e%ww%el + vel
+          dv   = r2*( -vel)
+          j3 = j3 - 6 !move pointer back to o in j-mol.
+          d((i3  )) = d((i3  )) -(dv*dxox)
+          d((j3  )) = d((j3  )) +(dv*dxox)
+          d((i3+1)) = d((i3+1)) -(dv*dyox)
+          d((j3+1)) = d((j3+1)) +(dv*dyox)
+          d((i3+2)) = d((i3+2)) -(dv*dzox)
+          d((j3+2)) = d((j3+2)) +(dv*dzox)
+          ! h2-h1 
+          r2 = rh1x * rh1x
+          vel = crg_hw*crg_hw*rh1x
+          e%ww%el = e%ww%el + vel
+          dv   = r2*( -vel)
+          j3 = j3 +3 !point to h1 in j-molecule
+          d((i3  )) = d((i3  )) -(dv*dxh1x)
+          d((j3  )) = d((j3  )) +(dv*dxh1x)
+          d((i3+1)) = d((i3+1)) -(dv*dyh1x)
+          d((j3+1)) = d((j3+1)) +(dv*dyh1x)
+          d((i3+2)) = d((i3+2)) -(dv*dzh1x)
+          d((j3+2)) = d((j3+2)) +(dv*dzh1x)
+          ! h2-h2
+          r2 = rh2x * rh2x
+          vel = crg_hw*crg_hw*rh2x
+          e%ww%el = e%ww%el + vel
+          dv   = r2*( -vel)
+          j3 = j3 +3 !point to h2 in j-molecule
+          d((i3  )) = d((i3  )) -(dv*dxh2x)
+          d((j3  )) = d((j3  )) +(dv*dxh2x)
+          d((i3+1)) = d((i3+1)) -(dv*dyh2x)
+          d((j3+1)) = d((j3+1)) +(dv*dyh2x)
+          d((i3+2)) = d((i3+2)) -(dv*dzh2x)
+          d((j3+2)) = d((j3+2)) +(dv*dzh2x)
+                        
+          ip = ip + 1
+        end do ! while ip
 
-	! skip the gap
-	ipstart = ip + 1			
+        ! skip the gap
+        ipstart = ip + 1                        
   end do ! iw
 
 end subroutine nonbond_ww_spc_box
@@ -12270,22 +12241,22 @@ end subroutine nonbond_ww_spc_box
 
 subroutine nonbond_3atomsolvent
 ! local variables
-integer						:: iw,ip,i,j,i3,j3, ia
-integer						:: ipstart
-real(8)						::	r1X, r2X, r3X, r2
-real(8)						::	dx1X,  dy1X,  dz1X
-real(8)						::	dx2X, dy2X, dz2X
-real(8)						::	dx3X, dy3X, dz3X
-real(8)						::	Vel,V_a,V_b,dv
-real(8), save					::	A_11, B_11, A_12, B_12, A_13, B_13
-real(8), save					::	A_22, B_22, A_23, B_23, A_33, B_33
-real, save					::	crg1, crg2, crg3
-integer						::	iac1, iac2, iac3
+integer                                         :: iw,ip,i,j,i3,j3, ia
+integer                                         :: ipstart
+real(8)                                         ::      r1x, r2x, r3x, r2
+real(8)                                         ::      dx1x,  dy1x,  dz1x
+real(8)                                         ::      dx2x, dy2x, dz2x
+real(8)                                         ::      dx3x, dy3x, dz3x
+real(8)                                         ::      vel,v_a,v_b,dv
+real(8), save                                   ::      a_11, b_11, a_12, b_12, a_13, b_13
+real(8), save                                   ::      a_22, b_22, a_23, b_23, a_33, b_33
+real, save                                      ::      crg1, crg2, crg3
+integer                                         ::      iac1, iac2, iac3
 
 ! global variables used:
-!  iaclib, nat_solute, x, E, d
+!  iaclib, nat_solute, x, e, d
 
-if(A_11 == 0.) then !initialize static variables
+if(a_11 == 0.) then !initialize static variables
 iac1 = iac(nat_solute+1)
 iac2 = iac(nat_solute+2)
 iac3 = iac(nat_solute+3)
@@ -12293,29 +12264,29 @@ crg1 = crg(nat_solute+1)
 crg2 = crg(nat_solute+2)
 crg3 = crg(nat_solute+3)
 
-A_11 = iaclib(iac1)%avdw(ljcod(iac1, iac1)) &
+a_11 = iaclib(iac1)%avdw(ljcod(iac1, iac1)) &
         *iaclib(iac1)%avdw(ljcod(iac1, iac1))
-B_11 = iaclib(iac1)%bvdw(ljcod(iac1, iac1)) &
+b_11 = iaclib(iac1)%bvdw(ljcod(iac1, iac1)) &
         *iaclib(iac1)%bvdw(ljcod(iac1, iac1))
-A_12 = iaclib(iac1)%avdw(ljcod(iac1, iac2)) &
+a_12 = iaclib(iac1)%avdw(ljcod(iac1, iac2)) &
         *iaclib(iac2)%avdw(ljcod(iac1, iac2))
-B_12 = iaclib(iac1)%bvdw(ljcod(iac1, iac2)) &
+b_12 = iaclib(iac1)%bvdw(ljcod(iac1, iac2)) &
         *iaclib(iac2)%bvdw(ljcod(iac1, iac2))
-A_13 = iaclib(iac1)%avdw(ljcod(iac1, iac3)) &
+a_13 = iaclib(iac1)%avdw(ljcod(iac1, iac3)) &
         *iaclib(iac3)%avdw(ljcod(iac1, iac3))
-B_13 = iaclib(iac1)%bvdw(ljcod(iac1, iac3)) &
+b_13 = iaclib(iac1)%bvdw(ljcod(iac1, iac3)) &
         *iaclib(iac3)%bvdw(ljcod(iac1, iac3))
-A_22 = iaclib(iac2)%avdw(ljcod(iac2, iac2)) &
+a_22 = iaclib(iac2)%avdw(ljcod(iac2, iac2)) &
         *iaclib(iac2)%avdw(ljcod(iac2, iac2))
-B_22 = iaclib(iac2)%bvdw(ljcod(iac2, iac2)) &
+b_22 = iaclib(iac2)%bvdw(ljcod(iac2, iac2)) &
         *iaclib(iac2)%bvdw(ljcod(iac2, iac2))
-A_23 = iaclib(iac2)%avdw(ljcod(iac2, iac3)) &
+a_23 = iaclib(iac2)%avdw(ljcod(iac2, iac3)) &
         *iaclib(iac3)%avdw(ljcod(iac2, iac3))
-B_23 = iaclib(iac2)%bvdw(ljcod(iac2, iac3)) &
+b_23 = iaclib(iac2)%bvdw(ljcod(iac2, iac3)) &
         *iaclib(iac3)%bvdw(ljcod(iac2, iac3))
-A_33 = iaclib(iac3)%avdw(ljcod(iac3, iac3)) &
+a_33 = iaclib(iac3)%avdw(ljcod(iac3, iac3)) &
         *iaclib(iac3)%avdw(ljcod(iac3, iac3))
-B_33 = iaclib(iac3)%bvdw(ljcod(iac3, iac3)) &
+b_33 = iaclib(iac3)%bvdw(ljcod(iac3, iac3)) &
         *iaclib(iac3)%bvdw(ljcod(iac3, iac3))
 end if
 
@@ -12331,530 +12302,530 @@ do while (nbww(ip) /= 0)
   i3 = (nat_solute+3*(iw-1))*3+1 !point to x for atom 1 in mol. iw
   j3 = nbww(ip)*3-2 !point to 1 in interacting mol.
   ! 1 - 1
-  dx1X = x((j3  ))-x((i3  ))
-  dy1X = x((j3+1))-x((i3+1))
-  dz1X = x((j3+2))-x((i3+2))
-  r1X = dx1X*dx1X+dy1X*dy1X+dz1X*dz1X
+  dx1x = x((j3  ))-x((i3  ))
+  dy1x = x((j3+1))-x((i3+1))
+  dz1x = x((j3+2))-x((i3+2))
+  r1x = dx1x*dx1x+dy1x*dy1x+dz1x*dz1x
   ! 1-2
   j3 = j3 + 3
-  dx2X = x((j3  ))-x((i3  ))
-  dy2X = x((j3+1))-x((i3+1))
-  dz2X = x((j3+2))-x((i3+2))
-  r2X = dx2X*dx2X+dy2X*dy2X+dz2X*dz2X
+  dx2x = x((j3  ))-x((i3  ))
+  dy2x = x((j3+1))-x((i3+1))
+  dz2x = x((j3+2))-x((i3+2))
+  r2x = dx2x*dx2x+dy2x*dy2x+dz2x*dz2x
   ! 1-3
 
   j3 = j3 + 3
-  dx3X = x((j3  ))-x((i3  ))
-  dy3X = x((j3+1))-x((i3+1))
-  dz3X = x((j3+2))-x((i3+2))
-  r3X = dx3X*dx3X+dy3X*dy3X+dz3X*dz3X
-  r1X=	sqrt(1._8/r1X  )
-  r2X=	sqrt(1._8/r2X )
-  r3X=	sqrt(1._8/r3X )
+  dx3x = x((j3  ))-x((i3  ))
+  dy3x = x((j3+1))-x((i3+1))
+  dz3x = x((j3+2))-x((i3+2))
+  r3x = dx3x*dx3x+dy3x*dy3x+dz3x*dz3x
+  r1x=  sqrt(1._8/r1x  )
+  r2x=  sqrt(1._8/r2x )
+  r3x=  sqrt(1._8/r3x )
   ! 1-1 
-  r2 = r1X * r1X
-  Vel = crg1*crg1*r1X
-  V_a  = A_11*(r2*r2*r2)*(r2*r2*r2)
-  V_b  = B_11*(r2*r2*r2)
-  E%ww%vdw = E%ww%vdw + V_a-V_B
-  E%ww%el = E%ww%el + Vel
-  dv = r2*( -Vel -12.*V_a +6.*V_b )
+  r2 = r1x * r1x
+  vel = crg1*crg1*r1x
+  v_a  = a_11*(r2*r2*r2)*(r2*r2*r2)
+  v_b  = b_11*(r2*r2*r2)
+  e%ww%vdw = e%ww%vdw + v_a-v_b
+  e%ww%el = e%ww%el + vel
+  dv = r2*( -vel -12.*v_a +6.*v_b )
   j3 = j3 - 6 !move pointer back to 1 in interacting mol.
-  d((i3  )) = d((i3  )) -(dv*dx1X)
-  d((j3  )) = d((j3  )) +(dv*dx1X)
-  d((i3+1)) = d((i3+1)) -(dv*dy1X)
-  d((j3+1)) = d((j3+1)) +(dv*dy1X)
-  d((i3+2)) = d((i3+2)) -(dv*dz1X)
-  d((j3+2)) = d((j3+2)) +(dv*dz1X)
+  d((i3  )) = d((i3  )) -(dv*dx1x)
+  d((j3  )) = d((j3  )) +(dv*dx1x)
+  d((i3+1)) = d((i3+1)) -(dv*dy1x)
+  d((j3+1)) = d((j3+1)) +(dv*dy1x)
+  d((i3+2)) = d((i3+2)) -(dv*dz1x)
+  d((j3+2)) = d((j3+2)) +(dv*dz1x)
   ! 1-2 
-  r2 = r2X * r2X
-  Vel = crg1*crg2*r2X
-  V_a  = A_12*(r2*r2*r2)*(r2*r2*r2)
-  V_b  = B_12*(r2*r2*r2)
-  E%ww%vdw = E%ww%vdw + V_a-V_B
-  E%ww%el = E%ww%el + Vel
-  dv = r2*( -Vel -12.*V_a +6.*V_b )
+  r2 = r2x * r2x
+  vel = crg1*crg2*r2x
+  v_a  = a_12*(r2*r2*r2)*(r2*r2*r2)
+  v_b  = b_12*(r2*r2*r2)
+  e%ww%vdw = e%ww%vdw + v_a-v_b
+  e%ww%el = e%ww%el + vel
+  dv = r2*( -vel -12.*v_a +6.*v_b )
   j3 = j3 +3 !point to 2 in j-molecule
-  d((i3  )) = d((i3  )) -(dv*dx2X)
-  d((j3  )) = d((j3  )) +(dv*dx2X)
-  d((i3+1)) = d((i3+1)) -(dv*dy2X)
-  d((j3+1)) = d((j3+1)) +(dv*dy2X)
-  d((i3+2)) = d((i3+2)) -(dv*dz2X)
-  d((j3+2)) = d((j3+2)) +(dv*dz2X)
+  d((i3  )) = d((i3  )) -(dv*dx2x)
+  d((j3  )) = d((j3  )) +(dv*dx2x)
+  d((i3+1)) = d((i3+1)) -(dv*dy2x)
+  d((j3+1)) = d((j3+1)) +(dv*dy2x)
+  d((i3+2)) = d((i3+2)) -(dv*dz2x)
+  d((j3+2)) = d((j3+2)) +(dv*dz2x)
   ! 1-3
-  r2 = r3X * r3X
-  Vel = crg1*crg3*r3X
-  V_a  = A_13*(r2*r2*r2)*(r2*r2*r2)
-  V_b  = B_13*(r2*r2*r2)
-  E%ww%vdw = E%ww%vdw + V_a-V_B
-  E%ww%el = E%ww%el + Vel
-  dv = r2*( -Vel -12.*V_a +6.*V_b )
+  r2 = r3x * r3x
+  vel = crg1*crg3*r3x
+  v_a  = a_13*(r2*r2*r2)*(r2*r2*r2)
+  v_b  = b_13*(r2*r2*r2)
+  e%ww%vdw = e%ww%vdw + v_a-v_b
+  e%ww%el = e%ww%el + vel
+  dv = r2*( -vel -12.*v_a +6.*v_b )
   j3 = j3 +3 !point to 3 in j-molecule
-  d((i3  )) = d((i3  )) -(dv*dx3X)
-  d((j3  )) = d((j3  )) +(dv*dx3X)
-  d((i3+1)) = d((i3+1)) -(dv*dy3X)
-  d((j3+1)) = d((j3+1)) +(dv*dy3X)
-  d((i3+2)) = d((i3+2)) -(dv*dz3X)
-  d((j3+2)) = d((j3+2)) +(dv*dz3X)
+  d((i3  )) = d((i3  )) -(dv*dx3x)
+  d((j3  )) = d((j3  )) +(dv*dx3x)
+  d((i3+1)) = d((i3+1)) -(dv*dy3x)
+  d((j3+1)) = d((j3+1)) +(dv*dy3x)
+  d((i3+2)) = d((i3+2)) -(dv*dz3x)
+  d((j3+2)) = d((j3+2)) +(dv*dz3x)
 
   ! --- 2 - (1,2,3) ---
   i3 = i3 + 3 !point to x for 2 in mol. iw
   j3 = nbww(ip)*3-2 !point to o in j-mol.
-  ! 2 - 1 (X=1)
-  dx1X = x((j3  ))-x((i3  ))
-  dy1X = x((j3+1))-x((i3+1))
-  dz1X = x((j3+2))-x((i3+2))
-  r1X = dx1X*dx1X+dy1X*dy1X+dz1X*dz1X
-  ! 2-2 (X=2)
+  ! 2 - 1 (x=1)
+  dx1x = x((j3  ))-x((i3  ))
+  dy1x = x((j3+1))-x((i3+1))
+  dz1x = x((j3+2))-x((i3+2))
+  r1x = dx1x*dx1x+dy1x*dy1x+dz1x*dz1x
+  ! 2-2 (x=2)
   j3 = j3 + 3
-  dx2X = x((j3  ))-x((i3  ))
-  dy2X = x((j3+1))-x((i3+1))
-  dz2X = x((j3+2))-x((i3+2))
-  r2X = dx2X*dx2X+dy2X*dy2X+dz2X*dz2X
-  ! 2-3 (X=3)
+  dx2x = x((j3  ))-x((i3  ))
+  dy2x = x((j3+1))-x((i3+1))
+  dz2x = x((j3+2))-x((i3+2))
+  r2x = dx2x*dx2x+dy2x*dy2x+dz2x*dz2x
+  ! 2-3 (x=3)
   j3 = j3 + 3
-  dx3X = x((j3  ))-x((i3  ))
-  dy3X = x((j3+1))-x((i3+1))
-  dz3X = x((j3+2))-x((i3+2))
-  r3X = dx3X*dx3X+dy3X*dy3X+dz3X*dz3X
-  r1X=	sqrt(1._8/r1X  )
-  r2X=	sqrt(1._8/r2X )
-  r3X=	sqrt(1._8/r3X )
+  dx3x = x((j3  ))-x((i3  ))
+  dy3x = x((j3+1))-x((i3+1))
+  dz3x = x((j3+2))-x((i3+2))
+  r3x = dx3x*dx3x+dy3x*dy3x+dz3x*dz3x
+  r1x=  sqrt(1._8/r1x  )
+  r2x=  sqrt(1._8/r2x )
+  r3x=  sqrt(1._8/r3x )
   ! 2-1 
-  r2 = r1X * r1X
-  Vel = crg2*crg1*r1X
-  V_a  = A_12*(r2*r2*r2)*(r2*r2*r2)
-  V_b  = B_12*(r2*r2*r2)
-  E%ww%vdw = E%ww%vdw + V_a-V_B
-  E%ww%el = E%ww%el + Vel
-  dv = r2*( -Vel -12.*V_a +6.*V_b )
+  r2 = r1x * r1x
+  vel = crg2*crg1*r1x
+  v_a  = a_12*(r2*r2*r2)*(r2*r2*r2)
+  v_b  = b_12*(r2*r2*r2)
+  e%ww%vdw = e%ww%vdw + v_a-v_b
+  e%ww%el = e%ww%el + vel
+  dv = r2*( -vel -12.*v_a +6.*v_b )
   j3 = j3 - 6 !move pointer back to o in j-mol.
-  d((i3  )) = d((i3  )) -(dv*dx1X)
-  d((j3  )) = d((j3  )) +(dv*dx1X)
-  d((i3+1)) = d((i3+1)) -(dv*dy1X)
-  d((j3+1)) = d((j3+1)) +(dv*dy1X)
-  d((i3+2)) = d((i3+2)) -(dv*dz1X)
-  d((j3+2)) = d((j3+2)) +(dv*dz1X)
+  d((i3  )) = d((i3  )) -(dv*dx1x)
+  d((j3  )) = d((j3  )) +(dv*dx1x)
+  d((i3+1)) = d((i3+1)) -(dv*dy1x)
+  d((j3+1)) = d((j3+1)) +(dv*dy1x)
+  d((i3+2)) = d((i3+2)) -(dv*dz1x)
+  d((j3+2)) = d((j3+2)) +(dv*dz1x)
   ! 2-2 
-  r2 = r2X * r2X
-  Vel = crg2*crg2*r2X
-  V_a  = A_22*(r2*r2*r2)*(r2*r2*r2)
-  V_b  = B_22*(r2*r2*r2)
-  E%ww%vdw = E%ww%vdw + V_a-V_B
-  E%ww%el = E%ww%el + Vel
-  dv = r2*( -Vel -12.*V_a +6.*V_b )
+  r2 = r2x * r2x
+  vel = crg2*crg2*r2x
+  v_a  = a_22*(r2*r2*r2)*(r2*r2*r2)
+  v_b  = b_22*(r2*r2*r2)
+  e%ww%vdw = e%ww%vdw + v_a-v_b
+  e%ww%el = e%ww%el + vel
+  dv = r2*( -vel -12.*v_a +6.*v_b )
   j3 = j3 +3 !point to 2 in j-molecule
-  d((i3  )) = d((i3  )) -(dv*dx2X)
-  d((j3  )) = d((j3  )) +(dv*dx2X)
-  d((i3+1)) = d((i3+1)) -(dv*dy2X)
-  d((j3+1)) = d((j3+1)) +(dv*dy2X)
-  d((i3+2)) = d((i3+2)) -(dv*dz2X)
-  d((j3+2)) = d((j3+2)) +(dv*dz2X)
+  d((i3  )) = d((i3  )) -(dv*dx2x)
+  d((j3  )) = d((j3  )) +(dv*dx2x)
+  d((i3+1)) = d((i3+1)) -(dv*dy2x)
+  d((j3+1)) = d((j3+1)) +(dv*dy2x)
+  d((i3+2)) = d((i3+2)) -(dv*dz2x)
+  d((j3+2)) = d((j3+2)) +(dv*dz2x)
   ! 2-3
-  r2 = r3X * r3X
-  Vel = crg2*crg3*r3X
-  V_a  = A_23*(r2*r2*r2)*(r2*r2*r2)
-  V_b  = B_23*(r2*r2*r2)
-  E%ww%vdw = E%ww%vdw + V_a-V_B
-  E%ww%el = E%ww%el + Vel
-  dv = r2*( -Vel -12.*V_a +6.*V_b )
+  r2 = r3x * r3x
+  vel = crg2*crg3*r3x
+  v_a  = a_23*(r2*r2*r2)*(r2*r2*r2)
+  v_b  = b_23*(r2*r2*r2)
+  e%ww%vdw = e%ww%vdw + v_a-v_b
+  e%ww%el = e%ww%el + vel
+  dv = r2*( -vel -12.*v_a +6.*v_b )
   j3 = j3 +3 !point to 3 in j-molecule
-  d((i3  )) = d((i3  )) -(dv*dx3X)
-  d((j3  )) = d((j3  )) +(dv*dx3X)
-  d((i3+1)) = d((i3+1)) -(dv*dy3X)
-  d((j3+1)) = d((j3+1)) +(dv*dy3X)
-  d((i3+2)) = d((i3+2)) -(dv*dz3X)
-  d((j3+2)) = d((j3+2)) +(dv*dz3X)
+  d((i3  )) = d((i3  )) -(dv*dx3x)
+  d((j3  )) = d((j3  )) +(dv*dx3x)
+  d((i3+1)) = d((i3+1)) -(dv*dy3x)
+  d((j3+1)) = d((j3+1)) +(dv*dy3x)
+  d((i3+2)) = d((i3+2)) -(dv*dz3x)
+  d((j3+2)) = d((j3+2)) +(dv*dz3x)
 
   ! --- 3 - (1,2,3) ---
   i3 = i3 + 3 !point to x for 3 in mol. iw
   j3 = nbww(ip)*3-2 !point to o in j-mol.
-  ! 3 - 1 (X=1)
-  dx1X = x((j3  ))-x((i3  ))
-  dy1X = x((j3+1))-x((i3+1))
-  dz1X = x((j3+2))-x((i3+2))
-  r1X = dx1X*dx1X+dy1X*dy1X+dz1X*dz1X
-  ! 3-2 (X=2)
+  ! 3 - 1 (x=1)
+  dx1x = x((j3  ))-x((i3  ))
+  dy1x = x((j3+1))-x((i3+1))
+  dz1x = x((j3+2))-x((i3+2))
+  r1x = dx1x*dx1x+dy1x*dy1x+dz1x*dz1x
+  ! 3-2 (x=2)
   j3 = j3 + 3
-  dx2X = x((j3  ))-x((i3  ))
-  dy2X = x((j3+1))-x((i3+1))
-  dz2X = x((j3+2))-x((i3+2))
-  r2X = dx2X*dx2X+dy2X*dy2X+dz2X*dz2X
-  ! 3-3 (X=3)
+  dx2x = x((j3  ))-x((i3  ))
+  dy2x = x((j3+1))-x((i3+1))
+  dz2x = x((j3+2))-x((i3+2))
+  r2x = dx2x*dx2x+dy2x*dy2x+dz2x*dz2x
+  ! 3-3 (x=3)
   j3 = j3 + 3
-  dx3X = x((j3  ))-x((i3  ))
-  dy3X = x((j3+1))-x((i3+1))
-  dz3X = x((j3+2))-x((i3+2))
-  r3X = dx3X*dx3X+dy3X*dy3X+dz3X*dz3X
-  r1X=	sqrt(1._8/r1X  )
-  r2X=	sqrt(1._8/r2X )
-  r3X=	sqrt(1._8/r3X )
+  dx3x = x((j3  ))-x((i3  ))
+  dy3x = x((j3+1))-x((i3+1))
+  dz3x = x((j3+2))-x((i3+2))
+  r3x = dx3x*dx3x+dy3x*dy3x+dz3x*dz3x
+  r1x=  sqrt(1._8/r1x  )
+  r2x=  sqrt(1._8/r2x )
+  r3x=  sqrt(1._8/r3x )
   ! 3-1 
-  r2 = r1X * r1X
-  Vel = crg3*crg1*r1X
-  V_a  = A_13*(r2*r2*r2)*(r2*r2*r2)
-  V_b  = B_13*(r2*r2*r2)
-  E%ww%vdw = E%ww%vdw + V_a-V_B
-  E%ww%el = E%ww%el + Vel
-  dv = r2*( -Vel -12.*V_a +6.*V_b )
+  r2 = r1x * r1x
+  vel = crg3*crg1*r1x
+  v_a  = a_13*(r2*r2*r2)*(r2*r2*r2)
+  v_b  = b_13*(r2*r2*r2)
+  e%ww%vdw = e%ww%vdw + v_a-v_b
+  e%ww%el = e%ww%el + vel
+  dv = r2*( -vel -12.*v_a +6.*v_b )
   j3 = j3 - 6 !move pointer back to o in j-mol.
-  d((i3  )) = d((i3  )) -(dv*dx1X)
-  d((j3  )) = d((j3  )) +(dv*dx1X)
-  d((i3+1)) = d((i3+1)) -(dv*dy1X)
-  d((j3+1)) = d((j3+1)) +(dv*dy1X)
-  d((i3+2)) = d((i3+2)) -(dv*dz1X)
-  d((j3+2)) = d((j3+2)) +(dv*dz1X)
+  d((i3  )) = d((i3  )) -(dv*dx1x)
+  d((j3  )) = d((j3  )) +(dv*dx1x)
+  d((i3+1)) = d((i3+1)) -(dv*dy1x)
+  d((j3+1)) = d((j3+1)) +(dv*dy1x)
+  d((i3+2)) = d((i3+2)) -(dv*dz1x)
+  d((j3+2)) = d((j3+2)) +(dv*dz1x)
   ! 3-2 
-  r2 = r2X * r2X
-  Vel = crg3*crg2*r2X
-  V_a  = A_23*(r2*r2*r2)*(r2*r2*r2)
-  V_b  = B_23*(r2*r2*r2)
-  E%ww%vdw = E%ww%vdw + V_a-V_B
-  E%ww%el = E%ww%el + Vel
-  dv = r2*( -Vel -12.*V_a +6.*V_b )
+  r2 = r2x * r2x
+  vel = crg3*crg2*r2x
+  v_a  = a_23*(r2*r2*r2)*(r2*r2*r2)
+  v_b  = b_23*(r2*r2*r2)
+  e%ww%vdw = e%ww%vdw + v_a-v_b
+  e%ww%el = e%ww%el + vel
+  dv = r2*( -vel -12.*v_a +6.*v_b )
   j3 = j3 +3 !point to 2 in j-molecule
-  d((i3  )) = d((i3  )) -(dv*dx2X)
-  d((j3  )) = d((j3  )) +(dv*dx2X)
-  d((i3+1)) = d((i3+1)) -(dv*dy2X)
-  d((j3+1)) = d((j3+1)) +(dv*dy2X)
-  d((i3+2)) = d((i3+2)) -(dv*dz2X)
-  d((j3+2)) = d((j3+2)) +(dv*dz2X)
+  d((i3  )) = d((i3  )) -(dv*dx2x)
+  d((j3  )) = d((j3  )) +(dv*dx2x)
+  d((i3+1)) = d((i3+1)) -(dv*dy2x)
+  d((j3+1)) = d((j3+1)) +(dv*dy2x)
+  d((i3+2)) = d((i3+2)) -(dv*dz2x)
+  d((j3+2)) = d((j3+2)) +(dv*dz2x)
   ! 3-3
-  r2 = r3X * r3X
-  Vel = crg3*crg3*r3X
-  V_a  = A_33*(r2*r2*r2)*(r2*r2*r2)
-  V_b  = B_33*(r2*r2*r2)
-  E%ww%vdw = E%ww%vdw + V_a-V_B
-  E%ww%el = E%ww%el + Vel
-  dv = r2*( -Vel -12.*V_a +6.*V_b )
+  r2 = r3x * r3x
+  vel = crg3*crg3*r3x
+  v_a  = a_33*(r2*r2*r2)*(r2*r2*r2)
+  v_b  = b_33*(r2*r2*r2)
+  e%ww%vdw = e%ww%vdw + v_a-v_b
+  e%ww%el = e%ww%el + vel
+  dv = r2*( -vel -12.*v_a +6.*v_b )
   j3 = j3 +3 !point to 3 in j-molecule
-  d((i3  )) = d((i3  )) -(dv*dx3X)
-  d((j3  )) = d((j3  )) +(dv*dx3X)
-  d((i3+1)) = d((i3+1)) -(dv*dy3X)
-  d((j3+1)) = d((j3+1)) +(dv*dy3X)
-  d((i3+2)) = d((i3+2)) -(dv*dz3X)
-  d((j3+2)) = d((j3+2)) +(dv*dz3X)
+  d((i3  )) = d((i3  )) -(dv*dx3x)
+  d((j3  )) = d((j3  )) +(dv*dx3x)
+  d((i3+1)) = d((i3+1)) -(dv*dy3x)
+  d((j3+1)) = d((j3+1)) +(dv*dy3x)
+  d((i3+2)) = d((i3+2)) -(dv*dz3x)
+  d((j3+2)) = d((j3+2)) +(dv*dz3x)
 
   ip = ip + 1
 end do ! while ip
 
 ! skip the gap
-ipstart = ip + 1			
+ipstart = ip + 1                        
 end do ! iw
 
 end subroutine nonbond_3atomsolvent
 
 !-----------------------------------------------------------------------
-!******PWadded 2001-10-23
+!******pwadded 2001-10-23
 subroutine nonbond_3atomsolvent_box
   ! local variables
-  integer						:: iw,ip,i,j,i3,j3, ia
-  integer						:: ipstart
-  real(8)						::	r1X, r2X, r3X, r2
-  real(8)						::	dx1X,  dy1X,  dz1X
-  real(8)						::	dx2X, dy2X, dz2X
-  real(8)						::	dx3X, dy3X, dz3X
-  real(8)						::	Vel,V_a,V_b,dv
-  real(8), save					::	A_11, B_11, A_12, B_12, A_13, B_13
-  real(8), save					::	A_22, B_22, A_23, B_23, A_33, B_33
-  real, save					::	crg1, crg2, crg3
-  integer						::	iac1, iac2, iac3
-  real(8)						::  boxshiftx, boxshifty, boxshiftz
+  integer                                               :: iw,ip,i,j,i3,j3, ia
+  integer                                               :: ipstart
+  real(8)                                               ::      r1x, r2x, r3x, r2
+  real(8)                                               ::      dx1x,  dy1x,  dz1x
+  real(8)                                               ::      dx2x, dy2x, dz2x
+  real(8)                                               ::      dx3x, dy3x, dz3x
+  real(8)                                               ::      vel,v_a,v_b,dv
+  real(8), save                                 ::      a_11, b_11, a_12, b_12, a_13, b_13
+  real(8), save                                 ::      a_22, b_22, a_23, b_23, a_33, b_33
+  real, save                                    ::      crg1, crg2, crg3
+  integer                                               ::      iac1, iac2, iac3
+  real(8)                                               ::  boxshiftx, boxshifty, boxshiftz
 
   ! global variables used:
-  !  iaclib, nat_solute, x, E, d
+  !  iaclib, nat_solute, x, e, d
 
-  if(A_11 == 0.) then !initialize static variables
-	iac1 = iac(nat_solute+1)
-	iac2 = iac(nat_solute+2)
-	iac3 = iac(nat_solute+3)
-	crg1 = crg(nat_solute+1)
-	crg2 = crg(nat_solute+2)
-	crg3 = crg(nat_solute+3)
+  if(a_11 == 0.) then !initialize static variables
+        iac1 = iac(nat_solute+1)
+        iac2 = iac(nat_solute+2)
+        iac3 = iac(nat_solute+3)
+        crg1 = crg(nat_solute+1)
+        crg2 = crg(nat_solute+2)
+        crg3 = crg(nat_solute+3)
 
-	A_11 = iaclib(iac1)%avdw(ljcod(iac1, iac1)) &
-		*iaclib(iac1)%avdw(ljcod(iac1, iac1))
-	B_11 = iaclib(iac1)%bvdw(ljcod(iac1, iac1)) &
-		*iaclib(iac1)%bvdw(ljcod(iac1, iac1))
-	A_12 = iaclib(iac1)%avdw(ljcod(iac1, iac2)) &
-		*iaclib(iac2)%avdw(ljcod(iac1, iac2))
-	B_12 = iaclib(iac1)%bvdw(ljcod(iac1, iac2)) &
-		*iaclib(iac2)%bvdw(ljcod(iac1, iac2))
-	A_13 = iaclib(iac1)%avdw(ljcod(iac1, iac3)) &
-		*iaclib(iac3)%avdw(ljcod(iac1, iac3))
-	B_13 = iaclib(iac1)%bvdw(ljcod(iac1, iac3)) &
-		*iaclib(iac3)%bvdw(ljcod(iac1, iac3))
-	A_22 = iaclib(iac2)%avdw(ljcod(iac2, iac2)) &
-		*iaclib(iac2)%avdw(ljcod(iac2, iac2))
-	B_22 = iaclib(iac2)%bvdw(ljcod(iac2, iac2)) &
-		*iaclib(iac2)%bvdw(ljcod(iac2, iac2))
-	A_23 = iaclib(iac2)%avdw(ljcod(iac2, iac3)) &
-		*iaclib(iac3)%avdw(ljcod(iac2, iac3))
-	B_23 = iaclib(iac2)%bvdw(ljcod(iac2, iac3)) &
-		*iaclib(iac3)%bvdw(ljcod(iac2, iac3))
-	A_33 = iaclib(iac3)%avdw(ljcod(iac3, iac3)) &
-		*iaclib(iac3)%avdw(ljcod(iac3, iac3))
-	B_33 = iaclib(iac3)%bvdw(ljcod(iac3, iac3)) &
-		*iaclib(iac3)%bvdw(ljcod(iac3, iac3))
+        a_11 = iaclib(iac1)%avdw(ljcod(iac1, iac1)) &
+                *iaclib(iac1)%avdw(ljcod(iac1, iac1))
+        b_11 = iaclib(iac1)%bvdw(ljcod(iac1, iac1)) &
+                *iaclib(iac1)%bvdw(ljcod(iac1, iac1))
+        a_12 = iaclib(iac1)%avdw(ljcod(iac1, iac2)) &
+                *iaclib(iac2)%avdw(ljcod(iac1, iac2))
+        b_12 = iaclib(iac1)%bvdw(ljcod(iac1, iac2)) &
+                *iaclib(iac2)%bvdw(ljcod(iac1, iac2))
+        a_13 = iaclib(iac1)%avdw(ljcod(iac1, iac3)) &
+                *iaclib(iac3)%avdw(ljcod(iac1, iac3))
+        b_13 = iaclib(iac1)%bvdw(ljcod(iac1, iac3)) &
+                *iaclib(iac3)%bvdw(ljcod(iac1, iac3))
+        a_22 = iaclib(iac2)%avdw(ljcod(iac2, iac2)) &
+                *iaclib(iac2)%avdw(ljcod(iac2, iac2))
+        b_22 = iaclib(iac2)%bvdw(ljcod(iac2, iac2)) &
+                *iaclib(iac2)%bvdw(ljcod(iac2, iac2))
+        a_23 = iaclib(iac2)%avdw(ljcod(iac2, iac3)) &
+                *iaclib(iac3)%avdw(ljcod(iac2, iac3))
+        b_23 = iaclib(iac2)%bvdw(ljcod(iac2, iac3)) &
+                *iaclib(iac3)%bvdw(ljcod(iac2, iac3))
+        a_33 = iaclib(iac3)%avdw(ljcod(iac3, iac3)) &
+                *iaclib(iac3)%avdw(ljcod(iac3, iac3))
+        b_33 = iaclib(iac3)%bvdw(ljcod(iac3, iac3)) &
+                *iaclib(iac3)%bvdw(ljcod(iac3, iac3))
   end if
 
   ipstart = 1
 
   do iw = calculation_assignment%ww%start, calculation_assignment%ww%end
-	ip = ipstart
+        ip = ipstart
 
-	do while (nbww(ip) /= 0)
-	  ! consider the pair (nat_solute+3*(iw-1)) - nbww(ip)
+        do while (nbww(ip) /= 0)
+          ! consider the pair (nat_solute+3*(iw-1)) - nbww(ip)
 
-	  ! --- 1 - (1,2,3) ---
-	  i3 = (nat_solute+3*(iw-1))*3+1 !point to x for atom 1 in mol. iw
-										!corresponds to oxygen in water
-	  j3 = nbww(ip)*3-2 !point to 1 in interacting mol.
-						!corresponds to oxygen in water	
-	  ! 1 - 1
-	  dx1X = x((j3  ))-x((i3  ))
-	  dy1X = x((j3+1))-x((i3+1))
-	  dz1X = x((j3+2))-x((i3+2))
-	  !the periodical shift
-	  boxshiftx = boxlength(1)*nint( dx1X*inv_boxl(1) )
-	  boxshifty = boxlength(2)*nint( dy1X*inv_boxl(2) )
-	  boxshiftz = boxlength(3)*nint( dz1X*inv_boxl(3) )
-	  ! 1-2
-	  j3 = j3 + 3
-	  dx2X = x((j3  ))-x((i3  ))
-	  dy2X = x((j3+1))-x((i3+1))
-	  dz2X = x((j3+2))-x((i3+2))
-	  ! 1-3
-	  j3 = j3 + 3
-	  dx3X = x((j3  ))-x((i3  ))
-	  dy3X = x((j3+1))-x((i3+1))
-	  dz3X = x((j3+2))-x((i3+2))
-	  dx1X = dx1X - boxshiftx
-	  dy1X = dy1X - boxshifty
-	  dz1X = dz1X - boxshiftz
-	  dx2X = dx2X - boxshiftx
-	  dy2X = dy2X - boxshifty
-	  dz2X = dz2X - boxshiftz
-	  dx3X = dx3X - boxshiftx
-	  dy3X = dy3X - boxshifty
-	  dz3X = dz3X - boxshiftz
+          ! --- 1 - (1,2,3) ---
+          i3 = (nat_solute+3*(iw-1))*3+1 !point to x for atom 1 in mol. iw
+                                                                                !corresponds to oxygen in water
+          j3 = nbww(ip)*3-2 !point to 1 in interacting mol.
+                                                !corresponds to oxygen in water 
+          ! 1 - 1
+          dx1x = x((j3  ))-x((i3  ))
+          dy1x = x((j3+1))-x((i3+1))
+          dz1x = x((j3+2))-x((i3+2))
+          !the periodical shift
+          boxshiftx = boxlength(1)*nint( dx1x*inv_boxl(1) )
+          boxshifty = boxlength(2)*nint( dy1x*inv_boxl(2) )
+          boxshiftz = boxlength(3)*nint( dz1x*inv_boxl(3) )
+          ! 1-2
+          j3 = j3 + 3
+          dx2x = x((j3  ))-x((i3  ))
+          dy2x = x((j3+1))-x((i3+1))
+          dz2x = x((j3+2))-x((i3+2))
+          ! 1-3
+          j3 = j3 + 3
+          dx3x = x((j3  ))-x((i3  ))
+          dy3x = x((j3+1))-x((i3+1))
+          dz3x = x((j3+2))-x((i3+2))
+          dx1x = dx1x - boxshiftx
+          dy1x = dy1x - boxshifty
+          dz1x = dz1x - boxshiftz
+          dx2x = dx2x - boxshiftx
+          dy2x = dy2x - boxshifty
+          dz2x = dz2x - boxshiftz
+          dx3x = dx3x - boxshiftx
+          dy3x = dy3x - boxshifty
+          dz3x = dz3x - boxshiftz
 
-	  r1X = dx1X*dx1X + dy1X*dy1X + dz1X*dz1X
-	  r2X = dx2X*dx2X + dy2X*dy2X + dz2X*dz2X
-	  r3X = dx3X*dx3X + dy3X*dy3X + dz3X*dz3X
+          r1x = dx1x*dx1x + dy1x*dy1x + dz1x*dz1x
+          r2x = dx2x*dx2x + dy2x*dy2x + dz2x*dz2x
+          r3x = dx3x*dx3x + dy3x*dy3x + dz3x*dz3x
 
-	  r1X=	sqrt(1._8/r1X  )
-	  r2X=	sqrt(1._8/r2X )
-	  r3X=	sqrt(1._8/r3X )
-	  ! 1-1 
-	  r2 = r1X * r1X
-	  Vel = crg1*crg1*r1X
-	  V_a  = A_11*(r2*r2*r2)*(r2*r2*r2)
-	  V_b  = B_11*(r2*r2*r2)
-	  E%ww%vdw = E%ww%vdw + V_a-V_B
-	  E%ww%el = E%ww%el + Vel
-	  dv = r2*( -Vel -12.*V_a +6.*V_b )
-	  j3 = j3 - 6 !move pointer back to 1 in interacting mol.
-	  d((i3  )) = d((i3  )) -(dv*dx1X)
-	  d((j3  )) = d((j3  )) +(dv*dx1X)
-	  d((i3+1)) = d((i3+1)) -(dv*dy1X)
-	  d((j3+1)) = d((j3+1)) +(dv*dy1X)
-	  d((i3+2)) = d((i3+2)) -(dv*dz1X)
-	  d((j3+2)) = d((j3+2)) +(dv*dz1X)
-	  ! 1-2 
-	  r2 = r2X * r2X
-	  Vel = crg1*crg2*r2X
-	  V_a  = A_12*(r2*r2*r2)*(r2*r2*r2)
-	  V_b  = B_12*(r2*r2*r2)
-	  E%ww%vdw = E%ww%vdw + V_a-V_B
-	  E%ww%el = E%ww%el + Vel
-	  dv = r2*( -Vel -12.*V_a +6.*V_b )
-	  j3 = j3 +3 !point to 2 in j-molecule
-	  d((i3  )) = d((i3  )) -(dv*dx2X)
-	  d((j3  )) = d((j3  )) +(dv*dx2X)
-	  d((i3+1)) = d((i3+1)) -(dv*dy2X)
-	  d((j3+1)) = d((j3+1)) +(dv*dy2X)
-	  d((i3+2)) = d((i3+2)) -(dv*dz2X)
-	  d((j3+2)) = d((j3+2)) +(dv*dz2X)
-	  ! 1-3
-	  r2 = r3X * r3X
-	  Vel = crg1*crg3*r3X
-	  V_a  = A_13*(r2*r2*r2)*(r2*r2*r2)
-	  V_b  = B_13*(r2*r2*r2)
-	  E%ww%vdw = E%ww%vdw + V_a-V_B
-	  E%ww%el = E%ww%el + Vel
-	  dv = r2*( -Vel -12.*V_a +6.*V_b )
-	  j3 = j3 +3 !point to 3 in j-molecule
-	  d((i3  )) = d((i3  )) -(dv*dx3X)
-	  d((j3  )) = d((j3  )) +(dv*dx3X)
-	  d((i3+1)) = d((i3+1)) -(dv*dy3X)
-	  d((j3+1)) = d((j3+1)) +(dv*dy3X)
-	  d((i3+2)) = d((i3+2)) -(dv*dz3X)
-	  d((j3+2)) = d((j3+2)) +(dv*dz3X)
-			
-	  ! --- 2 - (1,2,3) ---
-	  i3 = i3 + 3 !point to x for 2 in mol. iw
-	  j3 = nbww(ip)*3-2 !point to o in j-mol.
-	  ! 2 - 1 (X=1)
-	  dx1X = x((j3  ))-x((i3  ))
-	  dy1X = x((j3+1))-x((i3+1))
-	  dz1X = x((j3+2))-x((i3+2))
-	  ! 2-2 (X=2)
-	  j3 = j3 + 3
-	  dx2X = x((j3  ))-x((i3  ))
-	  dy2X = x((j3+1))-x((i3+1))
-	  dz2X = x((j3+2))-x((i3+2))
-	  ! 2-3 (X=3)
-	  j3 = j3 + 3
-	  dx3X = x((j3  ))-x((i3  ))
-	  dy3X = x((j3+1))-x((i3+1))
-	  dz3X = x((j3+2))-x((i3+2))
-	  dx1X = dx1X - boxshiftx
-	  dy1X = dy1X - boxshifty
-	  dz1X = dz1X - boxshiftz
-	  dx2X = dx2X - boxshiftx
-	  dy2X = dy2X - boxshifty
-	  dz2X = dz2X - boxshiftz
-	  dx3X = dx3X - boxshiftx
-	  dy3X = dy3X - boxshifty
-	  dz3X = dz3X - boxshiftz
+          r1x=  sqrt(1._8/r1x  )
+          r2x=  sqrt(1._8/r2x )
+          r3x=  sqrt(1._8/r3x )
+          ! 1-1 
+          r2 = r1x * r1x
+          vel = crg1*crg1*r1x
+          v_a  = a_11*(r2*r2*r2)*(r2*r2*r2)
+          v_b  = b_11*(r2*r2*r2)
+          e%ww%vdw = e%ww%vdw + v_a-v_b
+          e%ww%el = e%ww%el + vel
+          dv = r2*( -vel -12.*v_a +6.*v_b )
+          j3 = j3 - 6 !move pointer back to 1 in interacting mol.
+          d((i3  )) = d((i3  )) -(dv*dx1x)
+          d((j3  )) = d((j3  )) +(dv*dx1x)
+          d((i3+1)) = d((i3+1)) -(dv*dy1x)
+          d((j3+1)) = d((j3+1)) +(dv*dy1x)
+          d((i3+2)) = d((i3+2)) -(dv*dz1x)
+          d((j3+2)) = d((j3+2)) +(dv*dz1x)
+          ! 1-2 
+          r2 = r2x * r2x
+          vel = crg1*crg2*r2x
+          v_a  = a_12*(r2*r2*r2)*(r2*r2*r2)
+          v_b  = b_12*(r2*r2*r2)
+          e%ww%vdw = e%ww%vdw + v_a-v_b
+          e%ww%el = e%ww%el + vel
+          dv = r2*( -vel -12.*v_a +6.*v_b )
+          j3 = j3 +3 !point to 2 in j-molecule
+          d((i3  )) = d((i3  )) -(dv*dx2x)
+          d((j3  )) = d((j3  )) +(dv*dx2x)
+          d((i3+1)) = d((i3+1)) -(dv*dy2x)
+          d((j3+1)) = d((j3+1)) +(dv*dy2x)
+          d((i3+2)) = d((i3+2)) -(dv*dz2x)
+          d((j3+2)) = d((j3+2)) +(dv*dz2x)
+          ! 1-3
+          r2 = r3x * r3x
+          vel = crg1*crg3*r3x
+          v_a  = a_13*(r2*r2*r2)*(r2*r2*r2)
+          v_b  = b_13*(r2*r2*r2)
+          e%ww%vdw = e%ww%vdw + v_a-v_b
+          e%ww%el = e%ww%el + vel
+          dv = r2*( -vel -12.*v_a +6.*v_b )
+          j3 = j3 +3 !point to 3 in j-molecule
+          d((i3  )) = d((i3  )) -(dv*dx3x)
+          d((j3  )) = d((j3  )) +(dv*dx3x)
+          d((i3+1)) = d((i3+1)) -(dv*dy3x)
+          d((j3+1)) = d((j3+1)) +(dv*dy3x)
+          d((i3+2)) = d((i3+2)) -(dv*dz3x)
+          d((j3+2)) = d((j3+2)) +(dv*dz3x)
+                        
+          ! --- 2 - (1,2,3) ---
+          i3 = i3 + 3 !point to x for 2 in mol. iw
+          j3 = nbww(ip)*3-2 !point to o in j-mol.
+          ! 2 - 1 (x=1)
+          dx1x = x((j3  ))-x((i3  ))
+          dy1x = x((j3+1))-x((i3+1))
+          dz1x = x((j3+2))-x((i3+2))
+          ! 2-2 (x=2)
+          j3 = j3 + 3
+          dx2x = x((j3  ))-x((i3  ))
+          dy2x = x((j3+1))-x((i3+1))
+          dz2x = x((j3+2))-x((i3+2))
+          ! 2-3 (x=3)
+          j3 = j3 + 3
+          dx3x = x((j3  ))-x((i3  ))
+          dy3x = x((j3+1))-x((i3+1))
+          dz3x = x((j3+2))-x((i3+2))
+          dx1x = dx1x - boxshiftx
+          dy1x = dy1x - boxshifty
+          dz1x = dz1x - boxshiftz
+          dx2x = dx2x - boxshiftx
+          dy2x = dy2x - boxshifty
+          dz2x = dz2x - boxshiftz
+          dx3x = dx3x - boxshiftx
+          dy3x = dy3x - boxshifty
+          dz3x = dz3x - boxshiftz
 
-	  r1X = dx1X*dx1X + dy1X*dy1X + dz1X*dz1X
-	  r2X = dx2X*dx2X + dy2X*dy2X + dz2X*dz2X
-	  r3X = dx3X*dx3X + dy3X*dy3X + dz3X*dz3X
-	  r1X=	sqrt(1._8/r1X  )
-	  r2X=	sqrt(1._8/r2X )
-	  r3X=	sqrt(1._8/r3X )
-	  ! 2-1 
-	  r2 = r1X * r1X
-	  Vel = crg2*crg1*r1X
-	  V_a  = A_12*(r2*r2*r2)*(r2*r2*r2)
-	  V_b  = B_12*(r2*r2*r2)
-	  E%ww%vdw = E%ww%vdw + V_a-V_B
-	  E%ww%el = E%ww%el + Vel
-	  dv = r2*( -Vel -12.*V_a +6.*V_b )
-	  j3 = j3 - 6 !move pointer back to o in j-mol.
-	  d((i3  )) = d((i3  )) -(dv*dx1X)
-	  d((j3  )) = d((j3  )) +(dv*dx1X)
-	  d((i3+1)) = d((i3+1)) -(dv*dy1X)
-	  d((j3+1)) = d((j3+1)) +(dv*dy1X)
-	  d((i3+2)) = d((i3+2)) -(dv*dz1X)
-	  d((j3+2)) = d((j3+2)) +(dv*dz1X)
-	  ! 2-2 
-	  r2 = r2X * r2X
-	  Vel = crg2*crg2*r2X
-	  V_a  = A_22*(r2*r2*r2)*(r2*r2*r2)
-	  V_b  = B_22*(r2*r2*r2)
-	  E%ww%vdw = E%ww%vdw + V_a-V_B
-	  E%ww%el = E%ww%el + Vel
-	  dv = r2*( -Vel -12.*V_a +6.*V_b )
-	  j3 = j3 +3 !point to 2 in j-molecule
-	  d((i3  )) = d((i3  )) -(dv*dx2X)
-	  d((j3  )) = d((j3  )) +(dv*dx2X)
-	  d((i3+1)) = d((i3+1)) -(dv*dy2X)
-	  d((j3+1)) = d((j3+1)) +(dv*dy2X)
-	  d((i3+2)) = d((i3+2)) -(dv*dz2X)
-	  d((j3+2)) = d((j3+2)) +(dv*dz2X)
-	  ! 2-3
-	  r2 = r3X * r3X
-	  Vel = crg2*crg3*r3X
-	  V_a  = A_23*(r2*r2*r2)*(r2*r2*r2)
-	  V_b  = B_23*(r2*r2*r2)
-	  E%ww%vdw = E%ww%vdw + V_a-V_B
-	  E%ww%el = E%ww%el + Vel
-	  dv = r2*( -Vel -12.*V_a +6.*V_b )
-	  j3 = j3 +3 !point to 3 in j-molecule
-	  d((i3  )) = d((i3  )) -(dv*dx3X)
-	  d((j3  )) = d((j3  )) +(dv*dx3X)
-	  d((i3+1)) = d((i3+1)) -(dv*dy3X)
-	  d((j3+1)) = d((j3+1)) +(dv*dy3X)
-	  d((i3+2)) = d((i3+2)) -(dv*dz3X)
-	  d((j3+2)) = d((j3+2)) +(dv*dz3X)
-			
-	  ! --- 3 - (1,2,3) ---
-	  i3 = i3 + 3 !point to x for 3 in mol. iw
-	  j3 = nbww(ip)*3-2 !point to o in j-mol.
-	  ! 3 - 1 (X=1)
-	  dx1X = x((j3  ))-x((i3  ))
-	  dy1X = x((j3+1))-x((i3+1))
-	  dz1X = x((j3+2))-x((i3+2))
-	  ! 3-2 (X=2)
-	  j3 = j3 + 3
-	  dx2X = x((j3  ))-x((i3  ))
-	  dy2X = x((j3+1))-x((i3+1))
-	  dz2X = x((j3+2))-x((i3+2))
-	  ! 3-3 (X=3)
-	  j3 = j3 + 3
-	  dx3X = x((j3  ))-x((i3  ))
-	  dy3X = x((j3+1))-x((i3+1))
-	  dz3X = x((j3+2))-x((i3+2))
-	  dx1X = dx1X - boxshiftx
-	  dy1X = dy1X - boxshifty
-	  dz1X = dz1X - boxshiftz
-	  dx2X = dx2X - boxshiftx
-	  dy2X = dy2X - boxshifty
-	  dz2X = dz2X - boxshiftz
-	  dx3X = dx3X - boxshiftx
-	  dy3X = dy3X - boxshifty
-	  dz3X = dz3X - boxshiftz
+          r1x = dx1x*dx1x + dy1x*dy1x + dz1x*dz1x
+          r2x = dx2x*dx2x + dy2x*dy2x + dz2x*dz2x
+          r3x = dx3x*dx3x + dy3x*dy3x + dz3x*dz3x
+          r1x=  sqrt(1._8/r1x  )
+          r2x=  sqrt(1._8/r2x )
+          r3x=  sqrt(1._8/r3x )
+          ! 2-1 
+          r2 = r1x * r1x
+          vel = crg2*crg1*r1x
+          v_a  = a_12*(r2*r2*r2)*(r2*r2*r2)
+          v_b  = b_12*(r2*r2*r2)
+          e%ww%vdw = e%ww%vdw + v_a-v_b
+          e%ww%el = e%ww%el + vel
+          dv = r2*( -vel -12.*v_a +6.*v_b )
+          j3 = j3 - 6 !move pointer back to o in j-mol.
+          d((i3  )) = d((i3  )) -(dv*dx1x)
+          d((j3  )) = d((j3  )) +(dv*dx1x)
+          d((i3+1)) = d((i3+1)) -(dv*dy1x)
+          d((j3+1)) = d((j3+1)) +(dv*dy1x)
+          d((i3+2)) = d((i3+2)) -(dv*dz1x)
+          d((j3+2)) = d((j3+2)) +(dv*dz1x)
+          ! 2-2 
+          r2 = r2x * r2x
+          vel = crg2*crg2*r2x
+          v_a  = a_22*(r2*r2*r2)*(r2*r2*r2)
+          v_b  = b_22*(r2*r2*r2)
+          e%ww%vdw = e%ww%vdw + v_a-v_b
+          e%ww%el = e%ww%el + vel
+          dv = r2*( -vel -12.*v_a +6.*v_b )
+          j3 = j3 +3 !point to 2 in j-molecule
+          d((i3  )) = d((i3  )) -(dv*dx2x)
+          d((j3  )) = d((j3  )) +(dv*dx2x)
+          d((i3+1)) = d((i3+1)) -(dv*dy2x)
+          d((j3+1)) = d((j3+1)) +(dv*dy2x)
+          d((i3+2)) = d((i3+2)) -(dv*dz2x)
+          d((j3+2)) = d((j3+2)) +(dv*dz2x)
+          ! 2-3
+          r2 = r3x * r3x
+          vel = crg2*crg3*r3x
+          v_a  = a_23*(r2*r2*r2)*(r2*r2*r2)
+          v_b  = b_23*(r2*r2*r2)
+          e%ww%vdw = e%ww%vdw + v_a-v_b
+          e%ww%el = e%ww%el + vel
+          dv = r2*( -vel -12.*v_a +6.*v_b )
+          j3 = j3 +3 !point to 3 in j-molecule
+          d((i3  )) = d((i3  )) -(dv*dx3x)
+          d((j3  )) = d((j3  )) +(dv*dx3x)
+          d((i3+1)) = d((i3+1)) -(dv*dy3x)
+          d((j3+1)) = d((j3+1)) +(dv*dy3x)
+          d((i3+2)) = d((i3+2)) -(dv*dz3x)
+          d((j3+2)) = d((j3+2)) +(dv*dz3x)
+                        
+          ! --- 3 - (1,2,3) ---
+          i3 = i3 + 3 !point to x for 3 in mol. iw
+          j3 = nbww(ip)*3-2 !point to o in j-mol.
+          ! 3 - 1 (x=1)
+          dx1x = x((j3  ))-x((i3  ))
+          dy1x = x((j3+1))-x((i3+1))
+          dz1x = x((j3+2))-x((i3+2))
+          ! 3-2 (x=2)
+          j3 = j3 + 3
+          dx2x = x((j3  ))-x((i3  ))
+          dy2x = x((j3+1))-x((i3+1))
+          dz2x = x((j3+2))-x((i3+2))
+          ! 3-3 (x=3)
+          j3 = j3 + 3
+          dx3x = x((j3  ))-x((i3  ))
+          dy3x = x((j3+1))-x((i3+1))
+          dz3x = x((j3+2))-x((i3+2))
+          dx1x = dx1x - boxshiftx
+          dy1x = dy1x - boxshifty
+          dz1x = dz1x - boxshiftz
+          dx2x = dx2x - boxshiftx
+          dy2x = dy2x - boxshifty
+          dz2x = dz2x - boxshiftz
+          dx3x = dx3x - boxshiftx
+          dy3x = dy3x - boxshifty
+          dz3x = dz3x - boxshiftz
 
-	  r1X = dx1X*dx1X + dy1X*dy1X + dz1X*dz1X
-	  r2X = dx2X*dx2X + dy2X*dy2X + dz2X*dz2X
-	  r3X = dx3X*dx3X + dy3X*dy3X + dz3X*dz3X
-	  r1X=	sqrt(1._8/r1X  )
-	  r2X=	sqrt(1._8/r2X )
-	  r3X=	sqrt(1._8/r3X )
-	  ! 3-1 
-	  r2 = r1X * r1X
-	  Vel = crg3*crg1*r1X
-	  V_a  = A_13*(r2*r2*r2)*(r2*r2*r2)
-	  V_b  = B_13*(r2*r2*r2)
-	  E%ww%vdw = E%ww%vdw + V_a-V_B
-	  E%ww%el = E%ww%el + Vel
-	  dv = r2*( -Vel -12.*V_a +6.*V_b )
-	  j3 = j3 - 6 !move pointer back to o in j-mol.
-	  d((i3  )) = d((i3  )) -(dv*dx1X)
-	  d((j3  )) = d((j3  )) +(dv*dx1X)
-	  d((i3+1)) = d((i3+1)) -(dv*dy1X)
-	  d((j3+1)) = d((j3+1)) +(dv*dy1X)
-	  d((i3+2)) = d((i3+2)) -(dv*dz1X)
-	  d((j3+2)) = d((j3+2)) +(dv*dz1X)
-	  ! 3-2 
-	  r2 = r2X * r2X
-	  Vel = crg3*crg2*r2X
-	  V_a  = A_23*(r2*r2*r2)*(r2*r2*r2)
-	  V_b  = B_23*(r2*r2*r2)
-	  E%ww%vdw = E%ww%vdw + V_a-V_B
-	  E%ww%el = E%ww%el + Vel
-	  dv = r2*( -Vel -12.*V_a +6.*V_b )
-	  j3 = j3 +3 !point to 2 in j-molecule
-	  d((i3  )) = d((i3  )) -(dv*dx2X)
-	  d((j3  )) = d((j3  )) +(dv*dx2X)
-	  d((i3+1)) = d((i3+1)) -(dv*dy2X)
-	  d((j3+1)) = d((j3+1)) +(dv*dy2X)
-	  d((i3+2)) = d((i3+2)) -(dv*dz2X)
-	  d((j3+2)) = d((j3+2)) +(dv*dz2X)
-	  ! 3-3
-	  r2 = r3X * r3X
-	  Vel = crg3*crg3*r3X
-	  V_a  = A_33*(r2*r2*r2)*(r2*r2*r2)
-	  V_b  = B_33*(r2*r2*r2)
-	  E%ww%vdw = E%ww%vdw + V_a-V_B
-	  E%ww%el = E%ww%el + Vel
-	  dv = r2*( -Vel -12.*V_a +6.*V_b )
-	  j3 = j3 +3 !point to 3 in j-molecule
-	  d((i3  )) = d((i3  )) -(dv*dx3X)
-	  d((j3  )) = d((j3  )) +(dv*dx3X)
-	  d((i3+1)) = d((i3+1)) -(dv*dy3X)
-	  d((j3+1)) = d((j3+1)) +(dv*dy3X)
-	  d((i3+2)) = d((i3+2)) -(dv*dz3X)
-	  d((j3+2)) = d((j3+2)) +(dv*dz3X)
+          r1x = dx1x*dx1x + dy1x*dy1x + dz1x*dz1x
+          r2x = dx2x*dx2x + dy2x*dy2x + dz2x*dz2x
+          r3x = dx3x*dx3x + dy3x*dy3x + dz3x*dz3x
+          r1x=  sqrt(1._8/r1x  )
+          r2x=  sqrt(1._8/r2x )
+          r3x=  sqrt(1._8/r3x )
+          ! 3-1 
+          r2 = r1x * r1x
+          vel = crg3*crg1*r1x
+          v_a  = a_13*(r2*r2*r2)*(r2*r2*r2)
+          v_b  = b_13*(r2*r2*r2)
+          e%ww%vdw = e%ww%vdw + v_a-v_b
+          e%ww%el = e%ww%el + vel
+          dv = r2*( -vel -12.*v_a +6.*v_b )
+          j3 = j3 - 6 !move pointer back to o in j-mol.
+          d((i3  )) = d((i3  )) -(dv*dx1x)
+          d((j3  )) = d((j3  )) +(dv*dx1x)
+          d((i3+1)) = d((i3+1)) -(dv*dy1x)
+          d((j3+1)) = d((j3+1)) +(dv*dy1x)
+          d((i3+2)) = d((i3+2)) -(dv*dz1x)
+          d((j3+2)) = d((j3+2)) +(dv*dz1x)
+          ! 3-2 
+          r2 = r2x * r2x
+          vel = crg3*crg2*r2x
+          v_a  = a_23*(r2*r2*r2)*(r2*r2*r2)
+          v_b  = b_23*(r2*r2*r2)
+          e%ww%vdw = e%ww%vdw + v_a-v_b
+          e%ww%el = e%ww%el + vel
+          dv = r2*( -vel -12.*v_a +6.*v_b )
+          j3 = j3 +3 !point to 2 in j-molecule
+          d((i3  )) = d((i3  )) -(dv*dx2x)
+          d((j3  )) = d((j3  )) +(dv*dx2x)
+          d((i3+1)) = d((i3+1)) -(dv*dy2x)
+          d((j3+1)) = d((j3+1)) +(dv*dy2x)
+          d((i3+2)) = d((i3+2)) -(dv*dz2x)
+          d((j3+2)) = d((j3+2)) +(dv*dz2x)
+          ! 3-3
+          r2 = r3x * r3x
+          vel = crg3*crg3*r3x
+          v_a  = a_33*(r2*r2*r2)*(r2*r2*r2)
+          v_b  = b_33*(r2*r2*r2)
+          e%ww%vdw = e%ww%vdw + v_a-v_b
+          e%ww%el = e%ww%el + vel
+          dv = r2*( -vel -12.*v_a +6.*v_b )
+          j3 = j3 +3 !point to 3 in j-molecule
+          d((i3  )) = d((i3  )) -(dv*dx3x)
+          d((j3  )) = d((j3  )) +(dv*dx3x)
+          d((i3+1)) = d((i3+1)) -(dv*dy3x)
+          d((j3+1)) = d((j3+1)) +(dv*dy3x)
+          d((i3+2)) = d((i3+2)) -(dv*dz3x)
+          d((j3+2)) = d((j3+2)) +(dv*dz3x)
 
-	  ip = ip + 1
-	end do ! while ip
+          ip = ip + 1
+        end do ! while ip
 
-	! skip the gap
-	ipstart = ip + 1			
+        ! skip the gap
+        ipstart = ip + 1                        
   end do ! iw
 
 end subroutine nonbond_3atomsolvent_box
@@ -12863,11 +12834,11 @@ end subroutine nonbond_3atomsolvent_box
 
 subroutine offdiag
 ! local variables
-integer						:: io,i,j,k,l,k3,l3
-real(8)						:: r
+integer                                         :: io,i,j,k,l,k3,l3
+real(8)                                         :: r
 
 ! global variables used:
-!  offd, noffd, iqseq, x, Hij, offd2
+!  offd, noffd, iqseq, x, hij, offd2
 
 do io = 1, noffd
 ! for every offd:
@@ -12883,29 +12854,29 @@ r = sqrt ( (x(l3+1)-x(k3+1))**2 + &
   (x(l3+2)-x(k3+2))**2 + &
   (x(l3+3)-x(k3+3))**2 )
 
-Hij(i,j) = offd2(io)%A * exp(-offd2(io)%mu*r)
-offd(io)%Hij = Hij(i,j)	! store for save
+hij(i,j) = offd2(io)%a * exp(-offd2(io)%mu*r)
+offd(io)%hij = hij(i,j) ! store for save
 offd(io)%rkl = r
 end do
 end subroutine offdiag
 
 !-----------------------------------------------------------------------
 subroutine p_restrain
-! *** Local variables
-integer						::	ir,i,j,k,i3,j3,istate, n_ctr
-real(8)						::	fk,r2,erst,Edum,x2,y2,z2,wgt,b,db,dv, totmass
-real(8)						::	dr(3), ctr(3)
-real(8)						::	fexp
+! *** local variables
+integer                                         ::      ir,i,j,k,i3,j3,istate, n_ctr
+real(8)                                         ::      fk,r2,erst,edum,x2,y2,z2,wgt,b,db,dv, totmass
+real(8)                                         ::      dr(3), ctr(3)
+real(8)                                         ::      fexp
 
 ! global variables used:
-!  E, nstates, EQ, nrstr_seq, rstseq, heavy, x, xtop, d, nrstr_pos, rstpos, nrstr_dist, 
+!  e, nstates, eq, nrstr_seq, rstseq, heavy, x, xtop, d, nrstr_pos, rstpos, nrstr_dist, 
 !  rstdis, nrstr_wall, rstwal, xwcent
 
-! sequence restraints (independent of Q-state)
+! sequence restraints (independent of q-state)
 do ir = 1, nrstr_seq
 fk = rstseq(ir)%fk
 
-if(rstseq(ir)%to_centre == 1) then     ! Put == 1, then equal to 2
+if(rstseq(ir)%to_centre == 1) then     ! put == 1, then equal to 2
   ! restrain to geometrical centre
 
   ! reset dr & atom counter
@@ -12927,7 +12898,7 @@ if(rstseq(ir)%to_centre == 1) then     ! Put == 1, then equal to 2
         dr(:) = dr(:) / n_ctr 
         r2      = dr(1)**2 + dr(2)**2 + dr(3)**2
         erst    = 0.5*fk*r2
-        E%restraint%protein  = E%restraint%protein + erst
+        e%restraint%protein  = e%restraint%protein + erst
 
         ! apply same force to all atoms
         do i = rstseq(ir)%i, rstseq(ir)%j
@@ -12937,7 +12908,7 @@ if(rstseq(ir)%to_centre == 1) then     ! Put == 1, then equal to 2
         end do
   end if
  
-else if(rstseq(ir)%to_centre == 2) then     ! Put == 1, then equal to 2
+else if(rstseq(ir)%to_centre == 2) then     ! put == 1, then equal to 2
   ! restrain to mass centre
   ! reset dr & variable to put masses
   dr(:) = 0.
@@ -12946,9 +12917,9 @@ else if(rstseq(ir)%to_centre == 2) then     ! Put == 1, then equal to 2
 ! calculate deviation from mass center
   do i = rstseq(ir)%i, rstseq(ir)%j
         if ( heavy(i) .or. rstseq(ir)%ih .eq. 1 ) then
-          totmass = totmass + iaclib(iac(i))%mass                              ! Add masses
-          dr(:) = dr(:) + (x(i*3-2:i*3) - xtop(i*3-2:i*3))*iaclib(iac(i))%mass ! Massweight distances
-		end if
+          totmass = totmass + iaclib(iac(i))%mass                              ! add masses
+          dr(:) = dr(:) + (x(i*3-2:i*3) - xtop(i*3-2:i*3))*iaclib(iac(i))%mass ! massweight distances
+                end if
   end do
 
  if(totmass > 0) then 
@@ -12958,7 +12929,7 @@ else if(rstseq(ir)%to_centre == 2) then     ! Put == 1, then equal to 2
         dr(:) = dr(:)/totmass                                  ! divide by total mass
         r2      = dr(1)**2 + dr(2)**2 + dr(3)**2
         erst    = 0.5*fk*r2
-        E%restraint%protein  = E%restraint%protein + erst
+        e%restraint%protein  = e%restraint%protein + erst
 
         ! apply same force to all atoms
         do i = rstseq(ir)%i, rstseq(ir)%j
@@ -12978,7 +12949,7 @@ else
           dr(2)   = x(i3+2) - xtop(i3+2)
           dr(3)   = x(i3+3) - xtop(i3+3)
        !use the periodically minimal distance:
-       if( use_PBC ) then
+       if( use_pbc ) then
                dr(1) = dr(1) - boxlength(1)*nint( dr(1)*inv_boxl(1) )
                dr(2) = dr(2) - boxlength(2)*nint( dr(2)*inv_boxl(2) )
                dr(3) = dr(3) - boxlength(3)*nint( dr(3)*inv_boxl(3) )
@@ -12986,7 +12957,7 @@ else
           r2      = dr(1)**2 + dr(2)**2 + dr(3)**2
 
           erst    = 0.5*fk*r2
-          E%restraint%protein  = E%restraint%protein + erst
+          e%restraint%protein  = e%restraint%protein + erst
 
           d(i3+1) = d(i3+1) + fk*dr(1)
           d(i3+2) = d(i3+2) + fk*dr(2)
@@ -12996,7 +12967,7 @@ else
 end if
 end do
 
-! extra positional restraints (Q-state dependent)
+! extra positional restraints (q-state dependent)
 do ir = 1, nrstr_pos
 istate = rstpos(ir)%ipsi
 i      = rstpos(ir)%i
@@ -13007,7 +12978,7 @@ dr(2)  = x(i3+2) - rstpos(ir)%x(2)
 dr(3)  = x(i3+3) - rstpos(ir)%x(3)
 
 if ( istate .ne. 0 ) then
-wgt = EQ(istate)%lambda
+wgt = eq(istate)%lambda
 else
 wgt = 1.0
 end if
@@ -13016,7 +12987,7 @@ x2 = dr(1)**2
 y2 = dr(2)**2
 z2 = dr(3)**2
 
-Edum = 0.5*rstpos(ir)%fk(1)*x2 + &
+edum = 0.5*rstpos(ir)%fk(1)*x2 + &
    0.5*rstpos(ir)%fk(2)*y2 + &
    0.5*rstpos(ir)%fk(3)*z2
 
@@ -13026,15 +12997,15 @@ d(i3+3) = d(i3+3) + rstpos(ir)%fk(3)*dr(3)*wgt
 
 if ( istate .eq. 0 ) then
 do k = 1, nstates
-EQ(k)%restraint = EQ(k)%restraint + Edum
+eq(k)%restraint = eq(k)%restraint + edum
 end do
-if ( nstates .eq. 0 ) E%restraint%protein = E%restraint%protein + Edum
+if ( nstates .eq. 0 ) e%restraint%protein = e%restraint%protein + edum
 else
-EQ(istate)%restraint = EQ(istate)%restraint + Edum
+eq(istate)%restraint = eq(istate)%restraint + edum
 end if
 end do
 
-! atom-atom distance restraints (Q-state dependent)
+! atom-atom distance restraints (q-state dependent)
 do ir = 1, nrstr_dist
 istate = rstdis(ir)%ipsi
 i      = rstdis(ir)%i
@@ -13046,15 +13017,15 @@ dr(1)  = x(j3+1) - x(i3+1)
 dr(2)  = x(j3+2) - x(i3+2)
 dr(3)  = x(j3+3) - x(i3+3)
 
-! if PBC then adjust lengths according to periodicity - MA
-if( use_PBC ) then
-	dr(1) = dr(1) - boxlength(1)*nint( dr(1)*inv_boxl(1) )
-	dr(2) = dr(2) - boxlength(2)*nint( dr(2)*inv_boxl(2) )
-	dr(3) = dr(3) - boxlength(3)*nint( dr(3)*inv_boxl(3) )
+! if pbc then adjust lengths according to periodicity - ma
+if( use_pbc ) then
+        dr(1) = dr(1) - boxlength(1)*nint( dr(1)*inv_boxl(1) )
+        dr(2) = dr(2) - boxlength(2)*nint( dr(2)*inv_boxl(2) )
+        dr(3) = dr(3) - boxlength(3)*nint( dr(3)*inv_boxl(3) )
 end if
 
 if ( istate .ne. 0 ) then
-wgt = EQ(istate)%lambda
+wgt = eq(istate)%lambda
 else
 wgt = 1.0
 end if
@@ -13069,7 +13040,7 @@ else
         cycle !skip zero force calculation
 endif
 
-Edum   = 0.5*rstdis(ir)%fk*db**2
+edum   = 0.5*rstdis(ir)%fk*db**2
 dv     = wgt*rstdis(ir)%fk*db/b
 
 d(j3+1) = d(j3+1) + dr(1)*dv
@@ -13081,15 +13052,15 @@ d(i3+3) = d(i3+3) - dr(3)*dv
 
 if ( istate .eq. 0 ) then
 do k = 1, nstates
-EQ(k)%restraint = EQ(k)%restraint + Edum
+eq(k)%restraint = eq(k)%restraint + edum
 end do
-if ( nstates .eq. 0 ) E%restraint%protein = E%restraint%protein + Edum
+if ( nstates .eq. 0 ) e%restraint%protein = e%restraint%protein + edum
 else
-EQ(istate)%restraint = EQ(istate)%restraint + Edum
+eq(istate)%restraint = eq(istate)%restraint + edum
 end if
 end do
 
-if( .not. use_PBC ) then
+if( .not. use_pbc ) then
 ! extra half-harmonic wall restraints
 do ir = 1, nrstr_wall
         fk = rstwal(ir)%fk
@@ -13105,14 +13076,14 @@ do ir = 1, nrstr_wall
                         db = b - rstwal(ir)%d
 
                         if(db > 0.) then
-                                erst =  0.5 * fk * db**2 - rstwal(ir)%Dmorse
+                                erst =  0.5 * fk * db**2 - rstwal(ir)%dmorse
                                 dv = fk*db/b
                         else
-                                fexp = exp(rstwal(ir)%aMorse*db)
-                                erst = rstwal(ir)%dMorse*(fexp*fexp-2.*fexp)
-                                dv=-2.*rstwal(ir)%dMorse*rstwal(ir)%aMorse*(fexp-fexp*fexp)/b
+                                fexp = exp(rstwal(ir)%amorse*db)
+                                erst = rstwal(ir)%dmorse*(fexp*fexp-2.*fexp)
+                                dv=-2.*rstwal(ir)%dmorse*rstwal(ir)%amorse*(fexp-fexp*fexp)/b
                         end if
-                        E%restraint%protein = E%restraint%protein + erst
+                        e%restraint%protein = e%restraint%protein + erst
 
                         d(i3+1) = d(i3+1) + dv*dr(1)
                         d(i3+2) = d(i3+2) + dv*dr(2)
@@ -13131,61 +13102,61 @@ subroutine pot_energy
 ! local variables
 
 
-integer					:: istate, i, nat3
-integer					:: is, j
-#if defined (PROFILING)
-real(8)					:: start_loop_time1
-real(8)					:: start_loop_time2
-real(8)					:: start_loop_time3
+integer                                 :: istate, i, nat3
+integer                                 :: is, j
+#if defined (profiling)
+real(8)                                 :: start_loop_time1
+real(8)                                 :: start_loop_time2
+real(8)                                 :: start_loop_time3
 #endif
 
 ! --- reset all energies
 
-E%potential = 0.0
-!E%kinetic = 0.0	! no need to reset because it will be assigned its final value at once
-E%LRF = 0.0
-E%p%bond  = 0.0
-E%p%angle = 0.0
-E%p%torsion = 0.0
-E%p%improper = 0.0
-E%w%bond  = 0.0
-E%w%angle = 0.0
-E%w%torsion = 0.0
-E%w%improper = 0.0
-E%q%bond  = 0.0
-E%q%angle = 0.0
-E%q%torsion   = 0.0
-E%q%improper   = 0.0
-E%pp%el  = 0.0
-E%pp%vdw = 0.0
-E%pw%el  = 0.0
-E%pw%vdw = 0.0
-E%ww%el  = 0.0
-E%ww%vdw = 0.0
-E%qx%el    = 0.0
-E%qx%vdw   = 0.0
-!E%restraint%total = 0.0	! will be assigned its final value later
-E%restraint%fix = 0.0
-E%restraint%shell = 0.0
-E%restraint%protein = 0.0
-E%restraint%solvent_radial = 0.0
-E%restraint%water_pol = 0.0
+e%potential = 0.0
+!e%kinetic = 0.0        ! no need to reset because it will be assigned its final value at once
+e%lrf = 0.0
+e%p%bond  = 0.0
+e%p%angle = 0.0
+e%p%torsion = 0.0
+e%p%improper = 0.0
+e%w%bond  = 0.0
+e%w%angle = 0.0
+e%w%torsion = 0.0
+e%w%improper = 0.0
+e%q%bond  = 0.0
+e%q%angle = 0.0
+e%q%torsion   = 0.0
+e%q%improper   = 0.0
+e%pp%el  = 0.0
+e%pp%vdw = 0.0
+e%pw%el  = 0.0
+e%pw%vdw = 0.0
+e%ww%el  = 0.0
+e%ww%vdw = 0.0
+e%qx%el    = 0.0
+e%qx%vdw   = 0.0
+!e%restraint%total = 0.0        ! will be assigned its final value later
+e%restraint%fix = 0.0
+e%restraint%shell = 0.0
+e%restraint%protein = 0.0
+e%restraint%solvent_radial = 0.0
+e%restraint%water_pol = 0.0
 do istate = 1, nstates
-!EQ(istate)%lambda set by initialize
-!EQ(istate)%total assigned its final value later
-EQ(istate)%q%bond = 0.0
-EQ(istate)%q%angle = 0.0
-EQ(istate)%q%torsion = 0.0
-EQ(istate)%q%improper = 0.0
-!EQ(istate)%qx%el = 0.0	! assigned its final value later
-!EQ(istate)%qx%vdw = 0.0	! assigned its final value later
-EQ(istate)%qq%el = 0.0
-EQ(istate)%qq%vdw = 0.0
-EQ(istate)%qp%el = 0.0
-EQ(istate)%qp%vdw = 0.0
-EQ(istate)%qw%el = 0.0
-EQ(istate)%qw%vdw = 0.0
-EQ(istate)%restraint = 0.0
+!eq(istate)%lambda set by initialize
+!eq(istate)%total assigned its final value later
+eq(istate)%q%bond = 0.0
+eq(istate)%q%angle = 0.0
+eq(istate)%q%torsion = 0.0
+eq(istate)%q%improper = 0.0
+!eq(istate)%qx%el = 0.0 ! assigned its final value later
+!eq(istate)%qx%vdw = 0.0        ! assigned its final value later
+eq(istate)%qq%el = 0.0
+eq(istate)%qq%vdw = 0.0
+eq(istate)%qp%el = 0.0
+eq(istate)%qp%vdw = 0.0
+eq(istate)%qw%el = 0.0
+eq(istate)%qw%vdw = 0.0
+eq(istate)%restraint = 0.0
 end do
 
 !reset derivatives ---
@@ -13194,20 +13165,20 @@ d(:) = 0.
 ! --- calculate the potential energy and derivatives ---
 ! *** nonbonds distribueras
 
-#if defined (USE_MPI)
+#if defined (use_mpi)
 if (nodeid .eq. 0) then
-!First post recieves for gathering data from slaves
+!first post recieves for gathering data from slaves
 call gather_nonbond
 end if
 #endif
 
-#if defined (PROFILING)
+#if defined (profiling)
 start_loop_time2 = rtime()
 #endif
 
 ! classical nonbonds
 call pot_energy_nonbonds
-#if defined (PROFILING)
+#if defined (profiling)
 profile(10)%time = profile(10)%time + rtime() - start_loop_time2
 #endif
 
@@ -13215,22 +13186,22 @@ if (nodeid .eq. 0) then
 
 
 ! classical bond interactions (master node only)
-#if defined (PROFILING)
+#if defined (profiling)
 start_loop_time1 = rtime()
 #endif
 call pot_energy_bonds
-#if defined (PROFILING)
+#if defined (profiling)
 profile(8)%time = profile(8)%time + rtime() - start_loop_time1
 #endif
 
 ! various restraints
-if( .not. use_PBC ) then
-   call fix_shell     !Restrain all excluded atoms plus heavy solute atoms in the inner shell.
+if( .not. use_pbc ) then
+   call fix_shell     !restrain all excluded atoms plus heavy solute atoms in the inner shell.
 end if
 
-call p_restrain       !Seq. restraints, dist. restaints, etc
+call p_restrain       !seq. restraints, dist. restaints, etc
 
-if( .not. use_PBC ) then
+if( .not. use_pbc ) then
         if(nwat > 0) then
           call restrain_solvent 
         if (wpol_restr) call watpol
@@ -13257,72 +13228,72 @@ do istate = 1, nstates
   ! bonds, angles, torsions and impropers
   call qbond (istate)
   call qangle (istate)
-  if(ff_type == FF_CHARMM) call qurey_bradley(istate)
+  if(ff_type == ff_charmm) call qurey_bradley(istate)
   call qtorsion (istate)
   call qimproper (istate)
 end do
-#if defined (PROFILING)
+#if defined (profiling)
 profile(9)%time = profile(9)%time + rtime() - start_loop_time1 - profile(8)%time
 #endif
-#if defined(USE_MPI)
-else  !Slave nodes
+#if defined(use_mpi)
+else  !slave nodes
 call gather_nonbond
 #endif
 end if
 
 if (nodeid .eq. 0) then 
-#if (USE_MPI)
+#if (use_mpi)
 do i = 1, 3
-    call MPI_WaitAll(numnodes-1,request_recv(1,i),mpi_status,ierr)
+    call mpi_waitall(numnodes-1,request_recv(1,i),mpi_status,ierr)
 end do
 
-!Forces and energies are summarised
+!forces and energies are summarised
 do i=1,numnodes-1
   d = d + d_recv(:,i)
-  E%pp%el   = E%pp%el  + E_recv(i)%pp%el
-  E%pp%vdw  = E%pp%vdw + E_recv(i)%pp%vdw
-  E%pw%el   = E%pw%el  + E_recv(i)%pw%el
-  E%pw%vdw  = E%pw%vdw + E_recv(i)%pw%vdw
-  E%ww%el   = E%ww%el  + E_recv(i)%ww%el
-  E%ww%vdw  = E%ww%vdw + E_recv(i)%ww%vdw
-  E%lrf     = E%lrf    + E_recv(i)%lrf
-  EQ(1:nstates)%qp%el  = EQ(1:nstates)%qp%el  + EQ_recv(1:nstates,i)%qp%el
-  EQ(1:nstates)%qp%vdw = EQ(1:nstates)%qp%vdw + EQ_recv(1:nstates,i)%qp%vdw
-  EQ(1:nstates)%qw%el  = EQ(1:nstates)%qw%el  + EQ_recv(1:nstates,i)%qw%el
-  EQ(1:nstates)%qw%vdw = EQ(1:nstates)%qw%vdw + EQ_recv(1:nstates,i)%qw%vdw
+  e%pp%el   = e%pp%el  + e_recv(i)%pp%el
+  e%pp%vdw  = e%pp%vdw + e_recv(i)%pp%vdw
+  e%pw%el   = e%pw%el  + e_recv(i)%pw%el
+  e%pw%vdw  = e%pw%vdw + e_recv(i)%pw%vdw
+  e%ww%el   = e%ww%el  + e_recv(i)%ww%el
+  e%ww%vdw  = e%ww%vdw + e_recv(i)%ww%vdw
+  e%lrf     = e%lrf    + e_recv(i)%lrf
+  eq(1:nstates)%qp%el  = eq(1:nstates)%qp%el  + eq_recv(1:nstates,i)%qp%el
+  eq(1:nstates)%qp%vdw = eq(1:nstates)%qp%vdw + eq_recv(1:nstates,i)%qp%vdw
+  eq(1:nstates)%qw%el  = eq(1:nstates)%qw%el  + eq_recv(1:nstates,i)%qw%el
+  eq(1:nstates)%qw%vdw = eq(1:nstates)%qw%vdw + eq_recv(1:nstates,i)%qw%vdw
 end do
 #endif
 
 ! q-atom energy summary
 do istate = 1, nstates
-! update EQ
-EQ(istate)%qx%el  = EQ(istate)%qq%el +EQ(istate)%qp%el +EQ(istate)%qw%el
-EQ(istate)%qx%vdw = EQ(istate)%qq%vdw+EQ(istate)%qp%vdw+EQ(istate)%qw%vdw
+! update eq
+eq(istate)%qx%el  = eq(istate)%qq%el +eq(istate)%qp%el +eq(istate)%qw%el
+eq(istate)%qx%vdw = eq(istate)%qq%vdw+eq(istate)%qp%vdw+eq(istate)%qw%vdw
 
-EQ(istate)%total =  EQ(istate)%q%bond + EQ(istate)%q%angle   &
-  + EQ(istate)%q%torsion  + EQ(istate)%q%improper + EQ(istate)%qx%el &
-  + EQ(istate)%qx%vdw  + EQ(istate)%restraint
+eq(istate)%total =  eq(istate)%q%bond + eq(istate)%q%angle   &
+  + eq(istate)%q%torsion  + eq(istate)%q%improper + eq(istate)%qx%el &
+  + eq(istate)%qx%vdw  + eq(istate)%restraint
 
-! update E with an average of all states
-E%q%bond  = E%q%bond  + EQ(istate)%q%bond *EQ(istate)%lambda
-E%q%angle = E%q%angle + EQ(istate)%q%angle*EQ(istate)%lambda
-E%q%torsion   = E%q%torsion   + EQ(istate)%q%torsion  *EQ(istate)%lambda
-E%q%improper   = E%q%improper   + EQ(istate)%q%improper  *EQ(istate)%lambda
-E%qx%el    = E%qx%el    + EQ(istate)%qx%el   *EQ(istate)%lambda
-E%qx%vdw   = E%qx%vdw   + EQ(istate)%qx%vdw  *EQ(istate)%lambda
+! update e with an average of all states
+e%q%bond  = e%q%bond  + eq(istate)%q%bond *eq(istate)%lambda
+e%q%angle = e%q%angle + eq(istate)%q%angle*eq(istate)%lambda
+e%q%torsion   = e%q%torsion   + eq(istate)%q%torsion  *eq(istate)%lambda
+e%q%improper   = e%q%improper   + eq(istate)%q%improper  *eq(istate)%lambda
+e%qx%el    = e%qx%el    + eq(istate)%qx%el   *eq(istate)%lambda
+e%qx%vdw   = e%qx%vdw   + eq(istate)%qx%vdw  *eq(istate)%lambda
 
-! update E%restraint%protein with an average of all states
-E%restraint%protein = E%restraint%protein + EQ(istate)%restraint*EQ(istate)%lambda
+! update e%restraint%protein with an average of all states
+e%restraint%protein = e%restraint%protein + eq(istate)%restraint*eq(istate)%lambda
 end do
 
 ! total energy summary
-E%restraint%total = E%restraint%fix + E%restraint%shell + &
-E%restraint%protein + E%restraint%solvent_radial + E%restraint%water_pol
+e%restraint%total = e%restraint%fix + e%restraint%shell + &
+e%restraint%protein + e%restraint%solvent_radial + e%restraint%water_pol
 
-E%potential = E%p%bond + E%w%bond + E%p%angle + E%w%angle + E%p%torsion + &
-E%p%improper + E%pp%el + E%pp%vdw + E%pw%el + E%pw%vdw + E%ww%el + &
-E%ww%vdw + E%q%bond + E%q%angle + E%q%torsion + &
-E%q%improper + E%qx%el + E%qx%vdw + E%restraint%total + E%LRF
+e%potential = e%p%bond + e%w%bond + e%p%angle + e%w%angle + e%p%torsion + &
+e%p%improper + e%pp%el + e%pp%vdw + e%pw%el + e%pw%vdw + e%ww%el + &
+e%ww%vdw + e%q%bond + e%q%angle + e%q%torsion + &
+e%q%improper + e%qx%el + e%qx%vdw + e%restraint%total + e%lrf
 end if
 
 end subroutine pot_energy
@@ -13333,35 +13304,35 @@ subroutine pot_energy_bonds
 ! bond, angle, torsion and improper potential energy
 
 select case(ff_type)
-case(FF_GROMOS)
-        E%p%bond = bond(1, nbonds_solute)
-        E%w%bond = bond(nbonds_solute+1, nbonds)
-        E%p%angle = angle(1, nangles_solute)
-        E%w%angle = angle(nangles_solute+1, nangles)
-        E%p%torsion = torsion(1, ntors_solute)
-        E%w%torsion = torsion(ntors_solute+1, ntors)
-        E%p%improper = improper(1, nimps_solute)
-        E%w%improper = improper(nimps_solute+1, nimps)
-case(FF_AMBER)
-        E%p%bond = bond(1, nbonds_solute)
-        E%w%bond = bond(nbonds_solute+1, nbonds)
-        E%p%angle = angle(1, nangles_solute)
-        E%w%angle = angle(nangles_solute+1, nangles)
-        E%p%torsion = torsion(1, ntors_solute)
-        E%w%torsion = torsion(ntors_solute+1, ntors)
-        E%p%improper = improper2(1, nimps_solute)
-        E%w%improper = improper2(nimps_solute+1, nimps)
-case(FF_CHARMM)
-        E%p%bond = bond(1, nbonds_solute)
-        E%w%bond = bond(nbonds_solute+1, nbonds)
-        E%p%angle = angle(1, nangles_solute)
-        E%w%angle = angle(nangles_solute+1, nangles)
-        E%p%angle = E%p%angle + urey_bradley(1, nangles_solute)
-        E%w%angle = E%w%angle + urey_bradley(nangles_solute+1, nangles)
-        E%p%torsion = torsion(1, ntors_solute)
-        E%w%torsion = torsion(ntors_solute+1, ntors)
-        E%p%improper = improper(1, nimps_solute)
-        E%w%improper = improper(nimps_solute+1, nimps)
+case(ff_gromos)
+        e%p%bond = bond(1, nbonds_solute)
+        e%w%bond = bond(nbonds_solute+1, nbonds)
+        e%p%angle = angle(1, nangles_solute)
+        e%w%angle = angle(nangles_solute+1, nangles)
+        e%p%torsion = torsion(1, ntors_solute)
+        e%w%torsion = torsion(ntors_solute+1, ntors)
+        e%p%improper = improper(1, nimps_solute)
+        e%w%improper = improper(nimps_solute+1, nimps)
+case(ff_amber)
+        e%p%bond = bond(1, nbonds_solute)
+        e%w%bond = bond(nbonds_solute+1, nbonds)
+        e%p%angle = angle(1, nangles_solute)
+        e%w%angle = angle(nangles_solute+1, nangles)
+        e%p%torsion = torsion(1, ntors_solute)
+        e%w%torsion = torsion(ntors_solute+1, ntors)
+        e%p%improper = improper2(1, nimps_solute)
+        e%w%improper = improper2(nimps_solute+1, nimps)
+case(ff_charmm)
+        e%p%bond = bond(1, nbonds_solute)
+        e%w%bond = bond(nbonds_solute+1, nbonds)
+        e%p%angle = angle(1, nangles_solute)
+        e%w%angle = angle(nangles_solute+1, nangles)
+        e%p%angle = e%p%angle + urey_bradley(1, nangles_solute)
+        e%w%angle = e%w%angle + urey_bradley(nangles_solute+1, nangles)
+        e%p%torsion = torsion(1, ntors_solute)
+        e%w%torsion = torsion(ntors_solute+1, ntors)
+        e%p%improper = improper(1, nimps_solute)
+        e%w%improper = improper(nimps_solute+1, nimps)
 end select
 
 end subroutine pot_energy_bonds
@@ -13371,10 +13342,10 @@ subroutine pot_energy_nonbonds
 
 !nonbonded interactions
 
-if( use_PBC ) then !periodic box
+if( use_pbc ) then !periodic box
       
-		select case(ivdw_rule)
-        case(VDW_GEOMETRIC)
+                select case(ivdw_rule)
+        case(vdw_geometric)
                 call nonbond_pp_box
                 call nonbond_pw_box
                 if(qvdw_flag) then
@@ -13383,34 +13354,34 @@ if( use_PBC ) then !periodic box
                         call nonbond_qp_box
                 end if
                 if(natom > nat_solute) then !if any solvent
-                        if(solvent_type == SOLVENT_SPC) then
-                                !use the optimised SPC routine when possible
+                        if(solvent_type == solvent_spc) then
+                                !use the optimised spc routine when possible
                                 call nonbond_ww_spc_box
                                 call nonbond_qw_spc_box
-                        elseif(solvent_type == SOLVENT_3ATOM) then !otherwise calc. LJ with all atoms
+                        elseif(solvent_type == solvent_3atom) then !otherwise calc. lj with all atoms
                                 call nonbond_3atomsolvent_box
                                 call nonbond_qw_3atom_box
                         end if
                 end if
-        case(VDW_ARITHMETIC)
+        case(vdw_arithmetic)
                 call nonbon2_pp_box
                 call nonbon2_qp_box
                 if(natom > nat_solute) then !if any solvent
                         call nonbon2_pw_box
-                        call nonbon2_qw_box !no SPC-specific optimised routines here
+                        call nonbon2_qw_box !no spc-specific optimised routines here
                         call nonbon2_ww_box
                 end if
         end select
         
-		!LRF PBC
-		if (use_LRF) then
+                !lrf pbc
+                if (use_lrf) then
                 call lrf_taylor
         end if
 
 else !simulation sphere
 
         select case(ivdw_rule)
-        case(VDW_GEOMETRIC)
+        case(vdw_geometric)
                 call nonbond_pp   
                 call nonbond_pw   
                 if(qvdw_flag) then
@@ -13419,27 +13390,27 @@ else !simulation sphere
                         call nonbond_qp
                 end if
                 if(natom > nat_solute) then !if any solvent
-                        if(solvent_type == SOLVENT_SPC) then
-                                !use the optimised SPC routine when possible
+                        if(solvent_type == solvent_spc) then
+                                !use the optimised spc routine when possible
                                 call nonbond_ww_spc
                                 call nonbond_qw_spc
-                        elseif(solvent_type == SOLVENT_3ATOM) then !otherwise calc. LJ with all atoms
+                        elseif(solvent_type == solvent_3atom) then !otherwise calc. lj with all atoms
                                 call nonbond_3atomsolvent
                                 call nonbond_qw_3atom
                         end if
                 end if
-        case(VDW_ARITHMETIC)
+        case(vdw_arithmetic)
                 call nonbon2_pp
                 call nonbon2_qp
                 if(natom > nat_solute) then !if any solvent
                         call nonbon2_pw
-                        call nonbon2_qw !no SPC-specific optimised routines here
+                        call nonbon2_qw !no spc-specific optimised routines here
                         call nonbon2_ww
-                end if	
+                end if  
         end select
 
         ! on demand: taylor expansion of the electric field from charge groups beyond rcutoff
-        if (use_LRF) then
+        if (use_lrf) then
                 call lrf_taylor
         end if
 
@@ -13455,18 +13426,18 @@ subroutine prep_coord
 ! local variables
 integer(4)          :: i,nat3
 
-! --- Refresh topology coords. if needed (external restraints file)
+! --- refresh topology coords. if needed (external restraints file)
 if ( implicit_rstr_from_file .eq. 1 ) then
-write (*,'(/,a,/)') 'Refreshing topology coords for restraining...'
+write (*,'(/,a,/)') 'refreshing topology coords for restraining...'
 read (12) nat3,(xtop(i),i=1,nat_pro*3)
 end if
 
-!Assign restraints of kind res:atom their numerical atom numbers
+!assign restraints of kind res:atom their numerical atom numbers
 do i=1,nrstr_dist
   if(rstdis(i)%itext .ne. 'nil') then
     if (scan(rstdis(i)%itext,':') .ne. 0) then
       rstdis(i)%i=get_atom_from_resnum_atnum(rstdis(i)%itext)
-	else
+        else
       read(rstdis(i)%itext,*) rstdis(i)%i
     end if
     if (scan(rstdis(i)%jtext,':') .ne. 0) then
@@ -13477,54 +13448,54 @@ do i=1,nrstr_dist
   end if
 end do
 
-! --- Make spherical restraining shell lists based on
+! --- make spherical restraining shell lists based on
 !     the xtop coords.
-if (.not. use_PBC) then
+if (.not. use_pbc) then
 
-	if(rexcl_i > rexcl_o) then
-	  call die('inner radius of restrained shell must be < exclusion radius')
-	end if
-	!first find atoms in shell 
-	if (rexcl_i >= 0) then      !if rexcl_i is defined...
-	  if (rexcl_i <= 1.00) then   !if rexcl_i is defined as fraction of rexcl_o
-	    rexcl_i = rexcl_i * rexcl_o  !translate to Angstrom
-	  end if 
-	  if(iuse_switch_atom == 1) then
-	     call make_shell
-	  else
-	     call make_shell2
-	  end if
-	else
-	  write (*,'(/,a,/)') 'Restrained shell not defined!'
-	end if
+        if(rexcl_i > rexcl_o) then
+          call die('inner radius of restrained shell must be < exclusion radius')
+        end if
+        !first find atoms in shell 
+        if (rexcl_i >= 0) then      !if rexcl_i is defined...
+          if (rexcl_i <= 1.00) then   !if rexcl_i is defined as fraction of rexcl_o
+            rexcl_i = rexcl_i * rexcl_o  !translate to angstrom
+          end if 
+          if(iuse_switch_atom == 1) then
+             call make_shell
+          else
+             call make_shell2
+          end if
+        else
+          write (*,'(/,a,/)') 'restrained shell not defined!'
+        end if
 else
-	shell(:) = .false.
-end if ! .not. use_PBC
+        shell(:) = .false.
+end if ! .not. use_pbc
 ! --- read restart file
 
 call allocate_natom_arrays
 if(restart) then
         ! topology routine has determined nwat, natom and allocated storage
-        call centered_heading('Reading restart file','-')
+        call centered_heading('reading restart file','-')
         read (2) nat3
         rewind(2)
         if(nat3 /= 3*natom) then
                 write(*,100) nat3/3, natom
-100			format('>>>>> ERROR:',i5,' atoms in restart file not equal to',i5,&
+100                     format('>>>>> error:',i5,' atoms in restart file not equal to',i5,&
                         ' in topology.')
                 call die('wrong number of atoms in restart file')
         end if
         read (2,err=112,end=112) nat3, (x(i),i=1,nat3)
         read (2,err=112,end=112) nat3, (v(i),i=1,nat3)
-        write (*,'(a30,i8)')   'Total number of atoms        =',natom
-        write (*,'(a30,i8,/)') 'Number of waters encountered =',nwat
+        write (*,'(a30,i8)')   'total number of atoms        =',natom
+        write (*,'(a30,i8,/)') 'number of waters encountered =',nwat
 
-        if( use_PBC) then
+        if( use_pbc) then
                 read(2,err=112,end=112) boxlength(:)
                 read(2,err=112,end=112) boxcentre(:)
                 write(*,*)
-                write(*,'(a16,3f8.3)') 'Boxlength     =', boxlength(:)
-                write(*,'(a16,3f8.3)') 'Centre of box =', boxcentre(:)
+                write(*,'(a16,3f8.3)') 'boxlength     =', boxlength(:)
+                write(*,'(a16,3f8.3)') 'centre of box =', boxcentre(:)
         end if
         !water polarisation data will be read from restart file in wat_shells
 else
@@ -13535,98 +13506,98 @@ end if
 iqatom(:) = 0
 
 return
-#if defined(USE_MPI)
-112 call MPI_Abort(MPI_COMM_WORLD,1,ierr)
+#if defined(use_mpi)
+112 call mpi_abort(mpi_comm_world,1,ierr)
 #else
-112 stop 'Aborting due to errors reading restart file.'
+112 stop 'aborting due to errors reading restart file.'
 #endif
 
 end subroutine prep_coord
 
 !-----------------------------------------------------------------------
 
-!Sort out heavy atoms in restrained shell. Use protein center to calculate distance.
-!Uses coordinates from topology unless 'implicit_rstr_from_file' is specified.
+!sort out heavy atoms in restrained shell. use protein center to calculate distance.
+!uses coordinates from topology unless 'implicit_rstr_from_file' is specified.
 subroutine make_shell
-! *** Local variables
-	integer						::	i,ig,i3
-	real(8)						::	rin2,r2
+! *** local variables
+        integer                                         ::      i,ig,i3
+        real(8)                                         ::      rin2,r2
 
-	nshellats = 0
-	rin2  = rexcl_i**2
+        nshellats = 0
+        rin2  = rexcl_i**2
 
-	shell(:) = .false.
+        shell(:) = .false.
 
-	do ig=1,ncgp_solute
+        do ig=1,ncgp_solute
        if (.not. excl(cgp(ig)%iswitch) .and. heavy(cgp(ig)%iswitch)) then 
-		i3 = 3*cgp(ig)%iswitch-3
-		r2 = ( xtop(i3+1) - xpcent(1) )**2 &
-			+( xtop(i3+2) - xpcent(2) )**2 &
-			+( xtop(i3+3) - xpcent(3) )**2
+                i3 = 3*cgp(ig)%iswitch-3
+                r2 = ( xtop(i3+1) - xpcent(1) )**2 &
+                        +( xtop(i3+2) - xpcent(2) )**2 &
+                        +( xtop(i3+3) - xpcent(3) )**2
 
-		if(r2 > rin2) then
-			do i=cgp(ig)%first, cgp(ig)%last
+                if(r2 > rin2) then
+                        do i=cgp(ig)%first, cgp(ig)%last
         nshellats = nshellats + 1 
-				shell(cgpatom(i)) = .true.
-			end do
-		end if
+                                shell(cgpatom(i)) = .true.
+                        end do
+                end if
    end if
-	end do
-	write(*,105) nshellats, rexcl_i, rexcl_o
-105	format('Found   ',i6,' solute atoms in the restrained shell region (',f6.2,' to ',f6.2,')')
+        end do
+        write(*,105) nshellats, rexcl_i, rexcl_o
+105     format('found   ',i6,' solute atoms in the restrained shell region (',f6.2,' to ',f6.2,')')
 end subroutine make_shell
 
 !------------------------------------------------------------------------
 
-!Sort out heavy atoms in restrained shell. Use protein center to calculate distance.
-!Use coordinates from topology unless 'implicit_rstr_from_file' is specified
+!sort out heavy atoms in restrained shell. use protein center to calculate distance.
+!use coordinates from topology unless 'implicit_rstr_from_file' is specified
 subroutine make_shell2
-! *** Local variables
-	integer						::	i,ig,i3,k
-	real(8)						::	rout2,rin2,r2
-	real(8), allocatable		::	cgp_cent(:,:)
-	nshellats = 0
-	rin2  = rexcl_i**2
+! *** local variables
+        integer                                         ::      i,ig,i3,k
+        real(8)                                         ::      rout2,rin2,r2
+        real(8), allocatable            ::      cgp_cent(:,:)
+        nshellats = 0
+        rin2  = rexcl_i**2
 
-	shell(:) = .false.
+        shell(:) = .false.
 
-	allocate(cgp_cent(3,ncgp+nwat))
+        allocate(cgp_cent(3,ncgp+nwat))
 
-	cgp_cent(:,:) = 0.
+        cgp_cent(:,:) = 0.
 
-	do ig=1,ncgp_solute
+        do ig=1,ncgp_solute
     if (.not. excl(cgp(ig)%iswitch) .and. heavy(cgp(ig)%iswitch)) then
                 do i = cgp(ig)%first,cgp(ig)%last
-			i3 = cgpatom(i)*3
-			cgp_cent(:,ig) = cgp_cent(:,ig) + xtop(i3-2:i3)
-		end do
+                        i3 = cgpatom(i)*3
+                        cgp_cent(:,ig) = cgp_cent(:,ig) + xtop(i3-2:i3)
+                end do
         cgp_cent(:,ig) = cgp_cent(:,ig)/real(cgp(ig)%last - cgp(ig)%first +1)
-		r2 = dot_product(cgp_cent(:,ig)-xpcent(:),cgp_cent(:,ig)-xpcent(:))
+                r2 = dot_product(cgp_cent(:,ig)-xpcent(:),cgp_cent(:,ig)-xpcent(:))
 
-		if ( r2 .gt. rin2 ) then
-			do i=cgp(ig)%first, cgp(ig)%last
-				nshellats = nshellats + 1
-				shell(cgpatom(i)) = .true.
-			end do
-		end if
+                if ( r2 .gt. rin2 ) then
+                        do i=cgp(ig)%first, cgp(ig)%last
+                                nshellats = nshellats + 1
+                                shell(cgpatom(i)) = .true.
+                        end do
+                end if
    end if
-	end do
+        end do
 
-	deallocate(cgp_cent) 
-	write(*,105) nshellats, rexcl_i, rexcl_o
-105	format('Found   ',i6,' solute atoms in the restrained shell region (',f6.2,' to ',f6.2,'Å)')
+        deallocate(cgp_cent) 
+        write(*,105) nshellats, rexcl_i, rexcl_o
+105     format('found   ',i6,' solute atoms in the restrained shell region (',f6.2,' to ',f6.2,'ï¿½)')
 end subroutine make_shell2
 
 !-----------------------------------------------------------------------
 
 subroutine init_trj
 !locals
-integer						::	trj_atoms
+integer                                         ::      trj_atoms
 
 !initialise trajectory atom mask
 if(itrj_cycle > 0) then
         call trj_initialize(frames=nsteps/itrj_cycle, steps_before=itrj_cycle,&
-                interval=itrj_cycle, steps=nsteps,	degf=ndegfree, &
+                interval=itrj_cycle, steps=nsteps,      degf=ndegfree, &
                 topfile=top_file)
 
         trj_atoms = trj_commit_mask()
@@ -13636,62 +13607,62 @@ if(itrj_cycle > 0) then
         end if
 end if
 
-100	format('Coordinates for',i6,' atoms will be written to the trajectory.')
+100     format('coordinates for',i6,' atoms will be written to the trajectory.')
 end subroutine init_trj
 
 !-----------------------------------------------------------------------
 subroutine prep_sim
 ! local variables
-integer						:: i, j, ig, istate
+integer                                         :: i, j, ig, istate
 
-if (nodeid .eq. 0) then	
+if (nodeid .eq. 0) then 
         write(*,*)
-        call centered_heading('Initialising dynamics', '-')
+        call centered_heading('initialising dynamics', '-')
 end if
 
-! Set parameters (bonds, angles, charges,...) & restraints for water   
+! set parameters (bonds, angles, charges,...) & restraints for water   
 if(nwat > 0) then
         select case (solvent_type)
-        case (SOLVENT_SPC, SOLVENT_3ATOM)
+        case (solvent_spc, solvent_3atom)
                 crg_ow = crg(nat_solute+1)
                 crg_hw = -crg_ow/2.0
-        case(SOLVENT_GENERAL)
+        case(solvent_general)
                 !add appropriate code here
-                call die('Topology contains mixed or non-3-atomic solvent. This feature is not implemented yet.')
+                call die('topology contains mixed or non-3-atomic solvent. this feature is not implemented yet.')
         end select
 
-        if( .not. use_PBC ) then
+        if( .not. use_pbc ) then
                 call wat_sphere
                 if (wpol_restr) call wat_shells
 
         else !compute charges of the system for box case 
         !(done in subroutine wat_sphere for sphere case)
-                !calc. total charge of non-Q-atoms
+                !calc. total charge of non-q-atoms
                 crgtot = 0.0
                 do i = 1, nat_solute
                         if ( iqatom(i)==0 ) crgtot = crgtot + crg(i)
                 end do
                 write (*,60) crgtot
-60 format ('Total charge of non-Q atoms             = ',f10.2)
+60 format ('total charge of non-q atoms             = ',f10.2)
 
 
         !calc effective charge of whole system at this lambda
-                crgQtot = 0.0
+                crgqtot = 0.0
                 do i = 1, nqat
                         do istate = 1, nstates
-                        crgtot = crgtot + qcrg(i,istate)*EQ(istate)%lambda
-                        crgQtot = crgQtot + qcrg(i,istate)*EQ(istate)%lambda
+                        crgtot = crgtot + qcrg(i,istate)*eq(istate)%lambda
+                        crgqtot = crgqtot + qcrg(i,istate)*eq(istate)%lambda
                         end do
                 end do
 
                 write (*,70) crgtot
 
-70 format ('Total charge of system                  = ',f10.2)
+70 format ('total charge of system                  = ',f10.2)
 
         end if
 end if
-! set the charge group membership for every topology atom only if using LRF or PBC
-if(use_LRF .or. use_PBC) then
+! set the charge group membership for every topology atom only if using lrf or pbc
+if(use_lrf .or. use_pbc) then
         call allocate_lrf_arrays
 
         do ig = 1, ncgp
@@ -13701,19 +13672,19 @@ if(use_LRF .or. use_PBC) then
         end do
 end if
 
-!	Prepare an array of inverse masses
+!       prepare an array of inverse masses
 winv(:) = 1./iaclib(iac(:))%mass
 
 
-if(use_PBC .and. control_box) then
+if(use_pbc .and. control_box) then
         boxlength(:) = new_boxl(:)
-	if ( put_solute_back_in_box .or. put_solvent_back_in_box ) then !only put back in box if either solute or solvent should be put back (qdyn input option)
-        	call put_back_in_box
-	end if
-        write(*,'(a)') 'Boxsize changed. Equilibration may be needed'
+        if ( put_solute_back_in_box .or. put_solvent_back_in_box ) then !only put back in box if either solute or solvent should be put back (qdyn input option)
+                call put_back_in_box
+        end if
+        write(*,'(a)') 'boxsize changed. equilibration may be needed'
 end if
 
-if( use_PBC ) then 
+if( use_pbc ) then 
         !compute masses of all molecules
         allocate( mol_mass(1:nmol) )
         mol_mass(:) = 0.0
@@ -13751,12 +13722,12 @@ end subroutine prep_sim
 
 subroutine qangle (istate)
 ! arguments
-integer						:: istate
+integer                                         :: istate
 
 ! local variables
-integer						:: ia,i,j,k,ic,i3,j3,k3,im,icoupl,ib
-real(8)						:: bji,bjk,scp,ang,da,ae,dv,gamma
-real(8)						:: rji(3),rjk(3),f1,di(3),dk(3)
+integer                                         :: ia,i,j,k,ic,i3,j3,k3,im,icoupl,ib
+real(8)                                         :: bji,bjk,scp,ang,da,ae,dv,gamma
+real(8)                                         :: rji(3),rjk(3),f1,di(3),dk(3)
 
 
 do ia = 1, nqangle
@@ -13773,10 +13744,10 @@ do im = 1, nang_coupl
    if ( iang_coupl(1,im) .eq. ia ) then
       icoupl = im
       ib     = iang_coupl(2,im)
-      gamma = EMorseD(ib)
-	  !couple improper to bond breaking not making
-	  if ( iang_coupl(3,im) .eq. 1) gamma = 1.0_8 - gamma
-	  exit
+      gamma = emorsed(ib)
+          !couple improper to bond breaking not making
+          if ( iang_coupl(3,im) .eq. 1) gamma = 1.0_8 - gamma
+          exit
    end if
 end do
 
@@ -13802,9 +13773,9 @@ if ( scp .lt. -1.0 ) scp = -1.0
 ang = acos(scp)
 da = ang - qanglib(ic)%ang0
 ae = 0.5*qanglib(ic)%fk*da**2
-EQ(istate)%q%angle = EQ(istate)%q%angle + ae*gamma
+eq(istate)%q%angle = eq(istate)%q%angle + ae*gamma
 
-dv = gamma*qanglib(ic)%fk*da*EQ(istate)%lambda
+dv = gamma*qanglib(ic)%fk*da*eq(istate)%lambda
 f1 = sin ( ang )
 if ( abs(f1) .lt. 1.e-12 ) f1 = 1.e-12
 f1 =  -1.0 / f1
@@ -13831,12 +13802,12 @@ if ( icoupl .ne. 0 ) then
    i3 = 3*i-3
    j3 = 3*j-3
 
-   d(i3+1) = d(i3+1) + dMorse_i(1,ib)*ae
-   d(i3+2) = d(i3+2) + dMorse_i(2,ib)*ae
-   d(i3+3) = d(i3+3) + dMorse_i(3,ib)*ae
-   d(j3+1) = d(j3+1) + dMorse_j(1,ib)*ae
-   d(j3+2) = d(j3+2) + dMorse_j(2,ib)*ae
-   d(j3+3) = d(j3+3) + dMorse_j(3,ib)*ae
+   d(i3+1) = d(i3+1) + dmorse_i(1,ib)*ae
+   d(i3+2) = d(i3+2) + dmorse_i(2,ib)*ae
+   d(i3+3) = d(i3+3) + dmorse_i(3,ib)*ae
+   d(j3+1) = d(j3+1) + dmorse_j(1,ib)*ae
+   d(j3+2) = d(j3+2) + dmorse_j(2,ib)*ae
+   d(j3+3) = d(j3+3) + dmorse_j(3,ib)*ae
 
 end if
 end if
@@ -13847,14 +13818,14 @@ end subroutine qangle
 
 subroutine qurey_bradley (istate)
 ! arguments
-integer						:: istate
+integer                                         :: istate
 
 
 
 ! local variables
-integer						::	ia,i,j,k,ic,i3,j3,k3,im,icoupl,ib
-real(8)						::	gamma
-real(8)						::	rik(3), dik, du, ru, Eurey
+integer                                         ::      ia,i,j,k,ic,i3,j3,k3,im,icoupl,ib
+real(8)                                         ::      gamma
+real(8)                                         ::      rik(3), dik, du, ru, eurey
 
 do ia = 1, nqangle
         ic = qang(ia)%cod(istate)
@@ -13868,9 +13839,9 @@ do im = 1, nang_coupl
    if ( iang_coupl(1,im) .eq. ia ) then
       icoupl = im
       ib     = iang_coupl(2,im)
-      gamma = EMorseD(ib)
-	  !couple improper to bond breaking not making
-	  if ( iang_coupl(3,im) .eq. 1) gamma = 1 - gamma
+      gamma = emorsed(ib)
+          !couple improper to bond breaking not making
+          if ( iang_coupl(3,im) .eq. 1) gamma = 1 - gamma
    end if
 end do
 
@@ -13885,9 +13856,9 @@ k3 = 3*k-3
         rik(3) = x(k3+3) - x(i3+3)
         dik = sqrt(rik(1)*rik(1) + rik(2)*rik(2) + rik(3)*rik(3))
         ru = dik - qanglib(ic)%ureyr0
-        Eurey = qanglib(ic)%ureyfk*ru**2
-        EQ(istate)%q%angle = EQ(istate)%q%angle + Eurey*gamma
-        du = gamma*2*(qanglib(ic)%ureyfk*ru/dik)*EQ(istate)%lambda
+        eurey = qanglib(ic)%ureyfk*ru**2
+        eq(istate)%q%angle = eq(istate)%q%angle + eurey*gamma
+        du = gamma*2*(qanglib(ic)%ureyfk*ru/dik)*eq(istate)%lambda
 
 
 if ( icoupl .ne. 0 ) then
@@ -13897,14 +13868,14 @@ if ( icoupl .ne. 0 ) then
    i3 = 3*i-3
    j3 = 3*j-3
 
-   d(i3+1) = d(i3+1) + dMorse_i(1,ib)*Eurey
-   d(i3+2) = d(i3+2) + dMorse_i(2,ib)*Eurey
-   d(i3+3) = d(i3+3) + dMorse_i(3,ib)*Eurey
+   d(i3+1) = d(i3+1) + dmorse_i(1,ib)*eurey
+   d(i3+2) = d(i3+2) + dmorse_i(2,ib)*eurey
+   d(i3+3) = d(i3+3) + dmorse_i(3,ib)*eurey
 
 
-   d(j3+1) = d(j3+1) + dMorse_j(1,ib)*Eurey
-   d(j3+2) = d(j3+2) + dMorse_j(2,ib)*Eurey
-   d(j3+3) = d(j3+3) + dMorse_j(3,ib)*Eurey
+   d(j3+1) = d(j3+1) + dmorse_j(1,ib)*eurey
+   d(j3+2) = d(j3+2) + dmorse_j(2,ib)*eurey
+   d(j3+3) = d(j3+3) + dmorse_j(3,ib)*eurey
 
 
 end if
@@ -13915,12 +13886,12 @@ end subroutine qurey_bradley
 
 subroutine qbond (istate)
 ! arguments
-integer						::	istate
+integer                                         ::      istate
 
 ! local variables
-integer						::	ib,i,j,ic,i3,j3
-real(8)						::	b,db,be,dv,fexp
-real(8)						::	rij(3)
+integer                                         ::      ib,i,j,ic,i3,j3
+real(8)                                         ::      b,db,be,dv,fexp
+real(8)                                         ::      rij(3)
 
 do ib = 1, nqbond
 
@@ -13941,10 +13912,10 @@ b = sqrt ( rij(1)**2 + rij(2)**2 + rij(3)**2 )
 db = b - qbondlib(ic)%r0
 
         fexp = exp ( -qbondlib(ic)%amz*db ) 
-        be = qbondlib(ic)%Dmz*(fexp*fexp-2.*fexp) + 0.5*qbondlib(ic)%fk*db**2
-        EMorseD(ib) = -(fexp*fexp-2.*fexp)
-EQ(istate)%q%bond = EQ(istate)%q%bond + be
-dv = (2.*qbondlib(ic)%Dmz*qbondlib(ic)%amz*(fexp-fexp*fexp) + qbondlib(ic)%fk*db)*EQ(istate)%lambda/b
+        be = qbondlib(ic)%dmz*(fexp*fexp-2.*fexp) + 0.5*qbondlib(ic)%fk*db**2
+        emorsed(ib) = -(fexp*fexp-2.*fexp)
+eq(istate)%q%bond = eq(istate)%q%bond + be
+dv = (2.*qbondlib(ic)%dmz*qbondlib(ic)%amz*(fexp-fexp*fexp) + qbondlib(ic)%fk*db)*eq(istate)%lambda/b
 
 d(i3+1) = d(i3+1) - dv*rij(1)
 d(i3+2) = d(i3+2) - dv*rij(2)
@@ -13953,15 +13924,15 @@ d(j3+1) = d(j3+1) + dv*rij(1)
 d(j3+2) = d(j3+2) + dv*rij(2)
 d(j3+3) = d(j3+3) + dv*rij(3)
 
-!Force scaling factor to be 1 when distance is smaller than r0
+!force scaling factor to be 1 when distance is smaller than r0
  if ( db > 0 ) then
- 	EMorseD(ib) = -(fexp*fexp-2.*fexp)
- 	dMorse_i(:,ib) = +2.*qbondlib(ic)%amz*(fexp-fexp*fexp)*EQ(istate)%lambda/b*rij(:)
- 	dMorse_j(:,ib) = -2.*qbondlib(ic)%amz*(fexp-fexp*fexp)*EQ(istate)%lambda/b*rij(:)
+        emorsed(ib) = -(fexp*fexp-2.*fexp)
+        dmorse_i(:,ib) = +2.*qbondlib(ic)%amz*(fexp-fexp*fexp)*eq(istate)%lambda/b*rij(:)
+        dmorse_j(:,ib) = -2.*qbondlib(ic)%amz*(fexp-fexp*fexp)*eq(istate)%lambda/b*rij(:)
  else
- 	EMorseD(ib) = 1
- 	dMorse_i(:,ib) = 0
- 	dMorse_j(:,ib) = 0
+        emorsed(ib) = 1
+        dmorse_i(:,ib) = 0
+        dmorse_j(:,ib) = 0
  end if
 
 end if
@@ -13972,14 +13943,14 @@ end subroutine qbond
 
 subroutine qimproper (istate)
 ! arguments
-integer						::	istate
+integer                                         ::      istate
 
 ! local variables
-integer						::	i,j,k,l,ip,ic,i3,j3,k3,l3
-integer						::	icoupl,im,ib
-real(8)						::	bj,bk,scp,phi,sgn,pe,dv,arg,f1,gamma
-real(8)						::	rji(3),rjk(3),rkl(3),rnj(3),rnk(3)
-real(8)						::	rki(3),rlj(3),dp(12),di(3),dl(3)
+integer                                         ::      i,j,k,l,ip,ic,i3,j3,k3,l3
+integer                                         ::      icoupl,im,ib
+real(8)                                         ::      bj,bk,scp,phi,sgn,pe,dv,arg,f1,gamma
+real(8)                                         ::      rji(3),rjk(3),rkl(3),rnj(3),rnk(3)
+real(8)                                         ::      rki(3),rlj(3),dp(12),di(3),dl(3)
 
 do ip = 1,nqimp
 
@@ -13994,9 +13965,9 @@ do im = 1, nimp_coupl
    if ( iimp_coupl(1,im) .eq. ip ) then
       icoupl = im
       ib     = iimp_coupl(2,im)
-      gamma = EMorseD(ib)
-	  !couple improper to bond breaking not making
-	  if ( iimp_coupl(3,im) .eq. 1) gamma = 1 - gamma
+      gamma = emorsed(ib)
+          !couple improper to bond breaking not making
+          if ( iimp_coupl(3,im) .eq. 1) gamma = 1 - gamma
    end if 
 end do
 
@@ -14045,8 +14016,8 @@ arg = phi - qimp0(ic)
 arg = arg - 2.*pi*nint(arg/(2.*pi))
 dv  = qfkimp(ic)*arg
 pe  = 0.5*dv*arg
-EQ(istate)%q%improper = EQ(istate)%q%improper + pe*gamma
-dv = dv*gamma*EQ(istate)%lambda
+eq(istate)%q%improper = eq(istate)%q%improper + pe*gamma
+dv = dv*gamma*eq(istate)%lambda
 
 ! ---       forces
 
@@ -14102,12 +14073,12 @@ if ( icoupl .ne. 0 ) then
    i3 = 3*i-3
    j3 = 3*j-3
 
-   d(i3+1) = d(i3+1) + dMorse_i(1,ib)*pe
-   d(i3+2) = d(i3+2) + dMorse_i(2,ib)*pe
-   d(i3+3) = d(i3+3) + dMorse_i(3,ib)*pe
-   d(j3+1) = d(j3+1) + dMorse_j(1,ib)*pe
-   d(j3+2) = d(j3+2) + dMorse_j(2,ib)*pe
-   d(j3+3) = d(j3+3) + dMorse_j(3,ib)*pe
+   d(i3+1) = d(i3+1) + dmorse_i(1,ib)*pe
+   d(i3+2) = d(i3+2) + dmorse_i(2,ib)*pe
+   d(i3+3) = d(i3+3) + dmorse_i(3,ib)*pe
+   d(j3+1) = d(j3+1) + dmorse_j(1,ib)*pe
+   d(j3+2) = d(j3+2) + dmorse_j(2,ib)*pe
+   d(j3+3) = d(j3+3) + dmorse_j(3,ib)*pe
 
 end if
 end if
@@ -14118,14 +14089,14 @@ end subroutine qimproper
 
 subroutine qtorsion (istate)
 ! arguments
-integer						::	istate
+integer                                         ::      istate
 
 ! local variables
-integer						::	i,j,k,l,ip,ic,i3,j3,k3,l3
-integer						::	icoupl,im,ib
-real(8)						::	bj,bk,scp,phi,sgn,pe,dv,arg,f1,gamma
-real(8)						::	rji(3),rjk(3),rkl(3),rnj(3),rnk(3)
-real(8)						::	rki(3),rlj(3),dp(12),di(3),dl(3)
+integer                                         ::      i,j,k,l,ip,ic,i3,j3,k3,l3
+integer                                         ::      icoupl,im,ib
+real(8)                                         ::      bj,bk,scp,phi,sgn,pe,dv,arg,f1,gamma
+real(8)                                         ::      rji(3),rjk(3),rkl(3),rnj(3),rnk(3)
+real(8)                                         ::      rki(3),rlj(3),dp(12),di(3),dl(3)
 
 do ip = 1,nqtor
 
@@ -14140,9 +14111,9 @@ do im = 1, ntor_coupl
    if ( itor_coupl(1,im) .eq. ip ) then
       icoupl = im
       ib     = itor_coupl(2,im)
-      gamma = EMorseD(ib)
-	  !couple improper to bond breaking not making
-	  if ( itor_coupl(3,im) .eq. 1) gamma = 1 - gamma
+      gamma = emorsed(ib)
+          !couple improper to bond breaking not making
+          if ( itor_coupl(3,im) .eq. 1) gamma = 1 - gamma
    end if
 end do
 
@@ -14190,8 +14161,8 @@ if ( sgn .lt. 0 ) phi = -phi
 
 arg = qrmult(ic)*phi-qdeltor(ic)
 pe  = qfktor(ic)*(1.0+cos(arg))
-EQ(istate)%q%torsion = EQ(istate)%q%torsion + pe*gamma
-dv = -qrmult(ic)*qfktor(ic)*sin(arg)*gamma*EQ(istate)%lambda
+eq(istate)%q%torsion = eq(istate)%q%torsion + pe*gamma
+dv = -qrmult(ic)*qfktor(ic)*sin(arg)*gamma*eq(istate)%lambda
 
 ! ---       forces
 
@@ -14249,12 +14220,12 @@ if ( icoupl .ne. 0 ) then
 
 
 
-  d(i3+1) = d(i3+1) + dMorse_i(1,ib)*pe
-   d(i3+2) = d(i3+2) + dMorse_i(2,ib)*pe
-   d(i3+3) = d(i3+3) + dMorse_i(3,ib)*pe
-   d(j3+1) = d(j3+1) + dMorse_j(1,ib)*pe
-   d(j3+2) = d(j3+2) + dMorse_j(2,ib)*pe
-   d(j3+3) = d(j3+3) + dMorse_j(3,ib)*pe
+  d(i3+1) = d(i3+1) + dmorse_i(1,ib)*pe
+   d(i3+2) = d(i3+2) + dmorse_i(2,ib)*pe
+   d(i3+3) = d(i3+3) + dmorse_i(3,ib)*pe
+   d(j3+1) = d(j3+1) + dmorse_j(1,ib)*pe
+   d(j3+2) = d(j3+2) + dmorse_j(2,ib)*pe
+   d(j3+3) = d(j3+3) + dmorse_j(3,ib)*pe
 
 end if
 end if
@@ -14266,16 +14237,16 @@ end subroutine qtorsion
 
 real(8) function randm (ig)
 ! arguments
-integer					::	ig
+integer                                 ::      ig
 
 ! local variables
-integer, parameter		::	m = 100000000
-integer, parameter		::  m1 = 10000
-integer, parameter		::	mult=31415821
-integer					::	irandh,irandl,multh,multl
-real(8)					::	r
-integer, save				::	irand = 0
-integer, save				::  new = 0
+integer, parameter              ::      m = 100000000
+integer, parameter              ::  m1 = 10000
+integer, parameter              ::      mult=31415821
+integer                                 ::      irandh,irandl,multh,multl
+real(8)                                 ::      r
+integer, save                           ::      irand = 0
+integer, save                           ::  new = 0
 
 if (new .eq. 0) then
 new = 1
@@ -14304,14 +14275,14 @@ end function randm
 
 integer function shake(xx, x)
 !arguments
-real(8)						::	xx(:), x(:)
-!	returns no. of iterations
+real(8)                                         ::      xx(:), x(:)
+!       returns no. of iterations
 
 ! *** local variables
-integer						::	i,j,i3,j3,mol,ic,nits
-real(8)						::	xij2,diff,corr,scp,xxij2
-real(8)						::	xij(3),xxij(3)
-#if defined (PROFILING)
+integer                                         ::      i,j,i3,j3,mol,ic,nits
+real(8)                                         ::      xij2,diff,corr,scp,xxij2
+real(8)                                         ::      xij(3),xxij(3)
+#if defined (profiling)
 real(8)                                         :: start_loop_time
 start_loop_time = rtime()
 #endif
@@ -14341,7 +14312,7 @@ do mol=1,shake_molecules
                                 xij(3)  = x(i3+3) - x(j3+3)
                                 xij2    = xij(1)**2+xij(2)**2+xij(3)**2
                                 diff    = shake_mol(mol)%bond(ic)%dist2 - xij2
-                                if(abs(diff) < SHAKE_TOL*shake_mol(mol)%bond(ic)%dist2) then
+                                if(abs(diff) < shake_tol*shake_mol(mol)%bond(ic)%dist2) then
                                         shake_mol(mol)%bond(ic)%ready = .true. ! in range
                                 end if
                                 xxij(1) = xx(i3+1) - xx(j3+1)
@@ -14364,7 +14335,7 @@ do mol=1,shake_molecules
                 ! see if every constraint is met
                 if(all(shake_mol(mol)%bond(1:shake_mol(mol)%nconstraints)%ready)) then
                         exit !from iteration loop
-                elseif(nits >= SHAKE_MAX_ITER) then
+                elseif(nits >= shake_max_iter) then
                         ! fail on too many iterations
                         do ic=1,shake_mol(mol)%nconstraints
                                 if (.not. shake_mol(mol)%bond(ic)%ready) then
@@ -14384,7 +14355,7 @@ do mol=1,shake_molecules
                         end do
                         call die('shake failure')
                 end if
-100         format ('>>> Shake failed, i,j,d,d0 = ',2i6,2f10.5)
+100         format ('>>> shake failed, i,j,d,d0 = ',2i6,2f10.5)
         end do
 
         ! update niter
@@ -14393,7 +14364,7 @@ end do
 
 ! set niter to the average number of iterations per molecule
 shake=shake/nmol
-#if defined (PROFILING)
+#if defined (profiling)
 profile(7)%time = profile(7)%time + rtime() - start_loop_time
 #endif
 
@@ -14406,22 +14377,22 @@ subroutine shrink_topology
 !or where the code has been set to 0 due to q-[bonds|angles|...]
 
 !locals
-integer						::	i, removed
+integer                                         ::      i, removed
 
 if(exclude_bonded) then
         call centered_heading &
-                ('Eliminating torsions & impropers for excluded atoms', '-')
+                ('eliminating torsions & impropers for excluded atoms', '-')
 end if
 
-10	format('Reduced number of ',a,t31,'from ',i8,' to ')
-12	format(i8)
+10      format('reduced number of ',a,t31,'from ',i8,' to ')
+12      format(i8)
 
 i = 1
 removed = 0
 do while(i <= nbonds)
         !if all atoms excluded
         if(bnd(i)%cod <= 0) then
-                !bond code either 0 (bond redefined in FEP file) 
+                !bond code either 0 (bond redefined in fep file) 
                 !or -1 (bond removed by shake)
                 if(i <= nbonds_solute) then
                         bnd(i) = bnd(nbonds_solute)
@@ -14504,9 +14475,9 @@ end subroutine shrink_topology
 
 subroutine stop_cm_translation
 ! local variables
-integer						::	i,j,k
-real(8)						::	rmass,totmass
-real(8)						::	vcm(3)
+integer                                         ::      i,j,k
+real(8)                                         ::      rmass,totmass
+real(8)                                         ::      vcm(3)
 
 ! calculate totmass and vcm
 totmass = 0.0
@@ -14539,9 +14510,9 @@ end subroutine stop_cm_translation
 !-----------------------------------------------------------------------
 subroutine topology
 ! local variables
-integer					::	nat3
-integer					::	i
-real(8)					::	box_min, vtemp, vtemp1
+integer                                 ::      nat3
+integer                                 ::      i
+real(8)                                 ::      box_min, vtemp, vtemp1
 
 !
 ! read topology
@@ -14555,7 +14526,7 @@ real(8)					::	box_min, vtemp, vtemp1
 !  [iaclib%bvdw] (conversion)
 
 if(.not. topo_load(top_file, require_version=4.15)) then
-        call die('Failed to load topology.')
+        call die('failed to load topology.')
 end if
 natom = nat_pro
 
@@ -14579,19 +14550,19 @@ ljcod(lj2(i)%j, lj2(i)%i) = 2
 end do
 
 
-!	If arithmetic combination rule (ivdw_rule=2) take sqrt(epsilon) now
+!       if arithmetic combination rule (ivdw_rule=2) take sqrt(epsilon) now
 if ( ivdw_rule .eq. 2 ) then
 do i=1,natyps
   iaclib(i)%bvdw(:) = sqrt(abs(iaclib(i)%bvdw(:)))
 end do
 end if
 
-!check if same boundary in topology and Qdyn input file
-if(  ((.not. use_PBC) .and.  box) .or. ( use_PBC .and. (.not. box)) ) then
-call die('Must have same boundary (sphere or box) in topology and input file')
+!check if same boundary in topology and qdyn input file
+if(  ((.not. use_pbc) .and.  box) .or. ( use_pbc .and. (.not. box)) ) then
+call die('must have same boundary (sphere or box) in topology and input file')
 end if
 
-if( use_PBC ) then
+if( use_pbc ) then
 if( any(boxlength(:) == 0.0 ) ) then
         inv_boxl(:) = 0.0
 else
@@ -14601,24 +14572,24 @@ end if
 !check cut-offs if periodic box used
 box_min = min( boxlength(1), boxlength(2), boxlength(3) )
 
-!Solute-solute cut-off radii
-if( .not. (box_min .gt. Rcpp*2) ) then
-        call die('Solute-solute cut-off radii too large')
+!solute-solute cut-off radii
+if( .not. (box_min .gt. rcpp*2) ) then
+        call die('solute-solute cut-off radii too large')
 
-!Solvent-solvent
-else if( .not. (box_min .gt. Rcww*2) ) then
-        call die('Solvent-solvent cut-off radii too large')
+!solvent-solvent
+else if( .not. (box_min .gt. rcww*2) ) then
+        call die('solvent-solvent cut-off radii too large')
 
-!Solute-solvent
-else if( .not. (box_min .gt. Rcpw*2) ) then
-        call die('Solute-solvent cut-off radii too large')
+!solute-solvent
+else if( .not. (box_min .gt. rcpw*2) ) then
+        call die('solute-solvent cut-off radii too large')
 
-!Q-atom
+!q-atom
 else if( .not. (box_min .gt. rcq*2) ) then
-        call die('Q-atom cut-off radii too large')
-!LRF
-else if( .not. (box_min .gt. RcLRF*2) ) then
-        call die('LRF cut-off radii too large')
+        call die('q-atom cut-off radii too large')
+!lrf
+else if( .not. (box_min .gt. rclrf*2) ) then
+        call die('lrf cut-off radii too large')
 end if
 end if
 end subroutine topology
@@ -14627,16 +14598,16 @@ end subroutine topology
 
 real(8) function torsion(istart, iend)
 !arguments
-integer						::	istart, iend
+integer                                         ::      istart, iend
 
 ! local variables
-integer						::	ip
-real(8)						::	scp,phi,dv,arg,f1
-real(8)						::	bjinv, bkinv, bj2inv, bk2inv
-real(8), save					::	rji(3),rjk(3),rkl(3),rnj(3),rnk(3)
-real(8), save					::	rki(3),rlj(3),dp(12),di(3),dl(3)
-type(TOR_TYPE), pointer		::  t
-type(TORLIB_TYPE), pointer	::	lib
+integer                                         ::      ip
+real(8)                                         ::      scp,phi,dv,arg,f1
+real(8)                                         ::      bjinv, bkinv, bj2inv, bk2inv
+real(8), save                                   ::      rji(3),rjk(3),rkl(3),rnj(3),rnk(3)
+real(8), save                                   ::      rki(3),rlj(3),dp(12),di(3),dl(3)
+type(tor_type), pointer         ::  t
+type(torlib_type), pointer      ::      lib
 
 ! global variables used:
 !  tor, torlib, x, d
@@ -14745,16 +14716,16 @@ end function torsion
 !-----------------------------------------------------------------------
 subroutine restrain_solvent 
 ! local variables
-integer						::	iw,i,i3
-real(8)						::	b,db,erst,dv,fexp
-real(8), save					::	dr(3)
-real(8)						::	shift
+integer                                         ::      iw,i,i3
+real(8)                                         ::      b,db,erst,dv,fexp
+real(8), save                                   ::      dr(3)
+real(8)                                         ::      shift
 
 ! global variables used:
-!  E, Boltz, Tfree, fk_wsphere, nwat, nat_pro, x, xwcent, rwat, Dwmz, awmz, d
+!  e, boltz, tfree, fk_wsphere, nwat, nat_pro, x, xwcent, rwat, dwmz, awmz, d
 
 if(fk_wsphere /= 0.) then
-        shift = sqrt (Boltz*Tfree/fk_wsphere)
+        shift = sqrt (boltz*tfree/fk_wsphere)
 else
         shift = 0.
 end if
@@ -14771,13 +14742,13 @@ do iw = ncgp_solute + 1, ncgp
 
         ! calculate erst and dv
         if ( db > 0 ) then
-                erst = 0.5 * fk_wsphere * db**2 - Dwmz
+                erst = 0.5 * fk_wsphere * db**2 - dwmz
                 dv = fk_wsphere*db/b
         else
                 if (b > 0.0) then
                   fexp = exp ( awmz*db )
-                  erst = Dwmz*(fexp*fexp-2.*fexp)
-                  dv = -2.*Dwmz*awmz*(fexp-fexp*fexp)/b
+                  erst = dwmz*(fexp*fexp-2.*fexp)
+                  dv = -2.*dwmz*awmz*(fexp-fexp*fexp)/b
                 else
                   dv = 0
                   erst = 0
@@ -14785,7 +14756,7 @@ do iw = ncgp_solute + 1, ncgp
         end if
 
         ! update energy and forces
-        E%restraint%solvent_radial = E%restraint%solvent_radial + erst
+        e%restraint%solvent_radial = e%restraint%solvent_radial + erst
         d(i3+1) = d(i3+1) + dv*dr(1)
         d(i3+2) = d(i3+2) + dv*dr(2)
         d(i3+3) = d(i3+3) + dv*dr(3)
@@ -14796,82 +14767,82 @@ end subroutine restrain_solvent
 
 subroutine wat_sphere
 ! local variables
-integer					:: i,i3,kr,isort,int_wat,istate
-real(8)					:: rc,rnwat
-real(8), save				:: dr(3)
-real(8)					:: crgexcl
+integer                                 :: i,i3,kr,isort,int_wat,istate
+real(8)                                 :: rc,rnwat
+real(8), save                           :: dr(3)
+real(8)                                 :: crgexcl
 
 !possibly override target sphere radius from topology
 if(rwat_in > 0.) rwat = rwat_in
 
 
-!calc. total charge of non-excluded non-Q-atoms and excluded atoms
+!calc. total charge of non-excluded non-q-atoms and excluded atoms
 crgtot = 0.0
 crgexcl = 0.0
 do i = 1, nat_solute
-	if ( .not. excl(i) ) then
-		if ( iqatom(i)==0 ) then
-			crgtot = crgtot + crg(i)
-		end if
-	else
-		crgexcl = crgexcl + crg(i)
-	end if
+        if ( .not. excl(i) ) then
+                if ( iqatom(i)==0 ) then
+                        crgtot = crgtot + crg(i)
+                end if
+        else
+                crgexcl = crgexcl + crg(i)
+        end if
 end do
-write (*,60) 'non-Q atoms', crgtot
+write (*,60) 'non-q atoms', crgtot
 write (*,60) 'excluded atoms', crgexcl
-60 format ('Total charge of ',a,t41,'= ',f10.2)
+60 format ('total charge of ',a,t41,'= ',f10.2)
 
 !calc effective charge of simulation sphere at this lambda
-crgQtot = 0.0
+crgqtot = 0.0
 do i = 1, nqat
-	do istate = 1, nstates
-		crgtot = crgtot + qcrg(i,istate)*EQ(istate)%lambda
-		crgQtot = crgQtot + qcrg(i,istate)*EQ(istate)%lambda
-	end do
+        do istate = 1, nstates
+                crgtot = crgtot + qcrg(i,istate)*eq(istate)%lambda
+                crgqtot = crgqtot + qcrg(i,istate)*eq(istate)%lambda
+        end do
 end do
 write (*,70) crgtot
-70 format ('Total charge of system                  = ',f10.2)
+70 format ('total charge of system                  = ',f10.2)
 
-if (.not. wpol_born) crgQtot = 0.0 !ignore total Q if Born corr. is off
+if (.not. wpol_born) crgqtot = 0.0 !ignore total q if born corr. is off
 if ( nwat .eq. 0 ) return
 
 
-!	Set default values for unspecified optional parameters
+!       set default values for unspecified optional parameters
 if(fk_wsphere == -1) then
         !
-        ! To be replaced by function of rc giving appropriate default for any sphere
+        ! to be replaced by function of rc giving appropriate default for any sphere
         !
         fk_wsphere = fk_wsphere_default
 end if
 if(fkwpol == -1) then
         !
-        ! To be replaced by function of rc giving appropriate default for any sphere
+        ! to be replaced by function of rc giving appropriate default for any sphere
         !
         fkwpol = fkwpol_default
 end if
-if(Dwmz == -1) then !Use magic function to get suitable Dwmz
-        Dwmz = 0.26*exp(-0.19*(rwat-15.))+0.74
+if(dwmz == -1) then !use magic function to get suitable dwmz
+        dwmz = 0.26*exp(-0.19*(rwat-15.))+0.74
 end if
-if(awmz == -1) then !use magic for the reach of the Morse potential
+if(awmz == -1) then !use magic for the reach of the morse potential
         awmz = 0.2/(1.+exp(0.4*(rwat-25.)))+0.3
 end if
 
-write (*,90) rwat, fk_wsphere, Dwmz, awmz
-90	format ('Target water sphere radius              = ',f10.2,/,&
-                'Surface inward harmonic force constant  = ',f10.2,/,&
-                'Surface attraction well depth           = ',f10.2,/,&
-                'Surface attraction well width           = ',f10.2)
-92	format ('Water polarisation restraints           : ',a)
+write (*,90) rwat, fk_wsphere, dwmz, awmz
+90      format ('target water sphere radius              = ',f10.2,/,&
+                'surface inward harmonic force constant  = ',f10.2,/,&
+                'surface attraction well depth           = ',f10.2,/,&
+                'surface attraction well width           = ',f10.2)
+92      format ('water polarisation restraints           : ',a)
 if(.not. wpol_restr) then
-        write(*,92) 'OFF'
+        write(*,92) 'off'
 else if(wpol_born) then
-        write(*,92) 'ON, Born correction enabled'
+        write(*,92) 'on, born correction enabled'
         write(*, 100) fkwpol
 else 
-        write(*,92) 'ON, Born correction disabled'
+        write(*,92) 'on, born correction disabled'
         write(*, 100) fkwpol
 end if
-100	format('Radial polarisation force constant      = ',f10.2)
+100     format('radial polarisation force constant      = ',f10.2)
 
 end subroutine wat_sphere
 
@@ -14881,18 +14852,18 @@ subroutine wat_shells
 ! set up the shells for polarisation restraining
 
 ! local variables
-real(8)						::	rout, dr, ri, Vshell, rshell, drs
-integer						::	is, n_insh
+real(8)                                         ::      rout, dr, ri, vshell, rshell, drs
+integer                                         ::      is, n_insh
 
 
-integer						::	nwpolr_shell_restart, filestat
-integer						::	bndcodw, angcodw
+integer                                         ::      nwpolr_shell_restart, filestat
+integer                                         ::      bndcodw, angcodw
 
 !calc mu_w
 !look up bond code for water
 bndcodw = bnd(nbonds)%cod
 angcodw = ang(nangles)%cod
-!find charge of water O = charge of 1st solvent atom
+!find charge of water o = charge of 1st solvent atom
 crg_ow = crg(nat_solute + 1)
 mu_w = -crg_ow*bondlib(bndcodw)%bnd0*cos(anglib(angcodw)%ang0/2)
 
@@ -14905,7 +14876,7 @@ allocate(wshell(nwpolr_shell), stat=alloc_status)
 call check_alloc('water polarisation shell array')
 
 write(*, 100) nwpolr_shell
-100	format(/,'Setting up ', i1, ' water shells for polarisation restraints.')
+100     format(/,'setting up ', i1, ' water shells for polarisation restraints.')
 
 if(restart) then !try to load theta_corr from restart file
         read(2, iostat=filestat) nwpolr_shell_restart
@@ -14921,11 +14892,11 @@ else
         wshell(:)%theta_corr = 0.
 end if
 
-102	format('>>> WARNING: Failed to read polarisation restraint data from restart file.')
-103	format('Loaded polarisation restraint data from restart file.')
+102     format('>>> warning: failed to read polarisation restraint data from restart file.')
+103     format('loaded polarisation restraint data from restart file.')
 
-write(*,'(a)') 'Shell #    outer radius    inner radius'
-110	format(i7, 2f16.2)
+write(*,'(a)') 'shell #    outer radius    inner radius'
+110     format(i7, 2f16.2)
 
 rout = rwat
 n_max_insh = 0
@@ -14936,14 +14907,14 @@ do is = 1, nwpolr_shell
     dr = drout*is
         ri = rout - dr
         wshell(is)%dr = dr
-        Vshell = rout**3 - ri**3
-        n_insh = int(4 * pi/3 * Vshell * rho_wat)
+        vshell = rout**3 - ri**3
+        n_insh = int(4 * pi/3 * vshell * rho_wat)
         if (n_insh > n_max_insh) n_max_insh = n_insh
 rshell = (0.5*(rout**3+ri**3))**(1./3.)
 
 
-        ! --- Note below: 0.98750 = (1-1/epsilon) for water
-wshell(is)%cstb = crgQtot*0.98750/(rho_wat*mu_w*4.*pi*rshell**2)
+        ! --- note below: 0.98750 = (1-1/epsilon) for water
+wshell(is)%cstb = crgqtot*0.98750/(rho_wat*mu_w*4.*pi*rshell**2)
         write(*, 110) is, rout, ri
         rout = rout - dr
 end do
@@ -14957,14 +14928,14 @@ end subroutine wat_shells
 
 subroutine watpol
 ! local variables
-integer						:: iw,is,i,i3,il,jl,jw,imin,jmin
-real(8)						:: dr,rw,rshell,rm,rc,scp
-real(8)						:: tmin,arg,avtdum,dv,f0
-real(8), save					:: f1(9),f2(3)
-real(8), save					:: rmu(3),rcu(3)
+integer                                         :: iw,is,i,i3,il,jl,jw,imin,jmin
+real(8)                                         :: dr,rw,rshell,rm,rc,scp
+real(8)                                         :: tmin,arg,avtdum,dv,f0
+real(8), save                                   :: f1(9),f2(3)
+real(8), save                                   :: rmu(3),rcu(3)
 
 ! global variables used:
-!  E, wshell, bndw0, deg2rad, angw0, nwat, theta, theta0, nat_pro, x, xwcent,
+!  e, wshell, bndw0, deg2rad, angw0, nwat, theta, theta0, nat_pro, x, xwcent,
 !  tdum, nwpolr_shell, list_sh, pi, nsort, istep, itdis_update, fkwpol, d
 
 ! reset wshell%n_insh
@@ -14979,7 +14950,7 @@ i  = nat_solute + iw*3-2
 if(excl(i)) cycle ! skip excluded topology waters
 i3 = i*3-3
 
-rmu(1) = x(i3+4) + x(i3+7) - 2.*x(i3+1)   !Water vector
+rmu(1) = x(i3+4) + x(i3+7) - 2.*x(i3+1)   !water vector
 rmu(2) = x(i3+5) + x(i3+8) - 2.*x(i3+2)
 rmu(3) = x(i3+6) + x(i3+9) - 2.*x(i3+3)
 rm = sqrt ( rmu(1)**2 + rmu(2)**2 + rmu(3)**2 )
@@ -14987,7 +14958,7 @@ rmu(1) = rmu(1)/rm
 rmu(2) = rmu(2)/rm
 rmu(3) = rmu(3)/rm
 
-rcu(1) = x(i3+1) - xwcent(1)    !Radial vector to OW
+rcu(1) = x(i3+1) - xwcent(1)    !radial vector to ow
 rcu(2) = x(i3+2) - xwcent(2) 
 rcu(3) = x(i3+3) - xwcent(3) 
 rc = sqrt ( rcu(1)**2 + rcu(2)**2 + rcu(3)**2 )
@@ -14995,7 +14966,7 @@ rcu(1) = rcu(1)/rc
 rcu(2) = rcu(2)/rc
 rcu(3) = rcu(3)/rc
 
-scp = rmu(1)*rcu(1)+rmu(2)*rcu(2)+rmu(3)*rcu(3)   !Calculate angle between water vector and radial vector
+scp = rmu(1)*rcu(1)+rmu(2)*rcu(2)+rmu(3)*rcu(3)   !calculate angle between water vector and radial vector
 if ( scp .gt.  1.0 ) scp =  1.0
 if ( scp .lt. -1.0 ) scp = -1.0
 theta(iw) = acos( scp )
@@ -15032,7 +15003,7 @@ end do
 
 ! calculate energy and force
 if ( istep .ne. 0 .and. mod(istep,itdis_update) .eq. 0) then
-call centered_heading('Water polarisation restraint data', '-')
+call centered_heading('water polarisation restraint data', '-')
 write(*,'(a)') 'shell    <n>    <theta>    theta_0 theta_corr'
 do is = 1, nwpolr_shell
 wshell(is)%avtheta = wshell(is)%avtheta / real (itdis_update)
@@ -15040,7 +15011,7 @@ wshell(is)%avn_insh = wshell(is)%avn_insh / real (itdis_update)
 wshell(is)%theta_corr = wshell(is)%theta_corr + wshell(is)%avtheta-acos(wshell(is)%cstb)
 write (*,10) is,wshell(is)%avn_insh,wshell(is)%avtheta/deg2rad, &
      acos(wshell(is)%cstb)/deg2rad,wshell(is)%theta_corr/deg2rad
-10	  format(i5,1x,f6.1,3x,f8.3,3x,f8.3,3x,f8.3)
+10        format(i5,1x,f6.1,3x,f8.3,3x,f8.3,3x,f8.3)
 wshell(is)%avtheta = 0.0
 wshell(is)%avn_insh = 0.0
 end do
@@ -15059,7 +15030,7 @@ if ( theta0(il) .gt. pi)   theta0(il) = pi
 
 avtdum = avtdum + theta(iw)
 
-E%restraint%water_pol = E%restraint%water_pol + 0.5*fkwpol* &
+e%restraint%water_pol = e%restraint%water_pol + 0.5*fkwpol* &
      (theta(iw)-theta0(il)+wshell(is)%theta_corr)**2
 
 dv = fkwpol*(theta(iw)-theta0(il)+wshell(is)%theta_corr)
@@ -15127,149 +15098,149 @@ end subroutine watpol
 
 subroutine write_out
 ! local variables
-integer					::	i,istate
+integer                                 ::      i,istate
 
 ! header line
 if(istep >= nsteps) then
-write(*,3) 'Energy summary'
+write(*,3) 'energy summary'
 else
-write(*,2) 'Energy summary', istep
+write(*,2) 'energy summary', istep
 end if
-2 format('======================= ',A15,' at step ',i6,' ========================')
-3 format('=========================== FINAL ',A15,' =============================')
+2 format('======================= ',a15,' at step ',i6,' ========================')
+3 format('=========================== final ',a15,' =============================')
 
 ! legend line
-write(*,4) 'el', 'vdW' ,'bond', 'angle', 'torsion', 'improper'
-4 format(16X, 6A10)
+write(*,4) 'el', 'vdw' ,'bond', 'angle', 'torsion', 'improper'
+4 format(16x, 6a10)
 
-! row by row: solute, solvent, solute-solvent, LRF, q-atom
-write(*,6) 'solute', E%pp%el, E%pp%vdw, E%p%bond, E%p%angle, E%p%torsion, E%p%improper
-6 format(A,T17, 6F10.2)
+! row by row: solute, solvent, solute-solvent, lrf, q-atom
+write(*,6) 'solute', e%pp%el, e%pp%vdw, e%p%bond, e%p%angle, e%p%torsion, e%p%improper
+6 format(a,t17, 6f10.2)
 
 if(nwat > 0) then
-write(*,6) 'solvent', E%ww%el, E%ww%vdw, E%w%bond, E%w%angle, E%w%torsion, E%w%improper
+write(*,6) 'solvent', e%ww%el, e%ww%vdw, e%w%bond, e%w%angle, e%w%torsion, e%w%improper
 end if
 
-write(*,6) 'solute-solvent', E%pw%el, E%pw%vdw
+write(*,6) 'solute-solvent', e%pw%el, e%pw%vdw
 
-if(use_LRF) then
-write(*,6) 'LRF', E%LRF
+if(use_lrf) then
+write(*,6) 'lrf', e%lrf
 end if
 
 if(nqat .gt. 0) then
-	write(*,6) 'Q-atom', E%qx%el, E%qx%vdw, E%q%bond, E%q%angle, E%q%torsion, E%q%improper
+        write(*,6) 'q-atom', e%qx%el, e%qx%vdw, e%q%bond, e%q%angle, e%q%torsion, e%q%improper
 end if
 
 ! restraints
 write(*,*)
 write(*,4) 'total', 'fix', 'slvnt_rad', 'slvnt_pol', 'shell', 'solute'
-write(*,6) 'restraints', E%restraint%total, E%restraint%fix, &
-        E%restraint%solvent_radial, E%restraint%water_pol, E%restraint%shell, &
-        E%restraint%protein
+write(*,6) 'restraints', e%restraint%total, e%restraint%fix, &
+        e%restraint%solvent_radial, e%restraint%water_pol, e%restraint%shell, &
+        e%restraint%protein
 write(*,*)
 
 ! totals
 if(force_rms) then
         grms = sqrt(dot_product(d(:), d(:))/(3*natom))
-        write(*,4) 'total', 'potential', 'kinetic', '', 'RMS force'
-        write(*,14) 'SUM', E%potential+E%kinetic, E%potential, E%kinetic, grms
+        write(*,4) 'total', 'potential', 'kinetic', '', 'rms force'
+        write(*,14) 'sum', e%potential+e%kinetic, e%potential, e%kinetic, grms
 else
         write(*,4) 'total', 'potential', 'kinetic'
-        write(*,6) 'SUM', E%potential+E%kinetic, E%potential, E%kinetic
+        write(*,6) 'sum', e%potential+e%kinetic, e%potential, e%kinetic
 end if
-14 format(A,T17, 3F10.2, 10X, F10.2)
+14 format(a,t17, 3f10.2, 10x, f10.2)
 
 ! q-atom energies
 if(nstates > 0) then
 if(istep >= nsteps) then
-  write(*,3) 'Q-atom energies'
+  write(*,3) 'q-atom energies'
 else
-  write(*,2) 'Q-atom energies', istep
+  write(*,2) 'q-atom energies', istep
 end if
 
-write(*,26) 'el', 'vdW' ,'bond', 'angle', 'torsion', 'improper'
+write(*,26) 'el', 'vdw' ,'bond', 'angle', 'torsion', 'improper'
 
 do istate =1, nstates
-  write (*,32) 'Q-Q', istate, EQ(istate)%lambda, EQ(istate)%qq%el, EQ(istate)%qq%vdw
+  write (*,32) 'q-q', istate, eq(istate)%lambda, eq(istate)%qq%el, eq(istate)%qq%vdw
 end do
 write(*,*)
-if(nat_solute > nqat) then !only if there is something else than Q-atoms in topology
+if(nat_solute > nqat) then !only if there is something else than q-atoms in topology
   do istate =1, nstates
-        write (*,32) 'Q-prot', istate,EQ(istate)%lambda, EQ(istate)%qp%el, EQ(istate)%qp%vdw
+        write (*,32) 'q-prot', istate,eq(istate)%lambda, eq(istate)%qp%el, eq(istate)%qp%vdw
   end do
   write(*,*)
 end if
 
 if(nwat > 0) then
   do istate =1, nstates
-        write (*,32) 'Q-wat', istate, EQ(istate)%lambda, EQ(istate)%qw%el, EQ(istate)%qw%vdw
+        write (*,32) 'q-wat', istate, eq(istate)%lambda, eq(istate)%qw%el, eq(istate)%qw%vdw
   end do
   write(*,*)
 end if
 
 do istate =1, nstates
-  write (*,32) 'Q-surr.',istate, EQ(istate)%lambda, &
-                EQ(istate)%qp%el + EQ(istate)%qw%el, EQ(istate)%qp%vdw &
-                + EQ(istate)%qw%vdw
+  write (*,32) 'q-surr.',istate, eq(istate)%lambda, &
+                eq(istate)%qp%el + eq(istate)%qw%el, eq(istate)%qp%vdw &
+                + eq(istate)%qw%vdw
 end do
 write(*,*)
 
 do istate = 1, nstates
-  write (*,36) 'Q-any', istate, EQ(istate)%lambda, EQ(istate)%qx%el,&
-                EQ(istate)%qx%vdw, EQ(istate)%q%bond, EQ(istate)%q%angle,&
-                EQ(istate)%q%torsion, EQ(istate)%q%improper
+  write (*,36) 'q-any', istate, eq(istate)%lambda, eq(istate)%qx%el,&
+                eq(istate)%qx%vdw, eq(istate)%q%bond, eq(istate)%q%angle,&
+                eq(istate)%q%torsion, eq(istate)%q%improper
 end do
 write(*,*)
 
 write(*,22) 'total', 'restraint'
 do istate = 1, nstates
-  write (*,32) 'Q-SUM', istate, EQ(istate)%lambda,&
-                EQ(istate)%total, EQ(istate)%restraint
+  write (*,32) 'q-sum', istate, eq(istate)%lambda,&
+                eq(istate)%total, eq(istate)%restraint
 end do
 do i=1,noffd
-  write (*,360) offd(i)%i, offd(i)%j, Hij(offd(i)%i, offd(i)%j), &
+  write (*,360) offd(i)%i, offd(i)%j, hij(offd(i)%i, offd(i)%j), &
                 offd2(i)%k, offd2(i)%l, offd(i)%rkl
-360	  format ('H(',i2,',',i2,') =',f8.2,' dist. between Q-atoms',2i4, ' =',f8.2)
+360       format ('h(',i2,',',i2,') =',f8.2,' dist. between q-atoms',2i4, ' =',f8.2)
 end do
 end if
 
 if(monitor_group_pairs > 0) then
-        call centered_heading('Monitoring selected groups of nonbonded interactions','=')
+        call centered_heading('monitoring selected groups of nonbonded interactions','=')
         write (*,37,advance='no')
         write (*,38) (istate,istate, istate=1,nstates)
         do i=1,monitor_group_pairs
-                write (*,39,advance='no') i,monitor_group_pair(i)%Vwsum, &
-                        monitor_group_pair(i)%Vwel,monitor_group_pair(i)%Vwlj
-                write (*,40) (monitor_group_pair(i)%Vel(istate), &
-                        monitor_group_pair(i)%Vlj(istate), istate=1,nstates)
+                write (*,39,advance='no') i,monitor_group_pair(i)%vwsum, &
+                        monitor_group_pair(i)%vwel,monitor_group_pair(i)%vwlj
+                write (*,40) (monitor_group_pair(i)%vel(istate), &
+                        monitor_group_pair(i)%vlj(istate), istate=1,nstates)
         end do
 end if
 
 write(*,'(80a)') '==============================================================================='
 
 
-22	format('type   st lambda',2A10)
-26	format('type   st lambda',6a10)
-32	format (a,T8,i2,f7.4,2f10.2)
-36	format (a,T8,i2,f7.4,6f10.2)
-37  format ('pair   Vwsum    Vwel    Vwvdw')
-38  format (3(i4,':Vel',i3,':Vvdw'))
+22      format('type   st lambda',2a10)
+26      format('type   st lambda',6a10)
+32      format (a,t8,i2,f7.4,2f10.2)
+36      format (a,t8,i2,f7.4,6f10.2)
+37  format ('pair   vwsum    vwel    vwvdw')
+38  format (3(i4,':vel',i3,':vvdw'))
 39  format (i2,f10.2,f8.2,f9.2)
 40  format (3(2f8.2))
 
 
-if(use_PBC .and. constant_pressure .and. istep>=nsteps ) then
+if(use_pbc .and. constant_pressure .and. istep>=nsteps ) then
         write(*,*)
-        write(*,'(a)') '=========================== VOLUME CHANGE SUMMARY ==========================='
+        write(*,'(a)') '=========================== volume change summary ==========================='
         write(*,45) boxlength(1)*boxlength(2)*boxlength(3)
         write(*,*)
         write(*,46) 'total', 'accepted', 'ratio'
-        write(*,47) 'Attempts', volume_try, volume_acc, real(volume_acc)/volume_try
+        write(*,47) 'attempts', volume_try, volume_acc, real(volume_acc)/volume_try
 write(*,'(80a)') '==============================================================================='
 end if
-45 format('Final volume: ', f10.3)
-46 format(16X, 3A10)
-47 format(A,T17, 2i10, f10.3)
+45 format('final volume: ', f10.3)
+46 format(16x, 3a10)
+47 format(a,t17, 2i10, f10.3)
 
 end subroutine write_out
 
@@ -15287,7 +15258,7 @@ end subroutine write_trj
 
 subroutine write_xfin
 ! local variables
-integer						::	i,nat3
+integer                                         ::      i,nat3
 
 nat3 = natom*3
 
@@ -15295,31 +15266,31 @@ rewind (3)
 write (3) nat3, (x(i),i=1,nat3)
 write (3) nat3, (v(i),i=1,nat3)
 !save dynamic polarisation restraint data
-	if(wpol_restr .and. allocated(wshell)) then
+        if(wpol_restr .and. allocated(wshell)) then
         write (3) nwpolr_shell, wshell(:)%theta_corr
 end if
 
-if( use_PBC )then
+if( use_pbc )then
         write(3) boxlength(:)
         write(3) boxcentre(:)
 end if
 end subroutine write_xfin
 
 !-----------------------------------------------------------------------
-!Put molecules back in box for nice visualisation.
-!Change boxcentre if rigid_box_centre is off.
-!Update cgp_centers for LRF.
+!put molecules back in box for nice visualisation.
+!change boxcentre if rigid_box_centre is off.
+!update cgp_centers for lrf.
 !-----------------------------------------------------------------------
 subroutine put_back_in_box
 
-real(8)				::	boxc(1:3)
-integer				::	i, j, starten, slutet
+real(8)                         ::      boxc(1:3)
+integer                         ::      i, j, starten, slutet
 !the borders of the periodic box
-real(8)				::	x_max, x_min, y_max, y_min, z_max, z_min
-real(8)				:: cm(1:3)
-integer				::  mvd_mol(1:nmol) !moved molecule 1=yes, 0=no
-integer				::  k, ig
-integer				::  pbib_start, pbib_stop
+real(8)                         ::      x_max, x_min, y_max, y_min, z_max, z_min
+real(8)                         :: cm(1:3)
+integer                         ::  mvd_mol(1:nmol) !moved molecule 1=yes, 0=no
+integer                         ::  k, ig
+integer                         ::  pbib_start, pbib_stop
 
 if( .not. rigid_box_centre ) then !if the box is allowed to float around, center on solute if present, otherwise center on solvent
         if( nat_solute > 0) then
@@ -15357,11 +15328,11 @@ z_min = boxc(3) - boxlength(3)/2
 
 mvd_mol(:) = 0 
 
-!pbib_start and pbib_stop are the starting and stopping molecule indexes of which molecules to Put Back In Box
+!pbib_start and pbib_stop are the starting and stopping molecule indexes of which molecules to put back in box
 pbib_start = 1
 pbib_stop  = nmol
 if ( .not. put_solute_back_in_box ) then !we're not putting solute back in box
-	pbib_start = nmol - (natom - nat_solute)/(istart_mol(nmol) - istart_mol(nmol-1)) + 1    !(number of mol - number of solvent molecules + 1)
+        pbib_start = nmol - (natom - nat_solute)/(istart_mol(nmol) - istart_mol(nmol-1)) + 1    !(number of mol - number of solvent molecules + 1)
 end if
 if ( .not. put_solvent_back_in_box ) then !we're not putting solvent back in box
         pbib_stop  = nmol - (natom - nat_solute)/(istart_mol(nmol) - istart_mol(nmol-1))        !(number of mol - number of solvent molecules)
@@ -15376,134 +15347,134 @@ do i=pbib_start,pbib_stop
                 cm(3) = cm(3) + x(j*3  )*mass(j)
         end do
         cm(:) = cm(:) * mol_mass(i) !centre of mass of molecule i
-		
+                
         !x-direction
         if( cm(1) .gt. x_max) then !position of centre of mass
 
                         do j= istart_mol(i),istart_mol(i+1)-1 !move the molecule
-						x(j*3-2) = x(j*3-2) - boxlength(1)
-				        end do
-						mvd_mol(i) = 1
-		else if ( cm(1) .lt. x_min ) then
+                                                x(j*3-2) = x(j*3-2) - boxlength(1)
+                                        end do
+                                                mvd_mol(i) = 1
+                else if ( cm(1) .lt. x_min ) then
                         do j= istart_mol(i),istart_mol(i+1)-1 !move the molecule
-						x(j*3-2) = x(j*3-2) + boxlength(1)
-				        end do
-						mvd_mol(i) = 1
+                                                x(j*3-2) = x(j*3-2) + boxlength(1)
+                                        end do
+                                                mvd_mol(i) = 1
         end if
 
        ! y-direction
         if( cm(2) .gt. y_max) then !position of centre of mass
                         do j= istart_mol(i),istart_mol(i+1)-1 !move the molecule
-						x(j*3-1) = x(j*3-1) - boxlength(2)
-				        end do
-						mvd_mol(i) = 1
+                                                x(j*3-1) = x(j*3-1) - boxlength(2)
+                                        end do
+                                                mvd_mol(i) = 1
         else if ( cm(2) .lt. y_min ) then
                         do j= istart_mol(i),istart_mol(i+1)-1 !move the molecule
-						x(j*3-1) = x(j*3-1) + boxlength(2)
-				        end do
-						mvd_mol(i) = 1
+                                                x(j*3-1) = x(j*3-1) + boxlength(2)
+                                        end do
+                                                mvd_mol(i) = 1
         end if
 
         !z-direction
         if( cm(3) .gt. z_max) then !position of centre of mass
                         do j= istart_mol(i),istart_mol(i+1)-1 !move the molecule
-						x(j*3  ) = x(j*3  ) - boxlength(3)
-				        end do
-						mvd_mol(i) = 1
+                                                x(j*3  ) = x(j*3  ) - boxlength(3)
+                                        end do
+                                                mvd_mol(i) = 1
         else if ( cm(3) .lt. z_min ) then
                         do j= istart_mol(i),istart_mol(i+1)-1 !move the molecule
-						x(j*3  ) = x(j*3  ) + boxlength(3)
-				        end do
-						mvd_mol(i) = 1
-  		end if
+                                                x(j*3  ) = x(j*3  ) + boxlength(3)
+                                        end do
+                                                mvd_mol(i) = 1
+                end if
 end do !over molecules
 end if !if(nodeid .eq. 0)
 
-!LRF: if molecule moved update all cgp_centers from first charge group to the last one
-if (use_LRF) then
+!lrf: if molecule moved update all cgp_centers from first charge group to the last one
+if (use_lrf) then
 
-!Broadcast mvd_mol(:) & x(:)
-#if defined(USE_MPI)
-call MPI_Bcast(mvd_mol, nmol, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast mvd_mol(k)')
-call MPI_Bcast(x, nat3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast x')
+!broadcast mvd_mol(:) & x(:)
+#if defined(use_mpi)
+call mpi_bcast(mvd_mol, nmol, mpi_integer, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast mvd_mol(k)')
+call mpi_bcast(x, nat3, mpi_real8, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast x')
 #endif
 
 do k=pbib_start,pbib_stop
-		if (mvd_mol(k) == 1) then  
-						do ig=iwhich_cgp(istart_mol(k)),iwhich_cgp(istart_mol(k+1)-1)
-								lrf(ig)%cgp_cent(:) = 0
-								do i  = cgp(ig)%first, cgp(ig)%last
-										lrf(ig)%cgp_cent(:) = lrf(ig)%cgp_cent(:) + x(cgpatom(i)*3-2:cgpatom(i)*3)
-								end do
+                if (mvd_mol(k) == 1) then  
+                                                do ig=iwhich_cgp(istart_mol(k)),iwhich_cgp(istart_mol(k+1)-1)
+                                                                lrf(ig)%cgp_cent(:) = 0
+                                                                do i  = cgp(ig)%first, cgp(ig)%last
+                                                                                lrf(ig)%cgp_cent(:) = lrf(ig)%cgp_cent(:) + x(cgpatom(i)*3-2:cgpatom(i)*3)
+                                                                end do
 
-						lrf(ig)%cgp_cent(:) = lrf(ig)%cgp_cent(:)/real(cgp(ig)%last - cgp(ig)%first +1)
-						end do
-		end if 
+                                                lrf(ig)%cgp_cent(:) = lrf(ig)%cgp_cent(:)/real(cgp(ig)%last - cgp(ig)%first +1)
+                                                end do
+                end if 
 end do
 end if
 
 end subroutine put_back_in_box
 !----------------------------------------------------------------------------
-subroutine MC_volume()
+subroutine mc_volume()
 
-real(8)									:: old_x(1:3*nat_pro)
-type(ENERGIES)							:: old_E
-type(Q_ENERGIES), dimension(1:nstates)	:: old_EQ
-real(8)									:: old_boxl(1:3), old_inv(1:3)
-real(8)									:: old_V, new_V, deltaLength
-real(8)									:: deltaV, deltaE, deltaW
-real(8)									:: box_min
-integer									:: starten, slutet, i, j, sw_no !indeces
-real(8)									:: randomno !random number
-real(8)									:: new_x, new_y, new_z
-real(8)									:: move_x, move_y, move_z
-logical									:: acc
-integer									:: longest 
-real(8)									:: cubr_vol_ratio
-real(8)									:: cm(1:3)
+real(8)                                                                 :: old_x(1:3*nat_pro)
+type(energies)                                                  :: old_e
+type(q_energies), dimension(1:nstates)  :: old_eq
+real(8)                                                                 :: old_boxl(1:3), old_inv(1:3)
+real(8)                                                                 :: old_v, new_v, deltalength
+real(8)                                                                 :: deltav, deltae, deltaw
+real(8)                                                                 :: box_min
+integer                                                                 :: starten, slutet, i, j, sw_no !indeces
+real(8)                                                                 :: randomno !random number
+real(8)                                                                 :: new_x, new_y, new_z
+real(8)                                                                 :: move_x, move_y, move_z
+logical                                                                 :: acc
+integer                                                                 :: longest 
+real(8)                                                                 :: cubr_vol_ratio
+real(8)                                                                 :: cm(1:3)
 
 if (nodeid .eq. 0) then
-write(*,8) 'Volume change', istep
+write(*,8) 'volume change', istep
 write(*,*)
-write(*,'(a)') '---------- Before move'
-8 format('======================== ',A14,' at step ',i6,' ========================')
-4 format(16X, 3A10)
-6 format(A,T17, 3F10.3)
+write(*,'(a)') '---------- before move'
+8 format('======================== ',a14,' at step ',i6,' ========================')
+4 format(16x, 3a10)
+6 format(a,t17, 3f10.3)
 end if  !(nodeid .eq. 0)
 
 !save the old energies,coordinates and forces
 old_x(:) = x(:)
-old_E = E
+old_e = e
 old_boxl(:) = boxlength(:)
 old_inv(:) = inv_boxl(:)
-if (use_LRF) then
-	old_lrf(:) = lrf(:)
+if (use_lrf) then
+        old_lrf(:) = lrf(:)
 end if
 
-#if defined(USE_MPI)
-!Update modified coordinates  
-call MPI_Bcast(x, natom*3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast x')
+#if defined(use_mpi)
+!update modified coordinates  
+call mpi_bcast(x, natom*3, mpi_real8, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast x')
 #endif
 
-call new_potential(old_E)   !compute energies from previous md-step
+call new_potential(old_e)   !compute energies from previous md-step
 
 if (nodeid .eq. 0 ) then
-old_E = E                !Update to fresh E before changing volume
-old_EQ = EQ(1:nstates)
-old_V = old_boxl(1) * old_boxl(2) * old_boxl(3)
+old_e = e                !update to fresh e before changing volume
+old_eq = eq(1:nstates)
+old_v = old_boxl(1) * old_boxl(2) * old_boxl(3)
 
 
 !new volume randomized
 randomno = randm(pressure_seed) ! 0<=randomno<=1
 randomno = randomno*2 - 1    !-1 <= randomno <= 1
-deltaV = randomno * max_vol_displ
-new_V = deltaV + old_V
-cubr_vol_ratio = (new_V/old_V)**(1./3.)
+deltav = randomno * max_vol_displ
+new_v = deltav + old_v
+cubr_vol_ratio = (new_v/old_v)**(1./3.)
 write(*,4) 'old', 'new', 'delta'
-write(*,6) 'Volume', old_V, new_V, deltaV
+write(*,6) 'volume', old_v, new_v, deltav
 write(*,*)
 
 !compute new boxlenth and inv_boxl
@@ -15514,31 +15485,31 @@ inv_boxl(:) = 1.0/boxlength(:)
 write(*,10) old_boxl
 write(*,2) boxlength
 write(*,*)
-10 format('Old boxlength', 3f10.3)
-2 format('New boxlength ', 3f10.3)
+10 format('old boxlength', 3f10.3)
+2 format('new boxlength ', 3f10.3)
 
 !compare cut-offs with new boxsize
 box_min = min( boxlength(1), boxlength(2), boxlength(3) )
-!Solute-solute cut-off radii
-if( .not. (box_min .gt. Rcpp*2) ) then
-        write(*,*) 'Solute-solute cut-off radii too large', Rcpp
-        call die('Solute-solute cut-off radii too large')
-!Solvent-solvent
-else if( .not. (box_min .gt. Rcww*2) ) then
-        write(*,*) 'Solvent-solvent cut-off radii too large', Rcww
-        call die('Solvent-solvent cut-off radii too large')
-!Solute-solvent
-else if( .not. (box_min .gt. Rcpw*2) ) then
-        write(*,*) 'Solute-solvent cut-off radii too large', Rcpw
-        call die('Solute-solvent cut-off radii too large')
-!Q-atom
-else if( .not. (box_min .gt. Rcq*2) ) then
-        write(*,*) 'Q-atom cut-off radii too large', Rcq
-        call die('Q-atom cut-off radii too large')
-!LRF
-else if( .not. (box_min .gt. RcLRF*2) ) then
-        write(*,*) 'LRF cut-off radii too large', Rcq
-        call die('LRF cut-off radii too large')
+!solute-solute cut-off radii
+if( .not. (box_min .gt. rcpp*2) ) then
+        write(*,*) 'solute-solute cut-off radii too large', rcpp
+        call die('solute-solute cut-off radii too large')
+!solvent-solvent
+else if( .not. (box_min .gt. rcww*2) ) then
+        write(*,*) 'solvent-solvent cut-off radii too large', rcww
+        call die('solvent-solvent cut-off radii too large')
+!solute-solvent
+else if( .not. (box_min .gt. rcpw*2) ) then
+        write(*,*) 'solute-solvent cut-off radii too large', rcpw
+        call die('solute-solvent cut-off radii too large')
+!q-atom
+else if( .not. (box_min .gt. rcq*2) ) then
+        write(*,*) 'q-atom cut-off radii too large', rcq
+        call die('q-atom cut-off radii too large')
+!lrf
+else if( .not. (box_min .gt. rclrf*2) ) then
+        write(*,*) 'lrf cut-off radii too large', rcq
+        call die('lrf cut-off radii too large')
 end if
 
 !compute new coordinates after molecules and centre of mass
@@ -15580,50 +15551,50 @@ move_z = ( ( cm(3)-boxcentre(3) )*boxlength(3)/old_boxl(3) + boxcentre(3) ) - cm
 do j=istart_mol(nmol) , natom
         x(j*3-2) = x(j*3-2) + move_x
         x(j*3-1) = x(j*3-1) + move_y
-        x(j*3  ) = x(j*3  ) + move_z		
+        x(j*3  ) = x(j*3  ) + move_z            
 end do
 end if !nodeid .eq. 0
 
-#if defined(USE_MPI)
-!Update modified coordinates and boxlengths 
-call MPI_Bcast(x, natom*3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-if (ierr .ne. 0) call die('init_nodes/MPI_Bcast x')
-call MPI_Bcast(boxlength, 3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-call MPI_Bcast(inv_boxl, 3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
+#if defined(use_mpi)
+!update modified coordinates and boxlengths 
+call mpi_bcast(x, natom*3, mpi_real8, 0, mpi_comm_world, ierr)
+if (ierr .ne. 0) call die('init_nodes/mpi_bcast x')
+call mpi_bcast(boxlength, 3, mpi_real8, 0, mpi_comm_world, ierr)
+call mpi_bcast(inv_boxl, 3, mpi_real8, 0, mpi_comm_world, ierr)
 #endif
 
-!Need to update entire LRF... sigh
-if (use_LRF) then
-	call cgp_centers
-	if ( iuse_switch_atom == 1 ) then
-		call nbpplist_box_lrf
-		call nbpwlist_box_lrf
-	else
-		call nbpplis2_box_lrf
-		call nbpwlis2_box_lrf
-	endif
-	call nbwwlist_box_lrf
+!need to update entire lrf... sigh
+if (use_lrf) then
+        call cgp_centers
+        if ( iuse_switch_atom == 1 ) then
+                call nbpplist_box_lrf
+                call nbpwlist_box_lrf
+        else
+                call nbpplis2_box_lrf
+                call nbpwlis2_box_lrf
+        endif
+        call nbwwlist_box_lrf
 end if
 
 
 !compute the new potential, in parallel if possible
-call new_potential( old_E )
+call new_potential( old_e )
 
 if (nodeid .eq. 0) then
-!Jamfor nya med gamla
-deltaE = E%potential - old_E%potential
-deltaW = deltaE + pressure * deltaV - nmol*Boltz*Temp0*log(new_V/old_V)
+!jamfor nya med gamla
+deltae = e%potential - old_e%potential
+deltaw = deltae + pressure * deltav - nmol*boltz*temp0*log(new_v/old_v)
 write(*,4) 'old', 'new', 'delta'
-write(*,6) 'Potential', old_E%potential, E%potential, deltaE
+write(*,6) 'potential', old_e%potential, e%potential, deltae
 write(*,*)
 
 !accept or reject
-if( deltaW<=0.0 ) then
+if( deltaw<=0.0 ) then
         acc = .true.
 else
         !slumpa tal mellan  0 coh 1
         randomno = randm(pressure_seed)
-        if( randomno > exp(- deltaW / Boltz / Temp0) ) then
+        if( randomno > exp(- deltaw / boltz / temp0) ) then
                 acc = .false.
         else
                 acc = .true.
@@ -15631,38 +15602,38 @@ else
 end if
 
 volume_try = volume_try + 1
-write(*,'(a)') '---------- After move' 
+write(*,'(a)') '---------- after move' 
 if( acc ) then
-        write(*,'(a)') 'Volume change accepted'
+        write(*,'(a)') 'volume change accepted'
         volume_acc = volume_acc + 1
 else
-        write(*,'(a)') 'Volume change rejected'
+        write(*,'(a)') 'volume change rejected'
         !put stuff back to what they were before
         x(:) = old_x(:)
-        E = old_E
-        EQ(1:nstates) = old_EQ(1:nstates)
+        e = old_e
+        eq(1:nstates) = old_eq(1:nstates)
         boxlength(:) = old_boxl(:)
         inv_boxl(:) = old_inv(:)
-		if (use_LRF) then
-			lrf(:) = old_lrf(:)
-		end if
+                if (use_lrf) then
+                        lrf(:) = old_lrf(:)
+                end if
 end if
 
 write(*,11) boxlength(1)*boxlength(2)*boxlength(3)
 write(*,12) boxlength
-11 format('Final volume: ', f10.3)
-12 format('Final boxlength: ', 3f10.3)
+11 format('final volume: ', f10.3)
+12 format('final boxlength: ', 3f10.3)
 write(*,*)
 write(*,4) 'total', 'accepted', 'ratio'
-write(*,7) 'Attempts', volume_try, volume_acc, real(volume_acc)/volume_try
+write(*,7) 'attempts', volume_try, volume_acc, real(volume_acc)/volume_try
 write(*,*)
-7 format(A,T17, 2i10, f10.3)
+7 format(a,t17, 2i10, f10.3)
 write(*,'(80a)') '==============================================================================='
 end if !(nodeid .eq. 0)
 
-#if defined(USE_MPI)
-!Make slave nodes put things back if rejected
-call MPI_Bcast(acc, 1, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
+#if defined(use_mpi)
+!make slave nodes put things back if rejected
+call mpi_bcast(acc, 1, mpi_logical, 0, mpi_comm_world, ierr)
 if (.not. acc) then
   if (nodeid .ne. 0) then
     x(:) = old_x(:)
@@ -15672,41 +15643,41 @@ if (.not. acc) then
 end if
 #endif
 
-end subroutine MC_volume	
+end subroutine mc_volume        
 
 !-----------------------------------------------------------------------------------------------------
 subroutine new_potential( old )
 
-type(ENERGIES), intent(in)		:: old	
-integer							:: istate,i
+type(energies), intent(in)              :: old  
+integer                                                 :: istate,i
 
 !zero all energies
-E%potential = 0.0
-E%pp%el  = 0.0
-E%pp%vdw = 0.0
-E%pw%el  = 0.0
-E%pw%vdw = 0.0
-E%ww%el  = 0.0
-E%ww%vdw = 0.0
-E%qx%el    = 0.0
-E%qx%vdw   = 0.0
-E%restraint%protein = 0.0
-E%LRF      = 0.0 
+e%potential = 0.0
+e%pp%el  = 0.0
+e%pp%vdw = 0.0
+e%pw%el  = 0.0
+e%pw%vdw = 0.0
+e%ww%el  = 0.0
+e%ww%vdw = 0.0
+e%qx%el    = 0.0
+e%qx%vdw   = 0.0
+e%restraint%protein = 0.0
+e%lrf      = 0.0 
 do istate = 1, nstates
-EQ(istate)%qq%el = 0.0
-EQ(istate)%qq%vdw = 0.0
-EQ(istate)%qp%el = 0.0
-EQ(istate)%qp%vdw = 0.0
-EQ(istate)%qw%el = 0.0
-EQ(istate)%qw%vdw = 0.0
-EQ(istate)%restraint = 0.0
+eq(istate)%qq%el = 0.0
+eq(istate)%qq%vdw = 0.0
+eq(istate)%qp%el = 0.0
+eq(istate)%qp%vdw = 0.0
+eq(istate)%qw%el = 0.0
+eq(istate)%qw%vdw = 0.0
+eq(istate)%restraint = 0.0
 end do
 
 !reset derivatives ---
 d(:) = 0.0
 
-#if defined (USE_MPI)
-!First post recieves for gathering data from slaves
+#if defined (use_mpi)
+!first post recieves for gathering data from slaves
 if (nodeid .eq. 0) then
 call gather_nonbond
 end if
@@ -15714,7 +15685,7 @@ end if
 
 !compute the new potential
 select case(ivdw_rule)
-        case(VDW_GEOMETRIC)
+        case(vdw_geometric)
                 call nonbond_pp_box
                 call nonbond_pw_box
                 if(qvdw_flag) then
@@ -15723,27 +15694,27 @@ select case(ivdw_rule)
                         call nonbond_qp_box
                 end if
                 if(natom > nat_solute) then !if any solvent
-                if(solvent_type == SOLVENT_SPC) then
-                        !use the optimised SPC routine when possible
+                if(solvent_type == solvent_spc) then
+                        !use the optimised spc routine when possible
                         call nonbond_ww_spc_box
                         call nonbond_qw_spc_box
-                elseif(solvent_type == SOLVENT_3ATOM) then !otherwise calc. LJ with all atoms
+                elseif(solvent_type == solvent_3atom) then !otherwise calc. lj with all atoms
                         call nonbond_3atomsolvent_box
                 call nonbond_qw_3atom_box
                 end if
                 end if
-        case(VDW_ARITHMETIC)
+        case(vdw_arithmetic)
                 call nonbon2_pp_box
                 call nonbon2_qp_box
                 if(natom > nat_solute) then !if any solvent
                         call nonbon2_pw_box
-                        call nonbon2_qw_box !no SPC-specific optimised routines here
+                        call nonbon2_qw_box !no spc-specific optimised routines here
                         call nonbon2_ww_box
                 end if
 end select
 
 
- if (use_LRF) then
+ if (use_lrf) then
      call lrf_taylor
  end if
 
@@ -15765,71 +15736,71 @@ if (nodeid .eq. 0) then
  end if
 end if
 
-#if defined(USE_MPI)
-if (nodeid .ne. 0) then  !Slave nodes
+#if defined(use_mpi)
+if (nodeid .ne. 0) then  !slave nodes
 call gather_nonbond
 end if
 #endif
 
 if (nodeid .eq. 0) then 
-#if (USE_MPI)
+#if (use_mpi)
 do i = 1, 3
-    call MPI_WaitAll((numnodes-1),request_recv(1,i),mpi_status,ierr)
+    call mpi_waitall((numnodes-1),request_recv(1,i),mpi_status,ierr)
 end do
 
-!Forces and energies are summarised
+!forces and energies are summarised
 do i=1,numnodes-1
   d = d + d_recv(:,i)
-  E%pp%el   = E%pp%el  + E_recv(i)%pp%el
-  E%pp%vdw  = E%pp%vdw + E_recv(i)%pp%vdw
-  E%pw%el   = E%pw%el  + E_recv(i)%pw%el
-  E%pw%vdw  = E%pw%vdw + E_recv(i)%pw%vdw
-  E%ww%el   = E%ww%el  + E_recv(i)%ww%el
-  E%ww%vdw  = E%ww%vdw + E_recv(i)%ww%vdw
-  E%lrf     = E%lrf    + E_recv(i)%lrf
-  EQ(1:nstates)%qp%el  = EQ(1:nstates)%qp%el  + EQ_recv(1:nstates,i)%qp%el
-  EQ(1:nstates)%qp%vdw = EQ(1:nstates)%qp%vdw + EQ_recv(1:nstates,i)%qp%vdw
-  EQ(1:nstates)%qw%el  = EQ(1:nstates)%qw%el  + EQ_recv(1:nstates,i)%qw%el
-  EQ(1:nstates)%qw%vdw = EQ(1:nstates)%qw%vdw + EQ_recv(1:nstates,i)%qw%vdw
+  e%pp%el   = e%pp%el  + e_recv(i)%pp%el
+  e%pp%vdw  = e%pp%vdw + e_recv(i)%pp%vdw
+  e%pw%el   = e%pw%el  + e_recv(i)%pw%el
+  e%pw%vdw  = e%pw%vdw + e_recv(i)%pw%vdw
+  e%ww%el   = e%ww%el  + e_recv(i)%ww%el
+  e%ww%vdw  = e%ww%vdw + e_recv(i)%ww%vdw
+  e%lrf     = e%lrf    + e_recv(i)%lrf
+  eq(1:nstates)%qp%el  = eq(1:nstates)%qp%el  + eq_recv(1:nstates,i)%qp%el
+  eq(1:nstates)%qp%vdw = eq(1:nstates)%qp%vdw + eq_recv(1:nstates,i)%qp%vdw
+  eq(1:nstates)%qw%el  = eq(1:nstates)%qw%el  + eq_recv(1:nstates,i)%qw%el
+  eq(1:nstates)%qw%vdw = eq(1:nstates)%qw%vdw + eq_recv(1:nstates,i)%qw%vdw
 end do
 #endif
 
 !summation of energies
 do istate = 1, nstates
-        ! update EQ
-        EQ(istate)%qx%el  = EQ(istate)%qq%el +EQ(istate)%qp%el +EQ(istate)%qw%el
-        EQ(istate)%qx%vdw = EQ(istate)%qq%vdw+EQ(istate)%qp%vdw+EQ(istate)%qw%vdw
-        E%qx%el    = E%qx%el    + EQ(istate)%qx%el   *EQ(istate)%lambda
-        E%qx%vdw   = E%qx%vdw   + EQ(istate)%qx%vdw  *EQ(istate)%lambda
+        ! update eq
+        eq(istate)%qx%el  = eq(istate)%qq%el +eq(istate)%qp%el +eq(istate)%qw%el
+        eq(istate)%qx%vdw = eq(istate)%qq%vdw+eq(istate)%qp%vdw+eq(istate)%qw%vdw
+        e%qx%el    = e%qx%el    + eq(istate)%qx%el   *eq(istate)%lambda
+        e%qx%vdw   = e%qx%vdw   + eq(istate)%qx%vdw  *eq(istate)%lambda
 
-        ! update E%restraint%protein with an average of all states
-        E%restraint%protein = E%restraint%protein + EQ(istate)%restraint*EQ(istate)%lambda
+        ! update e%restraint%protein with an average of all states
+        e%restraint%protein = e%restraint%protein + eq(istate)%restraint*eq(istate)%lambda
 end do
 
-E%potential = old%p%bond + old%w%bond + old%p%angle + old%w%angle + old%p%torsion + &
-old%p%improper + E%pp%el + E%pp%vdw + E%pw%el + E%pw%vdw + E%ww%el + &
-E%ww%vdw + old%q%bond + old%q%angle + old%q%torsion + &
-old%q%improper + E%qx%el + E%qx%vdw + E%restraint%protein + E%LRF
+e%potential = old%p%bond + old%w%bond + old%p%angle + old%w%angle + old%p%torsion + &
+old%p%improper + e%pp%el + e%pp%vdw + e%pw%el + e%pw%vdw + e%ww%el + &
+e%ww%vdw + old%q%bond + old%q%angle + old%q%torsion + &
+old%q%improper + e%qx%el + e%qx%vdw + e%restraint%protein + e%lrf
 end if !(nodeid .eq. 0)
 end subroutine new_potential
 
 !----------------------------------------------------------------------------------------
 
-#if defined (USE_MPI)
+#if defined (use_mpi)
 !***********************
 !subroutine handling summation of nonbonded energies from slave nodes.
 !***********************
-! Use the global vars
-!  request_recv, E_send,EQ_send,E_recv,EQ_Recv,d_recv
-! Allocate  - status
+! use the global vars
+!  request_recv, e_send,eq_send,e_recv,eq_recv,d_recv
+! allocate  - status
 
 
 subroutine gather_nonbond()
 
 integer,parameter                       :: vars=3
 integer,dimension(3,numnodes-1)         :: tag
-integer,dimension(vars)	                :: blockcnt, ftype
-integer(kind=MPI_ADDRESS_KIND), dimension(vars)	:: fdisp, base
+integer,dimension(vars)                 :: blockcnt, ftype
+integer(kind=mpi_address_kind), dimension(vars) :: fdisp, base
 integer                                 :: mpitype_package,mpitype_send
 integer                                 :: i,istate
 
@@ -15841,42 +15812,42 @@ end do
 
 if (nodeid .eq. 0) then        !master
 
-! Post receives for each of the d/E/EQ_recv structures
-! E/EQ_Recv should really be handled with MPI_Type_create_struct
-! and d_recv's type should be handled correctly (it's KIND=wp8)
+! post receives for each of the d/e/eq_recv structures
+! e/eq_recv should really be handled with mpi_type_create_struct
+! and d_recv's type should be handled correctly (it's kind=wp8)
 ! should preferably use size(d_recv, 1) for count
 do i = 1,numnodes-1
-  call MPI_IRecv(d_recv(1,i), natom*3, MPI_REAL8, i, tag(1,i), MPI_COMM_WORLD, &
+  call mpi_irecv(d_recv(1,i), natom*3, mpi_real8, i, tag(1,i), mpi_comm_world, &
        request_recv(i,1),ierr)
-  if (ierr .ne. 0) call die('gather_nonbond/MPI_IRecv d_recv')
-  call MPI_IRecv(E_recv(i), 3*2+1, MPI_REAL8, i, tag(2,i), MPI_COMM_WORLD, &
+  if (ierr .ne. 0) call die('gather_nonbond/mpi_irecv d_recv')
+  call mpi_irecv(e_recv(i), 3*2+1, mpi_real8, i, tag(2,i), mpi_comm_world, &
        request_recv(i,2),ierr)
-  if (ierr .ne. 0) call die('gather_nonbond/MPI_IRecv E_recv')
-  call MPI_IRecv(EQ_recv(1,i), nstates*2*2, MPI_REAL8, i, tag(3,i), MPI_COMM_WORLD, &
+  if (ierr .ne. 0) call die('gather_nonbond/mpi_irecv e_recv')
+  call mpi_irecv(eq_recv(1,i), nstates*2*2, mpi_real8, i, tag(3,i), mpi_comm_world, &
        request_recv(i,3),ierr)
-  if (ierr .ne. 0) call die('gather_nonbond/MPI_IRecv EQ_recv')
+  if (ierr .ne. 0) call die('gather_nonbond/mpi_irecv eq_recv')
 end do
 
 else                  !slave nodes
-E_send%pp%el  = E%pp%el
-E_send%pp%vdw = E%pp%vdw
-E_send%pw%el  = E%pw%el
-E_send%pw%vdw = E%pw%vdw
-E_send%ww%el  = E%ww%el
-E_send%ww%vdw = E%ww%vdw
-E_send%lrf    = E%lrf
-EQ_send(1:nstates)%qp%el  = EQ(1:nstates)%qp%el
-EQ_send(1:nstates)%qp%vdw = EQ(1:nstates)%qp%vdw
-EQ_send(1:nstates)%qw%el  = EQ(1:nstates)%qw%el
-EQ_send(1:nstates)%qw%vdw = EQ(1:nstates)%qw%vdw
+e_send%pp%el  = e%pp%el
+e_send%pp%vdw = e%pp%vdw
+e_send%pw%el  = e%pw%el
+e_send%pw%vdw = e%pw%vdw
+e_send%ww%el  = e%ww%el
+e_send%ww%vdw = e%ww%vdw
+e_send%lrf    = e%lrf
+eq_send(1:nstates)%qp%el  = eq(1:nstates)%qp%el
+eq_send(1:nstates)%qp%vdw = eq(1:nstates)%qp%vdw
+eq_send(1:nstates)%qw%el  = eq(1:nstates)%qw%el
+eq_send(1:nstates)%qw%vdw = eq(1:nstates)%qw%vdw
 
-! See comments above on the IRecv part
-call MPI_Send(d, natom*3, MPI_REAL8, 0, tag(1,nodeid), MPI_COMM_WORLD,ierr) 
-if (ierr .ne. 0) call die('gather_nonbond/Send d')
-call MPI_Send(E_send, 3*2+1, MPI_REAL8, 0, tag(2,nodeid), MPI_COMM_WORLD,ierr) 
-if (ierr .ne. 0) call die('gather_nonbond/Send E_send')
-call MPI_Send(EQ_send, nstates*2*2, MPI_REAL8, 0, tag(3,nodeid), MPI_COMM_WORLD,ierr) 
-if (ierr .ne. 0) call die('gather_nonbond/Send EQ_send')
+! see comments above on the irecv part
+call mpi_send(d, natom*3, mpi_real8, 0, tag(1,nodeid), mpi_comm_world,ierr) 
+if (ierr .ne. 0) call die('gather_nonbond/send d')
+call mpi_send(e_send, 3*2+1, mpi_real8, 0, tag(2,nodeid), mpi_comm_world,ierr) 
+if (ierr .ne. 0) call die('gather_nonbond/send e_send')
+call mpi_send(eq_send, nstates*2*2, mpi_real8, 0, tag(3,nodeid), mpi_comm_world,ierr) 
+if (ierr .ne. 0) call die('gather_nonbond/send eq_send')
 
 end if
 end subroutine gather_nonbond
@@ -15884,22 +15855,22 @@ end subroutine gather_nonbond
 #endif
 !----------------------------------------------------------------------------------------
 !*******************************************************
-!Will find and return the xtop atom number from 
+!will find and return the xtop atom number from 
 !  residue number and atom number in residue from
 !  library sequence.
-! Uses global variables: xtop,nres,res
+! uses global variables: xtop,nres,res
 !*******************************************************
 
 integer function get_atom_from_resnum_atnum(aid)
 !arguments
-character(*), intent(in)	::	aid	!string=residue:atom
-	
+character(*), intent(in)        ::      aid     !string=residue:atom
+        
 !locals
-integer						::	separator_pos
-character(len=20)			::	res_str
-character(len=5)			::	atom_str
-integer						::	filestat
-integer						::	resnum, atnum
+integer                                         ::      separator_pos
+character(len=20)                       ::      res_str
+character(len=5)                        ::      atom_str
+integer                                         ::      filestat
+integer                                         ::      resnum, atnum
 
 get_atom_from_resnum_atnum = 0
 
@@ -15911,7 +15882,7 @@ read(res_str, *, iostat=filestat) resnum
 read(atom_str, *, iostat=filestat) atnum
 if(filestat > 0) return
 
-!Residue must be in topology
+!residue must be in topology
 if(resnum < 1 .or. resnum > nres) then                     
   return                                                 
 end if
@@ -15925,12 +15896,12 @@ end if
 write(*, 120) atnum, resnum
 call die('error in finding atom number from resnum:atnum.')
 
-120	format('>>>>> ERROR: There is no atom number ',i4,' in residue ',i4,'.')
+120     format('>>>>> error: there is no atom number ',i4,' in residue ',i4,'.')
 end function get_atom_from_resnum_atnum
 
 !----------------------------------------------------------------------------------------
 
-end module MD
+end module md
 
 
 
