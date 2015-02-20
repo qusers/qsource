@@ -27,7 +27,6 @@ say, if I (username:esguerra) wanted to create a new dead branch I could do:
     git checkout master
 
 When you want to clone only one branch and not the full repository use:
-
     git clone https://github.com/qusers/qsource.git --branch testing/akesandgren --single-branch qakesandgren
 
 
