@@ -1,33 +1,33 @@
-Qsource testing version.
-=======================
+Qsource development.
+--------------------------------------------------------------------------------
 
-This is yet another testing version.
-This one will be kept as a stale branch with the final version
-of the NEW MPI implementation by Ake Sandgren. Ake also took care
-of cleaning parts of the code such as an odd call to acosd which only
-used to work on old IBM proprietary compilers.
+Creating  a  hierarchy  of  "folders"  corresponding  to  branches  of
+development.
 
-So there are three testing versions now:
+The  idea is  to  migrate the  already  existing personal  development
+branches to a development hierarchy that will look something like:
 
-    testing/masoud
-    testing/esguerra
-    testing/akesandgren
+	development/alex
+	development/beat
+    development/esguerra	
+	development/irek
+	development/paul
 
-New folders for the testing branches should be added under testing,
-say, if I (username:esguerra) wanted to create a new dead branch I could do:
+New folders for development branches should be added under development.
+Say, if  I (username:esguerra) wanted to  create a new branch  for the
+development hierarchy I could do:
 
-##Create new testing branch (ideally not being developed) to test against master.  
-    git branch testing/esguerra
-    git checkout esguerra
+##Create new development branch which can be latter merge to master  
+    git branch development/esguerra
+    git checkout development/esguerra
     git add .
     git commit -a
-    git push --set-upstream origin testing/esguerra
+    git push --set-upstream origin development/esguerra
 
-##To go back to main development (master) branch.  
+##To go back to main master branch.  
     git checkout master
 
-When you want to clone only one branch and not the full repository use:
-
-    git clone https://github.com/qusers/qsource.git --branch testing/akesandgren --single-branch qakesandgren
+When you want to clone only one branch and not the full repository use:   
+    git clone https://github.com/qusers/qsource.git --branch development/esguerra --single-branch esguerra
 
 
