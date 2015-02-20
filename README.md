@@ -33,7 +33,7 @@ To get this version to compile intel fortran is needed.
 Using the Makefile from Ake  intel fortran is necessary, else gfortran
 does not like the declaration of a signal function in qdyn.f90
 This is  overcome by  simply changing the  signal function  from where
-it's invoked and  taking out of the interface  declaration. 
+it's invoked and taking it out of the interface declaration. 
 
 To get intel fortran into your environment in csb do:
     source /home/apps/intel/bin/ifortvars.sh intel64
@@ -45,4 +45,9 @@ And to get intel MPI (but not mpiifort) into the environment:
 
 module load intel/15.0.1.133
 module load impi/5.0.2.044
+
+When you want to clone only one branch and not the full repository use:
+    git clone https://github.com/qusers/qsource.git --branch testing/akesandgren --single-branch qakesandgren
+
+
 
