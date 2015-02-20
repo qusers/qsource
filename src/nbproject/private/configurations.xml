@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="95">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <df root="." name="0">
+      <in>avetr.f90</in>
+      <in>calc_base.f90</in>
+      <in>calc_chemscore.f90</in>
+      <in>calc_com.f90</in>
+      <in>calc_com_ke.f90</in>
+      <in>calc_entropy.f90</in>
+      <in>calc_fit.f90</in>
+      <in>calc_geom.f90</in>
+      <in>calc_nb.f90</in>
+      <in>calc_nb_radius.f90</in>
+      <in>calc_pmfscore.f90</in>
+      <in>calc_rdf.f90</in>
+      <in>calc_rms.f90</in>
+      <in>calc_rmsf.f90</in>
+      <in>calc_xscore.f90</in>
+      <in>eigen.f90</in>
+      <in>index.f90</in>
+      <in>mask.f90</in>
+      <in>maskmanip.f90</in>
+      <in>md.f90</in>
+      <in>misc.f90</in>
+      <in>mpiglob.f90</in>
+      <in>nrgy.f90</in>
+      <in>parse.f90</in>
+      <in>prefs.f90</in>
+      <in>prep.f90</in>
+      <in>prmfile.f90</in>
+      <in>q_prep.f90</in>
+      <in>qatom.f90</in>
+      <in>qcalc.f90</in>
+      <in>qdyn.f90</in>
+      <in>qfep.f90</in>
+      <in>sizes.f90</in>
+      <in>topo.f90</in>
+      <in>trj.f90</in>
+    </df>
+  </logicalFolder>
+  <projectmakefile>makefile</projectmakefile>
+  <confs>
+    <conf name="Default" type="0">
+      <toolsSet>
+        <developmentServer>localhost</developmentServer>
+        <platform>4</platform>
+      </toolsSet>
+      <compile>
+        <compiledirpicklist>
+          <compiledirpicklistitem>.</compiledirpicklistitem>
+          <compiledirpicklistitem>${AUTO_FOLDER}</compiledirpicklistitem>
+        </compiledirpicklist>
+        <compiledir>${AUTO_FOLDER}</compiledir>
+        <compilecommandpicklist>
+          <compilecommandpicklistitem>${MAKE} ${ITEM_NAME}.o</compilecommandpicklistitem>
+          <compilecommandpicklistitem>${AUTO_COMPILE}</compilecommandpicklistitem>
+        </compilecommandpicklist>
+        <compilecommand>${AUTO_COMPILE}</compilecommand>
+      </compile>
+      <dbx_gdbdebugger version="1">
+        <gdb_pathmaps>
+        </gdb_pathmaps>
+        <gdb_interceptlist>
+          <gdbinterceptoptions gdb_all="false" gdb_unhandled="true" gdb_unexpected="true"/>
+        </gdb_interceptlist>
+        <gdb_options>
+          <DebugOptions>
+          </DebugOptions>
+        </gdb_options>
+        <gdb_buildfirst gdb_buildfirst_overriden="false" gdb_buildfirst_old="false"/>
+      </dbx_gdbdebugger>
+      <nativedebugger version="1">
+        <engine>gdb</engine>
+      </nativedebugger>
+      <runprofile version="9">
+        <runcommandpicklist>
+          <runcommandpicklistitem>"${OUTPUT_PATH}"</runcommandpicklistitem>
+        </runcommandpicklist>
+        <runcommand>"${OUTPUT_PATH}"</runcommand>
+        <rundir>.</rundir>
+        <buildfirst>false</buildfirst>
+        <terminal-type>0</terminal-type>
+        <remove-instrumentation>0</remove-instrumentation>
+        <environment>
+        </environment>
+      </runprofile>
+    </conf>
+  </confs>
+</configurationDescriptor>
