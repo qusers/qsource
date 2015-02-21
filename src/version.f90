@@ -1,22 +1,22 @@
-! (C) 2014 Uppsala Molekylmekaniska HB, Uppsala, Sweden
+! (c) 2014 uppsala molekylmekaniska hb, uppsala, sweden
 ! version.f90
-! Initial date: 2015
-! by Ireneusz Szeler
-! Q version and help print info
+! initial date: 2015
+! by ireneusz szeler
+! q version and help print info
 
-module VERSIONS
+module versions
 
   implicit none
 
 contains
 
-subroutine version_check(Q_PROGRAM, Q_VERSION, Q_DATE, Q_SUFFIX)
+subroutine version_check(q_program, q_version, q_date, q_suffix)
 
 ! arguments
-  character(*)  :: Q_PROGRAM
-  character(*)  :: Q_VERSION
-  character(*)  :: Q_DATE
-  character(*)  :: Q_SUFFIX
+  character(*)  :: q_program
+  character(*)  :: q_version
+  character(*)  :: q_date
+  character(*)  :: q_suffix
 
 ! local
   logical  :: fin
@@ -33,64 +33,64 @@ subroutine version_check(Q_PROGRAM, Q_VERSION, Q_DATE, Q_SUFFIX)
       if ( flag .eq. '-v' .or. flag .eq. '-version' .or. flag .eq. '--version') fin = .true. 
     end if
 
-    call version_print(Q_PROGRAM, Q_VERSION, Q_DATE, Q_SUFFIX)
+    call version_print(q_program, q_version, q_date, q_suffix)
     
-    call lowcase(Q_PROGRAM)
+    call lowcase(q_program)
     
     if ( flag .eq. '-h' .or. flag .eq. '-help' .or. flag .eq. '--help') then
        fin = .true.
        write(*,*) 
-       write(*,'(a,a)') trim(Q_PROGRAM), ' help information'
-       select case (Q_PROGRAM)
+       write(*,'(a,a)') trim(q_program), ' help information'
+       select case (q_program)
          case ('qdyn')
              write(*,*) 
-             write(*,'(a)') 'To run calculations use: '
-             write(*,'(a,a,a)') '    ',trim(Q_PROGRAM), '5 inputfile.inp > output.file'
+             write(*,'(a)') 'to run calculations use: '
+             write(*,'(a,a,a)') '    ',trim(q_program), '5 inputfile.inp > output.file'
              write(*,'(a)') ' or for parallel version'
-             write(*,'(a,a,a)') '    mpienvirment ', trim(Q_PROGRAM), '5p inputfile.inp > output.file'
+             write(*,'(a,a,a)') '    mpienvirment ', trim(q_program), '5p inputfile.inp > output.file'
              write(*,*) 
              write(*,'(a)') 'where:'
              write(*,'(a)') 'mpienvirment - e.q. mpirun -n 4, for more info check cluster informations '
              write(*,*) 
          case ('qfep')
              write(*,*) 
-             write(*,'(a,a)') 'In this moment no info available for ', trim(Q_PROGRAM) 
+             write(*,'(a,a)') 'in this moment no info available for ', trim(q_program) 
              write(*,*) 
          case ('qprep')
              write(*,*) 
-             write(*,'(a,a)') 'In this moment no info available for ', trim(Q_PROGRAM) 
+             write(*,'(a,a)') 'in this moment no info available for ', trim(q_program) 
              write(*,*) 
          case ('qcalc')
              write(*,*) 
-             write(*,'(a,a)') 'In this moment no info available for ', trim(Q_PROGRAM) 
+             write(*,'(a,a)') 'in this moment no info available for ', trim(q_program) 
              write(*,*) 
          case default
              write(*,*) 
-             write(*,'(a)') 'It is some new program added to Q?'
+             write(*,'(a)') 'it is some new program added to q?'
              write(*,*) 
          end select
     end if
   
-    if(fin) STOP
+    if(fin) stop
 
-  select case (Q_PROGRAM)
+  select case (q_program)
     case ('qdyn')
       write(*,*) 
     case ('qfep')
       write(*,*) 
-      write(*,'(a,a,a,a)') 'Welcome in ', trim(Q_PROGRAM), ' modification date ', trim(Q_DATE) 
+      write(*,'(a,a,a,a)') 'welcome in ', trim(q_program), ' modification date ', trim(q_date) 
       write(*,*) 
     case ('qprep')
       write(*,*) 
-      write(*,'(a,a,a,a)') 'Welcome in ', trim(Q_PROGRAM), ' modification date ', trim(Q_DATE) 
+      write(*,'(a,a,a,a)') 'welcome in ', trim(q_program), ' modification date ', trim(q_date) 
       write(*,*) 
     case ('qcalc')
       write(*,*) 
-      write(*,'(a,a,a,a)') 'Welcome in ', trim(Q_PROGRAM), ' modification date ', trim(Q_DATE) 
+      write(*,'(a,a,a,a)') 'welcome in ', trim(q_program), ' modification date ', trim(q_date) 
       write(*,*) 
     case default
       write(*,*) 
-      write(*,'(a)') 'Welcome in ...' 
+      write(*,'(a)') 'welcome in ...' 
       write(*,*) 
   end select
 
@@ -112,13 +112,13 @@ elemental subroutine lowcase(word)
 
 end subroutine lowcase
 
-subroutine version_print(Q_PROGRAM, Q_VERSION, Q_DATE, Q_SUFFIX)
+subroutine version_print(q_program, q_version, q_date, q_suffix)
 
 ! arguments
-  character(*)  :: Q_PROGRAM
-  character(*)  :: Q_VERSION
-  character(*)  :: Q_DATE
-  character(*)  :: Q_SUFFIX
+  character(*)  :: q_program
+  character(*)  :: q_version
+  character(*)  :: q_date
+  character(*)  :: q_suffix
 
 ! local
   integer  :: i
@@ -126,33 +126,33 @@ subroutine version_print(Q_PROGRAM, Q_VERSION, Q_DATE, Q_SUFFIX)
 
 ! start-of-header
   write(*,*)
-  write(*,'(a)') 'Build and version information'
+  write(*,'(a)') 'build and version information'
   write(*,*)
 !  write (*,'(79a)') ('#',i=1,79)
-  if ( Q_PROGRAM .eq. 'Qdyn') then
-#if defined (DUM)
-    write(*,'(a,a,a)') 'QDum input checker version ', trim(Q_VERSION), ' initialising'
-#elif defined(EVAL)
-    write(*,'(a,a,a)') 'QDyn evaluation version ', trim(Q_VERSION), ' initialising'
-    write(*,'(a)') 'This version is for evaluation purposes only.'
-    write(*,'(a)') 'Optimisations are disabled - runs at <20% of maximum speed.'
+  if ( q_program .eq. 'qdyn') then
+#if defined (dum)
+    write(*,'(a,a,a)') 'qdum input checker version ', trim(q_version), ' initialising'
+#elif defined(eval)
+    write(*,'(a,a,a)') 'qdyn evaluation version ', trim(q_version), ' initialising'
+    write(*,'(a)') 'this version is for evaluation purposes only.'
+    write(*,'(a)') 'optimisations are disabled - runs at <20% of maximum speed.'
 #endif
   end if
-#if defined (BUILD_USERNAME) && defined (BUILD_HOSTNAME) && defined (BUILD_DATE) && defined (BUILD_SOURCE) && defined (BUILD_NUMBER) && defined(BUILD_COMPILER)
-  write(*,'(a,a)') 'Build number ', BUILD_NUMBER
-  write(*,'(a,a)') 'Build date   ', BUILD_DATE
-  write(*,'(a)')   'Built:       '
-  write(*,'(a,a)') '      by     ', BUILD_USERNAME
-  write(*,'(a,a)') '      on     ', BUILD_HOSTNAME
-  write(*,'(a,a)') '      git id ', BUILD_SOURCE
-  write(*,'(a,a)') '      with   ', BUILD_COMPILER
+#if defined (build_username) && defined (build_hostname) && defined (build_date) && defined (build_source) && defined (build_number) && defined(build_compiler)
+  write(*,'(a,a)') 'build number ', build_number
+  write(*,'(a,a)') 'build date   ', build_date
+  write(*,'(a)')   'built:       '
+  write(*,'(a,a)') '      by     ', build_username
+  write(*,'(a,a)') '      on     ', build_hostname
+  write(*,'(a,a)') '      git id ', build_source
+  write(*,'(a,a)') '      with   ', build_compiler
 #else
-  write(*,'(a,a,a,a,a)')  trim(Q_PROGRAM), ' version ', trim(Q_VERSION), trim(Q_SUFFIX),' initialising'
+  write(*,'(a,a,a,a,a)')  trim(q_program), ' version ', trim(q_version), trim(q_suffix),' initialising'
 #endif
   call date_and_time(values=datum)
   write(*,130) datum(1),datum(2),datum(3),datum(5),datum(6),datum(7)
-130	format('Current date ',i4,'-',i2,'-',i2,' and time ',i2,':',i2,':',i2)
+130	format('current date ',i4,'-',i2,'-',i2,' and time ',i2,':',i2,':',i2)
 
 end subroutine version_print
 
-end module VERSIONS
+end module versions

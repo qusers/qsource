@@ -1,20 +1,18 @@
-!	(C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
-
+!	(c) 2000 uppsala molekylmekaniska hb, uppsala, sweden
 !	trj.f90
-!	by John Marelius
+!	by john marelius
+!	q trajectory data, access and dcd format i/o
 
-!	Q trajectory data, access and DCD format I/O
+module trj
 
-module TRJ
-
-use ATOM_MASK
-use MISC
+use atom_mask
+use misc
 implicit none
 
-	character(*), private, parameter	:: MODULE_VERSION = '5.01'
-	character(*), private, parameter	:: MODULE_DATE = '2003-06-02'
+	character(*), private, parameter	:: module_version = '5.01'
+	character(*), private, parameter	:: module_date = '2003-06-02'
 
-	type, private :: REC1
+	type, private :: rec1
 		sequence
 		character(len=4)	::	trj_type
 		integer(4)				::	n_frames, n_steps_before, interval, n_steps
@@ -22,9 +20,9 @@ implicit none
 		integer(4)				::	n_fixed, unused10, const_p, unused12
 		integer(4)				::	unused13, unused14, unused15, unused16
 		integer(4)				::	unused17, unused18, unused19, charmm_version
-	end type REC1
+	end type rec1
 
-	type(REC1), private					::	r1
+	type(rec1), private					::	r1
 
 	character(len=80), private	::	topology
 	integer, private						::	mask_rows
@@ -37,7 +35,7 @@ implicit none
 	!mask 	
 	integer, private							::	ncoords
 	real(4), private, allocatable	::	xmasked(:)
-	type(MASK_TYPE), private			::	mask
+	type(mask_type), private			::	mask
 contains
 
 
@@ -64,18 +62,18 @@ subroutine trj_initialize(frames, steps_before, interval, steps,&
 	lun = 0
 	
 	!set defaults
-	r1%trj_type = 'CORD' !coordinate trajectory (not velocity)
-	r1%INTERVAL_VELCHECK = 0
-	r1%CONST_P = 0
-	r1%CHARMM_VERSION = 0
-	r1%n_fixed = 0 !required by VMD program
+	r1%trj_type = 'cord' !coordinate trajectory (not velocity)
+	r1%interval_velcheck = 0
+	r1%const_p = 0
+	r1%charmm_version = 0
+	r1%n_fixed = 0 !required by vmd program
 
 	!set values
-	r1%N_FRAMES = frames
-	r1%N_STEPS_BEFORE = steps_before
-	r1%INTERVAL = interval
-	r1%N_STEPS = steps
-	r1%N_DEGF = degf
+	r1%n_frames = frames
+	r1%n_steps_before = steps_before
+	r1%interval = interval
+	r1%n_steps = steps
+	r1%n_degf = degf
 	topology = topfile
 
 	call mask_initialize(mask)
@@ -90,7 +88,7 @@ integer function trj_add(line)
 	if(lun /= 0) then
 		!file open - can't add now
 		write(*,910) 
-910		format('>>>>> ERROR: Trajectory file open, cannot add atoms to mask')
+910		format('>>>>> error: trajectory file open, cannot add atoms to mask')
 		trj_add = 0
 	elseif(mask_rows < max_mask_rows) then
 		mask_rows = mask_rows + 1
@@ -98,7 +96,7 @@ integer function trj_add(line)
 		trj_add = mask_add(mask, line)
 	else
 		write(*,900) max_mask_rows
-900		format('>>>>> ERROR: Too many trajectory atom mask rows (max',i3,').')
+900		format('>>>>> error: too many trajectory atom mask rows (max',i3,').')
 		trj_add = 0
 	end if
 end function trj_add
@@ -113,7 +111,7 @@ logical function trj_store_mask(line)
 		trj_store_mask = .true.
 	else
 		write(*,900) max_mask_rows
-900		format('>>>>> ERROR: Too many trajectory atom mask rows (max',i3,').')
+900		format('>>>>> error: too many trajectory atom mask rows (max',i3,').')
 		trj_store_mask = .false.
 	end if
 end function trj_store_mask
@@ -126,7 +124,7 @@ integer function trj_commit_mask()
 	if(lun /= 0) then
 		!file open - can't add now
 		write(*,910) 
-910		format('>>>>> ERROR: Trajectory file open, cannot add atoms to mask')
+910		format('>>>>> error: trajectory file open, cannot add atoms to mask')
 	else
 		do row = 1, mask_rows
 			trj_commit_mask = mask_add(mask, mask_row(row))
@@ -153,18 +151,18 @@ logical function trj_create(filename, append)
 	ncoords = 3*mask%included
 	allocate(xmasked(ncoords))
 
-	titlerow = 'Q DCD trajectory version ' // MODULE_VERSION
+	titlerow = 'q dcd trajectory version ' // module_version
 
-	writemode = 'REWIND'
+	writemode = 'rewind'
 	if(present(append)) then
-		if(append) writemode='APPEND'
+		if(append) writemode='append'
 	end if
 
 	lun = freefile()
 	open(unit=lun, file=filename, status='unknown', form='unformatted', action='write',&
 		position=writemode, err=900)
-	if(writemode /= 'APPEND') then
-		!write the first 3 DCD format records
+	if(writemode /= 'append') then
+		!write the first 3 dcd format records
 		write(lun, err=920) r1
 		write(lun, err=920) 2+mask_rows, titlerow, topology, mask_row(1:mask_rows)
 		write(lun, err=920) int(mask%included, 4)
@@ -175,13 +173,13 @@ logical function trj_create(filename, append)
 	!error handling
 	!open error
 900	write(*,910) trim(filename)
-910	format('>>>>> ERROR: failed to open trajectory ',a)
+910	format('>>>>> error: failed to open trajectory ',a)
 	trj_create = .false.
 	return
 	
 	!write header error
 920	write(*,930) 
-930	format('>>>>> ERROR: failed to write trajectory header.')
+930	format('>>>>> error: failed to write trajectory header.')
 	trj_create = .false.
 	return
 
@@ -189,7 +187,7 @@ end function trj_create
 
 
 !******************************************************
-!Write real(4) coords to trajectory. Writes only 
+!write real(4) coords to trajectory. writes only 
 ! atoms in current mask.
 !******************************************************
 logical function trj_write(x)
@@ -214,7 +212,7 @@ logical function trj_write(x)
 end function trj_write
 
 !******************************************************
-!Read a frame from tjacectory file and returns coordinates
+!read a frame from tjacectory file and returns coordinates
 ! associated with atomnumbers in topology.
 !******************************************************
 logical function trj_read(x)
@@ -242,8 +240,8 @@ logical function trj_read(x)
 end function trj_read
 
 !******************************************************
-!Read a frame from tjacectory file containing masked atoms,
-! returns only masked coordinates. !REAL(4)!
+!read a frame from tjacectory file containing masked atoms,
+! returns only masked coordinates. !real(4)!
 !******************************************************
 logical function trj_read_masked(x)
 !arguments
@@ -274,9 +272,9 @@ logical function trj_seek(frame)
 	integer						::	i
 
 	!optionally fast-forward to selected frame
-	if(frame > r1%N_FRAMES .or. frame < 1) then
+	if(frame > r1%n_frames .or. frame < 1) then
 		write(*,962) frame
-962		format('>>>>> ERROR: Frame',i6,' does not exist.')
+962		format('>>>>> error: frame',i6,' does not exist.')
 		close(lun)
 		trj_seek = .false.
 	elseif(frame > current_frame) then
@@ -304,7 +302,7 @@ logical function trj_seek(frame)
 	return
 
 980	write(*,990) i, frame
-990	format('>>>>> ERROR: Read error at frame',i6,' while looking for frame',i6)
+990	format('>>>>> error: read error at frame',i6,' while looking for frame',i6)
 	trj_seek = .false.
 	return
 
@@ -339,9 +337,9 @@ logical function trj_open(filename)
 		err=900)
 	!read header
 	read(lun, err=920) r1
-	if(r1%trj_type /= 'CORD') then
+	if(r1%trj_type /= 'cord') then
 		write(*,940)
-940		format('>>>>> ERROR: Not a DCD Coordinate trajectory.')
+940		format('>>>>> error: not a dcd coordinate trajectory.')
 		close(lun)
 		trj_open = .false.
 		return
@@ -349,9 +347,9 @@ logical function trj_open(filename)
 !	write(*,456) r1%n_frames
 456 format(i10)
 	read(lun, err=920) mask_rows, titlerow, topology, mask_row(1:mask_rows-2)
-	if(titlerow(1:16) /= 'Q DCD trajectory') then
+	if(titlerow(1:16) /= 'q dcd trajectory') then
 		write(*,941)
-941		format('>>>>> ERROR: Not a Q DCD trajectory.')
+941		format('>>>>> error: not a q dcd trajectory.')
 		close(lun)
 		trj_open = .false.
 		return
@@ -370,15 +368,15 @@ logical function trj_open(filename)
 			write(*,950) trim(mask_row(i))
 		end if
 	end do
-950	format('>>> WARNING: no atoms in mask ',a)
+950	format('>>> warning: no atoms in mask ',a)
 	if(mask%included /= atoms) then
 		write(*,960) atoms, mask%included
-		write(*,*) 'Ignored'
+		write(*,*) 'ignored'
 !		close(lun)
 !		trj_open = .false.
 !		return
 	end if
-960	format('>>>>> ERROR: Different number of atoms in mask and trajectory',/,&
+960	format('>>>>> error: different number of atoms in mask and trajectory',/,&
 			i6, ' atoms in trajectory,',i6,' atoms in mask.')
 
 	!allocated masked coordinate array
@@ -392,13 +390,13 @@ logical function trj_open(filename)
 	!error handling
 	!open error
 900	write(*,910) trim(filename)
-910	format('>>>>> ERROR: failed to open trajectory ',a)
+910	format('>>>>> error: failed to open trajectory ',a)
 	trj_open = .false.
 	return
 	
 	!read header error
 920	write(*,930) 
-930	format('>>>>> ERROR: failed to read trajectory header.')
+930	format('>>>>> error: failed to read trajectory header.')
 	trj_open = .false.
 	close(lun)
 	return
@@ -408,14 +406,14 @@ end function trj_open
 
 integer function trj_intersection(m)
 !arguments
-	type(MASK_TYPE)				::	m
+	type(mask_type)				::	m
 	trj_intersection = count(m%mask .and. mask%mask)
 end function trj_intersection
 
 
 subroutine trj_clone_mask(m)
 !arguments
-	type(MASK_TYPE)				::	m
+	type(mask_type)				::	m
 	if(size(m%mask) == size(mask%mask)) then
 		m = mask
 	end if
@@ -425,4 +423,4 @@ integer function trj_get_ncoords()
  trj_get_ncoords = ncoords
 end function trj_get_ncoords	
 
-end module TRJ
+end module trj
