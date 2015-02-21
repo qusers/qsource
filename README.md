@@ -17,7 +17,7 @@ New folders for development branches should be added under development.
 Say, if  I (username:esguerra) wanted to  create a new branch  for the
 development hierarchy I could do:
 
-##Create new development branch which can be latter merge to master  
+##Create new development branch which can latter be merged to master    
     git branch development/esguerra
     git checkout development/esguerra
     git add .
