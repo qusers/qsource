@@ -58,7 +58,7 @@ do
   then echo -e "$OK"
  else 
   echo -e "$FAILED"
-  echo "Check output (dc${step}.log) for more info."
+  echo "Check output (dc${step}.logl) for more info."
   exit 1
  fi
 done

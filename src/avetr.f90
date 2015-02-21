@@ -1,46 +1,34 @@
-!------------------------------------------------------------------------------!
-!  Q V.5.7                                                                     !
-!  code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
-!  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
-!  Kajsa Ljunjberg, John Marelius, Martin Nervall                              !
-!  Maintainers: Beat Amrein, Alexandre Barrozo, Paul Bauer,                    !
-!  Mauricio Esguerra, Irek Szeler, Masoud Karemi                               !
-!  latest update: February 9, 2015                                             !
-!------------------------------------------------------------------------------!
+!	(C) 2004 Uppsala Molekylmekaniska HB, Uppsala, Sweden
 
-!------------------------------------------------------------------------------!
-!  (c) 2004 Uppsala Molekylmekaniska HB, Uppsala, Sweden                       !
-!  avetr.f90                                                                   !
-!  by Martin Nervall                                                           !
-!  date: March 2004                                                            !
-!  average co-ordinates from qdyn trajectory files and write pdb-structure     !
-!  tested to reproduce average structures from vmd                             !
-!------------------------------------------------------------------------------!
-module avetr
-use prep
-implicit none
+!average co-ordinates from Qdyn trajectory files and write pdb-structure
+!Added to Qprep March 2004 by Martin Nervall
+!Tested to reproduce average structures from vmd
 
-integer, parameter             :: ave_pdb = 11
-integer(4), private            :: ncoords, n_sets = 0
-real(4), allocatable, private  :: x_in(:), x_sum(:), x2_sum(:)
-real(8), private               :: rmsd
+module AVETR
+  use PREP
+  implicit none
+
+	integer, parameter             :: AVE_PDB = 11
+	integer(4), private            :: ncoords, N_sets = 0
+	real(4), allocatable, private  :: x_in(:), x_sum(:), x2_sum(:)
+	real(8), private               :: rmsd
 contains
-!todo: *choose which frames, add more trajectories, divide x_sum every 100 steps
+!TODO: *choose which frames, add more trajectories, divide x_sum every 100 steps
 
 !******************************************************
-!main subroutine
+!Main subroutine
 !******************************************************
 subroutine avetr_calc
   integer :: i, allocation_status
   character(len=1) :: ans
   logical :: fin
-  n_sets = 0
+  N_sets = 0
   call trajectory
   ncoords = trj_get_ncoords()
   allocate(x_in(ncoords), x_sum(ncoords), x2_sum(ncoords), &
-                                stat=allocation_status)
+				stat=allocation_status)
   if (allocation_status .ne. 0) then
-    write(*,*) 'out of memory!'
+    write(*,*) 'Out of memory!'
     return
   end if
   do while(trj_read_masked(x_in))  !add from first file
@@ -50,15 +38,15 @@ subroutine avetr_calc
   !add from multiple files
   fin = .false.
   do while(.not. fin)
-    call get_string_arg(ans, '-----> add more frames? (y or n): ')
+    CALL get_string_arg(ans, '-----> Add more frames? (y or n): ')
     if (ans .eq. 'y') then
-          call trajectory
-          do while(trj_read_masked(x_in))  !add from additional files
-                call add_coordinates
-          end do
-        else 
-          fin = .true.
-        end if
+	  call trajectory
+	  do while(trj_read_masked(x_in))  !add from additional files
+		call add_coordinates
+	  end do
+	else 
+	  fin = .true.
+	end if
   end do
 
 
@@ -68,35 +56,35 @@ subroutine avetr_calc
 end subroutine avetr_calc
 
 !******************************************************
-!sum the coordinates and the sqared coordinates
+!Sum the coordinates and the sqared coordinates
 !******************************************************
 subroutine add_coordinates
-        x_sum = x_sum + x_in
-        x2_sum = x2_sum + x_in**2
-        n_sets = n_sets +1
+	x_sum = x_sum + x_in
+	x2_sum = x2_sum + x_in**2
+	N_sets = N_sets +1
 end subroutine add_coordinates
 
 !******************************************************
-!make average and rmsd
+!Make average and rmsd
 !******************************************************
 subroutine average
-        x_sum = x_sum / n_sets
-        x2_sum = x2_sum / n_sets
-        rmsd = sqrt(sum(x2_sum - x_sum**2)/ncoords)
+	x_sum = x_sum / N_sets
+	x2_sum = x2_sum / N_sets
+	rmsd = sqrt(sum(x2_sum - x_sum**2)/ncoords)
 end subroutine average
 
 !******************************************************
-!write average coords to pdb file.
-!variables used from prep: mask
-!variables used from topo: xtop
+!Write average coords to pdb file.
+!Variables used from prep: mask
+!Variables used from topo: xtop
 !******************************************************
 subroutine write_average
-        !assign masked coordinates to right atom in topology
-        call mask_put(mask, xtop, x_sum)
+	!assign masked coordinates to right atom in topology
+	call mask_put(mask, xtop, x_sum)
     call writepdb
-        write(*,'(a,f6.3,a)') 'root mean square co-ordinate deviation ', rmsd, ' a'
-        x_sum = 0
-        x2_sum = 0
+	write(*,'(a,f6.3,a)') 'Root mean square co-ordinate deviation ', rmsd, ' A'
+	x_sum = 0
+	x2_sum = 0
 end subroutine write_average
 
-end module avetr
+end module AVETR
