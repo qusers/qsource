@@ -34,4 +34,4 @@ final                     heat1.re
 trajectory                heat1.dcd
 
 [sequence_restraints]
-1 40 25.0 1
+1 40 25.0 0 1

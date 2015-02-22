@@ -110,5 +110,5 @@ done
 
 
 time mpirun -np 8 qdynp equi.inp > equi.log 
-#mpirun -np 8 qdynp prod.inp > prod.log 
+#time mpirun -np 8 qdynp prod.inp > prod.log 
 

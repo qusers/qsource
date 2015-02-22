@@ -2,9 +2,10 @@
 rt init.top
 
 !Read the trajectory
-trajectory start.dcd
+!trajectory start.dcd
+tr relax7.dcd
 y
-readframe 10
-wp frame10.pdb
+rf 99
+wp frame99.pdb
 y
-
+q

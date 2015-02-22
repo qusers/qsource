@@ -35,7 +35,7 @@ final                     equi.re
 trajectory                equi.dcd
 
 [sequence_restraints]
-1 40 0.0 0
+1 40 0.0 0 1
 
 [wall_restraints]
 1 40 10 1.0 0 0 0
