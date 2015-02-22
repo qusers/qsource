@@ -374,10 +374,10 @@ contains
 ! md_startup
 !-------------------------------------------------------------------------------
 subroutine md_startup
-! initialise used modules
+! initialize used modules
 call qatom_startup
 call trj_startup
-! initialise constants
+! initialize constants
 pi = 4.0*atan(1.0)
 deg2rad = pi/180.0
 end subroutine md_startup
@@ -530,7 +530,7 @@ theta(nwat), &
 theta0(nwat), &
 tdum(nwat), &
 stat=alloc_status)
-call check_alloc('water polarisation shell arrays')
+call check_alloc('water polarization shell arrays')
 
 end subroutine allocate_watpol_arrays
 
@@ -1914,7 +1914,7 @@ end function improper2
 ! implemented yet.
 subroutine init_nodes
 !
-! initialise slave nodes, sending to slaves:
+! initialize slave nodes, sending to slaves:
 !
 ! variables:
 !  natom,nwat,nsteps,use_LRF,NBcycle,crg_ow,crg_hw,Rcpp,Rcww,Rcpw,Rcq,xpcent
@@ -2876,15 +2876,15 @@ if( .not. box ) then
                 write(*,'(a)') 'Solvent radial restraint force constant set to default'
                 fk_wsphere = -1 ! this will be set in water_sphere, once target radius is known
           end if
-          yes=prm_get_logical_by_key('polarisation', wpol_restr, wpol_restr_default)
+          yes=prm_get_logical_by_key('polarization', wpol_restr, wpol_restr_default)
           !default is on when pol. restr is on, otherwise off
           yes=prm_get_logical_by_key('charge_correction', wpol_born, wpol_restr)
           if(wpol_born .and. .not. wpol_restr) then
-                write(*,'(a)') '>>> ERROR: charge_correction on requires polarisation on (section solvent)'
+                write(*,'(a)') '>>> ERROR: charge_correction on requires polarization on (section solvent)'
                 initialize = .false.
           end if
           if(.not. prm_get_real8_by_key('polarisation_force', fkwpol)) then
-                write(*,'(a)') 'Solvent polarisation force constant set to default'
+                write(*,'(a)') 'Solvent polarization force constant set to default'
                 fkwpol = -1 ! this will be set in water_sphere, once target radius is known
           end if
           yes = prm_get_real8_by_key('morse_depth', Dwmz, -1._8)                        
@@ -3370,7 +3370,7 @@ write (*,50)
 50      format ('Ignoring solvent centre.')
 
 ! set default values before reading
-! done this way because the SGI compiler initialises values to be read to zero
+! done this way because the SGI compiler initializes values to be read to zero
 
 read(fu,'(a80)') text ! read line into buffer
 ! now read buffer (avoid reading more lines from input in search for more values)
@@ -3395,7 +3395,7 @@ elseif(iwpol_restr == 2) then
         wpol_restr = .true.
         wpol_born = .false.
 else
-        call die('unknown water polarisation restraining mode')
+        call die('unknown water polarization restraining mode')
 end if
 write(*,57)
 57      format('Ignoring solvent radius and min. packing distance.')
@@ -13520,7 +13520,7 @@ if(restart) then
                 write(*,'(a16,3f8.3)') 'Boxlength     =', boxlength(:)
                 write(*,'(a16,3f8.3)') 'Centre of box =', boxcentre(:)
         end if
-        !water polarisation data will be read from restart file in wat_shells
+        !water polarization data will be read from restart file in wat_shells
 else
         x(1:nat_pro*3) = xtop(1:nat_pro*3)
 end if
@@ -13617,7 +13617,7 @@ subroutine init_trj
 !locals
 integer                                         ::      trj_atoms
 
-!initialise trajectory atom mask
+!initialize trajectory atom mask
 if(itrj_cycle > 0) then
         call trj_initialize(frames=nsteps/itrj_cycle, steps_before=itrj_cycle,&
                 interval=itrj_cycle, steps=nsteps,      degf=ndegfree, &
@@ -13640,7 +13640,7 @@ integer                                         :: i, j, ig, istate
 
 if (nodeid .eq. 0) then 
         write(*,*)
-        call centered_heading('Initialising dynamics', '-')
+        call centered_heading('Initializing dynamics', '-')
 end if
 
 ! Set parameters (bonds, angles, charges,...) & restraints for water   
@@ -14855,7 +14855,7 @@ write (*,90) rwat, fk_wsphere, Dwmz, awmz
                 'Surface inward harmonic force constant  = ',f10.2,/,&
                 'Surface attraction well depth           = ',f10.2,/,&
                 'Surface attraction well width           = ',f10.2)
-92      format ('Water polarisation restraints           : ',a)
+92      format ('Water polarization restraints           : ',a)
 if(.not. wpol_restr) then
         write(*,92) 'OFF'
 else if(wpol_born) then
@@ -14865,14 +14865,14 @@ else
         write(*,92) 'ON, Born correction disabled'
         write(*, 100) fkwpol
 end if
-100     format('Radial polarisation force constant      = ',f10.2)
+100     format('Radial polarization force constant      = ',f10.2)
 
 end subroutine wat_sphere
 
 !-----------------------------------------------------------------------
 
 subroutine wat_shells
-! set up the shells for polarisation restraining
+! set up the shells for polarization restraining
 
 ! local variables
 real(8)                                         ::      rout, dr, ri, Vshell, rshell, drs
@@ -14896,10 +14896,10 @@ drs = wpolr_layer / drout !number of drouts
 ! calc number of shells based on arithmetic series sum formula
 nwpolr_shell = int(-0.5 + sqrt(2*drs + 0.25)) 
 allocate(wshell(nwpolr_shell), stat=alloc_status)
-call check_alloc('water polarisation shell array')
+call check_alloc('water polarization shell array')
 
 write(*, 100) nwpolr_shell
-100     format(/,'Setting up ', i1, ' water shells for polarisation restraints.')
+100     format(/,'Setting up ', i1, ' water shells for polarization restraints.')
 
 if(restart) then !try to load theta_corr from restart file
         read(2, iostat=filestat) nwpolr_shell_restart
@@ -14915,8 +14915,8 @@ else
         wshell(:)%theta_corr = 0.
 end if
 
-102     format('>>> WARNING: Failed to read polarisation restraint data from restart file.')
-103     format('Loaded polarisation restraint data from restart file.')
+102     format('>>> WARNING: Failed to read polarization restraint data from restart file.')
+103     format('Loaded polarization restraint data from restart file.')
 
 write(*,'(a)') 'Shell #    outer radius    inner radius'
 110     format(i7, 2f16.2)
@@ -15026,7 +15026,7 @@ end do
 
 ! calculate energy and force
 if ( istep .ne. 0 .and. mod(istep,itdis_update) .eq. 0) then
-call centered_heading('Water polarisation restraint data', '-')
+call centered_heading('Water polarization restraint data', '-')
 write(*,'(a)') 'shell    <n>    <theta>    theta_0 theta_corr'
 do is = 1, nwpolr_shell
 wshell(is)%avtheta = wshell(is)%avtheta / real (itdis_update)
@@ -15288,7 +15288,7 @@ nat3 = natom*3
 rewind (3)
 write (3) nat3, (x(i),i=1,nat3)
 write (3) nat3, (v(i),i=1,nat3)
-!save dynamic polarisation restraint data
+!save dynamic polarization restraint data
         if(wpol_restr .and. allocated(wshell)) then
         write (3) nwpolr_shell, wshell(:)%theta_corr
 end if

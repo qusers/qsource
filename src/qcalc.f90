@@ -407,7 +407,7 @@ logical function load_restart(fn)
 	elseif(filestat < 0) then
 		! EOF - do nothing
 	elseif(nat3 == 3) then
-		!We found a polarisation restraint data record in a restart file
+		!We found a polarization restraint data record in a restart file
 		!do nothing
 	elseif(nat3 /= 3*nat_pro) then
 		write(*,910) nat3/3
