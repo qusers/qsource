@@ -152,7 +152,7 @@ set style line 3 lt 1 lc 5 lw 1 pt 6
 set xlabel 'Simulation step'
 set ylabel 'VdW energy [kcal/mol]'
 set log x
-set xrange [1:3000]
+set xrange [1:6000]
 plot 'qsurr_benchmark.en' using 1:2                         \
                             notitle  with lines ls 1,       \
      'qsurr_benchmark.en' using 1:3                         \
@@ -173,11 +173,11 @@ echo -e "$OK"
 
 echo -n "Checking if Gnuplot is installed on the system              "
 
-if which gnuplot >& /dev/null 
+if which /sw/bin/gnuplot >& /dev/null 
 then 
  echo -e "$OK"
  echo "Launching Gnuplot..."
- gnuplot -persist < qsurr.plot &
+ /sw/bin/gnuplot -persist < qsurr.plot &
 else
  echo -e "$FAILED"
  echo "Gnuplot file qsurr.plot written."

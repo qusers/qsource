@@ -1,4 +1,4 @@
-#!/bin/bash -l
+#!/bin/bash 
 #################################################################
 # NOTE:
 # Uncomment or modify the next two lines depending on your system
@@ -9,7 +9,7 @@ export bindir="/Users/esguerra/software/qsource/development/esguerra/bin"
 
 if [ "x$bindir" == "x" ]
 then 
- echo "Please set the bindir variable to point at the Q directory."
+ echo "Please set the bindir variable to point to the Q directory."
  exit 1
 elif [ ! -x $bindir/qdynp ]
 then
@@ -20,20 +20,16 @@ else
 fi
 
 # How many cores on this machine?
-#  grep "cpu cores" /proc/cpuinfo  
-# cpu cores: 4
-# cpu cores: 4
-# cpu cores: 4
+# grep "cpu cores" /proc/cpuinfo  
 # cpu cores: 4
 # The cores need then to be added to get the total number of cores available per node.
-# For now bc is doing the sum, but BEWARE, maybe bc is not installed in all
-# nodes.
+# For now bc is doing the sum, but BEWARE, maybe bc is not installed on all nodes.
 # CORES=`grep processor /proc/cpuinfo | wc -l`
 # CORES=`grep cores /proc/cpuinfo | awk '{print $4}' | paste -sd+ | bc`
 CORES=8
 echo "Running simulation on $CORES cores."
 
-rm eq{1..5}.log dc{1..5}.log >& /dev/null
+rm -f eq{1..5}.log dc{1..5}.log >& /dev/null
 
 # Useful vars
 OK="(\033[0;32m   OK   \033[0m)"
@@ -50,6 +46,7 @@ do
   exit 1
  fi
 done
+
 
 for step in {1..5}
 do

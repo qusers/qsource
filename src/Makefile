@@ -1,11 +1,11 @@
 ################################################################################
-#  Q V.5.06 Makefile                                                           #
-#  code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      #
+#  Q V.5.7 Makefile                                                            #
+#  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      #
 #  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          #
 #  Kajsa Ljunjberg, John Marelius, Martin Nervall                              #
-#  keeper of the code: Paul Bauer                                              #
-#  maintainers: Beat Amrein, Alexandre Barrozo, Paul Bauer, Mauricio Esguerra  #
-#  latest update: May 9, 2014                                                  #
+#  Maintainers: Beat Amrein, Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, #
+#  Irek Szeler                                                                 #
+#  Latest update: February 21, 2015                                            #
 #  make [option] [COMP=compiler]                                               #
 ################################################################################
 
@@ -14,8 +14,8 @@
 ################################################################################
 ifeq ($(COMP),ifort)
 	FC=		ifort
-	FC_OPT=         -O3 -ip -ipo -unroll -i-static
-	FFLAGS=         -fstack-protector ${FC_OPT}
+	FC_OPT=         -O3
+	FFLAGS=         -ip -ipo -unroll -i-static -fstack-protector ${FC_OPT}
 	FPP_FLG=	-fpp
 
 	MPIFC=		mpiifort
@@ -33,9 +33,9 @@ ifeq ($(COMP),ifort)
 ################################################################################
 else ifeq ($(COMP),osx)
 	FC= gfortran
-	FC_OPT=         -O3 -ffree-line-length-none -fcray-pointer -fall-intrinsics \
-	                -std=legacy -Wall -Wtabs
-	FFLAGS=         -fstack-protector ${FC_OPT} -DG95=1
+	FC_OPT=         -O3
+	FFLAGS=         -ffree-line-length-none -fcray-pointer -fall-intrinsics \
+	                -std=legacy -Wall -Wtabs -fstack-protector ${FC_OPT} -DG95=1
 	FPP_FLG=        -cpp
 
 	MPIFC=          mpif90
@@ -102,58 +102,58 @@ default: what
 ################################################################################
 # Targets
 ################################################################################
-all:	qfep5 qprep5 qdyn5 qdum5 qcalc5 move1 move2
+all:	qfep qprep qdyn qdum qcalc move1 move2
 
 debug:
 	@make FFLAGS="${DEBUG}" \
-	qfep5 qprep5 qdyn5 qdum5 qcalc5 move1 move2
+	qfep qprep qdyn qdum qcalc move1 move2
 
 mpi:
 	@make FFLAGS="${MPI}" \
-	qdyn5p move1 move3
+	qdynp move1 move3
 
 mpidebug:
 	@make FFLAGS="${DEBUGMPI}" \
-	qdyn5p move1 move3
+	qdynp move1 move3
 
 clean:
 	-rm -f *.o  *.mod *.M *.kmo *.il *.oo
 
 nuke:
-	-rm -rf *.o  *.mod *.M *.kmo *.il *.oo qfep5 qdyn5p qdyn5 qprep5 qcalc5 qdum5 ../bin ../obj
+	-rm -rf *.o  *.mod *.M *.kmo *.il *.oo qfep qdynp qdyn qprep qcalc qdum ../bin ../obj
 
-qcalc5 qdyn5 qdum5 qdyn5p qprep5 qfep5: misc.o mpiglob.o
+qcalc qdyn qdum qdynp qprep qfep: misc.o mpiglob.o
 
-qcalc5 qdyn5 qdum5 qdyn5p qprep5: mask.o prmfile.o sizes.o topo.o trj.o index.o
+qcalc qdyn qdum qdynp qprep: mask.o prmfile.o sizes.o topo.o trj.o index.o
 
-qcalc5 qdyn5 qdum5 qdyn5p qfep5: nrgy.o
+qcalc qdyn qdum qdynp qfep: nrgy.o
 
-qcalc5 qdyn5 qdum5 qdyn5p: qatom.o
+qcalc qdyn qdum qdynp: qatom.o
 
-qcalc5 qprep5 qfep5: parse.o
+qcalc qprep qfep: parse.o
 
-qcalc5 qprep5: maskmanip.o
+qcalc qprep: maskmanip.o
 
-qdyn5 qdum5: qdyn.o
+qdyn qdum: qdyn.o
 
-qprep5: q_prep.o prefs.o prep.o avetr.o nrgy.o
+qprep: q_prep.o prefs.o prep.o avetr.o nrgy.o
 	${FC} ${FFLAGS} ${FLIBS} $+ -o $@
 
-qfep5: qfep.o
+qfep: qfep.o
 	${FC} ${FFLAGS} ${FLIBS} $+ -o $@
 
-qcalc5: calc_base.o calc_chemscore.o calc_fit.o calc_geom.o calc_pmfscore.o \
+qcalc: calc_base.o calc_chemscore.o calc_fit.o calc_geom.o calc_pmfscore.o \
 	calc_com_ke.o calc_com.o calc_rdf.o calc_rms.o calc_rmsf.o \
 	calc_entropy.o calc_nb.o calc_xscore.o eigen.o qcalc.o
 	${FC} ${FFLAGS} ${FLIBS} $+ -o $@
 
-qdyn5 : md.o
+qdyn : md.o
 	${FC} ${FFLAGS} ${FLIBS} $+ -o $@
 
-qdum5 : md_dum.o
+qdum : md_dum.o
 	${FC} ${FFLAGS} ${FLIBS} $+ -o $@
 
-qdyn5p : md_mpi.o qdyn_mpi.o
+qdynp : md_mpi.o qdyn_mpi.o
 	${MPIFC} ${MPIFLAGS} ${FFLAGS} ${FLIBS} $+ -o $@
 
 ################################################################################
@@ -279,10 +279,10 @@ move1:
 	mkdir -p ../obj ; mv *.o *.mod ../obj/
 
 move2:
-	mkdir -p ../bin ; mv qfep5 qprep5 qdyn5 qdum5 qcalc5 ../bin/
+	mkdir -p ../bin ; mv qfep qprep qdyn qdum qcalc ../bin/
 
 move3:
-	mkdir -p ../bin ; mv qdyn5p ../bin/
+	mkdir -p ../bin ; mv qdynp ../bin/
 
 ################################################################################
 
@@ -294,10 +294,10 @@ what:
 	@echo "Use: make [target] [COMP=compiler]"
 	@echo
 	@echo "[target] is one of:"
-	@echo "all              Everything except the MPI parallel version of Q (qdyn5p)"
+	@echo "all              Everything except the MPI parallel version of Q (qdynp)"
 	@echo "debug            All with debug information (stacktraces)."
-	@echo "mpi              qdyn5p using a currently loaded MPI library"
-	@echo "mpidebug         qdyn5p with debug information (stacktraces)."
+	@echo "mpi              qdynp using a currently loaded MPI library"
+	@echo "mpidebug         qdynp with debug information (stacktraces)."
 	@echo
 	@echo "For compiler/os pick one of:"
 	@echo "ifort            Intel Fortran compiler"
