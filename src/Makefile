@@ -136,7 +136,7 @@ qcalc qprep: maskmanip.o
 
 qdyn qdum: qdyn.o
 
-qprep: q_prep.o prefs.o prep.o avetr.o nrgy.o
+qprep: qprep.o prefs.o prep.o avetr.o nrgy.o
 	${FC} ${FFLAGS} ${FLIBS} $+ -o $@
 
 qfep: qfep.o
@@ -244,7 +244,7 @@ prep.o: prep.f90 maskmanip.o sizes.o parse.o prmfile.o trj.o index.o prefs.o
 prmfile.o: prmfile.f90 misc.o mpiglob.o
 	${FC} ${FFLAGS} -c $<
 
-q_prep.o: q_prep.f90 prep.o avetr.o
+qprep.o: qprep.f90 prep.o avetr.o
 	${FC} ${FFLAGS} -c $<
 
 qatom.o: qatom.f90 misc.o nrgy.o prmfile.o sizes.o index.o topo.o
