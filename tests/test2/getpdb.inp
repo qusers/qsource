@@ -1,0 +1,10 @@
+!Read the topology (library) file/files
+rt init.top
+
+!Read the trajectory
+trajectory start.dcd
+y
+readframe 10
+wp frame10.pdb
+y
+

@@ -1,0 +1,34 @@
+!Read the topology (library) file/files
+rl ff/qoplsaa.lib
+rl ff/lig.lib
+
+!Read the parameter file (i.e. force-field specific)
+rff ff/merged.prm
+
+!Read the starting, usually precleaned pdb file.
+rp lig.pdb
+
+ls      !list residues sequence
+lr 1    !list atoms in residue
+prefs   !show a list of Q preferences
+
+!sulfur-sulfur bridges need to be created by the user.
+!addbond atomnum atomnum y
+
+!Create water sphere
+boundary 1 -1.386 2.119 -1.219 15
+solvate -1.386 2.119 -1.219 15 1 HOH
+
+!Create initial topology
+mt init
+wt init.top
+
+!Punch to output unusually large energies
+checkbonds 6
+checkangs  6
+checktors  6
+checkimps  6
+
+!Write pdb file corresponding to the created topology.
+wp init.pdb y
+q

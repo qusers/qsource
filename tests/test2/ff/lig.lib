@@ -1,0 +1,111 @@
+*----------------------------------------------------------------------
+{LIG}                 ! LIG: atoms 40 charge -0.0000
+
+[info]
+SYBYLtype RESIDUE
+
+[atoms]
+  1      N1      TNE      -0.6300
+  2      N2      TNE      -0.5075
+  3      N3      TNI      -0.4815
+  4      N4      TNE      -0.7254
+  5      N5      TNE      -0.7850
+  6      C1      TCT       0.0900
+  7      C2      TCM       0.0000
+  8      C3      TCM       0.0000
+  9      C4      TCT      -0.1200
+ 10      C5      TCM      -0.1150
+ 11      C6      TCA       0.2100
+ 12      C7      TCM       0.1225
+ 13      C8      TCM      -0.1150
+ 14      C9      TCT       0.0300
+ 15      C10     TCM       0.1405
+ 16      C11     TCA      -0.1150
+ 17      C12     TCA      -0.1150
+ 18      C13     TCDX      0.3990
+ 19      C14     TCA      -0.1150
+ 20      C15     TCA      -0.1150
+ 21      C16     TCA      -0.1150
+ 22      H1      TH        0.4100
+ 23      H2      TH        0.3537
+ 24      H3      TH        0.3537
+ 25      H4      TH        0.3600
+ 26      H5      TH        0.3600
+ 27      H6      THC       0.0600
+ 28      H7      THC       0.0600
+ 29      H8      THC       0.0600
+ 30      H9      THC       0.0600
+ 31      H10     THC       0.1150
+ 32      H11     THC       0.1150
+ 33      H12     THC       0.0600
+ 34      H13     THC       0.0600
+ 35      H14     THC       0.0600
+ 36      H15     THA       0.1150
+ 37      H16     THA       0.1150
+ 38      H17     THA       0.1150
+ 39      H18     THA       0.1150
+ 40      H19     THA       0.1150
+
+[bonds]
+N1    C1  
+N1    C6  
+N1    C9  
+N2    C7  
+N2    C13 
+N2    H1  
+N3    C10 
+N3    C13 
+N4    C10 
+N4    H2  
+N4    H3  
+N5    C13 
+N5    H4  
+N5    H5  
+C1    C2  
+C1    H6  
+C1    H7  
+C2    C4  
+C2    C5  
+C3    C4  
+C3    C7  
+C3    C10 
+C4    H8  
+C4    H9  
+C5    C8  
+C5    H10 
+C6    C11 
+C6    C12 
+C7    C8  
+C8    H11 
+C9    H12 
+C9    H13 
+C9    H14 
+C11   C14 
+C11   H15 
+C12   C15 
+C12   H16 
+C14   C16 
+C14   H17 
+C15   C16 
+C15   H18 
+C16   H19 
+
+[impropers]
+C6    N1    C1    C9  
+H1    C7    N2    C13 
+H3    C10   N4    H2  
+H5    C13   N5    H4  
+C4    C2    C1    C5  
+C7    C3    C4    C10 
+H10   C5    C2    C8  
+C12   C6    N1    C11 
+C3    C7    N2    C8  
+H11   C8    C5    C7  
+N4    C10   C3    N3  
+H15   C11   C6    C14 
+H16   C12   C6    C15 
+N5    C13   N3    N2  
+H17   C14   C11   C16 
+H18   C15   C12   C16 
+H19   C16   C14   C15 
+
