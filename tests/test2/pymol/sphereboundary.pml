@@ -33,9 +33,13 @@ color orange, spherical17
 set sphere_transparency, 0.9, spherical17
 
 set sphere_quality, 6
+set transparency_mode, 1
 
 select ligand, resn LIG
 show sticks, ligand
+select waters, solvent
+
+zoom waters, 3.0
 
 deselect
 
@@ -44,3 +48,8 @@ set movie_panel=1
 movie.add_state_loop(1,0,start=1)
 set movie_panel_row_height, 20
 
+##Make images for movie
+viewport 1200,1200
+set ray_trace_frames=1
+set cache_frame=0
+mpng frame_
