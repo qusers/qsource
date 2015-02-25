@@ -5,7 +5,7 @@
 #  Kajsa Ljunjberg, John Marelius, Martin Nervall                              #
 #  Maintainers: Beat Amrein, Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, #
 #  Irek Szeler                                                                 #
-#  Latest update: February 21, 2015                                            #
+#  Latest update: February 25, 2015                                            #
 #  make [option] [COMP=compiler]                                               #
 ################################################################################
 
@@ -15,11 +15,11 @@
 ifeq ($(COMP),ifort)
 	FC=		ifort
 	FC_OPT=         -O3
-	FFLAGS=         -ip -ipo -unroll -i-static -fstack-protector ${FC_OPT}
+	FFLAGS=         -ip -ipo -unroll -static-intel -fstack-protector ${FC_OPT}
 	FPP_FLG=	-fpp
 
 	MPIFC=		mpiifort
-	MPIFLAGS=	-f90=${FC} -Nmpi
+	MPIFLAGS=	-f90=${FC}
 	OMPI_FC=	${FC}
 	MPI_FC=		${FC}
 	MPI_FCFLAGS=	${FFLAGS}

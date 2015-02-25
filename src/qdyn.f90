@@ -15,6 +15,7 @@
 !  by Johan Åqvist, John Marelius, Anders Kaplan & Martin Nervall
 !  Qdyn molecular dynamics main program
 !------------------------------------------------------------------------------!
+
 program qdyn
 use MD                                                                
 use MPIGLOB ! use MPI global data
@@ -178,9 +179,11 @@ end subroutine shutdown
 
 #if ! defined(__PATHCC__)
   integer(4) function signal( signum, proc, flag )
-    integer(4) signum, flag
+    implicit none
+    integer(4) :: signum, flag
     external proc
-  end function
+    signal = 1
+  end function signal
 #endif
 
 
