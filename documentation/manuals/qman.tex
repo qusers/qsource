@@ -2321,14 +2321,27 @@ file must conform to some rules to be accepted by \textbf{qprep} (if not
 specified use the PDB standard):
 
 \begin{itemize}
-\item \textbf{qprep} will only accept and read ATOM and HETATM records. All other record types have to be removed.
-\item Residue numbers must be numeric, $i.e.$ alphanumeric residue identifiers like 60B are not allowed. Use the renumber script to renumber residues. The numbering does not have to start at 1, but \textbf{qprep} will renumber residues starting at 1.
-\item Molecules must be separated with a gap marker line. This line should contain only the word GAP in capital letters, optionally preceded by blanks or tabs. There should not be a gap marker at the end of the file.
-\item Atom numbering is not significant and \textbf{qprep} will renumber atoms starting from 1. Note that the numbering will change due to the insertion of hydrogen atoms.
+\item  \textbf{qprep}  will  only  accept and  read  ATOM  and  HETATM
+records. All other record types have to be removed.
+\item  Residue numbers  must be  numeric, $i.e.$  alphanumeric residue
+identifiers  like 60B  are not  allowed.  Use  the renumber  script to
+renumber residues.   The numbering does  not have  to start at  1, but
+\textbf{qprep} will renumber residues starting at 1.
+\item Molecules  must be separated with  a gap marker line.  This line
+should  contain  only the  word  GAP  in capital  letters,  optionally
+preceded by blanks  or tabs. There should  not be a gap  marker at the
+end of the file.
+\item  Atom  numbering  is  not significant  and  \textbf{qprep}  will
+renumber atoms  starting from 1.  Note that the numbering  will change
+due to the insertion of hydrogen atoms.
 \item Only upper case letters may be used in PDB files.
-\item Residue names must match fragment library entry names. The maximal length of residue names is 3 alphanumeric characters (position 13 to 16). Most other characters like +, -, {\_} are also permitted.
-\item Atom names must match atom names within the relevant fragment library entry.
-\item Temperature factors and occupancy numbers are ignored by \textbf{qprep} and are optional.
+\item  Residue names  must  match fragment  library  entry names.  The
+maximal length of residue names is 3 alphanumeric characters (position
+13 to 16). Most other characters like +, -, {\_} are also permitted.
+\item Atom  names must match  atom names within the  relevant fragment
+library entry.
+\item  Temperature  factors  and  occupancy  numbers  are  ignored  by
+\textbf{qprep} and are optional.
 \end{itemize}
 
 \subsubsection{Atom masks}\label{subsubsec:atom_masks}
@@ -2600,75 +2613,73 @@ r_{ij}^{-6} }
 \end{split}
 \end{equation}
 
-The \textbf{[atom{\_}types]} section defines a name, and lists
-Lennard-Jones parameters and mass for each atom type. There are
-three sets of LJ parameters: set 1 for normal non-bonded
-interactions, set 2 for pairs of polar atom types (listed in a the
-section LJ{\_}type2{\_}pairs) and type 3 for pairs of atoms in
-1--4 position. The B parameter is the same for sets 2 and 3. Atom
-type names are alphanumeric. The length of the name is limited to
-8 characters.
+The  \textbf{[atom{\_}types]}  section  defines   a  name,  and  lists
+Lennard-Jones parameters and mass for  each atom type. There are three
+sets of LJ parameters: set 1 for normal non-bonded interactions, set 2
+for   pairs  of   polar  atom   types   (listed  in   a  the   section
+LJ{\_}type2{\_}pairs)  and  type   3  for  pairs  of   atoms  in  1--4
+position. The  B parameter  is the same  for sets 2  and 3.  Atom type
+names  are alphanumeric.  The  length  of the  name  is  limited to  8
+characters.
 
-The section \textbf{[atom{\_}aliases]} is used facilitate the
-transition from numeric atom type names used in earlier versions.
-In this section alias names may be assigned to atom types defined
-in the atom{\_}types section, $e.g.$ to be able to use the old
-numeric name as an alias for the new descriptive atom type name in
-library files.
+The   section  \textbf{[atom{\_}aliases]}   is  used   facilitate  the
+transition from numeric atom type  names used in earlier versions.  In
+this section alias names may be  assigned to atom types defined in the
+atom{\_}types section, $e.g.$  to be able to use the  old numeric name
+as an alias for the new descriptive atom type name in library files.
 
-The \textbf{[LJ{\_}type2{\_}pairs]} section lists pairs of polar
-atom types that should interact with LJ parameters from set 2.
+The \textbf{[LJ{\_}type2{\_}pairs]} section lists  pairs of polar atom
+types that should interact with LJ parameters from set 2.
 
-The \textbf{[bonds]} section lists force constant and equilibrium
-distance for bonds between two atoms. It contains one line for
-each (applicable) unique pair of atom types. The pair 1--2 is
-equivalent with the pair 2--1, so only one of these should be
-included. The pairs may appear in any order, but for reasons of
-readability it is convenient to sort the lines by both atom types
-and always have the lower atom type number first on each line.
+The  \textbf{[bonds]} section  lists  force  constant and  equilibrium
+distance for  bonds between two atoms.  It contains one line  for each
+(applicable) unique  pair of atom  types. The pair 1--2  is equivalent
+with the pair 2--1, so only one of these should be included. The pairs
+may  appear  in any  order,  but  for  reasons  of readability  it  is
+convenient to  sort the lines by  both atom types and  always have the
+lower atom type number first on each line.
 
-The \textbf{[angles]} section lists force constant and equilibrium
-angle for 3-atom angles. contains one line for each (applicable)
-unique triplet of atom types. The pair 1--2--3 is equivalent with
-the pair 3--2--1, so only one of these should be included. The
-pairs may appear in any order, but for reasons of readability it
-is convenient to sort the lines by the middle atom type first,
-then on the left and finally by the right atom type. It is also
-preferred to have the left atom type less than or equal to the
-right one ($i.e.$ 1--2--3 rather than 3--2--1).
+The  \textbf{[angles]} section  lists force  constant and  equilibrium
+angle  for 3-atom  angles.  contains one  line  for each  (applicable)
+unique triplet of atom types. The  pair 1--2--3 is equivalent with the
+pair 3--2--1, so  only one of these should be  included. The pairs may
+appear in any  order, but for reasons of readability  it is convenient
+to sort the lines by the middle  atom type first, then on the left and
+finally by the right atom type. It  is also preferred to have the left
+atom type less  than or equal to the right  one ($i.e.$ 1--2--3 rather
+than 3--2--1).
 
-The \textbf{[torsions]} section lists parameters for torsion
-angles. Torsions can be defined by 4 atom types but in many cases
-only the two middle atoms are significant. The latter case is
-indicated by "0" (zero) or "?" in column one and four. A torsion
-defined with four atom types overrides two-atom definitions. The
-force constant in the cosine-shaped function for the torsion
-potential is equal to half the barrier height. The periodicity is
-the number of maxima passed in a full 360\r{ } rotation. The phase
-shift divided by the periodicity is the angle where the first
-maximum should be. The number of paths is the number of ways that
-a two-atom torsion can be defined, $i.e.$ the product of the
-number of atoms bonded to the two middle atoms. It is used to
-distribute the force over all the atoms involved. The preferred
-order of the lines is analogous with the bonds section: sort by
-the two middle atom types. Multiple torsion potential terms may be
-defined for the same set of atom types, to enable more complex
-torsion potentials. All terms are then added together.
+The   \textbf{[torsions]}  section   lists   parameters  for   torsion
+angles. Torsions can be defined by 4 atom types but in many cases only
+the two middle atoms are significant.  The latter case is indicated by
+"0" (zero) or "?" in column one  and four. A torsion defined with four
+atom types overrides  two-atom definitions. The force  constant in the
+cosine-shaped function for the torsion  potential is equal to half the
+barrier height.  The periodicity is the  number of maxima passed  in a
+full 360\r{ } rotation. The phase  shift divided by the periodicity is
+the angle  where the first maximum  should be. The number  of paths is
+the number of ways that a  two-atom torsion can be defined, $i.e.$ the
+product of the number  of atoms bonded to the two  middle atoms. It is
+used  to  distribute  the  force  over all  the  atoms  involved.  The
+preferred order of the lines is analogous with the bonds section: sort
+by the two middle atom types.  Multiple torsion potential terms may be
+defined for the same set of atom types, to enable more complex torsion
+potentials. All terms are then added together.
 
-The \textbf{[impropers]} section lists force constant and
-equilibrium angle for improper torsion angles, which are modelled
-by a harmonic potential. The impropers may be defined by two atom
-types, but in many cases the second type is not used and set to
-"0" or "?" as in the torsions section.
+The \textbf{[impropers]} section lists  force constant and equilibrium
+angle for  improper torsion angles,  which are modelled by  a harmonic
+potential. The impropers may be defined by two atom types, but in many
+cases the  second type is  not used and  set to "0"  or "?" as  in the
+torsions section.
 
-The \textbf{[options]} section contains three keywords.
-Vdw{\_}rule selects the rule for combining LJ parameters from two
-atom types and takes the values "geometric" or "arithmetic".
-Scale{\_}14 is the scaling factor for electrostatic interactions
-between atoms in 1--4 positions. Switch{\_}atoms selects the
-cut-off logic for non-bonded interaction: On~=~use designated
-switch (central) atoms of charge groups. Off~=~include the charge
-groups if any pair of atoms is within the cut-off distance.
+The \textbf{[options]}  section contains three  keywords.  Vdw{\_}rule
+selects the rule  for combining LJ parameters from two  atom types and
+takes  the values  "geometric"  or "arithmetic".   Scale{\_}14 is  the
+scaling factor  for electrostatic  interactions between atoms  in 1--4
+positions. Switch{\_}atoms  selects the  cut-off logic  for non-bonded
+interaction:  On~=~use designated  switch  (central)  atoms of  charge
+groups. Off~=~include the charge groups if any pair of atoms is within
+the cut-off distance.
 
 Table \ref{tab:prm_f_f} lists the data and units for each column
 in the different sections, and an example is included as a file

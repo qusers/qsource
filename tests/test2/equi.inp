@@ -1,6 +1,6 @@
 [MD]
 steps                     500000
-stepsize                  1
+stepsize                  2
 temperature               300
 bath_coupling             10
 random_seed               1231
