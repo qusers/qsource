@@ -1,8 +1,8 @@
-      SUBROUTINE EIGEN (A,R,N,MV) 
+SUBROUTINE EIGEN (A,R,N,MV) 
 !                                                                       
 !CCCCC W.F. VAN GUNSTEREN, CAMBRIDGE, JUNE 1979 CCCCCCCCCCCCCCCCCCCCCCCC
 !                                                                      C
-!     SUBROUTINE EIGEN (A,R,N,MV)                                      C
+!SUBROUTINE EIGEN (A,R,N,MV)                                           C
 !                                                                      C
 !COMMENT:   EIGEN COMPUTES EIGENVALUES AND EIGENVECTORS OF THE REAL    C
 !     SYMMETRIC N*N MATRIX A, USING THE DIAGONALIZATION METHOD         C
@@ -24,7 +24,7 @@
 !                                                                      C
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 !                                                                       
-	implicit double precision (A-H, O-Z)
+        implicit double precision (A-H, O-Z)
     DIMENSION A(1),R(1) 
 
 !                                                                       

@@ -1,18 +1,16 @@
-!	(C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
+!       (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
+!       mpiglob.f90
+!       by John Marelius & Anders Kaplan
+!       global variables for MPI parallell Qdyn
 
-!	mpiglob.f90
-!	by John Marelius & Anders Kaplan
-
-!	global variables for MPI parallell Qdyn
-
-module	MPIGLOB
+module  MPIGLOB
 
 use NRGY
 
     ! types and variables used for calculation assignment
     type PAIR_ASSIGNMENT_TYPE
-            integer					:: start, end
-            integer					:: max
+            integer                                     :: start, end
+            integer                                     :: max
     end type PAIR_ASSIGNMENT_TYPE
 
 
