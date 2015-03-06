@@ -3175,80 +3175,77 @@ output from \textbf{qdyn}. Sections with no required entries are optional.
 \subsubsection{FEP file format}
 \label{subsubsec:fepfileformat}
 
-The FEP file which designates some atoms from the topology as
-Q-atoms and redefines the topology for these atoms in a number of
-states between which transformations can be made, is a text file.
-It is divided into sections which can appear in any order and
-which start with a section title. Within each section the data
-appears either as lines with values or as pairs of keyword and
-value.
+The FEP file  (given a .fep extension) designates some  atoms from the
+topology as  Q-atoms and redefines the  topology for these atoms  in a
+number of states between which  transformations can be made. This file
+is a plain text file. It is  divided into sections which can appear in
+any order  and which start with  a section title. Within  each section
+the data appears either as lines with values or as keyword-value pairs.
 
-Section titles are enclosed in square brackets and must be the
-first (non-white space) item on a line. They are not
-case-sensitive. Keyword-value pairs appear in that order, anywhere
-on a line but together on the same line. Keyword-value lines can
-appear in any order (within a section). White space is not
-significant in value-list lines.
+Section titles are  enclosed in square brackets and must  be the first
+(non-white    space)    item    on    a    line.    They    are    not
+case-sensitive. Keyword-value pairs appear  in that order, anywhere on
+a line but  together on the same line. Keyword-value  lines can appear
+in any  order (within a  section). White  space is not  significant in
+value-list lines.
 
-Comments start with "!", "\#" or "*" and may appear after values
-or as separate lines.
+Comments start with "!", "\#" or "*" and may appear after values or as
+separate lines.
 
-Only the section atoms where Q-atoms are designated, is required,
-all others are optional. They may appear in any order, but the
-preferred order is that of table \ref{tab:fepfileformat}. The
-section [\textbf{FEP}] contains the keyword states followed by the
-number of FEP states defined in the FEP file. An offset value to
-add to all topology atom numbers in order to avoid renumbering all
-atoms between $e.g.$ free ligand and bound ligand simulations can
-also be defined in the [\textbf{FEP}] section. New atom types for
-Q-atoms are defined in the [\textbf{atom\_types}] section. The
-assignment of Q-atom types to Q-atoms is done, for each state, in
-the [\textbf{change\_atoms}] section. Pairs of atoms between which
-bonds are made or broken should use the exponential repulsion
-non-bonded potential instead of the standard Lennard-Jones by
-listing them under the [\textbf{soft\_pairs}] heading. In some
-cases it is desirable to completely turn off certain non-bonded
-interactions. This can be done on a per-state basis in the section
-[\textbf{excluded\_pairs}].
+A  .fep file  only needs  as  a requirement  for the  \textbf{[atoms]}
+section (where  Q-atoms are  declared) to be  present, all  others are
+sections are optional. They may appear in any order, but the preferred
+order is that seen in table \ref{tab:fepfileformat}.  The section
+[\textbf{FEP}] contains the  keyword states followed by  the number of
+FEP states  defined in  the FEP file.  An offset value  to add  to all
+topology atom numbers in order  to avoid renumbering all atoms between
+$e.g.$ free ligand and bound ligand simulations can also be defined in
+the [\textbf{FEP}] section. New atom  types for Q-atoms are defined in
+the [\textbf{atom\_types}] section. The  assignment of Q-atom types to
+Q-atoms  is  done, for  each  state,  in the  [\textbf{change\_atoms}]
+section. Pairs of atoms between which  bonds are made or broken should
+use  the exponential  repulsion  non-bonded potential  instead of  the
+standard     Lennard-Jones    by     listing     them    under     the
+[\textbf{soft\_pairs}]  heading.  In some  cases  it  is desirable  to
+completely turn off certain non-bonded  interactions. This can be done
+on a per-state basis in the section [\textbf{excluded\_pairs}].
 
-New bond, angle, torsion and improper types can also be defined
-and used for any atoms in the topology, not only between Q-atoms.
-Atoms are therefore referred to by their number in the topology
-rather than by a Q-atom number. Definitions in the topology are
-overridden by definitions in the FEP file. To disable an
-interaction in one state, a zero should be used in place of the
-type number for that state.
+New bond,  angle, torsion and improper  types can also be  defined and
+used for any  atoms in the topology, not only  between Q-atoms.  Atoms
+are therefore referred to by their  number in the topology rather than
+by  a Q-atom  number. Definitions  in the  topology are  overridden by
+definitions in the FEP file. To disable an interaction in one state, a
+zero should be used in place of the type number for that state.
 
-Angles, torsions and impropers which depend on the existence of a
-bond being formed or broken should be "coupled" to that bond by
-scaling the angle energy by the ratio of the actual value of the
-Morse bond energy to the dissociation energy. These couplings are
-defined in the sections [\textbf{angle\_couplings}],
-[\textbf{torsion\_couplings}] and [\textbf{improper\_couplings}].
+Angles, torsions and impropers which depend on the existence of a bond
+being formed or broken should be "coupled" to that bond by scaling the
+angle energy by the ratio of the actual value of the Morse bond energy
+to  the  dissociation  energy.  These couplings  are  defined  in  the
+sections   [\textbf{angle\_couplings}],  [\textbf{torsion\_couplings}]
+and [\textbf{improper\_couplings}].
 
-Extra shake constraints can be imposed between any pair of atoms
-in the topology using the heading [\textbf{shake\_constraints}].
-The effective constraint distance will be the sum of the distances
-for each state weighted by their respective $\lambda$'s.
+Extra shake  constraints can be imposed  between any pair of  atoms in
+the  topology using  the  heading [\textbf{shake\_constraints}].   The
+effective constraint  distance will  be the sum  of the  distances for
+each state weighted by their respective $\lambda$'s.
 
-Quantum-mechanical mixing of states used in EVB calculations by
-introducing off-diagonal Hamiltonian matrix element functions is
+Quantum-mechanical  mixing  of  states  used in  EVB  calculations  by
+introducing  off-diagonal  Hamiltonian  matrix  element  functions  is
 defined in the section [\textbf{off\_diagonals}].
 
-If vanishing or appearing atoms are part of your FEP strategy, it
-may be desirable to use a \textit{softcore} potential for the
-Q-atoms in question.\cite{Zacharias:1994} Softcore potentials have
-been implemented in \textbf{qdyn} according to equation \ref{eq:softcore}.
-Depending on the value of
-\textbf{softcore\-\_use\-\_max\-\_potential} given in the
-[\textbf{FEP}] section, the $\alpha$-values are either read
-directly from the [\textbf{softcore}] section or calculated by
-\textbf{qdyn} in a pairwise manner based upon the desired potentials at
-$r=0$ given in the [\textbf{softcore}] section. Softcore
-potentials are only available for Q-atoms, i.e. Q-Q, Q-water and
-Q-solute interactions are treated with softcore. In the case of a
-Q-Q interaction where both Q-atoms have softcore potentials, the
-$\alpha$ which is used is that which gives rise to the lowest potential at
+If vanishing or appearing atoms are  part of your FEP strategy, it may
+be desirable to  use a \textit{softcore} potential for  the Q-atoms in
+question.\cite{Zacharias:1994}    Softcore   potentials    have   been
+implemented in \textbf{qdyn}  according to equation \ref{eq:softcore}.
+Depending on the value of \textbf{softcore\-\_use\-\_max\-\_potential}
+given in  the [\textbf{FEP}]  section, the $\alpha$-values  are either
+read directly  from the  [\textbf{softcore}] section or  calculated by
+\textbf{qdyn} in a  pairwise manner based upon  the desired potentials
+at $r=0$ given in the [\textbf{softcore}] section. Softcore potentials
+are  only  available  for  Q-atoms, i.e.  Q-Q,  Q-water  and  Q-solute
+interactions  are  treated  with  softcore.  In  the  case  of  a  Q-Q
+interaction where both Q-atoms  have softcore potentials, the $\alpha$
+which is  used is  that which  gives rise to  the lowest  potential at
 $r=0$.
 
 \begin {equation}
@@ -3259,14 +3256,14 @@ $r=0$.
  V_{vdW}(r_{ij}) = \epsilon\cdot(\frac{{R_{ij}^{*}}^{12}}{(r_{ij}^6 + \alpha)^2} - 2\cdot\frac{{R_{ij}^{*}}^{6}}{r_{ij}^6 + \alpha})
 \end{equation}
 
-If periodic boundary conditions are used an additional section
-[\textbf{PBC}] is needed. In this section one switching atom for
-all Q-atoms is defined. This switching atom is used when
-generating the Q-surrounding nonbonded pair lists.
+If  periodic  boundary  conditions  are  used  an  additional  section
+[\textbf{PBC}] is needed.  In this section one switching  atom for all
+Q-atoms is  defined. This switching  atom is used when  generating the
+Q-surrounding nonbonded pair lists.
 
-Table \ref{tab:fepfileformat} lists the data and units for each
-column in the different sections, and an example is included as
-file example on page \pageref{tab:FEP_file_f_p_t_r}.
+Table \ref{tab:fepfileformat} lists the data and units for each column
+in the different sections, and an  example is included as file example
+on page \pageref{tab:FEP_file_f_p_t_r}.
 
 \small
 \begin{longtable}{|p{53pt}|p{181pt}|p{160pt}|}
