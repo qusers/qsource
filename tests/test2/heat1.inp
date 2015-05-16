@@ -1,10 +1,10 @@
 [MD]
-steps                     10000
+steps                     1000
 stepsize                  1
 temperature               50.0
 bath_coupling             5
 random_seed               666
-initial_temperature       50
+!initial_temperature       10.0
 shake_solvent             on
 shake_solute              off
 lrf                       on

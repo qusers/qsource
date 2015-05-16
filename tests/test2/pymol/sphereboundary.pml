@@ -43,13 +43,13 @@ zoom waters, 3.0
 
 deselect
 
-set movie_panel=1
-#movie.add_state_sweep(1,0,start=1)
-movie.add_state_loop(1,0,start=1)
-set movie_panel_row_height, 20
+#set movie_panel=1
+##movie.add_state_sweep(1,0,start=1)
+#movie.add_state_loop(1,0,start=1)
+#set movie_panel_row_height, 20
 
 ##Make images for movie
-viewport 1200,1200
-set ray_trace_frames=1
-set cache_frame=0
-mpng frame_
+#viewport 1200,1200
+#set ray_trace_frames=1
+#set cache_frame=0
+#mpng frame_

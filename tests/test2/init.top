@@ -1,6 +1,6 @@
 Q topology file
 TITLE      init
-DATE       20150222
+DATE       20150326
 VERSION     5.03
 LIB_FILES  ff/qoplsaa.lib;ff/lig.lib
 FORCEFIELD Q-OPLSAA

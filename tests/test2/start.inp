@@ -1,7 +1,7 @@
 [MD]
 steps                     10000
 stepsize                  0.1
-temperature               1.0
+temperature               10.0
 bath_coupling             1
 random_seed               3463
 initial_temperature       1
@@ -33,4 +33,4 @@ final                     start.re
 trajectory                start.dcd
 
 [sequence_restraints]
-1 40 25.0 1
+1 40 25 0 1

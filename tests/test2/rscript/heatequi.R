@@ -2,186 +2,166 @@
 ################################################################################
 # Property plotter for Q runs
 ################################################################################
-heatw <- grep("^SUM",readLines("../start.log"), value=TRUE)
-nshw  <- grep("steps",readLines("../start.inp"), value=TRUE)    #numberofsteps
-sshw  <- grep("stepsize",readLines("../start.inp"), value=TRUE)    #stepsize
+# An example of the "juice" in a Q output file is in the following summary lines:
 
-#equiw <- grep("system  - epot     :",readLines("../water/out/equilibrate.out"), value=TRUE)
-#nsew  <- grep("log_write_fq",readLines("../water/equilibrate.inp"), value=TRUE) #numberofsteps
-#ssew   <- grep(" ss ",readLines("../water/equilibrate.inp"), value=TRUE)   #stepsize
+# =======================  Energy summary at step  24500 ========================
+#   el       vdW      bond     angle   torsion  improper
+# solute            -7230.75   -235.91    912.03   1328.94    531.60     64.47
+# solvent           -8127.62   1396.65      0.00      0.00      0.00      0.00
+# solute-solvent    -2938.63   -151.95
+# LRF                -231.30
+# Q-atom            -1275.33     30.90   -241.13      8.34      2.86      0.00
+# 
+# total       fix slvnt_rad slvnt_pol     shell    solute
+# restraints          631.26    113.34   -385.36     25.87     67.21    810.21
+# 
+# total potential   kinetic
+# SUM              -10847.32 -15525.57   4678.25
+# ======================= Q-atom energies at step  24500 ========================
+#   type   st lambda        el       vdW      bond     angle   torsion  improper
+# Q-Q     1 1.0000    329.24     15.16
+# Q-Q     2 0.0000    269.55     60.38
+# 
+# Q-prot  1 1.0000  -1462.79      5.45
+# Q-prot  2 0.0000  -1486.59      1.64
+# 
+# Q-wat   1 1.0000   -141.78     10.29
+# Q-wat   2 0.0000   -143.81     10.35
+# 
+# Q-surr. 1 1.0000  -1604.57     15.75
+# Q-surr. 2 0.0000  -1630.40     11.99
+# 
+# Q-any   1 1.0000  -1275.33     30.90   -241.13      8.34      2.86      0.00
+# Q-any   2 0.0000  -1360.85     72.37    -29.70    159.91      3.82      0.00
+# 
+# type   st lambda     total restraint
+# Q-SUM   1 1.0000  -1474.36      0.00
+# Q-SUM   2 0.0000  -1154.44      0.00
+# H( 1, 2) =    0.00 dist. between Q-atoms   2  31 =    1.68
+# H( 1, 2) =    0.00 dist. between Q-atoms  23  31 =    2.99
+# H( 1, 2) =    0.00 dist. between Q-atoms  23  26 =    1.00
+# H( 1, 2) =    0.00 dist. between Q-atoms  26  33 =    2.75
+# ===============================================================================
+#   Temperature at step   24500:         T_tot=     295.2         T_free=     307.4
 
-#fepw  <- grep("system  - epot     :",readLines("../water/out/fep.out"), value=TRUE)
-#nsfw  <- grep("log_write_fq",readLines("../water/fep.inp"), value=TRUE) #numberofsteps
-#ssfw   <- grep(" ss ",readLines("../water/fep.inp"), value=TRUE)   #stepsize
+qlog <- "../start.log"
+simtime         <- grep("Number of MD steps ",readLines(qlog), value=TRUE)
+solute          <- grep("^solute ",readLines(qlog), value=TRUE)
+solvent         <- grep("^solvent ",readLines(qlog), value=TRUE)
+solutesolvent   <- grep("^solute-solvent ",readLines(qlog), value=TRUE)
+lrf             <- grep("^LRF ",readLines(qlog), value=TRUE)
+qatom           <- grep("^Q-atom ",readLines(qlog), value=TRUE)
+restraints      <- grep("^restraints ",readLines(qlog), value=TRUE)
+total           <- grep("^SUM ",readLines(qlog), value=TRUE)
+temperature     <- grep("Temperature at step",readLines(qlog), value=TRUE)
 
-#heatp <- grep("system  - epot     :",readLines("../protein/out/heat.out"), value=TRUE)
-#nshp  <- grep("log_write_fq",readLines("../protein/heat.inp"), value=TRUE) #numberofsteps
-#sshp   <- grep(" ss ",readLines("../protein/heat.inp"), value=TRUE)   #stepsize
+simtime       <- read.table(text = simtime)[1:(length(simtime)-1), 2:10]
+simtime       <- (simtime[9]*simtime[5])/1000  #simulation time in picoseconds
+solute        <- read.table(text = solute)[1:(length(solute)-1), 2:7]
+solvent       <- read.table(text = solvent)[1:(length(solvent)-1), 2:7]
+solutesolvent <- read.table(text = solutesolvent)[1:(length(solutesolvent)-1), 2:3]
+lrf           <- read.table(text = lrf)[1:(length(lrf)-1), 2]
+qatom         <- read.table(text = qatom)[1:(length(qatom)-1), 2:7]
+restraints    <- read.table(text = restraints)[1:(length(restraints)-1), 2:7]
+total         <- read.table(text = total)[1:(length(total)-1), 2:4]
+temperature   <- read.table(text = temperature)[1:(length(temperature)-1), 2:8]
 
-#equip <- grep("system  - epot     :",readLines("../protein/out/equilibrate.out"), value=TRUE)
-#nsep  <- grep("log_write_fq",readLines("../protein/equilibrate.inp"), value=TRUE) #numberofsteps
-#ssep   <- grep(" ss ",readLines("../protein/equilibrate.inp"), value=TRUE)   #stepsize
+qlog <- "../heat1.log"
+simtime1         <- grep("Number of MD steps ",readLines(qlog), value=TRUE)
+solute1          <- grep("^solute ",readLines(qlog), value=TRUE)
+solvent1         <- grep("^solvent ",readLines(qlog), value=TRUE)
+solutesolvent1   <- grep("^solute-solvent ",readLines(qlog), value=TRUE)
+lrf1             <- grep("^LRF ",readLines(qlog), value=TRUE)
+qatom1           <- grep("^Q-atom ",readLines(qlog), value=TRUE)
+restraints1      <- grep("^restraints ",readLines(qlog), value=TRUE)
+total1           <- grep("^SUM ",readLines(qlog), value=TRUE)
+temperature1     <- grep("Temperature at step",readLines(qlog), value=TRUE)
 
-#fepp  <- grep("system  - epot     :",readLines("../protein/out/fep.out"), value=TRUE)
-#nsfp  <- grep("log_write_fq",readLines("../protein/fep.inp"), value=TRUE) #numberofsteps
-#ssfp   <- grep(" ss ",readLines("../protein/fep.inp"), value=TRUE)   #stepsize
+simtime1       <- read.table(text = simtime1)[1:(length(simtime1)-1), 2:10]
+simtime1       <- (simtime1[9]*simtime1[5])/1000  #simulation time in picoseconds
+solute1        <- read.table(text = solute1)[1:(length(solute1)-1), 2:7]
+solvent1       <- read.table(text = solvent1)[1:(length(solvent1)-1), 2:7]
+solutesolvent1 <- read.table(text = solutesolvent1)[1:(length(solutesolvent1)-1), 2:3]
+lrf1           <- read.table(text = lrf1)[1:(length(lrf1)-1), 2]
+qatom1         <- read.table(text = qatom1)[1:(length(qatom1)-1), 2:7]
+restraints1    <- read.table(text = restraints1)[1:(length(restraints1)-1), 2:7]
+total1         <- read.table(text = total1)[1:(length(total1)-1), 2:4]
+temperature1   <- read.table(text = temperature1)[1:(length(temperature1)-1), 2:8]
 
-#     1 == water
-#     2 == protein
+qlog <- "../heat2.log"
+simtime2         <- grep("Number of MD steps ",readLines(qlog), value=TRUE)
+solute2          <- grep("^solute ",readLines(qlog), value=TRUE)
+solvent2         <- grep("^solvent ",readLines(qlog), value=TRUE)
+solutesolvent2   <- grep("^solute-solvent ",readLines(qlog), value=TRUE)
+lrf2             <- grep("^LRF ",readLines(qlog), value=TRUE)
+qatom2           <- grep("^Q-atom ",readLines(qlog), value=TRUE)
+restraints2      <- grep("^restraints ",readLines(qlog), value=TRUE)
+total2           <- grep("^SUM ",readLines(qlog), value=TRUE)
+temperature2     <- grep("Temperature at step",readLines(qlog), value=TRUE)
 
-ekinh1 <- read.table(text = heatw)[2:(length(heatw)-1), 4]
-epoth1 <- read.table(text = heatw)[2:(length(heatw)-1), 3]
-etoth1 <- read.table(text = heatw)[2:(length(heatw)-1), 2]
-fsshw <- read.table(text=nshw)[,2]*read.table(text=sshw)[,2]
-
-#ekine1 <- read.table(text = equiw)[2:(length(equiw)-1), 5]
-#epote1 <- read.table(text = equiw)[2:(length(equiw)-1), 8]
-#etote1 <- read.table(text = equiw)[2:(length(equiw)-1), 11]
-#fssew <- read.table(text=nsew)[,2]*read.table(text=ssew)[,2]
-
-## NOTE NOTE NOTE, those c%%7 and c%%6 are hard coded at the moment
-## meaning that they depend on the specific log_write for this case. They
-## are not general numbers for any fep file yet.
-## MOLARIS outputs an average which is not differentiated from the other values 
-## and then the grep command has more than it should. It also includes an additional report
-## on energy zero and that is why the line c <- 1:length(ekinf1); ekinf1 <- ekinf1[!(c%%6==0)]
-## is needed.
-#ekinf1 <- read.table(text = fepw)[, 5]
-#c <- 1:length(ekinf1); ekinf1 <- ekinf1[!(c%%7==0)]
-#c <- 1:length(ekinf1); ekinf1 <- ekinf1[!(c%%6==0)]
-#epotf1 <- read.table(text = fepw)[, 8]
-#c <- 1:length(epotf1); epotf1 <- epotf1[!(c%%7==0)]
-#c <- 1:length(epotf1); epotf1 <- epotf1[!(c%%6==0)]
-#etotf1 <- read.table(text = fepw)[, 11]
-#c <- 1:length(etotf1); etotf1 <- etotf1[!(c%%7==0)]
-#c <- 1:length(etotf1); etotf1 <- etotf1[!(c%%6==0)]
-#fssfw <- read.table(text=nsfw)[,2]*read.table(text=ssfw)[,2]
-
-
-#ekinh2 <- read.table(text = heatp)[2:(length(heatp)-1), 5]
-#epoth2 <- read.table(text = heatp)[2:(length(heatp)-1), 8]
-#etoth2 <- read.table(text = heatp)[2:(length(heatp)-1), 11]
-#fsshp <- read.table(text=nshp)[,2]*read.table(text=sshp)[,2]
-#ekine2 <- read.table(text = equip)[2:(length(equip)-1), 5]
-#epote2 <- read.table(text = equip)[2:(length(equip)-1), 8]
-#etote2 <- read.table(text = equip)[2:(length(equip)-1), 11]
-#fssep <- read.table(text=nsep)[,2]*read.table(text=ssep)[,2]
-
-#ekinf2 <- read.table(text = fepp)[, 5]
-#c <- 1:length(ekinf2); ekinf2 <- ekinf2[!(c%%7==0)]
-#c <- 1:length(ekinf2); ekinf2 <- ekinf2[!(c%%6==0)]
-#epotf2 <- read.table(text = fepp)[, 8]
-#c <- 1:length(epotf2); epotf2 <- epotf2[!(c%%7==0)]
-#c <- 1:length(epotf2); epotf2 <- epotf2[!(c%%6==0)]
-#etotf2 <- read.table(text = fepp)[, 11]
-#c <- 1:length(etotf2); etotf2 <- etotf2[!(c%%7==0)]
-#c <- 1:length(etotf2); etotf2 <- etotf2[!(c%%6==0)]
-#fssfp <- read.table(text=nsfp)[,2]*read.table(text=ssfp)[,2]
+simtime2       <- read.table(text = simtime2)[1:(length(simtime2)-1), 2:10]
+simtime2       <- (simtime2[9]*simtime2[5])/1000  #simulation time in picoseconds
+solute2        <- read.table(text = solute2)[1:(length(solute2)-1), 2:7]
+solvent2       <- read.table(text = solvent2)[1:(length(solvent2)-1), 2:7]
+solutesolvent2 <- read.table(text = solutesolvent2)[1:(length(solutesolvent2)-1), 2:3]
+lrf2           <- read.table(text = lrf2)[1:(length(lrf2)-1), 2]
+qatom2         <- read.table(text = qatom2)[1:(length(qatom2)-1), 2:7]
+restraints2    <- read.table(text = restraints2)[1:(length(restraints2)-1), 2:7]
+total2         <- read.table(text = total2)[1:(length(total2)-1), 2:4]
+temperature2   <- read.table(text = temperature2)[1:(length(temperature2)-1), 2:8]
 
 
-pdf(file="moldiag.pdf",family="Helvetica", width=10,height=6)
-
-par(mfcol=c(2,3))
+pdf(file="qanalyze.pdf",family="Helvetica", width=10,height=6)
+par(mfrow=c(2,3))
 par(cex=0.6)
 par(mar=c(1, 2, 0, 0), oma=c(4,4,4,2))
 par(tcl=-0.25)
 par(mgp=c(2,0.6,0))
 
-ndim <- (nrow(as.matrix(etoth1))*fsshw)
-xlim=range(0, ndim[1])
-ylim=range(min(ekinh1),max(epoth1))
-yrange=abs(max(epoth1)-min(ekinh1))
-plot(seq(fsshw[1],ndim[1],fsshw[1]),etoth1, type="o", col="green",
+xlim=range(0, simtime[1,])
+ylim=range(min(solvent[,1]),max(solvent[,1]))
+yrange=abs(max(solvent[,1])-min(solvent[,1]))
+plot(seq(0,simtime[1,],simtime[1,]/19),solute[,1], type="o", col="green",
      xlab = " ", main="", xlim = xlim, ylim = ylim, ylab= " ",
      panel.first = grid(), axes=FALSE, xaxs="i", yaxs="i", pch=18)
-lines(seq(fsshw[1],ndim[1],fsshw[1]),ekinh1,type="b",col="red" ,xaxt="n",yaxt="n",xlab="",ylab="", pch=18)
-lines(seq(fsshw[1],ndim[1],fsshw[1]),epoth1,type="b",col="blue",xaxt="n",yaxt="n",xlab="",ylab="", pch=18)
-legend("topright",col=c("red","blue","green"),lty=1,legend=c("ekin","epot","etot"))
-#axis(1, cex.axis=1.2, at=seq(0,ndim,(ndim/10)))
-axis(2, at=seq(min(ekinh1),max(epoth1),yrange/10),las=1)
-box(which="plot",col="black")
-
-ndim <- nrow(as.matrix(etoth2))*fsshp
-xlim=range(0, ndim)
-ylim=range(min(ekinh2),max(epoth2))
-yrange=abs(max(epoth2)-min(ekinh2))
-plot(seq(fsshp,ndim,fsshp),etoth2, type="o", col="green",
-     xlab = " ", main="", xlim = xlim, ylim = ylim, ylab= " ",
-     panel.first = grid(), axes=FALSE, xaxs="i", yaxs="i", pch=18)
-lines(seq(fsshp,ndim,fsshp),ekinh2,type="b",col="red" ,xaxt="n",yaxt="n",xlab="",ylab="", pch=18)
-lines(seq(fsshp,ndim,fsshp),epoth2,type="b",col="blue",xaxt="n",yaxt="n",xlab="",ylab="", pch=18)
-legend("topright",col=c("red","blue","green"),lty=1,legend=c("ekin","epot","etot"))
-axis(1, cex.axis=1.0, at=seq(0,ndim,fsshp*10))
-axis(2, cex.axis=1.0, at=seq(min(ekinh2),max(epoth2),yrange/10),las=1)
+lines(seq(0,simtime[1,],simtime[1,]/19),solvent[,1],type="b",col="red" ,xaxt="n",yaxt="n",xlab="",ylab="", pch=18)
+lines(seq(0,simtime[1,],simtime[1,]/19),solutesolvent[,1],type="b",col="blue",xaxt="n",yaxt="n",xlab="",ylab="", pch=18)
+legend("topright",col=c("red","blue","green"),lty=1,legend=c("solute-solvent","solvent","solute"))
+axis(1, cex.axis=1.2, at=seq(0,simtime[1,],(simtime[1,]/10)))
+axis(2, at=seq(min(solvent[,1]),max(solvent[,1]),yrange/10),las=1)
 box(which="plot",col="black")
 
 
-
-
-ndim <- nrow(as.matrix(etote1))*fssew
-xlim=range(0, ndim)
-ylim=range(min(ekinh1),max(epoth1))
-yrange=abs(max(epoth1)-min(ekinh1))
-plot(seq(fssew,ndim,fssew),etote1, type="o", col="green",
+xlim=range(0, simtime[1,])
+ylim=range(min(solvent[,2]),max(solvent[,2]))
+yrange=abs(max(solvent[,2])-min(solvent[,2]))
+plot(seq(0,simtime[1,],simtime[1,]/19),solute[,2], type="o", col="green",
      xlab = " ", main="", xlim = xlim, ylim = ylim, ylab= " ",
      panel.first = grid(), axes=FALSE, xaxs="i", yaxs="i", pch=18)
-lines(seq(fssew,ndim,fssew),ekine1,type="b",col="red" ,xaxt="n",yaxt="n",xlab="",ylab="", pch=18)
-lines(seq(fssew,ndim,fssew),epote1,type="b",col="blue",xaxt="n",yaxt="n",xlab="",ylab="", pch=18)
-legend("topright",col=c("red","blue","green"),lty=1,legend=c("ekin","epot","etot"), cex=1.0)
-#axis(1, cex.axis=1.2, at=seq(0,ndim,(ndim/10)))
-#axis(2, cex.axis=1.0, at=seq(min(ekinh1),max(epoth1),yrange/10),las=1)
-box(which="plot",col="black")
-
-ndim <- nrow(as.matrix(etote2))*fssep
-xlim=range(0, ndim)
-ylim=range(min(ekinh2),max(epoth2))
-yrange=abs(max(epoth2)-min(ekinh2))
-plot(seq(fssep,ndim,fssep),etote2, type="o", col="green",
-     xlab = " ", main="", xlim = xlim, ylim = ylim, ylab= " ",
-     panel.first = grid(), axes=FALSE, xaxs="i", yaxs="i", pch=18)
-lines(seq(fssep,ndim,fssep),ekine2,type="b",col="red" ,xaxt="n",yaxt="n",xlab="",ylab="", pch=18)
-lines(seq(fssep,ndim,fssep),epote2,type="b",col="blue",xaxt="n",yaxt="n",xlab="",ylab="", pch=18)
-legend("topright",col=c("red","blue","green"),lty=1,legend=c("ekin","epot","etot"), cex=1.0)
-axis(1, cex.axis=1.0, at=seq(0,ndim,fssep*10))
-#axis(2, cex.axis=1.0, at=seq(min(ekinh2),max(epoth2),yrange/10),las=1)
+lines(seq(0,simtime[1,],simtime[1,]/19),solvent[,2],type="b",col="red" ,xaxt="n",yaxt="n",xlab="",ylab="", pch=18)
+lines(seq(0,simtime[1,],simtime[1,]/19),solutesolvent[,2],type="b",col="blue",xaxt="n",yaxt="n",xlab="",ylab="", pch=18)
+legend("topright",col=c("red","blue","green"),lty=1,legend=c("solute-solvent","solvent","solute"))
+axis(1, cex.axis=1.2, at=seq(0,simtime[1,],(simtime[1,]/10)))
+axis(2, at=seq(min(solvent[,2]),max(solvent[,2]),yrange/10),las=1)
 box(which="plot",col="black")
 
 
-
-
-ndim <- nrow(as.matrix(etotf1))*fssfw
-xlim=range(0, ndim)
-ylim=range(min(ekinh1),max(epoth1))
-yrange=abs(max(epoth1)-min(ekinh1))
-plot(seq(fssfw,ndim,fssfw),etotf1, type="o", col="green",
+alltemps <- rbind(temperature,temperature1,temperature2)
+xlim=range(0, length(alltemps[,3]))
+ylim=range(min(alltemps[,5]),max(alltemps[,5]))
+yrange=abs(max(alltemps[,5])-min(alltemps[,5]))
+plot(seq(1,length(alltemps[,3])),alltemps[,5], type="o", col="green",
      xlab = " ", main="", xlim = xlim, ylim = ylim, ylab= " ",
      panel.first = grid(), axes=FALSE, xaxs="i", yaxs="i", pch=18)
-lines(seq(fssfw,ndim,fssfw),ekinf1,type="b",col="red" ,xaxt="n",yaxt="n",xlab="",ylab="", pch=18)
-lines(seq(fssfw,ndim,fssfw),epotf1,type="b",col="blue",xaxt="n",yaxt="n",xlab="",ylab="", pch=18)
-legend("topright",col=c("red","blue","green"),lty=1,legend=c("ekin","epot","etot"), cex=1.0)
-#axis(1, cex.axis=1.2, at=seq(0,ndim,(ndim/10)))
-#axis(2, cex.axis=1.0, at=seq(min(ekinh1),max(epoth1),yrange/10),las=1)
+lines(seq(1,length(alltemps[,3])),alltemps[,7],type="b",col="red" ,xaxt="n",yaxt="n",xlab="",ylab="", pch=18)
+lines(seq(1,length(alltemps[,3])),alltemps[,5],type="b",col="blue",xaxt="n",yaxt="n",xlab="",ylab="", pch=18)
+legend("topright",col=c("red","blue","green"),lty=1,legend=c("solute-solvent","solvent","solute"))
+axis(1, cex.axis=1.2, at=seq(0,simtime2[1,],(simtime2[1,]/10)))
+axis(2, at=seq(min(alltemps[,5]),max(alltemps[,5]),yrange/10),las=1)
 box(which="plot",col="black")
 
-ndim <- nrow(as.matrix(etotf2))*fssfp
-xlim=range(0, ndim)
-ylim=range(min(ekinh2),max(epoth2))
-yrange=abs(max(epoth2)-min(ekinh2))
-plot(seq(fssfp,ndim,fssfp),etotf2, type="o", col="green",
-     xlab = " ", main="", xlim = xlim, ylim = ylim, ylab= " ",
-     panel.first = grid(), axes=FALSE, xaxs="i", yaxs="i", pch=18)
-lines(seq(fssfp,ndim,fssfp),ekinf2,type="b",col="red" ,xaxt="n",yaxt="n",xlab="",ylab="", pch=18)
-lines(seq(fssfp,ndim,fssfp),epotf2,type="b",col="blue",xaxt="n",yaxt="n",xlab="",ylab="", pch=18)
-legend("topright",col=c("red","blue","green"),lty=1,legend=c("ekin","epot","etot"), cex=1.0)
-axis(1, cex.axis=1.0, at=seq(0,ndim,fssfp*10))
-#axis(2, cex.axis=1.0, at=seq(min(ekinh2),max(epoth2),yrange/10),las=1)
-box(which="plot",col="black")
 
-par(las=0)
-mtext("Water", side=3, outer=T, cex=1.0, line=1.6)
-mtext("Heat", side=3, outer=T, cex=0.6, line=0.6, adj=0.16)
-mtext("Equilibrate", side=3, outer=T, cex=0.6, line=0.6, adj=0.5)
-mtext("FEP-US", side=3, outer=T, cex=0.6, line=0.6, adj=0.86)
-mtext("Protein", side=1, outer=T, cex=1.0, line=3.0)
-mtext("Simulation time in ps", side=1, outer=T, cex=0.8, line=1.0)
 dev.off()
+
+
+
