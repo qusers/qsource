@@ -1,0 +1,2346 @@
+\hypertarget{classcalc__chemscore}{\subsection{calc\-\_\-chemscore Module Reference}
+\label{classcalc__chemscore}\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}}
+}
+
+
+Collaboration diagram for calc\-\_\-chemscore\-:
+\subsubsection*{Data Types}
+\begin{DoxyCompactItemize}
+\item 
+type \hyperlink{structcalc__chemscore_1_1atom__data__type}{atom\-\_\-data\-\_\-type}
+\item 
+type \hyperlink{structcalc__chemscore_1_1bond__pointer}{bond\-\_\-pointer}
+\item 
+type \hyperlink{structcalc__chemscore_1_1donor}{donor}
+\item 
+type \hyperlink{structcalc__chemscore_1_1lipos}{lipos}
+\item 
+type \hyperlink{structcalc__chemscore_1_1q__atom}{q\-\_\-atom}
+\item 
+type \hyperlink{structcalc__chemscore_1_1q__bond}{q\-\_\-bond}
+\item 
+type \hyperlink{structcalc__chemscore_1_1score__coord__type}{score\-\_\-coord\-\_\-type}
+\item 
+type \hyperlink{structcalc__chemscore_1_1score__precalc__type}{score\-\_\-precalc\-\_\-type}
+\item 
+type \hyperlink{structcalc__chemscore_1_1score__type}{score\-\_\-type}
+\item 
+type \hyperlink{structcalc__chemscore_1_1wat}{wat}
+\end{DoxyCompactItemize}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine \hyperlink{classcalc__chemscore_af6e984aa1653e69de2ec2a501c90913d}{score\-\_\-initialize}
+\item 
+subroutine \hyperlink{classcalc__chemscore_ae933b171a206adf49ec5cde460082f5a}{chemscore\-\_\-finalize}
+\item 
+subroutine \hyperlink{classcalc__chemscore_ac981dadd7632147eefe3240bada21d79}{log\-\_\-frame} (i\-Frame)
+\item 
+subroutine \hyperlink{classcalc__chemscore_a281f50164f92a72afef6055495578adb}{score\-\_\-heading} (\hyperlink{classcalc__chemscore_a5579c59a11b61014e8a2d04bd984678e}{i})
+\item 
+subroutine \hyperlink{classcalc__chemscore_ac93b5a3a788abe9cc8dc2e98dc9c50bc}{calc\-\_\-hbonds}
+\item 
+subroutine \hyperlink{classcalc__chemscore_a6b8b6af53a8f99ef2db73dd097e88729}{calc\-\_\-lipo}
+\item 
+subroutine \hyperlink{classcalc__chemscore_a6755b67dc877c9ed91725640f577d272}{calc\-\_\-metals}
+\item 
+subroutine \hyperlink{classcalc__chemscore_af574f7169a6f5779bb0f7b26b3377e81}{calc\-\_\-rot}
+\item 
+subroutine \hyperlink{classcalc__chemscore_ac685deaa80ea9769e36c6b9ac8c8462d}{calc\-\_\-scores}
+\item 
+subroutine \hyperlink{classcalc__chemscore_afa2b8e0f000132f3f983c3781cc16115}{count\-\_\-qlipo}
+\item 
+recursive function \hyperlink{classcalc__chemscore_a8c71c15529a582f52f4d152db39e0704}{lip\-\_\-atom} (atom)
+\item 
+subroutine \hyperlink{classcalc__chemscore_a69331a1a41dd3b2dd7c69f272d87ebc5}{frozen}
+\item 
+recursive function \hyperlink{classcalc__chemscore_a95aa01634744dda8ac3af377750a6de1}{find\-\_\-contact} (atom)
+\item 
+subroutine \hyperlink{classcalc__chemscore_a4f53ad3d13e7c23d47c94a6a882e6bd8}{get\-\_\-atom\-\_\-data}
+\item 
+subroutine \hyperlink{classcalc__chemscore_a4bb62e49849feeae28e33973facd130e}{make\-\_\-tac\-\_\-index}
+\item 
+subroutine \hyperlink{classcalc__chemscore_a92a6bfaa5082d7b7d825e44c40226307}{q\-\_\-contacts}
+\item 
+subroutine \hyperlink{classcalc__chemscore_a2e6ad5279a8abd4f97d64943f783bc61}{q\-\_\-types}
+\item 
+subroutine \hyperlink{classcalc__chemscore_a01a080b62749ee18b509448a22380c13}{report\-\_\-ligand}
+\item 
+subroutine \hyperlink{classcalc__chemscore_af79fd6a521299e01b74e8d9ec1c113fe}{report\-\_\-protein}
+\item 
+subroutine \hyperlink{classcalc__chemscore_a96f372948049119e39d151b115758321}{report\-\_\-rings}
+\item 
+subroutine \hyperlink{classcalc__chemscore_a8b10ac4feeec194f53ba62db0a28cd6c}{reset\-\_\-waters}
+\item 
+subroutine \hyperlink{classcalc__chemscore_acdc0c2f07cc5b0046e6fa9acf7cbfa20}{score\-\_\-waters}
+\item 
+subroutine \hyperlink{classcalc__chemscore_a1a0ba4ea42a592ed4c0017e204372e0b}{set\-\_\-ligand}
+\item 
+subroutine \hyperlink{classcalc__chemscore_ace212f3ac54af67d6c9b4219bcfe2f54}{set\-\_\-rings}
+\item 
+recursive subroutine \hyperlink{classcalc__chemscore_a52f0eaac7653260916cc115ae99209b1}{search\-\_\-ring} (bond, ir)
+\item 
+subroutine \hyperlink{classcalc__chemscore_a414b73e7646faa655654d38f811747f4}{mark\-\_\-ring} (bond, ir)
+\item 
+recursive function \hyperlink{classcalc__chemscore_abfb55febeb0d91f6e19fc431c096e3d8}{trace\-\_\-ring} (atom, ir)
+\item 
+subroutine \hyperlink{classcalc__chemscore_a83a9746853c3430bcb4548f1e5c88b90}{set\-\_\-rotatable}
+\item 
+subroutine \hyperlink{classcalc__chemscore_a81ef9a983f650189ae781ea35f2d2699}{set\-\_\-waters}
+\item 
+subroutine \hyperlink{classcalc__chemscore_a5612ee8ef3d2f944d4d10d6fd62e86f0}{sort\-\_\-atoms}
+\item 
+subroutine \hyperlink{classcalc__chemscore_a02f4a93c7e3a6a2621b7574617ce0775}{sort\-\_\-bonds}
+\item 
+subroutine \hyperlink{classcalc__chemscore_a340ee3d9ab3aefb6311490a3780ba4c8}{sort\-\_\-waters}
+\item 
+subroutine \hyperlink{classcalc__chemscore_af43d8e5ae35fc5fd588eae032d48cb51}{start}
+\item 
+subroutine \hyperlink{classcalc__chemscore_a9ee63e29d215e66459adea3d67c95cfc}{store\-\_\-waters}
+\item 
+real function \hyperlink{classcalc__chemscore_a8af51a917f080c281be0bce50c1e6d76}{angle} (a, b, c)
+\item 
+real function \hyperlink{classcalc__chemscore_aae7e243df77ac184d4fcd6cff5b0c0f2}{dist} (a, b)
+\item 
+real function \hyperlink{classcalc__chemscore_a0538eec23e42416be4896f6501beec20}{distsq} (a, b)
+\item 
+real function \hyperlink{classcalc__chemscore_aa375f714a981f45d8700a8ad88e7a000}{fr\-\_\-lip} (a, b)
+\item 
+real function \hyperlink{classcalc__chemscore_a3ce8ab0790256615b1d72e31ab89ce59}{fr\-\_\-met} (a, b)
+\item 
+real function \hyperlink{classcalc__chemscore_a43c74c5136c8bd28466d9be8129c0c41}{g1\-\_\-hb} (a, b)
+\item 
+real function \hyperlink{classcalc__chemscore_ad76a52480cfdcf6a556fd98bab1a3f5a}{g2\-\_\-hb} (a, b, c)
+\item 
+subroutine \hyperlink{classcalc__chemscore_a1dbdeb7c4eb3b9068a041f3b08224417}{score\-\_\-precalc}
+\item 
+integer function \hyperlink{classcalc__chemscore_a8ac120993f6d7fd6a2d13d1de1ef8a04}{score\-\_\-add} (desc)
+\item 
+subroutine \hyperlink{classcalc__chemscore_a745d266685ca3b123d11d20d0baf1dec}{score\-\_\-mean}
+\item 
+subroutine \hyperlink{classcalc__chemscore_a678c1ccc18920a66c00a8fe528997561}{score\-\_\-calc} (i\-Calc, i\-Frame)
+\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+real \hyperlink{classcalc__chemscore_a0a128ccdf119ded09ab8d3ef43bae64c}{score}
+\item 
+integer \hyperlink{classcalc__chemscore_a4cd182377bd9390c602bd0a0c169a345}{frame}
+\item 
+integer \hyperlink{classcalc__chemscore_a3b2724ed780bdae65bbbec15ac8422c8}{stat}
+\item 
+integer \hyperlink{classcalc__chemscore_a5579c59a11b61014e8a2d04bd984678e}{i}
+\item 
+character(len=4) \hyperlink{classcalc__chemscore_a47f6a15d75ed5c28132a8cc8c8141416}{trj\-\_\-type}
+\item 
+character $\ast$80 \hyperlink{classcalc__chemscore_a6c1dfab249f0271c1032ed943ecb6d86}{top\-\_\-file}
+\item 
+character $\ast$80 \hyperlink{classcalc__chemscore_a8a0c88973d83ec082072a7115b8c0e45}{fep\-\_\-file}
+\item 
+integer, parameter \hyperlink{classcalc__chemscore_a035d2a19bada1d6c65c8ac2d7574c263}{max\-\_\-masks} = 10
+\item 
+integer \hyperlink{classcalc__chemscore_a410140d396d152254ee380ca143a2171}{nscores}
+\item 
+integer \hyperlink{classcalc__chemscore_a17d6933892fcc2b0199a9946b8d761a3}{maxscores}
+\item 
+integer(ai), dimension(\-:), \\*
+allocatable \hyperlink{classcalc__chemscore_ab1e216a48152826de41fffb5a9d2d48e}{lph\-\_\-r}
+\item 
+integer(ai), dimension(\-:), \\*
+allocatable \hyperlink{classcalc__chemscore_a39c1639390221a6c4a2a8edba8cb98cc}{lph\-\_\-l}
+\item 
+type(\hyperlink{structcalc__chemscore_1_1donor}{donor}), dimension(\-:), \\*
+allocatable \hyperlink{classcalc__chemscore_aa414095b9d9b645a440912b5a2022214}{hbd\-\_\-r}
+\item 
+type(\hyperlink{structcalc__chemscore_1_1donor}{donor}), dimension(\-:), \\*
+allocatable \hyperlink{classcalc__chemscore_a38023298e024f0fc25e3f31f390cffb8}{hbd\-\_\-l}
+\item 
+integer(ai), dimension(\-:), \\*
+allocatable \hyperlink{classcalc__chemscore_a2d5806a7dbd81e921bd36250e2c5e625}{hba\-\_\-r}
+\item 
+integer(ai), dimension(\-:), \\*
+allocatable \hyperlink{classcalc__chemscore_acd1541a9ea18346f52dd8b3d8690928b}{hba\-\_\-l}
+\item 
+integer(ai), dimension(\-:), \\*
+allocatable \hyperlink{classcalc__chemscore_a8d928ea8b4d7dd3d55c900989dd2349a}{met\-\_\-r}
+\item 
+type(\hyperlink{structcalc__chemscore_1_1wat}{wat}), dimension(\-:), \\*
+allocatable \hyperlink{classcalc__chemscore_ab81e8c2249c6c29046df0cf2d5dc9cac}{waters}
+\item 
+integer, dimension(\-:), allocatable \hyperlink{classcalc__chemscore_a967fddb2385d770370d95b0d762617a6}{pol\-\_\-con}
+\item 
+integer \hyperlink{classcalc__chemscore_a398cedd02c40d7f982a22ccc167e29f0}{nlph\-\_\-r}
+\item 
+integer \hyperlink{classcalc__chemscore_a4eec2bd11c50bf788ae8928ba575fbef}{nlph\-\_\-l}
+\item 
+integer \hyperlink{classcalc__chemscore_a5bffc5652f8ffe498565f481d234250d}{nhbd\-\_\-r}
+\item 
+integer \hyperlink{classcalc__chemscore_a77e25979c44ad62df2302682ed5ce099}{nhbd\-\_\-l}
+\item 
+integer \hyperlink{classcalc__chemscore_a3ee7fc10e0807111d9574989ecc56269}{nhba\-\_\-r}
+\item 
+integer \hyperlink{classcalc__chemscore_a1b8de903d8b742309e2a5fda2f90fe2e}{nhba\-\_\-l}
+\item 
+integer \hyperlink{classcalc__chemscore_abc3a16c3de721ae16d616b77d7cceec2}{nmet\-\_\-r}
+\item 
+integer \hyperlink{classcalc__chemscore_a9620ce63e8c0a9af29f2e28281526f61}{nwaters}
+\item 
+integer \hyperlink{classcalc__chemscore_a95d0411713ed1669162b176b8fd96065}{nqbonds}
+\item 
+integer \hyperlink{classcalc__chemscore_a03c8c74285e823b77a4b9342b74063ef}{nhbd\-\_\-prot}
+\item 
+integer \hyperlink{classcalc__chemscore_afbfb586ffade33d234a7bce3ec4899e4}{nhba\-\_\-prot}
+\item 
+integer \hyperlink{classcalc__chemscore_a86fcc5a701ba3b1900908778c29fccc1}{nrings}
+\item 
+integer, parameter \hyperlink{classcalc__chemscore_aff9edea104beefd190c34dc9fd12a9b3}{lipo} =1
+\item 
+integer, parameter \hyperlink{classcalc__chemscore_a9e666817bc6f8db23e5265e8192ffe0d}{metal} =2
+\item 
+integer, parameter \hyperlink{classcalc__chemscore_a95d7b76641cfc63037276718a6c0d409}{sulphur} =3
+\item 
+integer, parameter \hyperlink{classcalc__chemscore_ab0714dffb0d2349340f52b46a349c063}{acceptor} =4
+\item 
+integer, parameter \hyperlink{classcalc__chemscore_ad73876c67ee54139a1c99297d4393db4}{sp3} =5
+\item 
+integer, parameter \hyperlink{classcalc__chemscore_af5cc74079916deed8dc10fc9749a5ae2}{sp2} =6
+\item 
+integer, parameter \hyperlink{classcalc__chemscore_a09ae8a1f9f2ef13e71fcec99d065126d}{sp3\-\_\-n} =7
+\item 
+integer, parameter \hyperlink{classcalc__chemscore_a67e8e7ef0865731aa0ac9ca31aa4e52d}{pl\-\_\-n} =8
+\item 
+integer, parameter \hyperlink{classcalc__chemscore_a828a4eeea12cf549672d73ad8c68c6c5}{hydrogen} =9
+\item 
+integer, parameter \hyperlink{classcalc__chemscore_aee2123f93427e62198b19acbe63a1a01}{oxygen} =10
+\item 
+integer, parameter \hyperlink{classcalc__chemscore_a24ac03a6e52902f5474d7bf0636d1b8d}{carbon\-\_\-lipo} =11
+\item 
+integer, parameter \hyperlink{classcalc__chemscore_af75eb4e985bdc19e748fddbce9488d0e}{carbonyl\-\_\-carbon} =12
+\item 
+integer, parameter \hyperlink{classcalc__chemscore_a9da5d81c112c26d8c8911ad5c100be1b}{carbonyl\-\_\-oxygen} =13
+\item 
+integer, parameter \hyperlink{classcalc__chemscore_a21d027f3f912e3305b65b0db008c5053}{nprops} =13
+\item 
+character $\ast$($\ast$), dimension(\hyperlink{classcalc__chemscore_a21d027f3f912e3305b65b0db008c5053}{nprops}), \\*
+parameter \hyperlink{classcalc__chemscore_a7e04d3fd8fe18efe87ef287cc54572dd}{file\-\_\-heading} = \mbox{[} 'lipophilic '
+\item 
+type(\hyperlink{structcalc__chemscore_1_1atom__data__type}{atom\-\_\-data\-\_\-type}), \\*
+dimension(\-:), allocatable \hyperlink{classcalc__chemscore_a4de84d0dd19f0b32599251fb0812813c}{atom\-\_\-data}
+\item 
+integer, dimension(\-:), allocatable \hyperlink{classcalc__chemscore_ab620b7f585ddb65438bfcf1bd78a83b0}{iqatom}
+\item 
+real, dimension(\-:), allocatable \hyperlink{classcalc__chemscore_a0a9f262f34f33777a05e38e993df8a66}{vdwr}
+\item 
+character $\ast$80 \hyperlink{classcalc__chemscore_ae6953c3a16fa9621b6b6c4686a740711}{atom\-\_\-data\-\_\-file}
+\item 
+character $\ast$80 \hyperlink{classcalc__chemscore_a7e693ad770c136c0edc287994e1f44e2}{coord\-\_\-file}
+\item 
+real \hyperlink{classcalc__chemscore_a31441c347099258d0b25055878078c9f}{hbond\-\_\-term}
+\item 
+real \hyperlink{classcalc__chemscore_ad0445c5c5fe8d2e46a1c07680f3d69d1}{metal\-\_\-term}
+\item 
+real \hyperlink{classcalc__chemscore_a3ba58639189e7f54e3a4d95eff409d27}{lipo\-\_\-term}
+\item 
+real \hyperlink{classcalc__chemscore_a750abcd708dc4cad10da3fd9b3e3fea2}{rot\-\_\-term}
+\item 
+real, parameter \hyperlink{classcalc__chemscore_a0700bbed17560b18c8a68cc8ede74f5e}{dgconst} =-\/5.\-48
+\item 
+real, parameter \hyperlink{classcalc__chemscore_a07cb5cb9cd2c15d9b1339e4212224011}{dghbond} =-\/3.\-34
+\item 
+real, parameter \hyperlink{classcalc__chemscore_a8e30cdec6eac436e2c66c8042077f8fd}{dgmetal} =-\/6.\-03
+\item 
+real, parameter \hyperlink{classcalc__chemscore_a56c59d883c700c67655d80f08f9de928}{dglipo} =-\/0.\-117
+\item 
+real, parameter \hyperlink{classcalc__chemscore_a2ffd6fa0a78e73647da9a04acf90124e}{dgrot} =2.\-56
+\end{DoxyCompactItemize}
+\subsubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+type(\hyperlink{structcalc__chemscore_1_1score__precalc__type}{score\-\_\-precalc\-\_\-type}), \\*
+dimension(\-:), pointer, private \hyperlink{classcalc__chemscore_a586a968234f3a2338f8f7a045122ccb7}{aprecalc}
+\item 
+integer, private \hyperlink{classcalc__chemscore_a55ea4b33c86233768f0a6f859c2023b6}{iprecalc}
+\item 
+integer, private \hyperlink{classcalc__chemscore_a5bff437603dc25b9d5bd6537a8039f2d}{maxprecalc}
+\item 
+type(\hyperlink{structcalc__chemscore_1_1score__type}{score\-\_\-type}), dimension(\-:), \\*
+pointer, private \hyperlink{classcalc__chemscore_ab15cb5a3ebf1b4cff3c3a65acbf76159}{ascore}
+\item 
+type(mask\-\_\-type), dimension(\hyperlink{classcalc__chemscore_a035d2a19bada1d6c65c8ac2d7574c263}{max\-\_\-masks}), \\*
+target, private \hyperlink{classcalc__chemscore_ae95a0840a35137beed3bcc7ff4345626}{masks}
+\item 
+integer, private \hyperlink{classcalc__chemscore_a7a4e890daa5f6464f57b789a0a0a82a9}{nmasks} = 0
+\item 
+type(\hyperlink{structcalc__chemscore_1_1score__coord__type}{score\-\_\-coord\-\_\-type}), \\*
+dimension(\hyperlink{classcalc__chemscore_a035d2a19bada1d6c65c8ac2d7574c263}{max\-\_\-masks}), private \hyperlink{classcalc__chemscore_ab1a63356a1ac975b5dd189e550e7e143}{coords}
+\item 
+type(\hyperlink{structcalc__chemscore_1_1q__atom}{q\-\_\-atom}), dimension(\-:), \\*
+allocatable, target, private \hyperlink{classcalc__chemscore_afb82a7d43bbfe0502a2131ea40819b60}{q\-\_\-atoms}
+\item 
+type(\hyperlink{structcalc__chemscore_1_1q__bond}{q\-\_\-bond}), dimension(\-:), \\*
+allocatable, target, private \hyperlink{classcalc__chemscore_ad19a31c4b53236429ca22cc9f16a8283}{q\-\_\-bonds}
+\item 
+integer, private \hyperlink{classcalc__chemscore_aaefd70da86dc7e096e752cb92073e59a}{bdotopcalc}
+\item 
+integer, private \hyperlink{classcalc__chemscore_ae221adc2a0ae83b528c10fe7b2493c80}{irestartcalc} =-\/1
+\item 
+logical, private \hyperlink{classcalc__chemscore_a33ff8ef2871f086a64634d3af142e368}{busexin} = .false.
+\item 
+integer, private \hyperlink{classcalc__chemscore_af393275025caa6267b2c9ee46fadd3d7}{warn}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+
+
+Definition at line 8 of file calc\-\_\-chemscore.\-f90.
+
+
+
+\subsubsection{Member Function/\-Subroutine Documentation}
+\hypertarget{classcalc__chemscore_a8af51a917f080c281be0bce50c1e6d76}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!angle@{angle}}
+\index{angle@{angle}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{angle}]{\setlength{\rightskip}{0pt plus 5cm}real function calc\-\_\-chemscore\-::angle (
+\begin{DoxyParamCaption}
+\item[{integer}]{a, }
+\item[{integer}]{b, }
+\item[{integer}]{c}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_a8af51a917f080c281be0bce50c1e6d76}
+
+
+Definition at line 1205 of file calc\-\_\-chemscore.\-f90.
+
+
+
+References distsq().
+
+
+
+Referenced by calc\-\_\-xscore\-::angle(), md\-::angle(), prep\-::angle\-\_\-ene(), calc\-\_\-xscore\-::angle\-\_\-of\-\_\-two\-\_\-vectors(), g2\-\_\-hb(), prep\-::genh(), calc\-\_\-xscore\-::hbond\-\_\-value\-\_\-hbond\-\_\-2(), md\-::init\-\_\-shake(), calc\-\_\-xscore\-::ligand\-\_\-sum\-\_\-hbonds(), calc\-\_\-pmf\-::pmfangle\-\_\-of\-\_\-two\-\_\-vectors(), and md\-::pot\-\_\-energy\-\_\-bonds().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_a8af51a917f080c281be0bce50c1e6d76_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classcalc__chemscore_ac93b5a3a788abe9cc8dc2e98dc9c50bc}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!calc\-\_\-hbonds@{calc\-\_\-hbonds}}
+\index{calc\-\_\-hbonds@{calc\-\_\-hbonds}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{calc\-\_\-hbonds}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-chemscore\-::calc\-\_\-hbonds (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_ac93b5a3a788abe9cc8dc2e98dc9c50bc}
+
+
+Definition at line 219 of file calc\-\_\-chemscore.\-f90.
+
+
+
+References g1\-\_\-hb(), and g2\-\_\-hb().
+
+
+
+Referenced by calc\-\_\-scores().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_ac93b5a3a788abe9cc8dc2e98dc9c50bc_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_ac93b5a3a788abe9cc8dc2e98dc9c50bc_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__chemscore_a6b8b6af53a8f99ef2db73dd097e88729}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!calc\-\_\-lipo@{calc\-\_\-lipo}}
+\index{calc\-\_\-lipo@{calc\-\_\-lipo}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{calc\-\_\-lipo}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-chemscore\-::calc\-\_\-lipo (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_a6b8b6af53a8f99ef2db73dd097e88729}
+
+
+Definition at line 243 of file calc\-\_\-chemscore.\-f90.
+
+
+
+References fr\-\_\-lip().
+
+
+
+Referenced by calc\-\_\-scores().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_a6b8b6af53a8f99ef2db73dd097e88729_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_a6b8b6af53a8f99ef2db73dd097e88729_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__chemscore_a6755b67dc877c9ed91725640f577d272}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!calc\-\_\-metals@{calc\-\_\-metals}}
+\index{calc\-\_\-metals@{calc\-\_\-metals}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{calc\-\_\-metals}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-chemscore\-::calc\-\_\-metals (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_a6755b67dc877c9ed91725640f577d272}
+
+
+Definition at line 258 of file calc\-\_\-chemscore.\-f90.
+
+
+
+References fr\-\_\-met().
+
+
+
+Referenced by calc\-\_\-scores().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_a6755b67dc877c9ed91725640f577d272_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_a6755b67dc877c9ed91725640f577d272_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__chemscore_af574f7169a6f5779bb0f7b26b3377e81}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!calc\-\_\-rot@{calc\-\_\-rot}}
+\index{calc\-\_\-rot@{calc\-\_\-rot}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{calc\-\_\-rot}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-chemscore\-::calc\-\_\-rot (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_af574f7169a6f5779bb0f7b26b3377e81}
+
+
+Definition at line 272 of file calc\-\_\-chemscore.\-f90.
+
+
+
+Referenced by calc\-\_\-scores().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_af574f7169a6f5779bb0f7b26b3377e81_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__chemscore_ac685deaa80ea9769e36c6b9ac8c8462d}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!calc\-\_\-scores@{calc\-\_\-scores}}
+\index{calc\-\_\-scores@{calc\-\_\-scores}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{calc\-\_\-scores}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-chemscore\-::calc\-\_\-scores (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_ac685deaa80ea9769e36c6b9ac8c8462d}
+
+
+Definition at line 297 of file calc\-\_\-chemscore.\-f90.
+
+
+
+References calc\-\_\-hbonds(), calc\-\_\-lipo(), calc\-\_\-metals(), calc\-\_\-rot(), frozen(), q\-\_\-contacts(), and set\-\_\-waters().
+
+
+
+Referenced by score\-\_\-calc(), and score\-\_\-precalc().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_ac685deaa80ea9769e36c6b9ac8c8462d_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__chemscore_ae933b171a206adf49ec5cde460082f5a}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!chemscore\-\_\-finalize@{chemscore\-\_\-finalize}}
+\index{chemscore\-\_\-finalize@{chemscore\-\_\-finalize}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{chemscore\-\_\-finalize}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-chemscore\-::chemscore\-\_\-finalize (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_ae933b171a206adf49ec5cde460082f5a}
+
+
+Definition at line 176 of file calc\-\_\-chemscore.\-f90.
+
+
+
+Referenced by finalize().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classcalc__chemscore_afa2b8e0f000132f3f983c3781cc16115}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!count\-\_\-qlipo@{count\-\_\-qlipo}}
+\index{count\-\_\-qlipo@{count\-\_\-qlipo}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{count\-\_\-qlipo}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-chemscore\-::count\-\_\-qlipo (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_afa2b8e0f000132f3f983c3781cc16115}
+
+
+Definition at line 310 of file calc\-\_\-chemscore.\-f90.
+
+
+
+References lip\-\_\-atom().
+
+
+
+Referenced by set\-\_\-ligand().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_afa2b8e0f000132f3f983c3781cc16115_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_afa2b8e0f000132f3f983c3781cc16115_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__chemscore_aae7e243df77ac184d4fcd6cff5b0c0f2}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!dist@{dist}}
+\index{dist@{dist}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{dist}]{\setlength{\rightskip}{0pt plus 5cm}real function calc\-\_\-chemscore\-::dist (
+\begin{DoxyParamCaption}
+\item[{integer}]{a, }
+\item[{integer}]{b}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_aae7e243df77ac184d4fcd6cff5b0c0f2}
+
+
+Definition at line 1225 of file calc\-\_\-chemscore.\-f90.
+
+
+
+Referenced by fr\-\_\-lip(), fr\-\_\-met(), g1\-\_\-hb(), q\-\_\-contacts(), and calc\-\_\-rdf\-::rdf\-\_\-calc().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_aae7e243df77ac184d4fcd6cff5b0c0f2_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__chemscore_a0538eec23e42416be4896f6501beec20}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!distsq@{distsq}}
+\index{distsq@{distsq}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{distsq}]{\setlength{\rightskip}{0pt plus 5cm}real function calc\-\_\-chemscore\-::distsq (
+\begin{DoxyParamCaption}
+\item[{integer}]{a, }
+\item[{integer}]{b}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_a0538eec23e42416be4896f6501beec20}
+
+
+Definition at line 1240 of file calc\-\_\-chemscore.\-f90.
+
+
+
+Referenced by angle().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classcalc__chemscore_a95aa01634744dda8ac3af377750a6de1}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!find\-\_\-contact@{find\-\_\-contact}}
+\index{find\-\_\-contact@{find\-\_\-contact}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{find\-\_\-contact}]{\setlength{\rightskip}{0pt plus 5cm}recursive function calc\-\_\-chemscore\-::find\-\_\-contact (
+\begin{DoxyParamCaption}
+\item[{type({\bf q\-\_\-atom}), pointer}]{atom}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_a95aa01634744dda8ac3af377750a6de1}
+
+
+Definition at line 403 of file calc\-\_\-chemscore.\-f90.
+
+
+
+References md\-::bond().
+
+
+
+Referenced by frozen().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classcalc__chemscore_aa375f714a981f45d8700a8ad88e7a000}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!fr\-\_\-lip@{fr\-\_\-lip}}
+\index{fr\-\_\-lip@{fr\-\_\-lip}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{fr\-\_\-lip}]{\setlength{\rightskip}{0pt plus 5cm}real function calc\-\_\-chemscore\-::fr\-\_\-lip (
+\begin{DoxyParamCaption}
+\item[{integer}]{a, }
+\item[{integer}]{b}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_aa375f714a981f45d8700a8ad88e7a000}
+
+
+Definition at line 1256 of file calc\-\_\-chemscore.\-f90.
+
+
+
+References dist().
+
+
+
+Referenced by calc\-\_\-lipo().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=342pt]{classcalc__chemscore_aa375f714a981f45d8700a8ad88e7a000_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_aa375f714a981f45d8700a8ad88e7a000_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__chemscore_a3ce8ab0790256615b1d72e31ab89ce59}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!fr\-\_\-met@{fr\-\_\-met}}
+\index{fr\-\_\-met@{fr\-\_\-met}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{fr\-\_\-met}]{\setlength{\rightskip}{0pt plus 5cm}real function calc\-\_\-chemscore\-::fr\-\_\-met (
+\begin{DoxyParamCaption}
+\item[{integer}]{a, }
+\item[{integer}]{b}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_a3ce8ab0790256615b1d72e31ab89ce59}
+
+
+Definition at line 1279 of file calc\-\_\-chemscore.\-f90.
+
+
+
+References dist().
+
+
+
+Referenced by calc\-\_\-metals().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=349pt]{classcalc__chemscore_a3ce8ab0790256615b1d72e31ab89ce59_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_a3ce8ab0790256615b1d72e31ab89ce59_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__chemscore_a69331a1a41dd3b2dd7c69f272d87ebc5}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!frozen@{frozen}}
+\index{frozen@{frozen}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{frozen}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-chemscore\-::frozen (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_a69331a1a41dd3b2dd7c69f272d87ebc5}
+
+
+Definition at line 381 of file calc\-\_\-chemscore.\-f90.
+
+
+
+References md\-::bond(), and find\-\_\-contact().
+
+
+
+Referenced by calc\-\_\-scores().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_a69331a1a41dd3b2dd7c69f272d87ebc5_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__chemscore_a43c74c5136c8bd28466d9be8129c0c41}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!g1\-\_\-hb@{g1\-\_\-hb}}
+\index{g1\-\_\-hb@{g1\-\_\-hb}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{g1\-\_\-hb}]{\setlength{\rightskip}{0pt plus 5cm}real function calc\-\_\-chemscore\-::g1\-\_\-hb (
+\begin{DoxyParamCaption}
+\item[{integer}]{a, }
+\item[{integer}]{b}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_a43c74c5136c8bd28466d9be8129c0c41}
+
+
+Definition at line 1297 of file calc\-\_\-chemscore.\-f90.
+
+
+
+References dist().
+
+
+
+Referenced by calc\-\_\-hbonds(), and score\-\_\-waters().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=348pt]{classcalc__chemscore_a43c74c5136c8bd28466d9be8129c0c41_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_a43c74c5136c8bd28466d9be8129c0c41_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__chemscore_ad76a52480cfdcf6a556fd98bab1a3f5a}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!g2\-\_\-hb@{g2\-\_\-hb}}
+\index{g2\-\_\-hb@{g2\-\_\-hb}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{g2\-\_\-hb}]{\setlength{\rightskip}{0pt plus 5cm}real function calc\-\_\-chemscore\-::g2\-\_\-hb (
+\begin{DoxyParamCaption}
+\item[{integer}]{a, }
+\item[{integer}]{b, }
+\item[{integer}]{c}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_ad76a52480cfdcf6a556fd98bab1a3f5a}
+
+
+Definition at line 1318 of file calc\-\_\-chemscore.\-f90.
+
+
+
+References angle().
+
+
+
+Referenced by calc\-\_\-hbonds(), and score\-\_\-waters().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_ad76a52480cfdcf6a556fd98bab1a3f5a_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_ad76a52480cfdcf6a556fd98bab1a3f5a_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__chemscore_a4f53ad3d13e7c23d47c94a6a882e6bd8}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!get\-\_\-atom\-\_\-data@{get\-\_\-atom\-\_\-data}}
+\index{get\-\_\-atom\-\_\-data@{get\-\_\-atom\-\_\-data}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{get\-\_\-atom\-\_\-data}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-chemscore\-::get\-\_\-atom\-\_\-data (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_a4f53ad3d13e7c23d47c94a6a882e6bd8}
+
+
+Definition at line 440 of file calc\-\_\-chemscore.\-f90.
+
+
+
+References indexer\-::index\-\_\-get(), prmfile\-::prm\-\_\-get\-\_\-line(), prmfile\-::prm\-\_\-get\-\_\-string\-\_\-real(), and prmfile\-::prm\-\_\-open\-\_\-section().
+
+
+
+Referenced by start().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classcalc__chemscore_a8c71c15529a582f52f4d152db39e0704}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!lip\-\_\-atom@{lip\-\_\-atom}}
+\index{lip\-\_\-atom@{lip\-\_\-atom}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{lip\-\_\-atom}]{\setlength{\rightskip}{0pt plus 5cm}recursive function calc\-\_\-chemscore\-::lip\-\_\-atom (
+\begin{DoxyParamCaption}
+\item[{type({\bf q\-\_\-atom}), pointer}]{atom}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_a8c71c15529a582f52f4d152db39e0704}
+
+
+Definition at line 337 of file calc\-\_\-chemscore.\-f90.
+
+
+
+References md\-::bond().
+
+
+
+Referenced by count\-\_\-qlipo().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=306pt]{classcalc__chemscore_a8c71c15529a582f52f4d152db39e0704_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_a8c71c15529a582f52f4d152db39e0704_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__chemscore_ac981dadd7632147eefe3240bada21d79}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!log\-\_\-frame@{log\-\_\-frame}}
+\index{log\-\_\-frame@{log\-\_\-frame}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{log\-\_\-frame}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-chemscore\-::log\-\_\-frame (
+\begin{DoxyParamCaption}
+\item[{integer, intent(in)}]{i\-Frame}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_ac981dadd7632147eefe3240bada21d79}
+
+
+Definition at line 184 of file calc\-\_\-chemscore.\-f90.
+
+
+
+Referenced by score\-\_\-calc().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_ac981dadd7632147eefe3240bada21d79_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__chemscore_a4bb62e49849feeae28e33973facd130e}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!make\-\_\-tac\-\_\-index@{make\-\_\-tac\-\_\-index}}
+\index{make\-\_\-tac\-\_\-index@{make\-\_\-tac\-\_\-index}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{make\-\_\-tac\-\_\-index}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-chemscore\-::make\-\_\-tac\-\_\-index (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_a4bb62e49849feeae28e33973facd130e}
+
+
+Definition at line 506 of file calc\-\_\-chemscore.\-f90.
+
+
+
+References indexer\-::index\-\_\-add(), and indexer\-::index\-\_\-create().
+
+
+
+Referenced by start().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_a4bb62e49849feeae28e33973facd130e_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classcalc__chemscore_a414b73e7646faa655654d38f811747f4}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!mark\-\_\-ring@{mark\-\_\-ring}}
+\index{mark\-\_\-ring@{mark\-\_\-ring}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{mark\-\_\-ring}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-chemscore\-::mark\-\_\-ring (
+\begin{DoxyParamCaption}
+\item[{type({\bf q\-\_\-bond}), pointer}]{bond, }
+\item[{integer}]{ir}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_a414b73e7646faa655654d38f811747f4}
+
+
+Definition at line 779 of file calc\-\_\-chemscore.\-f90.
+
+
+
+References md\-::bond(), and trace\-\_\-ring().
+
+
+
+Referenced by search\-\_\-ring().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_a414b73e7646faa655654d38f811747f4_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_a414b73e7646faa655654d38f811747f4_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__chemscore_a92a6bfaa5082d7b7d825e44c40226307}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!q\-\_\-contacts@{q\-\_\-contacts}}
+\index{q\-\_\-contacts@{q\-\_\-contacts}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{q\-\_\-contacts}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-chemscore\-::q\-\_\-contacts (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_a92a6bfaa5082d7b7d825e44c40226307}
+
+
+Definition at line 518 of file calc\-\_\-chemscore.\-f90.
+
+
+
+References dist(), and calc\-\_\-xscore\-::distance().
+
+
+
+Referenced by calc\-\_\-scores().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_a92a6bfaa5082d7b7d825e44c40226307_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_a92a6bfaa5082d7b7d825e44c40226307_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__chemscore_a2e6ad5279a8abd4f97d64943f783bc61}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!q\-\_\-types@{q\-\_\-types}}
+\index{q\-\_\-types@{q\-\_\-types}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{q\-\_\-types}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-chemscore\-::q\-\_\-types (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_a2e6ad5279a8abd4f97d64943f783bc61}
+
+
+Definition at line 541 of file calc\-\_\-chemscore.\-f90.
+
+
+
+Referenced by set\-\_\-ligand().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_a2e6ad5279a8abd4f97d64943f783bc61_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__chemscore_a01a080b62749ee18b509448a22380c13}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!report\-\_\-ligand@{report\-\_\-ligand}}
+\index{report\-\_\-ligand@{report\-\_\-ligand}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{report\-\_\-ligand}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-chemscore\-::report\-\_\-ligand (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_a01a080b62749ee18b509448a22380c13}
+
+
+Definition at line 595 of file calc\-\_\-chemscore.\-f90.
+
+
+
+Referenced by score\-\_\-precalc().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_a01a080b62749ee18b509448a22380c13_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__chemscore_af79fd6a521299e01b74e8d9ec1c113fe}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!report\-\_\-protein@{report\-\_\-protein}}
+\index{report\-\_\-protein@{report\-\_\-protein}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{report\-\_\-protein}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-chemscore\-::report\-\_\-protein (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_af79fd6a521299e01b74e8d9ec1c113fe}
+
+
+Definition at line 634 of file calc\-\_\-chemscore.\-f90.
+
+
+
+Referenced by score\-\_\-precalc().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_af79fd6a521299e01b74e8d9ec1c113fe_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__chemscore_a96f372948049119e39d151b115758321}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!report\-\_\-rings@{report\-\_\-rings}}
+\index{report\-\_\-rings@{report\-\_\-rings}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{report\-\_\-rings}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-chemscore\-::report\-\_\-rings (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_a96f372948049119e39d151b115758321}
+
+
+Definition at line 648 of file calc\-\_\-chemscore.\-f90.
+
+
+
+Referenced by score\-\_\-precalc().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_a96f372948049119e39d151b115758321_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__chemscore_a8b10ac4feeec194f53ba62db0a28cd6c}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!reset\-\_\-waters@{reset\-\_\-waters}}
+\index{reset\-\_\-waters@{reset\-\_\-waters}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{reset\-\_\-waters}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-chemscore\-::reset\-\_\-waters (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_a8b10ac4feeec194f53ba62db0a28cd6c}
+
+
+Definition at line 664 of file calc\-\_\-chemscore.\-f90.
+
+
+
+Referenced by set\-\_\-waters().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_a8b10ac4feeec194f53ba62db0a28cd6c_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__chemscore_a8ac120993f6d7fd6a2d13d1de1ef8a04}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!score\-\_\-add@{score\-\_\-add}}
+\index{score\-\_\-add@{score\-\_\-add}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{score\-\_\-add}]{\setlength{\rightskip}{0pt plus 5cm}integer function calc\-\_\-chemscore\-::score\-\_\-add (
+\begin{DoxyParamCaption}
+\item[{character($\ast$)}]{desc}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_a8ac120993f6d7fd6a2d13d1de1ef8a04}
+
+
+Definition at line 1366 of file calc\-\_\-chemscore.\-f90.
+
+
+
+References misc\-::getlin(), misc\-::locase(), atom\-\_\-mask\-::mask\-\_\-finalize(), atom\-\_\-mask\-::mask\-\_\-initialize(), and maskmanip\-::maskmanip\-\_\-make().
+
+
+
+Referenced by add\-\_\-a\-\_\-calc().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_a8ac120993f6d7fd6a2d13d1de1ef8a04_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__chemscore_a678c1ccc18920a66c00a8fe528997561}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!score\-\_\-calc@{score\-\_\-calc}}
+\index{score\-\_\-calc@{score\-\_\-calc}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{score\-\_\-calc}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-chemscore\-::score\-\_\-calc (
+\begin{DoxyParamCaption}
+\item[{integer, intent(in)}]{i\-Calc, }
+\item[{integer, intent(in)}]{i\-Frame}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_a678c1ccc18920a66c00a8fe528997561}
+
+
+Definition at line 1455 of file calc\-\_\-chemscore.\-f90.
+
+
+
+References calc\-\_\-scores(), and log\-\_\-frame().
+
+
+
+Referenced by calc\-\_\-all().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_a678c1ccc18920a66c00a8fe528997561_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__chemscore_a281f50164f92a72afef6055495578adb}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!score\-\_\-heading@{score\-\_\-heading}}
+\index{score\-\_\-heading@{score\-\_\-heading}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{score\-\_\-heading}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-chemscore\-::score\-\_\-heading (
+\begin{DoxyParamCaption}
+\item[{integer}]{i}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_a281f50164f92a72afef6055495578adb}
+
+
+Definition at line 210 of file calc\-\_\-chemscore.\-f90.
+
+
+
+Referenced by print\-\_\-headings().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=317pt]{classcalc__chemscore_a281f50164f92a72afef6055495578adb_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__chemscore_af6e984aa1653e69de2ec2a501c90913d}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!score\-\_\-initialize@{score\-\_\-initialize}}
+\index{score\-\_\-initialize@{score\-\_\-initialize}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{score\-\_\-initialize}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-chemscore\-::score\-\_\-initialize (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_af6e984aa1653e69de2ec2a501c90913d}
+
+
+Definition at line 170 of file calc\-\_\-chemscore.\-f90.
+
+
+
+Referenced by initialize().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_af6e984aa1653e69de2ec2a501c90913d_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__chemscore_a745d266685ca3b123d11d20d0baf1dec}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!score\-\_\-mean@{score\-\_\-mean}}
+\index{score\-\_\-mean@{score\-\_\-mean}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{score\-\_\-mean}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-chemscore\-::score\-\_\-mean (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_a745d266685ca3b123d11d20d0baf1dec}
+
+
+Definition at line 1419 of file calc\-\_\-chemscore.\-f90.
+
+
+
+Referenced by make\-\_\-mean\-\_\-all().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classcalc__chemscore_a1dbdeb7c4eb3b9068a041f3b08224417}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!score\-\_\-precalc@{score\-\_\-precalc}}
+\index{score\-\_\-precalc@{score\-\_\-precalc}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{score\-\_\-precalc}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-chemscore\-::score\-\_\-precalc (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_a1dbdeb7c4eb3b9068a041f3b08224417}
+
+
+Definition at line 1337 of file calc\-\_\-chemscore.\-f90.
+
+
+
+References calc\-\_\-scores(), misc\-::centered\-\_\-heading(), report\-\_\-ligand(), report\-\_\-protein(), report\-\_\-rings(), set\-\_\-ligand(), and start().
+
+
+
+Referenced by do\-\_\-pre\-\_\-calcs().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=311pt]{classcalc__chemscore_a1dbdeb7c4eb3b9068a041f3b08224417_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__chemscore_acdc0c2f07cc5b0046e6fa9acf7cbfa20}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!score\-\_\-waters@{score\-\_\-waters}}
+\index{score\-\_\-waters@{score\-\_\-waters}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{score\-\_\-waters}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-chemscore\-::score\-\_\-waters (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_acdc0c2f07cc5b0046e6fa9acf7cbfa20}
+
+
+Definition at line 672 of file calc\-\_\-chemscore.\-f90.
+
+
+
+References g1\-\_\-hb(), and g2\-\_\-hb().
+
+
+
+Referenced by set\-\_\-waters().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_acdc0c2f07cc5b0046e6fa9acf7cbfa20_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_acdc0c2f07cc5b0046e6fa9acf7cbfa20_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__chemscore_a52f0eaac7653260916cc115ae99209b1}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!search\-\_\-ring@{search\-\_\-ring}}
+\index{search\-\_\-ring@{search\-\_\-ring}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{search\-\_\-ring}]{\setlength{\rightskip}{0pt plus 5cm}recursive subroutine calc\-\_\-chemscore\-::search\-\_\-ring (
+\begin{DoxyParamCaption}
+\item[{type({\bf q\-\_\-bond}), pointer}]{bond, }
+\item[{integer}]{ir}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_a52f0eaac7653260916cc115ae99209b1}
+
+
+Definition at line 745 of file calc\-\_\-chemscore.\-f90.
+
+
+
+References md\-::bond(), and mark\-\_\-ring().
+
+
+
+Referenced by set\-\_\-rings().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_a52f0eaac7653260916cc115ae99209b1_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_a52f0eaac7653260916cc115ae99209b1_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__chemscore_a1a0ba4ea42a592ed4c0017e204372e0b}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!set\-\_\-ligand@{set\-\_\-ligand}}
+\index{set\-\_\-ligand@{set\-\_\-ligand}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{set\-\_\-ligand}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-chemscore\-::set\-\_\-ligand (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_a1a0ba4ea42a592ed4c0017e204372e0b}
+
+
+Definition at line 700 of file calc\-\_\-chemscore.\-f90.
+
+
+
+References count\-\_\-qlipo(), q\-\_\-types(), set\-\_\-rings(), and set\-\_\-rotatable().
+
+
+
+Referenced by score\-\_\-precalc().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_a1a0ba4ea42a592ed4c0017e204372e0b_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_a1a0ba4ea42a592ed4c0017e204372e0b_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__chemscore_ace212f3ac54af67d6c9b4219bcfe2f54}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!set\-\_\-rings@{set\-\_\-rings}}
+\index{set\-\_\-rings@{set\-\_\-rings}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{set\-\_\-rings}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-chemscore\-::set\-\_\-rings (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_ace212f3ac54af67d6c9b4219bcfe2f54}
+
+
+Definition at line 707 of file calc\-\_\-chemscore.\-f90.
+
+
+
+References search\-\_\-ring().
+
+
+
+Referenced by set\-\_\-ligand().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_ace212f3ac54af67d6c9b4219bcfe2f54_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_ace212f3ac54af67d6c9b4219bcfe2f54_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__chemscore_a83a9746853c3430bcb4548f1e5c88b90}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!set\-\_\-rotatable@{set\-\_\-rotatable}}
+\index{set\-\_\-rotatable@{set\-\_\-rotatable}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{set\-\_\-rotatable}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-chemscore\-::set\-\_\-rotatable (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_a83a9746853c3430bcb4548f1e5c88b90}
+
+
+Definition at line 837 of file calc\-\_\-chemscore.\-f90.
+
+
+
+Referenced by set\-\_\-ligand().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_a83a9746853c3430bcb4548f1e5c88b90_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__chemscore_a81ef9a983f650189ae781ea35f2d2699}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!set\-\_\-waters@{set\-\_\-waters}}
+\index{set\-\_\-waters@{set\-\_\-waters}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{set\-\_\-waters}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-chemscore\-::set\-\_\-waters (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_a81ef9a983f650189ae781ea35f2d2699}
+
+
+Definition at line 862 of file calc\-\_\-chemscore.\-f90.
+
+
+
+References reset\-\_\-waters(), score\-\_\-waters(), and sort\-\_\-waters().
+
+
+
+Referenced by calc\-\_\-scores().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_a81ef9a983f650189ae781ea35f2d2699_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_a81ef9a983f650189ae781ea35f2d2699_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__chemscore_a5612ee8ef3d2f944d4d10d6fd62e86f0}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!sort\-\_\-atoms@{sort\-\_\-atoms}}
+\index{sort\-\_\-atoms@{sort\-\_\-atoms}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{sort\-\_\-atoms}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-chemscore\-::sort\-\_\-atoms (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_a5612ee8ef3d2f944d4d10d6fd62e86f0}
+
+
+Definition at line 869 of file calc\-\_\-chemscore.\-f90.
+
+
+
+Referenced by start().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classcalc__chemscore_a02f4a93c7e3a6a2621b7574617ce0775}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!sort\-\_\-bonds@{sort\-\_\-bonds}}
+\index{sort\-\_\-bonds@{sort\-\_\-bonds}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{sort\-\_\-bonds}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-chemscore\-::sort\-\_\-bonds (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_a02f4a93c7e3a6a2621b7574617ce0775}
+
+
+Definition at line 928 of file calc\-\_\-chemscore.\-f90.
+
+
+
+Referenced by start().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classcalc__chemscore_a340ee3d9ab3aefb6311490a3780ba4c8}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!sort\-\_\-waters@{sort\-\_\-waters}}
+\index{sort\-\_\-waters@{sort\-\_\-waters}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{sort\-\_\-waters}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-chemscore\-::sort\-\_\-waters (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_a340ee3d9ab3aefb6311490a3780ba4c8}
+
+
+Definition at line 1119 of file calc\-\_\-chemscore.\-f90.
+
+
+
+Referenced by set\-\_\-waters().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_a340ee3d9ab3aefb6311490a3780ba4c8_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__chemscore_af43d8e5ae35fc5fd588eae032d48cb51}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!start@{start}}
+\index{start@{start}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{start}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-chemscore\-::start (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_af43d8e5ae35fc5fd588eae032d48cb51}
+
+
+Definition at line 1140 of file calc\-\_\-chemscore.\-f90.
+
+
+
+References misc\-::centered\-\_\-heading(), get\-\_\-atom\-\_\-data(), make\-\_\-tac\-\_\-index(), qatom\-::qatom\-\_\-load\-\_\-atoms(), sort\-\_\-atoms(), sort\-\_\-bonds(), and store\-\_\-waters().
+
+
+
+Referenced by prmfile\-::load(), calc\-\_\-pmf\-::pmfatom\-\_\-walk(), score\-\_\-precalc(), and misc\-::string\-\_\-part().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classcalc__chemscore_a9ee63e29d215e66459adea3d67c95cfc}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!store\-\_\-waters@{store\-\_\-waters}}
+\index{store\-\_\-waters@{store\-\_\-waters}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{store\-\_\-waters}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-chemscore\-::store\-\_\-waters (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_a9ee63e29d215e66459adea3d67c95cfc}
+
+
+Definition at line 1190 of file calc\-\_\-chemscore.\-f90.
+
+
+
+Referenced by start().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classcalc__chemscore_abfb55febeb0d91f6e19fc431c096e3d8}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!trace\-\_\-ring@{trace\-\_\-ring}}
+\index{trace\-\_\-ring@{trace\-\_\-ring}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{trace\-\_\-ring}]{\setlength{\rightskip}{0pt plus 5cm}recursive function calc\-\_\-chemscore\-::trace\-\_\-ring (
+\begin{DoxyParamCaption}
+\item[{type({\bf q\-\_\-atom}), pointer}]{atom, }
+\item[{integer}]{ir}
+\end{DoxyParamCaption}
+)}}\label{classcalc__chemscore_abfb55febeb0d91f6e19fc431c096e3d8}
+
+
+Definition at line 795 of file calc\-\_\-chemscore.\-f90.
+
+
+
+References md\-::bond().
+
+
+
+Referenced by mark\-\_\-ring().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{classcalc__chemscore_abfb55febeb0d91f6e19fc431c096e3d8_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__chemscore_abfb55febeb0d91f6e19fc431c096e3d8_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Data Documentation}
+\hypertarget{classcalc__chemscore_ab0714dffb0d2349340f52b46a349c063}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!acceptor@{acceptor}}
+\index{acceptor@{acceptor}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{acceptor}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter calc\-\_\-chemscore\-::acceptor =4}}\label{classcalc__chemscore_ab0714dffb0d2349340f52b46a349c063}
+
+
+Definition at line 122 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a586a968234f3a2338f8f7a045122ccb7}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!aprecalc@{aprecalc}}
+\index{aprecalc@{aprecalc}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{aprecalc}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf score\-\_\-precalc\-\_\-type}), dimension(\-:), pointer, private calc\-\_\-chemscore\-::aprecalc\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__chemscore_a586a968234f3a2338f8f7a045122ccb7}
+
+
+Definition at line 43 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_ab15cb5a3ebf1b4cff3c3a65acbf76159}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!ascore@{ascore}}
+\index{ascore@{ascore}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{ascore}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf score\-\_\-type}), dimension(\-:), pointer, private calc\-\_\-chemscore\-::ascore\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__chemscore_ab15cb5a3ebf1b4cff3c3a65acbf76159}
+
+
+Definition at line 47 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a4de84d0dd19f0b32599251fb0812813c}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!atom\-\_\-data@{atom\-\_\-data}}
+\index{atom\-\_\-data@{atom\-\_\-data}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{atom\-\_\-data}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf atom\-\_\-data\-\_\-type}), dimension(\-:), allocatable calc\-\_\-chemscore\-::atom\-\_\-data}}\label{classcalc__chemscore_a4de84d0dd19f0b32599251fb0812813c}
+
+
+Definition at line 146 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_ae6953c3a16fa9621b6b6c4686a740711}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!atom\-\_\-data\-\_\-file@{atom\-\_\-data\-\_\-file}}
+\index{atom\-\_\-data\-\_\-file@{atom\-\_\-data\-\_\-file}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{atom\-\_\-data\-\_\-file}]{\setlength{\rightskip}{0pt plus 5cm}character$\ast$80 calc\-\_\-chemscore\-::atom\-\_\-data\-\_\-file}}\label{classcalc__chemscore_ae6953c3a16fa9621b6b6c4686a740711}
+
+
+Definition at line 154 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_aaefd70da86dc7e096e752cb92073e59a}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!bdotopcalc@{bdotopcalc}}
+\index{bdotopcalc@{bdotopcalc}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{bdotopcalc}]{\setlength{\rightskip}{0pt plus 5cm}integer, private calc\-\_\-chemscore\-::bdotopcalc\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__chemscore_aaefd70da86dc7e096e752cb92073e59a}
+
+
+Definition at line 161 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a33ff8ef2871f086a64634d3af142e368}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!busexin@{busexin}}
+\index{busexin@{busexin}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{busexin}]{\setlength{\rightskip}{0pt plus 5cm}logical, private calc\-\_\-chemscore\-::busexin = .false.\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__chemscore_a33ff8ef2871f086a64634d3af142e368}
+
+
+Definition at line 164 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a24ac03a6e52902f5474d7bf0636d1b8d}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!carbon\-\_\-lipo@{carbon\-\_\-lipo}}
+\index{carbon\-\_\-lipo@{carbon\-\_\-lipo}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{carbon\-\_\-lipo}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter calc\-\_\-chemscore\-::carbon\-\_\-lipo =11}}\label{classcalc__chemscore_a24ac03a6e52902f5474d7bf0636d1b8d}
+
+
+Definition at line 124 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_af75eb4e985bdc19e748fddbce9488d0e}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!carbonyl\-\_\-carbon@{carbonyl\-\_\-carbon}}
+\index{carbonyl\-\_\-carbon@{carbonyl\-\_\-carbon}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{carbonyl\-\_\-carbon}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter calc\-\_\-chemscore\-::carbonyl\-\_\-carbon =12}}\label{classcalc__chemscore_af75eb4e985bdc19e748fddbce9488d0e}
+
+
+Definition at line 125 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a9da5d81c112c26d8c8911ad5c100be1b}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!carbonyl\-\_\-oxygen@{carbonyl\-\_\-oxygen}}
+\index{carbonyl\-\_\-oxygen@{carbonyl\-\_\-oxygen}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{carbonyl\-\_\-oxygen}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter calc\-\_\-chemscore\-::carbonyl\-\_\-oxygen =13}}\label{classcalc__chemscore_a9da5d81c112c26d8c8911ad5c100be1b}
+
+
+Definition at line 125 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a7e693ad770c136c0edc287994e1f44e2}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!coord\-\_\-file@{coord\-\_\-file}}
+\index{coord\-\_\-file@{coord\-\_\-file}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{coord\-\_\-file}]{\setlength{\rightskip}{0pt plus 5cm}character$\ast$80 calc\-\_\-chemscore\-::coord\-\_\-file}}\label{classcalc__chemscore_a7e693ad770c136c0edc287994e1f44e2}
+
+
+Definition at line 155 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_ab1a63356a1ac975b5dd189e550e7e143}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!coords@{coords}}
+\index{coords@{coords}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{coords}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf score\-\_\-coord\-\_\-type}), dimension({\bf max\-\_\-masks}), private calc\-\_\-chemscore\-::coords\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__chemscore_ab1a63356a1ac975b5dd189e550e7e143}
+
+
+Definition at line 57 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a0700bbed17560b18c8a68cc8ede74f5e}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!dgconst@{dgconst}}
+\index{dgconst@{dgconst}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{dgconst}]{\setlength{\rightskip}{0pt plus 5cm}real, parameter calc\-\_\-chemscore\-::dgconst =-\/5.\-48}}\label{classcalc__chemscore_a0700bbed17560b18c8a68cc8ede74f5e}
+
+
+Definition at line 158 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a07cb5cb9cd2c15d9b1339e4212224011}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!dghbond@{dghbond}}
+\index{dghbond@{dghbond}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{dghbond}]{\setlength{\rightskip}{0pt plus 5cm}real, parameter calc\-\_\-chemscore\-::dghbond =-\/3.\-34}}\label{classcalc__chemscore_a07cb5cb9cd2c15d9b1339e4212224011}
+
+
+Definition at line 158 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a56c59d883c700c67655d80f08f9de928}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!dglipo@{dglipo}}
+\index{dglipo@{dglipo}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{dglipo}]{\setlength{\rightskip}{0pt plus 5cm}real, parameter calc\-\_\-chemscore\-::dglipo =-\/0.\-117}}\label{classcalc__chemscore_a56c59d883c700c67655d80f08f9de928}
+
+
+Definition at line 159 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a8e30cdec6eac436e2c66c8042077f8fd}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!dgmetal@{dgmetal}}
+\index{dgmetal@{dgmetal}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{dgmetal}]{\setlength{\rightskip}{0pt plus 5cm}real, parameter calc\-\_\-chemscore\-::dgmetal =-\/6.\-03}}\label{classcalc__chemscore_a8e30cdec6eac436e2c66c8042077f8fd}
+
+
+Definition at line 158 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a2ffd6fa0a78e73647da9a04acf90124e}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!dgrot@{dgrot}}
+\index{dgrot@{dgrot}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{dgrot}]{\setlength{\rightskip}{0pt plus 5cm}real, parameter calc\-\_\-chemscore\-::dgrot =2.\-56}}\label{classcalc__chemscore_a2ffd6fa0a78e73647da9a04acf90124e}
+
+
+Definition at line 159 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a8a0c88973d83ec082072a7115b8c0e45}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!fep\-\_\-file@{fep\-\_\-file}}
+\index{fep\-\_\-file@{fep\-\_\-file}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{fep\-\_\-file}]{\setlength{\rightskip}{0pt plus 5cm}character$\ast$80 calc\-\_\-chemscore\-::fep\-\_\-file}}\label{classcalc__chemscore_a8a0c88973d83ec082072a7115b8c0e45}
+
+
+Definition at line 23 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a7e04d3fd8fe18efe87ef287cc54572dd}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!file\-\_\-heading@{file\-\_\-heading}}
+\index{file\-\_\-heading@{file\-\_\-heading}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{file\-\_\-heading}]{\setlength{\rightskip}{0pt plus 5cm}character$\ast$($\ast$), dimension({\bf nprops}), parameter calc\-\_\-chemscore\-::file\-\_\-heading = \mbox{[} 'lipophilic '}}\label{classcalc__chemscore_a7e04d3fd8fe18efe87ef287cc54572dd}
+
+
+Definition at line 127 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a4cd182377bd9390c602bd0a0c169a345}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!frame@{frame}}
+\index{frame@{frame}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{frame}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-chemscore\-::frame}}\label{classcalc__chemscore_a4cd182377bd9390c602bd0a0c169a345}
+
+
+Definition at line 19 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_acd1541a9ea18346f52dd8b3d8690928b}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!hba\-\_\-l@{hba\-\_\-l}}
+\index{hba\-\_\-l@{hba\-\_\-l}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{hba\-\_\-l}]{\setlength{\rightskip}{0pt plus 5cm}integer(ai), dimension(\-:), allocatable calc\-\_\-chemscore\-::hba\-\_\-l}}\label{classcalc__chemscore_acd1541a9ea18346f52dd8b3d8690928b}
+
+
+Definition at line 105 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a2d5806a7dbd81e921bd36250e2c5e625}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!hba\-\_\-r@{hba\-\_\-r}}
+\index{hba\-\_\-r@{hba\-\_\-r}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{hba\-\_\-r}]{\setlength{\rightskip}{0pt plus 5cm}integer(ai), dimension(\-:), allocatable calc\-\_\-chemscore\-::hba\-\_\-r}}\label{classcalc__chemscore_a2d5806a7dbd81e921bd36250e2c5e625}
+
+
+Definition at line 104 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a38023298e024f0fc25e3f31f390cffb8}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!hbd\-\_\-l@{hbd\-\_\-l}}
+\index{hbd\-\_\-l@{hbd\-\_\-l}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{hbd\-\_\-l}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf donor}), dimension(\-:), allocatable calc\-\_\-chemscore\-::hbd\-\_\-l}}\label{classcalc__chemscore_a38023298e024f0fc25e3f31f390cffb8}
+
+
+Definition at line 103 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_aa414095b9d9b645a440912b5a2022214}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!hbd\-\_\-r@{hbd\-\_\-r}}
+\index{hbd\-\_\-r@{hbd\-\_\-r}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{hbd\-\_\-r}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf donor}), dimension(\-:), allocatable calc\-\_\-chemscore\-::hbd\-\_\-r}}\label{classcalc__chemscore_aa414095b9d9b645a440912b5a2022214}
+
+
+Definition at line 102 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a31441c347099258d0b25055878078c9f}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!hbond\-\_\-term@{hbond\-\_\-term}}
+\index{hbond\-\_\-term@{hbond\-\_\-term}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{hbond\-\_\-term}]{\setlength{\rightskip}{0pt plus 5cm}real calc\-\_\-chemscore\-::hbond\-\_\-term}}\label{classcalc__chemscore_a31441c347099258d0b25055878078c9f}
+
+
+Definition at line 157 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a828a4eeea12cf549672d73ad8c68c6c5}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!hydrogen@{hydrogen}}
+\index{hydrogen@{hydrogen}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{hydrogen}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter calc\-\_\-chemscore\-::hydrogen =9}}\label{classcalc__chemscore_a828a4eeea12cf549672d73ad8c68c6c5}
+
+
+Definition at line 124 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a5579c59a11b61014e8a2d04bd984678e}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!i@{i}}
+\index{i@{i}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{i}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-chemscore\-::i}}\label{classcalc__chemscore_a5579c59a11b61014e8a2d04bd984678e}
+
+
+Definition at line 21 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a55ea4b33c86233768f0a6f859c2023b6}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!iprecalc@{iprecalc}}
+\index{iprecalc@{iprecalc}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{iprecalc}]{\setlength{\rightskip}{0pt plus 5cm}integer, private calc\-\_\-chemscore\-::iprecalc\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__chemscore_a55ea4b33c86233768f0a6f859c2023b6}
+
+
+Definition at line 44 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_ab620b7f585ddb65438bfcf1bd78a83b0}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!iqatom@{iqatom}}
+\index{iqatom@{iqatom}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{iqatom}]{\setlength{\rightskip}{0pt plus 5cm}integer, dimension(\-:), allocatable calc\-\_\-chemscore\-::iqatom}}\label{classcalc__chemscore_ab620b7f585ddb65438bfcf1bd78a83b0}
+
+
+Definition at line 150 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_ae221adc2a0ae83b528c10fe7b2493c80}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!irestartcalc@{irestartcalc}}
+\index{irestartcalc@{irestartcalc}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{irestartcalc}]{\setlength{\rightskip}{0pt plus 5cm}integer, private calc\-\_\-chemscore\-::irestartcalc =-\/1\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__chemscore_ae221adc2a0ae83b528c10fe7b2493c80}
+
+
+Definition at line 162 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_aff9edea104beefd190c34dc9fd12a9b3}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!lipo@{lipo}}
+\index{lipo@{lipo}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{lipo}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter calc\-\_\-chemscore\-::lipo =1}}\label{classcalc__chemscore_aff9edea104beefd190c34dc9fd12a9b3}
+
+
+Definition at line 122 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a3ba58639189e7f54e3a4d95eff409d27}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!lipo\-\_\-term@{lipo\-\_\-term}}
+\index{lipo\-\_\-term@{lipo\-\_\-term}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{lipo\-\_\-term}]{\setlength{\rightskip}{0pt plus 5cm}real calc\-\_\-chemscore\-::lipo\-\_\-term}}\label{classcalc__chemscore_a3ba58639189e7f54e3a4d95eff409d27}
+
+
+Definition at line 157 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a39c1639390221a6c4a2a8edba8cb98cc}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!lph\-\_\-l@{lph\-\_\-l}}
+\index{lph\-\_\-l@{lph\-\_\-l}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{lph\-\_\-l}]{\setlength{\rightskip}{0pt plus 5cm}integer(ai), dimension(\-:), allocatable calc\-\_\-chemscore\-::lph\-\_\-l}}\label{classcalc__chemscore_a39c1639390221a6c4a2a8edba8cb98cc}
+
+
+Definition at line 101 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_ab1e216a48152826de41fffb5a9d2d48e}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!lph\-\_\-r@{lph\-\_\-r}}
+\index{lph\-\_\-r@{lph\-\_\-r}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{lph\-\_\-r}]{\setlength{\rightskip}{0pt plus 5cm}integer(ai), dimension(\-:), allocatable calc\-\_\-chemscore\-::lph\-\_\-r}}\label{classcalc__chemscore_ab1e216a48152826de41fffb5a9d2d48e}
+
+
+Definition at line 100 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_ae95a0840a35137beed3bcc7ff4345626}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!masks@{masks}}
+\index{masks@{masks}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{masks}]{\setlength{\rightskip}{0pt plus 5cm}type(mask\-\_\-type), dimension({\bf max\-\_\-masks}), target, private calc\-\_\-chemscore\-::masks\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__chemscore_ae95a0840a35137beed3bcc7ff4345626}
+
+
+Definition at line 50 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a035d2a19bada1d6c65c8ac2d7574c263}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!max\-\_\-masks@{max\-\_\-masks}}
+\index{max\-\_\-masks@{max\-\_\-masks}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{max\-\_\-masks}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter calc\-\_\-chemscore\-::max\-\_\-masks = 10}}\label{classcalc__chemscore_a035d2a19bada1d6c65c8ac2d7574c263}
+
+
+Definition at line 41 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a5bff437603dc25b9d5bd6537a8039f2d}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!maxprecalc@{maxprecalc}}
+\index{maxprecalc@{maxprecalc}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{maxprecalc}]{\setlength{\rightskip}{0pt plus 5cm}integer, private calc\-\_\-chemscore\-::maxprecalc\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__chemscore_a5bff437603dc25b9d5bd6537a8039f2d}
+
+
+Definition at line 45 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a17d6933892fcc2b0199a9946b8d761a3}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!maxscores@{maxscores}}
+\index{maxscores@{maxscores}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{maxscores}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-chemscore\-::maxscores}}\label{classcalc__chemscore_a17d6933892fcc2b0199a9946b8d761a3}
+
+
+Definition at line 48 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a8d928ea8b4d7dd3d55c900989dd2349a}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!met\-\_\-r@{met\-\_\-r}}
+\index{met\-\_\-r@{met\-\_\-r}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{met\-\_\-r}]{\setlength{\rightskip}{0pt plus 5cm}integer(ai), dimension(\-:), allocatable calc\-\_\-chemscore\-::met\-\_\-r}}\label{classcalc__chemscore_a8d928ea8b4d7dd3d55c900989dd2349a}
+
+
+Definition at line 106 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a9e666817bc6f8db23e5265e8192ffe0d}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!metal@{metal}}
+\index{metal@{metal}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{metal}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter calc\-\_\-chemscore\-::metal =2}}\label{classcalc__chemscore_a9e666817bc6f8db23e5265e8192ffe0d}
+
+
+Definition at line 122 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_ad0445c5c5fe8d2e46a1c07680f3d69d1}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!metal\-\_\-term@{metal\-\_\-term}}
+\index{metal\-\_\-term@{metal\-\_\-term}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{metal\-\_\-term}]{\setlength{\rightskip}{0pt plus 5cm}real calc\-\_\-chemscore\-::metal\-\_\-term}}\label{classcalc__chemscore_ad0445c5c5fe8d2e46a1c07680f3d69d1}
+
+
+Definition at line 157 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a1b8de903d8b742309e2a5fda2f90fe2e}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!nhba\-\_\-l@{nhba\-\_\-l}}
+\index{nhba\-\_\-l@{nhba\-\_\-l}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{nhba\-\_\-l}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-chemscore\-::nhba\-\_\-l}}\label{classcalc__chemscore_a1b8de903d8b742309e2a5fda2f90fe2e}
+
+
+Definition at line 117 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_afbfb586ffade33d234a7bce3ec4899e4}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!nhba\-\_\-prot@{nhba\-\_\-prot}}
+\index{nhba\-\_\-prot@{nhba\-\_\-prot}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{nhba\-\_\-prot}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-chemscore\-::nhba\-\_\-prot}}\label{classcalc__chemscore_afbfb586ffade33d234a7bce3ec4899e4}
+
+
+Definition at line 118 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a3ee7fc10e0807111d9574989ecc56269}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!nhba\-\_\-r@{nhba\-\_\-r}}
+\index{nhba\-\_\-r@{nhba\-\_\-r}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{nhba\-\_\-r}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-chemscore\-::nhba\-\_\-r}}\label{classcalc__chemscore_a3ee7fc10e0807111d9574989ecc56269}
+
+
+Definition at line 117 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a77e25979c44ad62df2302682ed5ce099}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!nhbd\-\_\-l@{nhbd\-\_\-l}}
+\index{nhbd\-\_\-l@{nhbd\-\_\-l}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{nhbd\-\_\-l}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-chemscore\-::nhbd\-\_\-l}}\label{classcalc__chemscore_a77e25979c44ad62df2302682ed5ce099}
+
+
+Definition at line 116 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a03c8c74285e823b77a4b9342b74063ef}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!nhbd\-\_\-prot@{nhbd\-\_\-prot}}
+\index{nhbd\-\_\-prot@{nhbd\-\_\-prot}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{nhbd\-\_\-prot}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-chemscore\-::nhbd\-\_\-prot}}\label{classcalc__chemscore_a03c8c74285e823b77a4b9342b74063ef}
+
+
+Definition at line 118 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a5bffc5652f8ffe498565f481d234250d}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!nhbd\-\_\-r@{nhbd\-\_\-r}}
+\index{nhbd\-\_\-r@{nhbd\-\_\-r}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{nhbd\-\_\-r}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-chemscore\-::nhbd\-\_\-r}}\label{classcalc__chemscore_a5bffc5652f8ffe498565f481d234250d}
+
+
+Definition at line 116 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a4eec2bd11c50bf788ae8928ba575fbef}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!nlph\-\_\-l@{nlph\-\_\-l}}
+\index{nlph\-\_\-l@{nlph\-\_\-l}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{nlph\-\_\-l}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-chemscore\-::nlph\-\_\-l}}\label{classcalc__chemscore_a4eec2bd11c50bf788ae8928ba575fbef}
+
+
+Definition at line 116 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a398cedd02c40d7f982a22ccc167e29f0}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!nlph\-\_\-r@{nlph\-\_\-r}}
+\index{nlph\-\_\-r@{nlph\-\_\-r}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{nlph\-\_\-r}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-chemscore\-::nlph\-\_\-r}}\label{classcalc__chemscore_a398cedd02c40d7f982a22ccc167e29f0}
+
+
+Definition at line 116 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a7a4e890daa5f6464f57b789a0a0a82a9}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!nmasks@{nmasks}}
+\index{nmasks@{nmasks}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{nmasks}]{\setlength{\rightskip}{0pt plus 5cm}integer, private calc\-\_\-chemscore\-::nmasks = 0\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__chemscore_a7a4e890daa5f6464f57b789a0a0a82a9}
+
+
+Definition at line 51 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_abc3a16c3de721ae16d616b77d7cceec2}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!nmet\-\_\-r@{nmet\-\_\-r}}
+\index{nmet\-\_\-r@{nmet\-\_\-r}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{nmet\-\_\-r}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-chemscore\-::nmet\-\_\-r}}\label{classcalc__chemscore_abc3a16c3de721ae16d616b77d7cceec2}
+
+
+Definition at line 117 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a21d027f3f912e3305b65b0db008c5053}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!nprops@{nprops}}
+\index{nprops@{nprops}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{nprops}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter calc\-\_\-chemscore\-::nprops =13}}\label{classcalc__chemscore_a21d027f3f912e3305b65b0db008c5053}
+
+
+Definition at line 126 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a95d0411713ed1669162b176b8fd96065}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!nqbonds@{nqbonds}}
+\index{nqbonds@{nqbonds}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{nqbonds}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-chemscore\-::nqbonds}}\label{classcalc__chemscore_a95d0411713ed1669162b176b8fd96065}
+
+
+Definition at line 117 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a86fcc5a701ba3b1900908778c29fccc1}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!nrings@{nrings}}
+\index{nrings@{nrings}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{nrings}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-chemscore\-::nrings}}\label{classcalc__chemscore_a86fcc5a701ba3b1900908778c29fccc1}
+
+
+Definition at line 119 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a410140d396d152254ee380ca143a2171}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!nscores@{nscores}}
+\index{nscores@{nscores}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{nscores}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-chemscore\-::nscores}}\label{classcalc__chemscore_a410140d396d152254ee380ca143a2171}
+
+
+Definition at line 48 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a9620ce63e8c0a9af29f2e28281526f61}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!nwaters@{nwaters}}
+\index{nwaters@{nwaters}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{nwaters}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-chemscore\-::nwaters}}\label{classcalc__chemscore_a9620ce63e8c0a9af29f2e28281526f61}
+
+
+Definition at line 117 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_aee2123f93427e62198b19acbe63a1a01}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!oxygen@{oxygen}}
+\index{oxygen@{oxygen}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{oxygen}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter calc\-\_\-chemscore\-::oxygen =10}}\label{classcalc__chemscore_aee2123f93427e62198b19acbe63a1a01}
+
+
+Definition at line 124 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a67e8e7ef0865731aa0ac9ca31aa4e52d}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!pl\-\_\-n@{pl\-\_\-n}}
+\index{pl\-\_\-n@{pl\-\_\-n}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{pl\-\_\-n}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter calc\-\_\-chemscore\-::pl\-\_\-n =8}}\label{classcalc__chemscore_a67e8e7ef0865731aa0ac9ca31aa4e52d}
+
+
+Definition at line 123 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a967fddb2385d770370d95b0d762617a6}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!pol\-\_\-con@{pol\-\_\-con}}
+\index{pol\-\_\-con@{pol\-\_\-con}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{pol\-\_\-con}]{\setlength{\rightskip}{0pt plus 5cm}integer, dimension(\-:), allocatable calc\-\_\-chemscore\-::pol\-\_\-con}}\label{classcalc__chemscore_a967fddb2385d770370d95b0d762617a6}
+
+
+Definition at line 109 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_afb82a7d43bbfe0502a2131ea40819b60}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!q\-\_\-atoms@{q\-\_\-atoms}}
+\index{q\-\_\-atoms@{q\-\_\-atoms}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{q\-\_\-atoms}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf q\-\_\-atom}), dimension(\-:), allocatable, target, private calc\-\_\-chemscore\-::q\-\_\-atoms\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__chemscore_afb82a7d43bbfe0502a2131ea40819b60}
+
+
+Definition at line 112 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_ad19a31c4b53236429ca22cc9f16a8283}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!q\-\_\-bonds@{q\-\_\-bonds}}
+\index{q\-\_\-bonds@{q\-\_\-bonds}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{q\-\_\-bonds}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf q\-\_\-bond}), dimension(\-:), allocatable, target, private calc\-\_\-chemscore\-::q\-\_\-bonds\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__chemscore_ad19a31c4b53236429ca22cc9f16a8283}
+
+
+Definition at line 113 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a750abcd708dc4cad10da3fd9b3e3fea2}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!rot\-\_\-term@{rot\-\_\-term}}
+\index{rot\-\_\-term@{rot\-\_\-term}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{rot\-\_\-term}]{\setlength{\rightskip}{0pt plus 5cm}real calc\-\_\-chemscore\-::rot\-\_\-term}}\label{classcalc__chemscore_a750abcd708dc4cad10da3fd9b3e3fea2}
+
+
+Definition at line 157 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a0a128ccdf119ded09ab8d3ef43bae64c}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!score@{score}}
+\index{score@{score}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{score}]{\setlength{\rightskip}{0pt plus 5cm}real calc\-\_\-chemscore\-::score}}\label{classcalc__chemscore_a0a128ccdf119ded09ab8d3ef43bae64c}
+
+
+Definition at line 18 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_af5cc74079916deed8dc10fc9749a5ae2}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!sp2@{sp2}}
+\index{sp2@{sp2}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{sp2}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter calc\-\_\-chemscore\-::sp2 =6}}\label{classcalc__chemscore_af5cc74079916deed8dc10fc9749a5ae2}
+
+
+Definition at line 123 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_ad73876c67ee54139a1c99297d4393db4}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!sp3@{sp3}}
+\index{sp3@{sp3}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{sp3}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter calc\-\_\-chemscore\-::sp3 =5}}\label{classcalc__chemscore_ad73876c67ee54139a1c99297d4393db4}
+
+
+Definition at line 123 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a09ae8a1f9f2ef13e71fcec99d065126d}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!sp3\-\_\-n@{sp3\-\_\-n}}
+\index{sp3\-\_\-n@{sp3\-\_\-n}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{sp3\-\_\-n}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter calc\-\_\-chemscore\-::sp3\-\_\-n =7}}\label{classcalc__chemscore_a09ae8a1f9f2ef13e71fcec99d065126d}
+
+
+Definition at line 123 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a3b2724ed780bdae65bbbec15ac8422c8}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!stat@{stat}}
+\index{stat@{stat}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{stat}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-chemscore\-::stat}}\label{classcalc__chemscore_a3b2724ed780bdae65bbbec15ac8422c8}
+
+
+Definition at line 20 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a95d7b76641cfc63037276718a6c0d409}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!sulphur@{sulphur}}
+\index{sulphur@{sulphur}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{sulphur}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter calc\-\_\-chemscore\-::sulphur =3}}\label{classcalc__chemscore_a95d7b76641cfc63037276718a6c0d409}
+
+
+Definition at line 122 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a6c1dfab249f0271c1032ed943ecb6d86}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!top\-\_\-file@{top\-\_\-file}}
+\index{top\-\_\-file@{top\-\_\-file}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{top\-\_\-file}]{\setlength{\rightskip}{0pt plus 5cm}character$\ast$80 calc\-\_\-chemscore\-::top\-\_\-file}}\label{classcalc__chemscore_a6c1dfab249f0271c1032ed943ecb6d86}
+
+
+Definition at line 23 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a47f6a15d75ed5c28132a8cc8c8141416}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!trj\-\_\-type@{trj\-\_\-type}}
+\index{trj\-\_\-type@{trj\-\_\-type}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{trj\-\_\-type}]{\setlength{\rightskip}{0pt plus 5cm}character(len=4) calc\-\_\-chemscore\-::trj\-\_\-type}}\label{classcalc__chemscore_a47f6a15d75ed5c28132a8cc8c8141416}
+
+
+Definition at line 22 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_a0a9f262f34f33777a05e38e993df8a66}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!vdwr@{vdwr}}
+\index{vdwr@{vdwr}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{vdwr}]{\setlength{\rightskip}{0pt plus 5cm}real, dimension(\-:), allocatable calc\-\_\-chemscore\-::vdwr}}\label{classcalc__chemscore_a0a9f262f34f33777a05e38e993df8a66}
+
+
+Definition at line 152 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_af393275025caa6267b2c9ee46fadd3d7}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!warn@{warn}}
+\index{warn@{warn}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{warn}]{\setlength{\rightskip}{0pt plus 5cm}integer, private calc\-\_\-chemscore\-::warn\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__chemscore_af393275025caa6267b2c9ee46fadd3d7}
+
+
+Definition at line 166 of file calc\-\_\-chemscore.\-f90.
+
+\hypertarget{classcalc__chemscore_ab81e8c2249c6c29046df0cf2d5dc9cac}{\index{calc\-\_\-chemscore@{calc\-\_\-chemscore}!waters@{waters}}
+\index{waters@{waters}!calc_chemscore@{calc\-\_\-chemscore}}
+\paragraph[{waters}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf wat}), dimension(\-:), allocatable calc\-\_\-chemscore\-::waters}}\label{classcalc__chemscore_ab81e8c2249c6c29046df0cf2d5dc9cac}
+
+
+Definition at line 107 of file calc\-\_\-chemscore.\-f90.
+
+
+
+The documentation for this module was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{calc__chemscore_8f90}{calc\-\_\-chemscore.\-f90}\end{DoxyCompactItemize}

@@ -1,0 +1,4 @@
+<map id="calc_xscore::q_atom" name="calc_xscore::q_atom">
+<area shape="rect" id="node3" href="$structcalc__xscore_1_1q__bond.html" title="{calc_xscore::q_bond\n|+ rotatable\l+ acontact\l+ bcontact\l+ been_there\l+ a_nonlip\l+ b_nonlip\l+ a_lip\l+ b_lip\l+ cyclic\l+ active\l+ cod\l|}" alt="" coords="5,263,149,487"/>
+<area shape="rect" id="node2" href="$structcalc__xscore_1_1bond__pointer.html" title="{calc_xscore::bond_pointer\n||}" alt="" coords="67,549,245,627"/>
+</map>

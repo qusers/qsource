@@ -1,0 +1,3482 @@
+\hypertarget{classprep}{\subsection{prep Module Reference}
+\label{classprep}\index{prep@{prep}}
+}
+
+
+Collaboration diagram for prep\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classprep__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Data Types}
+\begin{DoxyCompactItemize}
+\item 
+type \hyperlink{structprep_1_1angle__type__type}{angle\-\_\-type\-\_\-type}
+\item 
+type \hyperlink{structprep_1_1bond__prm__type}{bond\-\_\-prm\-\_\-type}
+\item 
+type \hyperlink{structprep_1_1bond__type__type}{bond\-\_\-type\-\_\-type}
+\item 
+type \hyperlink{structprep_1_1imp__prm__type}{imp\-\_\-prm\-\_\-type}
+\item 
+type \hyperlink{structprep_1_1lib__bond__type}{lib\-\_\-bond\-\_\-type}
+\item 
+type \hyperlink{structprep_1_1lib__entry__type}{lib\-\_\-entry\-\_\-type}
+\item 
+type \hyperlink{structprep_1_1lib__imp__type}{lib\-\_\-imp\-\_\-type}
+\item 
+type \hyperlink{structprep_1_1lib__rule__type}{lib\-\_\-rule\-\_\-type}
+\item 
+type \hyperlink{structprep_1_1tor__codes}{tor\-\_\-codes}
+\item 
+type \hyperlink{structprep_1_1torsion__type__type}{torsion\-\_\-type\-\_\-type}
+\end{DoxyCompactItemize}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine \hyperlink{classprep_a09769dae7cb5df79a430d07e240fb16b}{prep\-\_\-startup}
+\item 
+subroutine \hyperlink{classprep_a5f21f991d15abcd5c2924e5b0c336150}{allocate\-\_\-for\-\_\-pdb} (atoms, residues, molecules)
+\item 
+subroutine \hyperlink{classprep_a980bbec7c9f236072dd12ff9ad79415e}{prep\-\_\-shutdown}
+\item 
+subroutine \hyperlink{classprep_a178e327edc517c88f0c9b73deaea4ea5}{clearlib}
+\item 
+subroutine \hyperlink{classprep_acadfec11c64fcb6b270659df6eda3423}{addbond}
+\item 
+subroutine \hyperlink{classprep_a24b3ed27b340b275c00ec436ee42f541}{clearbond}
+\item 
+subroutine \hyperlink{classprep_a5b47d59f9e81a2b2ef38e462a396bb5e}{angle\-\_\-ene} (emax, nlarge, av\-\_\-ene)
+\item 
+integer function \hyperlink{classprep_ac73d54cb63e87af1514bf46d1b083d6b}{anglecode} (taci, tacj, tack)
+\item 
+subroutine \hyperlink{classprep_acaccf4ef0504c7bebef36bdd5a6bfc1f}{bond\-\_\-ene} (emax, nlarge, av\-\_\-ene)
+\item 
+character(K\-E\-Y\-L\-E\-N\-G\-T\-H) function \hyperlink{classprep_a794267b8fc71dc3627e499ead4d46036}{wildcard\-\_\-tac} (taci)
+\item 
+integer function \hyperlink{classprep_ab06305b2cf8d811511432d82e368ce92}{bondcode} (taci, tacj)
+\item 
+subroutine \hyperlink{classprep_ad6bd84f0763211bf5153b296e98f8eb8}{changeimp}
+\item 
+subroutine \hyperlink{classprep_a7ac174f5565d619eba52fbd3857ecc09}{checkangs}
+\item 
+subroutine \hyperlink{classprep_a8d372a19058ff7689d991fd5a1926c3c}{checkbonds}
+\item 
+subroutine \hyperlink{classprep_a61d9fe11fd8e2fcacee27aed5b2d03df}{checkimps}
+\item 
+subroutine \hyperlink{classprep_a78d4b6ccd1cf10b70d165ca709f2a1a3}{checktors}
+\item 
+real(8) function, dimension(3) \hyperlink{classprep_a441b1a4d5250639ed72f5d07555a18bd}{cross\-\_\-product} (a, b)
+\item 
+subroutine \hyperlink{classprep_a9e4f40f3858e73e7e2e5e520a6e99cf0}{xlink}
+\item 
+integer function \hyperlink{classprep_ab2285a42c7d8ccdf6807443c55ebef12}{impcode} (taci, tacj, tack, tacl)
+\item 
+subroutine \hyperlink{classprep_ae5d14f28b42c21cbeac0a6d01b437b0a}{impr\-\_\-ene} (emax, nlarge, av\-\_\-ene, mode)
+\item 
+subroutine \hyperlink{classprep_a826ccdfd790c158de7a5c69009883282}{listres}
+\item 
+subroutine \hyperlink{classprep_a79d5c64b6e03f8453c97ee7e4b0adbc5}{listseq}
+\item 
+subroutine \hyperlink{classprep_a0c95e6e67020077e83eb467d3a21c3e5}{make14list}
+\item 
+subroutine \hyperlink{classprep_a8d909ff9b94b53c7825bd883adfa22f7}{makeangles}
+\item 
+subroutine \hyperlink{classprep_aac9d9e5e1214d4794749dc77e9de4747}{make\-\_\-solute\-\_\-bonds}
+\item 
+subroutine \hyperlink{classprep_a91be0a910b6ce5c0a9046eeb76457a8f}{makebonds}
+\item 
+integer function \hyperlink{classprep_a2703dd8ae27ed1ccd2d53f907fa9a64f}{makeextrabonds} ()
+\item 
+subroutine \hyperlink{classprep_aa25c6d94bb5bfc531ab510e79422fce5}{set\-\_\-bondcodes}
+\item 
+integer function \hyperlink{classprep_aecab92978bb189465862cc9d64504926}{makesomebonds} (startres, endres)
+\item 
+subroutine \hyperlink{classprep_ad74718adb758876e6080d71768b03bf2}{makeexlist}
+\item 
+subroutine \hyperlink{classprep_ab3a376766b645bd5b93ac77220735ee5}{makehyds}
+\item 
+integer function \hyperlink{classprep_afb869c9c110e8701cde8761ae8856405}{genh} (j, residue)
+\item 
+subroutine \hyperlink{classprep_a39400f89f3b6e4db1b43078c8671b409}{makeimps}
+\item 
+subroutine \hyperlink{classprep_add71bde50c689d84c2d8bc7fd0e60c25}{imp\-\_\-params}
+\item 
+integer function \hyperlink{classprep_a65869d9a985447ee3e4a7fd579b55c0a}{find\-\_\-atom} (ires, atom)
+\item 
+subroutine \hyperlink{classprep_a72e19a9dc7029265b5d2077e1b4c6288}{makeimps\-\_\-explicit}
+\item 
+subroutine \hyperlink{classprep_ac1b20bb4677de808773357bae4f5b4a5}{maketop}
+\item 
+subroutine \hyperlink{classprep_a66e2390289edaef47f6dcefb4a185202}{set\-\_\-default\-\_\-mask}
+\item 
+subroutine \hyperlink{classprep_a94241a6b92f9a195d99d246496af82f1}{makeconn}
+\item 
+subroutine \hyperlink{classprep_ac846f0515160efb246ed00491918d9b4}{maketors}
+\item 
+subroutine \hyperlink{classprep_a162b497f3439d96e352c9cb8b4e94cc9}{prompt} (outtxt)
+\item 
+real function \hyperlink{classprep_a5641b3358b25c1add0aef28b30a9c055}{randm} (seed, seed\-\_\-only)
+\item 
+subroutine \hyperlink{classprep_a0dedb90780274dad9f0cb73c67bc72c4}{oldreadlib} (filnam)
+\item 
+subroutine \hyperlink{classprep_a5416ced67e818030602fa86ed687ac6b}{readlib} (file)
+\item 
+subroutine \hyperlink{classprep_af0136172f3ff29a37f279ae1a8bb3a0c}{check\-\_\-overload} (resnam)
+\item 
+subroutine \hyperlink{classprep_aa8bce8b46beb9bb1a75090b0ca7666e1}{oldreadparm} (flag)
+\item 
+subroutine \hyperlink{classprep_a266a5e1af478996cb0484355015fbd31}{readff}
+\item 
+subroutine \hyperlink{classprep_a95a57c9975f303d860e25611bb7a14ad}{readparm} (filnam)
+\item 
+subroutine \hyperlink{classprep_a7806a1003fb2bd7b5e4b0defb56cd7c8}{clearpdb}
+\item 
+subroutine \hyperlink{classprep_ab6d8d62fc9dadbde610b37b9efe4413a}{cleartop}
+\item 
+logical function \hyperlink{classprep_ab0f4a5ea2c1daf3121ad69cf0c16f40a}{countpdb} (pdb\-\_\-fileno, atoms, residues, molecules)
+\item 
+subroutine \hyperlink{classprep_a11614f4fd619fd0eb99727e258ca2300}{readpdb} ()
+\item 
+subroutine \hyperlink{classprep_a59d775f3eb60a2041f8a27c882d3bc70}{readtop}
+\item 
+subroutine \hyperlink{classprep_ab2a8422cb6cb324200f5b5bf3083675c}{readx}
+\item 
+subroutine \hyperlink{classprep_ab41936ec09ac09e102a791f2c28d8c37}{readnext}
+\item 
+subroutine \hyperlink{classprep_a76cc92e2a4be8c7ee740c6ba35b8789b}{readframe}
+\item 
+subroutine \hyperlink{classprep_aa25e33c6f5da38aba332f11ca5cff8f3}{trajectory}
+\item 
+subroutine \hyperlink{classprep_a977d8921a8e453a4a83f89e42147e5e9}{modify\-\_\-mask}
+\item 
+subroutine \hyperlink{classprep_a92afff65bcc25e77c24396983122b519}{set\-\_\-cgp}
+\item 
+subroutine \hyperlink{classprep_aa73f65ac2841ae32010701ac95af166a}{set\-\_\-crg}
+\item 
+subroutine \hyperlink{classprep_ac058180472b1eead5ada468b0ddb2a3b}{set\-\_\-iac}
+\item 
+logical function \hyperlink{classprep_a6b313325f97052430b9b558dca9606fd}{set\-\_\-irc\-\_\-solvent} ()
+\item 
+subroutine \hyperlink{classprep_aa37b27ef2e62436323ff35a371c0d152}{set\-\_\-solvent\-\_\-type}
+\item 
+integer function \hyperlink{classprep_aa1417fc48a24a3fd294d10f9254a0a0c}{get\-\_\-atom\-\_\-from\-\_\-descriptor} (aid)
+\item 
+subroutine \hyperlink{classprep_a63b4a8d3ff88f78114eb1d70ba5fbef1}{define\-\_\-boundary\-\_\-condition}
+\item 
+logical function \hyperlink{classprep_a6cb87d50fe4a6bf0ae27fe34d7316f5b}{set\-\_\-boundary\-\_\-condition} ()
+\item 
+logical function \hyperlink{classprep_a35f72f5ffad726d4d9f3f8405837b1a2}{set\-\_\-simulation\-\_\-sphere} ()
+\item 
+logical function \hyperlink{classprep_a28767f39911fb26ba4be630e1b41c4e5}{set\-\_\-solvent\-\_\-box} ()
+\item 
+subroutine \hyperlink{classprep_ab40618e65f3f9ff77388540cc08fb857}{solvate}
+\item 
+subroutine \hyperlink{classprep_adea6f92652c57e735fc1ecfb1c51b307}{solvate\-\_\-box}
+\item 
+subroutine \hyperlink{classprep_a69ec3a8bd439427b2a57259dcf0b7db5}{solvate\-\_\-box\-\_\-grid}
+\item 
+subroutine \hyperlink{classprep_acd0632e7396c17a73263117350d795b2}{solvate\-\_\-box\-\_\-file}
+\item 
+subroutine \hyperlink{classprep_a94b652674f1c868ef55bb9e4a3cd8204}{solvate\-\_\-sphere}
+\item 
+logical function \hyperlink{classprep_abb116903e6c029e9d8ad398fc9968393}{set\-\_\-solvent\-\_\-sphere} ()
+\item 
+subroutine \hyperlink{classprep_a48c69af56814950cb78d8a40679c6389}{solvate\-\_\-sphere\-\_\-grid}
+\item 
+subroutine \hyperlink{classprep_a41752fc7d46be8f022fbba88f159f4d8}{solvate\-\_\-sphere\-\_\-file} (shift)
+\item 
+subroutine \hyperlink{classprep_a5c7e6488cce390d096ff1ba62f9f7e3b}{solvate\-\_\-restart}
+\item 
+subroutine \hyperlink{classprep_ada43fa39af17de1fca637c3702966043}{add\-\_\-solvent\-\_\-to\-\_\-topology} (waters\-\_\-in\-\_\-sphere, max\-\_\-waters, make\-\_\-hydrogens, pack)
+\item 
+subroutine \hyperlink{classprep_a83cffe3873feafd7ebdef521099d5bac}{grow\-\_\-arrays\-\_\-for\-\_\-solvent} (nmore, atoms\-\_\-per\-\_\-molecule)
+\item 
+real function \hyperlink{classprep_aede855ae502ac617ebdefee64cf18581}{rwat\-\_\-eff} ()
+\item 
+type(T\-O\-R\-\_\-\-C\-O\-D\-E\-S) function \hyperlink{classprep_a65595c8aac3bb35b611e3222ccd26241}{torcode} (taci, tacj, tack, tacl)
+\item 
+subroutine \hyperlink{classprep_a7ad81d7c12ae2e8a3ddaa2819ff9de90}{tors\-\_\-ene} (emax, nlarge, av\-\_\-ene)
+\item 
+logical function \hyperlink{classprep_aac95240e79d8797c485ec2c4d7ff7d28}{check\-\_\-residues} ()
+\item 
+subroutine \hyperlink{classprep_a86389b7be94682ea34144a6086ebf289}{writepdb}
+\item 
+subroutine \hyperlink{classprep_ad083f95844e256edae2a0a1f08770477}{writemol2}
+\item 
+subroutine \hyperlink{classprep_a9c1837f9f9cc480111bc869021782ba7}{writetop}
+\item 
+subroutine \hyperlink{classprep_a98a2bbf68312eda5398cd628a5acad6d}{listprefs}
+\item 
+subroutine \hyperlink{classprep_a970e6693d83b14e44100bacdd3ad4132}{set}
+\item 
+subroutine \hyperlink{classprep_a590bd98683520ed1b1edce0bdf78b337}{make\-\_\-shell2}
+\item 
+logical function \hyperlink{classprep_ac5cb1bd82cdabbd55089747c70946e9f}{get\-\_\-centre\-\_\-by\-\_\-mass} (centre)
+\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+integer, parameter \hyperlink{classprep_ac8c3b3f850c904ceb431889c42d85ee2}{max\-\_\-entry} = 1000
+\item 
+integer, parameter \hyperlink{classprep_a6772647467cb95a41202bbe0a01db5b7}{max\-\_\-atlib} = 500
+\item 
+integer, parameter \hyperlink{classprep_a72fc2af9b6f9249f3ef63a2f5e570f0a}{max\-\_\-cgplib} = 100
+\item 
+integer, parameter \hyperlink{classprep_a1e810276f7b8d213da60f190be18113c}{max\-\_\-atcgplib} = 100
+\item 
+integer, parameter \hyperlink{classprep_aa395d2a6f28f4a82d4f7faef27010bae}{max\-\_\-old\-\_\-atyps} = 100
+\item 
+integer, parameter \hyperlink{classprep_a0954fb2199580b767b0fec5e0d190eb0}{max\-\_\-extrabnd} = 100
+\item 
+integer, parameter \hyperlink{classprep_afddd5b41836da73acf6f6d7b66741283}{max\-\_\-lib} = 1000
+\item 
+integer, parameter \hyperlink{classprep_a1df01e5c34db215d69c53f52185163a5}{max\-\_\-long} = 10000
+\item 
+integer, parameter \hyperlink{classprep_ae00ce511ccdd1623a7fded5f4cdb237a}{max\-\_\-conn} = 10
+\item 
+real, target \hyperlink{classprep_abbddacbd376e8aca501f6151d3114a5c}{solvent\-\_\-pack} = 2.\-4
+\item 
+real, target \hyperlink{classprep_ade49a05a54bea9b47761d04a3087afa5}{rho\-\_\-solute} = 0.\-05794
+\item 
+real, target \hyperlink{classprep_a85c4693cbc15c5614620bcc7d837e763}{max\-\_\-xlink} = 2.\-1
+\item 
+character(len=200), target \hyperlink{classprep_a23cb9b5f1c2ed42421091cd8a8566d02}{solvent\-\_\-names} = ''
+\item 
+integer, target \hyperlink{classprep_a4e1a07eb57a103152818e73c1a23e65c}{random\-\_\-seed\-\_\-solute} = 179857
+\item 
+integer, target \hyperlink{classprep_a1a7de818be67e3e32a510b0bad624a5b}{random\-\_\-seed\-\_\-solvent} = 758971
+\item 
+integer, parameter \hyperlink{classprep_a853f496291d4e6336bc962adf492d392}{build\-\_\-rule\-\_\-torsion} = 1
+\item 
+integer \hyperlink{classprep_a45b6e35c6833923457375f4d56f0f5b5}{nlibres}
+\item 
+type(\hyperlink{structprep_1_1lib__entry__type}{lib\-\_\-entry\-\_\-type}), \\*
+dimension(\hyperlink{classprep_ac8c3b3f850c904ceb431889c42d85ee2}{max\-\_\-entry}), target \hyperlink{classprep_a8d289afb3f6d89fbade57a991736cdbc}{lib}
+\item 
+logical \hyperlink{classprep_af4d8bdabfcb632efdd69f7f9459d4cb1}{have\-\_\-prm\-\_\-file\-\_\-name} = .false.
+\item 
+logical \hyperlink{classprep_ae5fc82378da688778b62b1855f535646}{have\-\_\-solute\-\_\-sphere} = .false.
+\item 
+logical \hyperlink{classprep_aef51fe5ef8e99e94ce6215e4862693ab}{have\-\_\-title} = .false.
+\item 
+logical \hyperlink{classprep_a8c26fbee1c34fbb32339ce304880a6fb}{have\-\_\-solvent\-\_\-boundary} = .false.
+\item 
+logical \hyperlink{classprep_a7a6bd6d143339e8bfd4eca5c729d53fc}{boundary\-\_\-set} = .false.
+\item 
+integer \hyperlink{classprep_a9956f590e2211602a6e5ec0fc78ac75e}{nbnd\-\_\-prm}
+\item 
+integer \hyperlink{classprep_a2308de44ae31622b6609e54cd66291da}{nbnd\-\_\-types}
+\item 
+type(\hyperlink{structprep_1_1bond__type__type}{bond\-\_\-type\-\_\-type}), \\*
+dimension(\-:), allocatable \hyperlink{classprep_a8612d16f438fce2fdfab421435fc12b0}{bnd\-\_\-types}
+\item 
+type(\hyperlink{structprep_1_1bond__prm__type}{bond\-\_\-prm\-\_\-type}), dimension(\-:), \\*
+allocatable \hyperlink{classprep_ac427697c7ffa6252f064c2203abbc8d1}{bnd\-\_\-prm}
+\item 
+type(\hyperlink{structprep_1_1angle__type__type}{angle\-\_\-type\-\_\-type}), \\*
+dimension(\-:), allocatable \hyperlink{classprep_a35c47c52d6cde56a3edbbad318eb0735}{ang\-\_\-types}
+\item 
+type(anglib\-\_\-type), dimension(\-:), \\*
+allocatable \hyperlink{classprep_a29c0f063e1579b1087d6e9bd35d11f9f}{ang\-\_\-prm}
+\item 
+integer \hyperlink{classprep_a13fc2319ab89b1b88b8fd6a130e08c4e}{nang\-\_\-types}
+\item 
+integer \hyperlink{classprep_ac17ec7b95ca0f0ef40679baf2c9c0ae9}{nang\-\_\-prm}
+\item 
+type(\hyperlink{structprep_1_1torsion__type__type}{torsion\-\_\-type\-\_\-type}), \\*
+dimension(\-:), allocatable \hyperlink{classprep_a9fcc991cb6c52982df60dcab52ddc7b9}{tor\-\_\-types}
+\item 
+type(torlib\-\_\-type), dimension(\-:), \\*
+allocatable \hyperlink{classprep_a0a44d47429834f891ba1a0e8260f30e9}{tor\-\_\-prm}
+\item 
+integer \hyperlink{classprep_a1db4f2bef544894cece6f2a4f6df3d15}{ntor\-\_\-types}
+\item 
+integer \hyperlink{classprep_abf46f8b225b713c8e1eff53bcecdee8c}{ntor\-\_\-prm}
+\item 
+type(\hyperlink{structprep_1_1imp__prm__type}{imp\-\_\-prm\-\_\-type}), dimension(\-:), \\*
+allocatable \hyperlink{classprep_ad5c72f6c240f7753aff7bbf36a03dbde}{imp\-\_\-prm}
+\item 
+integer \hyperlink{classprep_a131a8dff6c39bd140e35d19b2ee9558c}{nimp\-\_\-prm}
+\item 
+logical \hyperlink{classprep_a6de36f3182c32c9e273c5a54632112f7}{imp\-\_\-explicit}
+\item 
+integer \hyperlink{classprep_ab8dbadaf12262e9ad75d242a9d94a7be}{natom}
+\item 
+integer \hyperlink{classprep_a3d0b820d2bd0a7434096e0de29e2752b}{nat\-\_\-wat}
+\item 
+integer \hyperlink{classprep_a29b7c355a8f655a65d6589479f27f0f1}{nwat}
+\item 
+character(len=100) \hyperlink{classprep_a23c49c42a55467a3ef357748fb876a49}{coord\-\_\-source} = ''
+\item 
+character(len=80) \hyperlink{classprep_a83b69e52469478c0d64cb6bd2ad3060f}{auto\-\_\-name} = ''
+\item 
+integer, parameter \hyperlink{classprep_a2a8286c4c7bbbdf7837514adf40f56e8}{trj\-\_\-unit} = 17
+\item 
+integer \hyperlink{classprep_a67234152a914abc499cb54855d5005ce}{trj\-\_\-frame} = 0
+\item 
+character(len=180) \hyperlink{classprep_a92c84680f6cd6dc7868c862b571b1a01}{trj\-\_\-filnam}
+\item 
+type(mask\-\_\-type) \hyperlink{classprep_a847c8ade6c795111f259163203927538}{mask}
+\item 
+integer \hyperlink{classprep_a43c4ae861ddacd4228d5cbbb31ceed7a}{nextrabnd}
+\item 
+type(bond\-\_\-type), dimension(\hyperlink{classprep_a0954fb2199580b767b0fec5e0d190eb0}{max\-\_\-extrabnd}) \hyperlink{classprep_ad8cf2067e77b186f2d5601ee6da085c1}{extrabnd}
+\item 
+logical, dimension(\-:), allocatable \hyperlink{classprep_a675b91e8d296db8b3cfcf39516b278a3}{makeh}
+\item 
+integer, dimension(\-:), allocatable \hyperlink{classprep_a61e6a6610a60fcf8e557aeeb68215ccb}{nconn}
+\item 
+integer, dimension(\-:,\-:), \\*
+allocatable \hyperlink{classprep_a5a02e0194d123205200fc6c1f8267df4}{iconn}
+\item 
+real(8) \hyperlink{classprep_a1e865a41955c21ed803962409e39acf9}{pi}
+\item 
+real(8) \hyperlink{classprep_a7b7c9985659296eb39ad6c6be3b156a7}{deg2rad}
+\item 
+real(8), dimension(\-:,\-:,\-:), \\*
+allocatable \hyperlink{classprep_aa9c1e662e10b97582fdefac8e317ab53}{xw}
+\item 
+logical, dimension(\-:), allocatable \hyperlink{classprep_ade7b1c1c2de355450a64197eefc36d28}{keep}
+\item 
+integer \hyperlink{classprep_a47b263321dda7fb6c374e3f622fdf735}{irc\-\_\-solvent}
+\item 
+character(len=4) \hyperlink{classprep_aa665c6e3401ced3ba9d6e361beb2a4b5}{solvent\-\_\-name}
+\item 
+logical \hyperlink{classprep_a2b85c6800fc53b36e3c2c07b5af26dbb}{topo\-\_\-ok} = .false.
+\item 
+logical \hyperlink{classprep_ad93c90f3fad2706aabf577cd4a7bc3e5}{ff\-\_\-ok} = .false.
+\end{DoxyCompactItemize}
+\subsubsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine, private \hyperlink{classprep_afbb47add947423aeae686c4021702ab1}{check\-\_\-alloc} (message)
+\end{DoxyCompactItemize}
+\subsubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+character($\ast$), parameter, private \hyperlink{classprep_af285bdd5135ab10225b55c9a2ed4d0d0}{module\-\_\-version} = '5.\-04'
+\item 
+character($\ast$), parameter, private \hyperlink{classprep_a1e39aac67364bce4d4389f161fe8555e}{module\-\_\-date} = '2005-\/04-\/14'
+\item 
+integer, private \hyperlink{classprep_a87d974b870f3e4297b7616cd4516d489}{alloc\-\_\-status}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+
+
+Definition at line 6 of file prep.\-f90.
+
+
+
+\subsubsection{Member Function/\-Subroutine Documentation}
+\hypertarget{classprep_ada43fa39af17de1fca637c3702966043}{\index{prep@{prep}!add\-\_\-solvent\-\_\-to\-\_\-topology@{add\-\_\-solvent\-\_\-to\-\_\-topology}}
+\index{add\-\_\-solvent\-\_\-to\-\_\-topology@{add\-\_\-solvent\-\_\-to\-\_\-topology}!prep@{prep}}
+\paragraph[{add\-\_\-solvent\-\_\-to\-\_\-topology}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::add\-\_\-solvent\-\_\-to\-\_\-topology (
+\begin{DoxyParamCaption}
+\item[{integer}]{waters\-\_\-in\-\_\-sphere, }
+\item[{integer}]{max\-\_\-waters, }
+\item[{logical}]{make\-\_\-hydrogens, }
+\item[{real}]{pack}
+\end{DoxyParamCaption}
+)}}\label{classprep_ada43fa39af17de1fca637c3702966043}
+
+
+Definition at line 5488 of file prep.\-f90.
+
+
+
+References grow\-\_\-arrays\-\_\-for\-\_\-solvent().
+
+
+
+Referenced by solvate\-\_\-box\-\_\-file(), solvate\-\_\-box\-\_\-grid(), solvate\-\_\-restart(), solvate\-\_\-sphere\-\_\-file(), and solvate\-\_\-sphere\-\_\-grid().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_acadfec11c64fcb6b270659df6eda3423}{\index{prep@{prep}!addbond@{addbond}}
+\index{addbond@{addbond}!prep@{prep}}
+\paragraph[{addbond}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::addbond (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_acadfec11c64fcb6b270659df6eda3423}
+
+
+Definition at line 268 of file prep.\-f90.
+
+
+
+References get\-\_\-atom\-\_\-from\-\_\-descriptor(), parse\-::get\-\_\-string\-\_\-arg(), and misc\-::upcase().
+
+
+
+Referenced by parse\-\_\-command().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a5f21f991d15abcd5c2924e5b0c336150}{\index{prep@{prep}!allocate\-\_\-for\-\_\-pdb@{allocate\-\_\-for\-\_\-pdb}}
+\index{allocate\-\_\-for\-\_\-pdb@{allocate\-\_\-for\-\_\-pdb}!prep@{prep}}
+\paragraph[{allocate\-\_\-for\-\_\-pdb}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::allocate\-\_\-for\-\_\-pdb (
+\begin{DoxyParamCaption}
+\item[{integer, intent(in)}]{atoms, }
+\item[{integer, intent(in)}]{residues, }
+\item[{integer, intent(in)}]{molecules}
+\end{DoxyParamCaption}
+)}}\label{classprep_a5f21f991d15abcd5c2924e5b0c336150}
+
+
+Definition at line 222 of file prep.\-f90.
+
+
+
+Referenced by prep\-\_\-startup(), and readpdb().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a5b47d59f9e81a2b2ef38e462a396bb5e}{\index{prep@{prep}!angle\-\_\-ene@{angle\-\_\-ene}}
+\index{angle\-\_\-ene@{angle\-\_\-ene}!prep@{prep}}
+\paragraph[{angle\-\_\-ene}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::angle\-\_\-ene (
+\begin{DoxyParamCaption}
+\item[{real}]{emax, }
+\item[{integer}]{nlarge, }
+\item[{real}]{av\-\_\-ene}
+\end{DoxyParamCaption}
+)}}\label{classprep_a5b47d59f9e81a2b2ef38e462a396bb5e}
+
+
+Definition at line 348 of file prep.\-f90.
+
+
+
+References calc\-\_\-chemscore\-::angle().
+
+
+
+Referenced by checkangs().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classprep_a5b47d59f9e81a2b2ef38e462a396bb5e_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_ac73d54cb63e87af1514bf46d1b083d6b}{\index{prep@{prep}!anglecode@{anglecode}}
+\index{anglecode@{anglecode}!prep@{prep}}
+\paragraph[{anglecode}]{\setlength{\rightskip}{0pt plus 5cm}integer function prep\-::anglecode (
+\begin{DoxyParamCaption}
+\item[{character($\ast$), intent(in)}]{taci, }
+\item[{character($\ast$), intent(in)}]{tacj, }
+\item[{character($\ast$), intent(in)}]{tack}
+\end{DoxyParamCaption}
+)}}\label{classprep_ac73d54cb63e87af1514bf46d1b083d6b}
+
+
+Definition at line 406 of file prep.\-f90.
+
+
+
+References wildcard\-\_\-tac().
+
+
+
+Referenced by makeangles().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=302pt]{classprep_ac73d54cb63e87af1514bf46d1b083d6b_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_acaccf4ef0504c7bebef36bdd5a6bfc1f}{\index{prep@{prep}!bond\-\_\-ene@{bond\-\_\-ene}}
+\index{bond\-\_\-ene@{bond\-\_\-ene}!prep@{prep}}
+\paragraph[{bond\-\_\-ene}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::bond\-\_\-ene (
+\begin{DoxyParamCaption}
+\item[{real}]{emax, }
+\item[{integer}]{nlarge, }
+\item[{real}]{av\-\_\-ene}
+\end{DoxyParamCaption}
+)}}\label{classprep_acaccf4ef0504c7bebef36bdd5a6bfc1f}
+
+
+Definition at line 437 of file prep.\-f90.
+
+
+
+Referenced by checkbonds().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_ab06305b2cf8d811511432d82e368ce92}{\index{prep@{prep}!bondcode@{bondcode}}
+\index{bondcode@{bondcode}!prep@{prep}}
+\paragraph[{bondcode}]{\setlength{\rightskip}{0pt plus 5cm}integer function prep\-::bondcode (
+\begin{DoxyParamCaption}
+\item[{character($\ast$), intent(in)}]{taci, }
+\item[{character($\ast$), intent(in)}]{tacj}
+\end{DoxyParamCaption}
+)}}\label{classprep_ab06305b2cf8d811511432d82e368ce92}
+
+
+Definition at line 499 of file prep.\-f90.
+
+
+
+References wildcard\-\_\-tac().
+
+
+
+Referenced by makeextrabonds(), and set\-\_\-bondcodes().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=300pt]{classprep_ab06305b2cf8d811511432d82e368ce92_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_ad6bd84f0763211bf5153b296e98f8eb8}{\index{prep@{prep}!changeimp@{changeimp}}
+\index{changeimp@{changeimp}!prep@{prep}}
+\paragraph[{changeimp}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::changeimp (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_ad6bd84f0763211bf5153b296e98f8eb8}
+
+
+Definition at line 531 of file prep.\-f90.
+
+
+
+References impr\-\_\-ene(), and prompt().
+
+
+
+Referenced by parse\-\_\-command().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=291pt]{classprep_ad6bd84f0763211bf5153b296e98f8eb8_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_afbb47add947423aeae686c4021702ab1}{\index{prep@{prep}!check\-\_\-alloc@{check\-\_\-alloc}}
+\index{check\-\_\-alloc@{check\-\_\-alloc}!prep@{prep}}
+\paragraph[{check\-\_\-alloc}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, private prep\-::check\-\_\-alloc (
+\begin{DoxyParamCaption}
+\item[{character($\ast$)}]{message}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classprep_afbb47add947423aeae686c4021702ab1}
+
+
+Definition at line 255 of file prep.\-f90.
+
+\hypertarget{classprep_af0136172f3ff29a37f279ae1a8bb3a0c}{\index{prep@{prep}!check\-\_\-overload@{check\-\_\-overload}}
+\index{check\-\_\-overload@{check\-\_\-overload}!prep@{prep}}
+\paragraph[{check\-\_\-overload}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::check\-\_\-overload (
+\begin{DoxyParamCaption}
+\item[{character(len=80)}]{resnam}
+\end{DoxyParamCaption}
+)}}\label{classprep_af0136172f3ff29a37f279ae1a8bb3a0c}
+
+
+Definition at line 2952 of file prep.\-f90.
+
+
+
+Referenced by readlib().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_aac95240e79d8797c485ec2c4d7ff7d28}{\index{prep@{prep}!check\-\_\-residues@{check\-\_\-residues}}
+\index{check\-\_\-residues@{check\-\_\-residues}!prep@{prep}}
+\paragraph[{check\-\_\-residues}]{\setlength{\rightskip}{0pt plus 5cm}logical function prep\-::check\-\_\-residues (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_aac95240e79d8797c485ec2c4d7ff7d28}
+
+
+Definition at line 5928 of file prep.\-f90.
+
+
+
+Referenced by listres(), maketop(), writemol2(), writepdb(), and xlink().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a7ac174f5565d619eba52fbd3857ecc09}{\index{prep@{prep}!checkangs@{checkangs}}
+\index{checkangs@{checkangs}!prep@{prep}}
+\paragraph[{checkangs}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::checkangs (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a7ac174f5565d619eba52fbd3857ecc09}
+
+
+Definition at line 579 of file prep.\-f90.
+
+
+
+References angle\-\_\-ene(), and parse\-::get\-\_\-real\-\_\-arg().
+
+
+
+Referenced by parse\-\_\-command().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classprep_a7ac174f5565d619eba52fbd3857ecc09_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a8d372a19058ff7689d991fd5a1926c3c}{\index{prep@{prep}!checkbonds@{checkbonds}}
+\index{checkbonds@{checkbonds}!prep@{prep}}
+\paragraph[{checkbonds}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::checkbonds (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a8d372a19058ff7689d991fd5a1926c3c}
+
+
+Definition at line 602 of file prep.\-f90.
+
+
+
+References bond\-\_\-ene(), and parse\-::get\-\_\-real\-\_\-arg().
+
+
+
+Referenced by parse\-\_\-command().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classprep_a8d372a19058ff7689d991fd5a1926c3c_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a61d9fe11fd8e2fcacee27aed5b2d03df}{\index{prep@{prep}!checkimps@{checkimps}}
+\index{checkimps@{checkimps}!prep@{prep}}
+\paragraph[{checkimps}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::checkimps (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a61d9fe11fd8e2fcacee27aed5b2d03df}
+
+
+Definition at line 625 of file prep.\-f90.
+
+
+
+References parse\-::get\-\_\-real\-\_\-arg(), and impr\-\_\-ene().
+
+
+
+Referenced by parse\-\_\-command().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classprep_a61d9fe11fd8e2fcacee27aed5b2d03df_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a78d4b6ccd1cf10b70d165ca709f2a1a3}{\index{prep@{prep}!checktors@{checktors}}
+\index{checktors@{checktors}!prep@{prep}}
+\paragraph[{checktors}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::checktors (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a78d4b6ccd1cf10b70d165ca709f2a1a3}
+
+
+Definition at line 651 of file prep.\-f90.
+
+
+
+References parse\-::get\-\_\-real\-\_\-arg(), and tors\-\_\-ene().
+
+
+
+Referenced by parse\-\_\-command().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classprep_a78d4b6ccd1cf10b70d165ca709f2a1a3_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a24b3ed27b340b275c00ec436ee42f541}{\index{prep@{prep}!clearbond@{clearbond}}
+\index{clearbond@{clearbond}!prep@{prep}}
+\paragraph[{clearbond}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::clearbond (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a24b3ed27b340b275c00ec436ee42f541}
+
+
+Definition at line 341 of file prep.\-f90.
+
+
+
+Referenced by parse\-\_\-command().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a178e327edc517c88f0c9b73deaea4ea5}{\index{prep@{prep}!clearlib@{clearlib}}
+\index{clearlib@{clearlib}!prep@{prep}}
+\paragraph[{clearlib}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::clearlib (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a178e327edc517c88f0c9b73deaea4ea5}
+
+
+Definition at line 248 of file prep.\-f90.
+
+
+
+Referenced by parse\-\_\-command(), and qprep().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a7806a1003fb2bd7b5e4b0defb56cd7c8}{\index{prep@{prep}!clearpdb@{clearpdb}}
+\index{clearpdb@{clearpdb}!prep@{prep}}
+\paragraph[{clearpdb}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::clearpdb (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a7806a1003fb2bd7b5e4b0defb56cd7c8}
+
+
+Definition at line 3665 of file prep.\-f90.
+
+
+
+Referenced by prep\-\_\-startup(), and readpdb().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_ab6d8d62fc9dadbde610b37b9efe4413a}{\index{prep@{prep}!cleartop@{cleartop}}
+\index{cleartop@{cleartop}!prep@{prep}}
+\paragraph[{cleartop}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::cleartop (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_ab6d8d62fc9dadbde610b37b9efe4413a}
+
+
+Definition at line 3683 of file prep.\-f90.
+
+
+
+Referenced by parse\-\_\-command(), and prep\-\_\-startup().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_ab0f4a5ea2c1daf3121ad69cf0c16f40a}{\index{prep@{prep}!countpdb@{countpdb}}
+\index{countpdb@{countpdb}!prep@{prep}}
+\paragraph[{countpdb}]{\setlength{\rightskip}{0pt plus 5cm}logical function prep\-::countpdb (
+\begin{DoxyParamCaption}
+\item[{integer}]{pdb\-\_\-fileno, }
+\item[{integer}]{atoms, }
+\item[{integer}]{residues, }
+\item[{integer}]{molecules}
+\end{DoxyParamCaption}
+)}}\label{classprep_ab0f4a5ea2c1daf3121ad69cf0c16f40a}
+
+
+Definition at line 3693 of file prep.\-f90.
+
+
+
+Referenced by readpdb().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a441b1a4d5250639ed72f5d07555a18bd}{\index{prep@{prep}!cross\-\_\-product@{cross\-\_\-product}}
+\index{cross\-\_\-product@{cross\-\_\-product}!prep@{prep}}
+\paragraph[{cross\-\_\-product}]{\setlength{\rightskip}{0pt plus 5cm}real(8) function, dimension(3) prep\-::cross\-\_\-product (
+\begin{DoxyParamCaption}
+\item[{real(8), dimension(3)}]{a, }
+\item[{real(8), dimension(3)}]{b}
+\end{DoxyParamCaption}
+)}}\label{classprep_a441b1a4d5250639ed72f5d07555a18bd}
+
+
+Definition at line 676 of file prep.\-f90.
+
+
+
+Referenced by genh().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a63b4a8d3ff88f78114eb1d70ba5fbef1}{\index{prep@{prep}!define\-\_\-boundary\-\_\-condition@{define\-\_\-boundary\-\_\-condition}}
+\index{define\-\_\-boundary\-\_\-condition@{define\-\_\-boundary\-\_\-condition}!prep@{prep}}
+\paragraph[{define\-\_\-boundary\-\_\-condition}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::define\-\_\-boundary\-\_\-condition (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a63b4a8d3ff88f78114eb1d70ba5fbef1}
+
+
+Definition at line 4518 of file prep.\-f90.
+
+
+
+References parse\-::parse\-\_\-reset(), and set\-\_\-boundary\-\_\-condition().
+
+
+
+Referenced by parse\-\_\-command().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a65869d9a985447ee3e4a7fd579b55c0a}{\index{prep@{prep}!find\-\_\-atom@{find\-\_\-atom}}
+\index{find\-\_\-atom@{find\-\_\-atom}!prep@{prep}}
+\paragraph[{find\-\_\-atom}]{\setlength{\rightskip}{0pt plus 5cm}integer function prep\-::find\-\_\-atom (
+\begin{DoxyParamCaption}
+\item[{integer}]{ires, }
+\item[{character(len=5)}]{atom}
+\end{DoxyParamCaption}
+)}}\label{classprep_a65869d9a985447ee3e4a7fd579b55c0a}
+
+
+Definition at line 2039 of file prep.\-f90.
+
+
+
+Referenced by get\-\_\-atom\-\_\-from\-\_\-descriptor(), and makeimps\-\_\-explicit().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_afb869c9c110e8701cde8761ae8856405}{\index{prep@{prep}!genh@{genh}}
+\index{genh@{genh}!prep@{prep}}
+\paragraph[{genh}]{\setlength{\rightskip}{0pt plus 5cm}integer function prep\-::genh (
+\begin{DoxyParamCaption}
+\item[{integer, intent(in)}]{j, }
+\item[{integer, intent(in)}]{residue}
+\end{DoxyParamCaption}
+)}}\label{classprep_afb869c9c110e8701cde8761ae8856405}
+
+
+Definition at line 1712 of file prep.\-f90.
+
+
+
+References calc\-\_\-chemscore\-::angle(), cross\-\_\-product(), and md\-::randm().
+
+
+
+Referenced by makehyds().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classprep_afb869c9c110e8701cde8761ae8856405_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_aa1417fc48a24a3fd294d10f9254a0a0c}{\index{prep@{prep}!get\-\_\-atom\-\_\-from\-\_\-descriptor@{get\-\_\-atom\-\_\-from\-\_\-descriptor}}
+\index{get\-\_\-atom\-\_\-from\-\_\-descriptor@{get\-\_\-atom\-\_\-from\-\_\-descriptor}!prep@{prep}}
+\paragraph[{get\-\_\-atom\-\_\-from\-\_\-descriptor}]{\setlength{\rightskip}{0pt plus 5cm}integer function prep\-::get\-\_\-atom\-\_\-from\-\_\-descriptor (
+\begin{DoxyParamCaption}
+\item[{character($\ast$), intent(in)}]{aid}
+\end{DoxyParamCaption}
+)}}\label{classprep_aa1417fc48a24a3fd294d10f9254a0a0c}
+
+
+Definition at line 4492 of file prep.\-f90.
+
+
+
+References find\-\_\-atom().
+
+
+
+Referenced by addbond(), set\-\_\-simulation\-\_\-sphere(), set\-\_\-solvent\-\_\-box(), and set\-\_\-solvent\-\_\-sphere().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_ac5cb1bd82cdabbd55089747c70946e9f}{\index{prep@{prep}!get\-\_\-centre\-\_\-by\-\_\-mass@{get\-\_\-centre\-\_\-by\-\_\-mass}}
+\index{get\-\_\-centre\-\_\-by\-\_\-mass@{get\-\_\-centre\-\_\-by\-\_\-mass}!prep@{prep}}
+\paragraph[{get\-\_\-centre\-\_\-by\-\_\-mass}]{\setlength{\rightskip}{0pt plus 5cm}logical function prep\-::get\-\_\-centre\-\_\-by\-\_\-mass (
+\begin{DoxyParamCaption}
+\item[{real(8), dimension(3), intent(out)}]{centre}
+\end{DoxyParamCaption}
+)}}\label{classprep_ac5cb1bd82cdabbd55089747c70946e9f}
+
+
+Definition at line 6313 of file prep.\-f90.
+
+
+
+References atom\-\_\-mask\-::mask\-\_\-initialize(), maskmanip\-::maskmanip\-\_\-make\-\_\-pretop(), and set\-\_\-iac().
+
+
+
+Referenced by set\-\_\-simulation\-\_\-sphere(), set\-\_\-solvent\-\_\-box(), and set\-\_\-solvent\-\_\-sphere().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classprep_ac5cb1bd82cdabbd55089747c70946e9f_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a83cffe3873feafd7ebdef521099d5bac}{\index{prep@{prep}!grow\-\_\-arrays\-\_\-for\-\_\-solvent@{grow\-\_\-arrays\-\_\-for\-\_\-solvent}}
+\index{grow\-\_\-arrays\-\_\-for\-\_\-solvent@{grow\-\_\-arrays\-\_\-for\-\_\-solvent}!prep@{prep}}
+\paragraph[{grow\-\_\-arrays\-\_\-for\-\_\-solvent}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::grow\-\_\-arrays\-\_\-for\-\_\-solvent (
+\begin{DoxyParamCaption}
+\item[{integer, intent(in)}]{nmore, }
+\item[{integer, intent(in)}]{atoms\-\_\-per\-\_\-molecule}
+\end{DoxyParamCaption}
+)}}\label{classprep_a83cffe3873feafd7ebdef521099d5bac}
+
+
+Definition at line 5619 of file prep.\-f90.
+
+
+
+References md\-::check\-\_\-alloc().
+
+
+
+Referenced by add\-\_\-solvent\-\_\-to\-\_\-topology(), and solvate\-\_\-restart().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_add71bde50c689d84c2d8bc7fd0e60c25}{\index{prep@{prep}!imp\-\_\-params@{imp\-\_\-params}}
+\index{imp\-\_\-params@{imp\-\_\-params}!prep@{prep}}
+\paragraph[{imp\-\_\-params}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::imp\-\_\-params (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_add71bde50c689d84c2d8bc7fd0e60c25}
+
+
+Definition at line 1990 of file prep.\-f90.
+
+
+
+References impcode().
+
+
+
+Referenced by maketop().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classprep_add71bde50c689d84c2d8bc7fd0e60c25_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_ab2285a42c7d8ccdf6807443c55ebef12}{\index{prep@{prep}!impcode@{impcode}}
+\index{impcode@{impcode}!prep@{prep}}
+\paragraph[{impcode}]{\setlength{\rightskip}{0pt plus 5cm}integer function prep\-::impcode (
+\begin{DoxyParamCaption}
+\item[{character(keylength)}]{taci, }
+\item[{character(keylength)}]{tacj, }
+\item[{character(keylength)}]{tack, }
+\item[{character(keylength)}]{tacl}
+\end{DoxyParamCaption}
+)}}\label{classprep_ab2285a42c7d8ccdf6807443c55ebef12}
+
+
+Definition at line 767 of file prep.\-f90.
+
+
+
+References wildcard\-\_\-tac().
+
+
+
+Referenced by imp\-\_\-params().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=294pt]{classprep_ab2285a42c7d8ccdf6807443c55ebef12_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_ae5d14f28b42c21cbeac0a6d01b437b0a}{\index{prep@{prep}!impr\-\_\-ene@{impr\-\_\-ene}}
+\index{impr\-\_\-ene@{impr\-\_\-ene}!prep@{prep}}
+\paragraph[{impr\-\_\-ene}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::impr\-\_\-ene (
+\begin{DoxyParamCaption}
+\item[{real}]{emax, }
+\item[{integer}]{nlarge, }
+\item[{real}]{av\-\_\-ene, }
+\item[{integer}]{mode}
+\end{DoxyParamCaption}
+)}}\label{classprep_ae5d14f28b42c21cbeac0a6d01b437b0a}
+
+
+Definition at line 1103 of file prep.\-f90.
+
+
+
+Referenced by changeimp(), and checkimps().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a98a2bbf68312eda5398cd628a5acad6d}{\index{prep@{prep}!listprefs@{listprefs}}
+\index{listprefs@{listprefs}!prep@{prep}}
+\paragraph[{listprefs}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::listprefs (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a98a2bbf68312eda5398cd628a5acad6d}
+
+
+Definition at line 6247 of file prep.\-f90.
+
+
+
+References prefs\-::pref\-\_\-list().
+
+
+
+Referenced by parse\-\_\-command().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=272pt]{classprep_a98a2bbf68312eda5398cd628a5acad6d_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a826ccdfd790c158de7a5c69009883282}{\index{prep@{prep}!listres@{listres}}
+\index{listres@{listres}!prep@{prep}}
+\paragraph[{listres}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::listres (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a826ccdfd790c158de7a5c69009883282}
+
+
+Definition at line 1192 of file prep.\-f90.
+
+
+
+References check\-\_\-residues(), and parse\-::get\-\_\-int\-\_\-arg().
+
+
+
+Referenced by parse\-\_\-command().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classprep_a826ccdfd790c158de7a5c69009883282_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a79d5c64b6e03f8453c97ee7e4b0adbc5}{\index{prep@{prep}!listseq@{listseq}}
+\index{listseq@{listseq}!prep@{prep}}
+\paragraph[{listseq}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::listseq (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a79d5c64b6e03f8453c97ee7e4b0adbc5}
+
+
+Definition at line 1220 of file prep.\-f90.
+
+
+
+Referenced by parse\-\_\-command().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a0c95e6e67020077e83eb467d3a21c3e5}{\index{prep@{prep}!make14list@{make14list}}
+\index{make14list@{make14list}!prep@{prep}}
+\paragraph[{make14list}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::make14list (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a0c95e6e67020077e83eb467d3a21c3e5}
+
+
+Definition at line 1235 of file prep.\-f90.
+
+
+
+Referenced by maketop().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a590bd98683520ed1b1edce0bdf78b337}{\index{prep@{prep}!make\-\_\-shell2@{make\-\_\-shell2}}
+\index{make\-\_\-shell2@{make\-\_\-shell2}!prep@{prep}}
+\paragraph[{make\-\_\-shell2}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::make\-\_\-shell2 (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a590bd98683520ed1b1edce0bdf78b337}
+
+
+Definition at line 6269 of file prep.\-f90.
+
+
+
+References parse\-::get\-\_\-real\-\_\-arg().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classprep_a590bd98683520ed1b1edce0bdf78b337_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classprep_aac9d9e5e1214d4794749dc77e9de4747}{\index{prep@{prep}!make\-\_\-solute\-\_\-bonds@{make\-\_\-solute\-\_\-bonds}}
+\index{make\-\_\-solute\-\_\-bonds@{make\-\_\-solute\-\_\-bonds}!prep@{prep}}
+\paragraph[{make\-\_\-solute\-\_\-bonds}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::make\-\_\-solute\-\_\-bonds (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_aac9d9e5e1214d4794749dc77e9de4747}
+
+
+Definition at line 1410 of file prep.\-f90.
+
+
+
+References makesomebonds(), and topo\-::topo\-\_\-set\-\_\-max().
+
+
+
+Referenced by xlink().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classprep_aac9d9e5e1214d4794749dc77e9de4747_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a8d909ff9b94b53c7825bd883adfa22f7}{\index{prep@{prep}!makeangles@{makeangles}}
+\index{makeangles@{makeangles}!prep@{prep}}
+\paragraph[{makeangles}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::makeangles (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a8d909ff9b94b53c7825bd883adfa22f7}
+
+
+Definition at line 1301 of file prep.\-f90.
+
+
+
+References anglecode().
+
+
+
+Referenced by maketop().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classprep_a8d909ff9b94b53c7825bd883adfa22f7_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a91be0a910b6ce5c0a9046eeb76457a8f}{\index{prep@{prep}!makebonds@{makebonds}}
+\index{makebonds@{makebonds}!prep@{prep}}
+\paragraph[{makebonds}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::makebonds (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a91be0a910b6ce5c0a9046eeb76457a8f}
+
+
+Definition at line 1435 of file prep.\-f90.
+
+
+
+References makeextrabonds(), and makesomebonds().
+
+
+
+Referenced by maketop().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classprep_a91be0a910b6ce5c0a9046eeb76457a8f_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a94241a6b92f9a195d99d246496af82f1}{\index{prep@{prep}!makeconn@{makeconn}}
+\index{makeconn@{makeconn}!prep@{prep}}
+\paragraph[{makeconn}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::makeconn (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a94241a6b92f9a195d99d246496af82f1}
+
+
+Definition at line 2287 of file prep.\-f90.
+
+
+
+Referenced by maketop().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_ad74718adb758876e6080d71768b03bf2}{\index{prep@{prep}!makeexlist@{makeexlist}}
+\index{makeexlist@{makeexlist}!prep@{prep}}
+\paragraph[{makeexlist}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::makeexlist (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_ad74718adb758876e6080d71768b03bf2}
+
+
+Definition at line 1591 of file prep.\-f90.
+
+
+
+Referenced by maketop().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a2703dd8ae27ed1ccd2d53f907fa9a64f}{\index{prep@{prep}!makeextrabonds@{makeextrabonds}}
+\index{makeextrabonds@{makeextrabonds}!prep@{prep}}
+\paragraph[{makeextrabonds}]{\setlength{\rightskip}{0pt plus 5cm}integer function prep\-::makeextrabonds (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a2703dd8ae27ed1ccd2d53f907fa9a64f}
+
+
+Definition at line 1463 of file prep.\-f90.
+
+
+
+References bondcode().
+
+
+
+Referenced by makebonds().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classprep_a2703dd8ae27ed1ccd2d53f907fa9a64f_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_ab3a376766b645bd5b93ac77220735ee5}{\index{prep@{prep}!makehyds@{makehyds}}
+\index{makehyds@{makehyds}!prep@{prep}}
+\paragraph[{makehyds}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::makehyds (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_ab3a376766b645bd5b93ac77220735ee5}
+
+
+Definition at line 1669 of file prep.\-f90.
+
+
+
+References genh(), calc\-\_\-rdf\-::r(), and md\-::randm().
+
+
+
+Referenced by maketop().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classprep_ab3a376766b645bd5b93ac77220735ee5_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a39400f89f3b6e4db1b43078c8671b409}{\index{prep@{prep}!makeimps@{makeimps}}
+\index{makeimps@{makeimps}!prep@{prep}}
+\paragraph[{makeimps}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::makeimps (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a39400f89f3b6e4db1b43078c8671b409}
+
+
+Definition at line 1966 of file prep.\-f90.
+
+
+
+Referenced by maketop().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a72e19a9dc7029265b5d2077e1b4c6288}{\index{prep@{prep}!makeimps\-\_\-explicit@{makeimps\-\_\-explicit}}
+\index{makeimps\-\_\-explicit@{makeimps\-\_\-explicit}!prep@{prep}}
+\paragraph[{makeimps\-\_\-explicit}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::makeimps\-\_\-explicit (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a72e19a9dc7029265b5d2077e1b4c6288}
+
+
+Definition at line 2099 of file prep.\-f90.
+
+
+
+References find\-\_\-atom().
+
+
+
+Referenced by maketop().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_aecab92978bb189465862cc9d64504926}{\index{prep@{prep}!makesomebonds@{makesomebonds}}
+\index{makesomebonds@{makesomebonds}!prep@{prep}}
+\paragraph[{makesomebonds}]{\setlength{\rightskip}{0pt plus 5cm}integer function prep\-::makesomebonds (
+\begin{DoxyParamCaption}
+\item[{integer}]{startres, }
+\item[{integer}]{endres}
+\end{DoxyParamCaption}
+)}}\label{classprep_aecab92978bb189465862cc9d64504926}
+
+
+Definition at line 1539 of file prep.\-f90.
+
+
+
+Referenced by make\-\_\-solute\-\_\-bonds(), and makebonds().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_ac1b20bb4677de808773357bae4f5b4a5}{\index{prep@{prep}!maketop@{maketop}}
+\index{maketop@{maketop}!prep@{prep}}
+\paragraph[{maketop}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::maketop (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_ac1b20bb4677de808773357bae4f5b4a5}
+
+
+Definition at line 2129 of file prep.\-f90.
+
+
+
+References check\-\_\-residues(), parse\-::get\-\_\-line\-\_\-arg(), imp\-\_\-params(), make14list(), makeangles(), makebonds(), makeconn(), makeexlist(), makehyds(), makeimps(), makeimps\-\_\-explicit(), maketors(), set\-\_\-bondcodes(), set\-\_\-cgp(), set\-\_\-crg(), set\-\_\-default\-\_\-mask(), set\-\_\-iac(), set\-\_\-solvent\-\_\-type(), and topo\-::topo\-\_\-set\-\_\-max().
+
+
+
+Referenced by parse\-\_\-command().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_ac846f0515160efb246ed00491918d9b4}{\index{prep@{prep}!maketors@{maketors}}
+\index{maketors@{maketors}!prep@{prep}}
+\paragraph[{maketors}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::maketors (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_ac846f0515160efb246ed00491918d9b4}
+
+
+Definition at line 2310 of file prep.\-f90.
+
+
+
+References torcode().
+
+
+
+Referenced by maketop().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classprep_ac846f0515160efb246ed00491918d9b4_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a977d8921a8e453a4a83f89e42147e5e9}{\index{prep@{prep}!modify\-\_\-mask@{modify\-\_\-mask}}
+\index{modify\-\_\-mask@{modify\-\_\-mask}!prep@{prep}}
+\paragraph[{modify\-\_\-mask}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::modify\-\_\-mask (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a977d8921a8e453a4a83f89e42147e5e9}
+
+
+Definition at line 4229 of file prep.\-f90.
+
+
+
+References parse\-::get\-\_\-line\-\_\-arg(), atom\-\_\-mask\-::mask\-\_\-add(), atom\-\_\-mask\-::mask\-\_\-clear(), and misc\-::upcase().
+
+
+
+Referenced by parse\-\_\-command().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classprep_a977d8921a8e453a4a83f89e42147e5e9_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a0dedb90780274dad9f0cb73c67bc72c4}{\index{prep@{prep}!oldreadlib@{oldreadlib}}
+\index{oldreadlib@{oldreadlib}!prep@{prep}}
+\paragraph[{oldreadlib}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::oldreadlib (
+\begin{DoxyParamCaption}
+\item[{character($\ast$)}]{filnam}
+\end{DoxyParamCaption}
+)}}\label{classprep_a0dedb90780274dad9f0cb73c67bc72c4}
+
+
+Definition at line 2460 of file prep.\-f90.
+
+
+
+References parse\-::openit(), and misc\-::skip\-\_\-comments().
+
+
+
+Referenced by readlib().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classprep_a0dedb90780274dad9f0cb73c67bc72c4_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_aa8bce8b46beb9bb1a75090b0ca7666e1}{\index{prep@{prep}!oldreadparm@{oldreadparm}}
+\index{oldreadparm@{oldreadparm}!prep@{prep}}
+\paragraph[{oldreadparm}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::oldreadparm (
+\begin{DoxyParamCaption}
+\item[{logical}]{flag}
+\end{DoxyParamCaption}
+)}}\label{classprep_aa8bce8b46beb9bb1a75090b0ca7666e1}
+
+
+Definition at line 2970 of file prep.\-f90.
+
+
+
+References md\-::check\-\_\-alloc(), indexer\-::index\-\_\-add(), indexer\-::index\-\_\-create(), and misc\-::skip\-\_\-comments().
+
+
+
+Referenced by readff(), and readparm().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a980bbec7c9f236072dd12ff9ad79415e}{\index{prep@{prep}!prep\-\_\-shutdown@{prep\-\_\-shutdown}}
+\index{prep\-\_\-shutdown@{prep\-\_\-shutdown}!prep@{prep}}
+\paragraph[{prep\-\_\-shutdown}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::prep\-\_\-shutdown (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a980bbec7c9f236072dd12ff9ad79415e}
+
+
+Definition at line 238 of file prep.\-f90.
+
+
+
+References indexer\-::index\-\_\-shutdown(), atom\-\_\-mask\-::mask\-\_\-finalize(), topo\-::topo\-\_\-deallocate(), and trj\-::trj\-\_\-shutdown().
+
+
+
+Referenced by shutdown().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=285pt]{classprep_a980bbec7c9f236072dd12ff9ad79415e_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classprep_a09769dae7cb5df79a430d07e240fb16b}{\index{prep@{prep}!prep\-\_\-startup@{prep\-\_\-startup}}
+\index{prep\-\_\-startup@{prep\-\_\-startup}!prep@{prep}}
+\paragraph[{prep\-\_\-startup}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::prep\-\_\-startup (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a09769dae7cb5df79a430d07e240fb16b}
+
+
+Definition at line 194 of file prep.\-f90.
+
+
+
+References allocate\-\_\-for\-\_\-pdb(), clearpdb(), cleartop(), indexer\-::index\-\_\-startup(), parse\-::parse\-\_\-startup(), prefs\-::pref\-\_\-add(), prefs\-::pref\-\_\-initialize(), prmfile\-::prmfile\-\_\-startup(), and topo\-::topo\-\_\-startup().
+
+
+
+Referenced by startup().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=261pt]{classprep_a09769dae7cb5df79a430d07e240fb16b_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classprep_a162b497f3439d96e352c9cb8b4e94cc9}{\index{prep@{prep}!prompt@{prompt}}
+\index{prompt@{prompt}!prep@{prep}}
+\paragraph[{prompt}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::prompt (
+\begin{DoxyParamCaption}
+\item[{character( $\ast$ )}]{outtxt}
+\end{DoxyParamCaption}
+)}}\label{classprep_a162b497f3439d96e352c9cb8b4e94cc9}
+
+
+Definition at line 2408 of file prep.\-f90.
+
+\hypertarget{classprep_a5641b3358b25c1add0aef28b30a9c055}{\index{prep@{prep}!randm@{randm}}
+\index{randm@{randm}!prep@{prep}}
+\paragraph[{randm}]{\setlength{\rightskip}{0pt plus 5cm}real function prep\-::randm (
+\begin{DoxyParamCaption}
+\item[{integer, intent(in), optional}]{seed, }
+\item[{logical, intent(in), optional}]{seed\-\_\-only}
+\end{DoxyParamCaption}
+)}}\label{classprep_a5641b3358b25c1add0aef28b30a9c055}
+
+
+Definition at line 2422 of file prep.\-f90.
+
+
+
+References calc\-\_\-rdf\-::r(), and md\-::randm().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=346pt]{classprep_a5641b3358b25c1add0aef28b30a9c055_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classprep_a266a5e1af478996cb0484355015fbd31}{\index{prep@{prep}!readff@{readff}}
+\index{readff@{readff}!prep@{prep}}
+\paragraph[{readff}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::readff (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a266a5e1af478996cb0484355015fbd31}
+
+
+Definition at line 3150 of file prep.\-f90.
+
+
+
+References parse\-::get\-\_\-string\-\_\-arg(), oldreadparm(), parse\-::openit(), prmfile\-::prm\-\_\-close(), prmfile\-::prm\-\_\-open(), and readparm().
+
+
+
+Referenced by parse\-\_\-command().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a76cc92e2a4be8c7ee740c6ba35b8789b}{\index{prep@{prep}!readframe@{readframe}}
+\index{readframe@{readframe}!prep@{prep}}
+\paragraph[{readframe}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::readframe (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a76cc92e2a4be8c7ee740c6ba35b8789b}
+
+
+Definition at line 4186 of file prep.\-f90.
+
+
+
+References parse\-::get\-\_\-int\-\_\-arg(), readnext(), and trj\-::trj\-\_\-seek().
+
+
+
+Referenced by parse\-\_\-command().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a5416ced67e818030602fa86ed687ac6b}{\index{prep@{prep}!readlib@{readlib}}
+\index{readlib@{readlib}!prep@{prep}}
+\paragraph[{readlib}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::readlib (
+\begin{DoxyParamCaption}
+\item[{character($\ast$), optional}]{file}
+\end{DoxyParamCaption}
+)}}\label{classprep_a5416ced67e818030602fa86ed687ac6b}
+
+
+Definition at line 2607 of file prep.\-f90.
+
+
+
+References check\-\_\-overload(), parse\-::get\-\_\-string\-\_\-arg(), indexer\-::index\-\_\-add(), indexer\-::index\-\_\-create(), indexer\-::index\-\_\-get(), misc\-::locase(), oldreadlib(), prmfile\-::prm\-\_\-close(), prmfile\-::prm\-\_\-count(), prmfile\-::prm\-\_\-get\-\_\-field(), prmfile\-::prm\-\_\-get\-\_\-line(), prmfile\-::prm\-\_\-get\-\_\-logical\-\_\-by\-\_\-key(), prmfile\-::prm\-\_\-get\-\_\-next\-\_\-title(), prmfile\-::prm\-\_\-get\-\_\-real\-\_\-by\-\_\-key(), prmfile\-::prm\-\_\-get\-\_\-string\-\_\-by\-\_\-key(), prmfile\-::prm\-\_\-open(), prmfile\-::prm\-\_\-open\-\_\-section(), and misc\-::upcase().
+
+
+
+Referenced by parse\-\_\-command(), and readtop().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_ab41936ec09ac09e102a791f2c28d8c37}{\index{prep@{prep}!readnext@{readnext}}
+\index{readnext@{readnext}!prep@{prep}}
+\paragraph[{readnext}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::readnext (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_ab41936ec09ac09e102a791f2c28d8c37}
+
+
+Definition at line 4161 of file prep.\-f90.
+
+
+
+References trj\-::trj\-\_\-close(), and trj\-::trj\-\_\-read().
+
+
+
+Referenced by parse\-\_\-command(), and readframe().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a95a57c9975f303d860e25611bb7a14ad}{\index{prep@{prep}!readparm@{readparm}}
+\index{readparm@{readparm}!prep@{prep}}
+\paragraph[{readparm}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::readparm (
+\begin{DoxyParamCaption}
+\item[{character($\ast$)}]{filnam}
+\end{DoxyParamCaption}
+)}}\label{classprep_a95a57c9975f303d860e25611bb7a14ad}
+
+
+Definition at line 3176 of file prep.\-f90.
+
+
+
+References md\-::check\-\_\-alloc(), indexer\-::index\-\_\-add(), indexer\-::index\-\_\-alias(), indexer\-::index\-\_\-create(), indexer\-::index\-\_\-get(), indexer\-::index\-\_\-resize(), oldreadparm(), parse\-::openit(), prmfile\-::prm\-\_\-close(), prmfile\-::prm\-\_\-count(), prmfile\-::prm\-\_\-get\-\_\-line(), prmfile\-::prm\-\_\-get\-\_\-logical\-\_\-by\-\_\-key(), prmfile\-::prm\-\_\-get\-\_\-real\-\_\-by\-\_\-key(), prmfile\-::prm\-\_\-get\-\_\-string\-\_\-by\-\_\-key(), prmfile\-::prm\-\_\-get\-\_\-string\-\_\-string(), prmfile\-::prm\-\_\-open\-\_\-section(), and misc\-::upcase().
+
+
+
+Referenced by readff().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a11614f4fd619fd0eb99727e258ca2300}{\index{prep@{prep}!readpdb@{readpdb}}
+\index{readpdb@{readpdb}!prep@{prep}}
+\paragraph[{readpdb}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::readpdb (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a11614f4fd619fd0eb99727e258ca2300}
+
+
+Definition at line 3803 of file prep.\-f90.
+
+
+
+References allocate\-\_\-for\-\_\-pdb(), clearpdb(), countpdb(), parse\-::get\-\_\-string\-\_\-arg(), parse\-::openit(), and topo\-::topo\-\_\-deallocate().
+
+
+
+Referenced by parse\-\_\-command().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classprep_a11614f4fd619fd0eb99727e258ca2300_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a59d775f3eb60a2041f8a27c882d3bc70}{\index{prep@{prep}!readtop@{readtop}}
+\index{readtop@{readtop}!prep@{prep}}
+\paragraph[{readtop}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::readtop (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a59d775f3eb60a2041f8a27c882d3bc70}
+
+
+Definition at line 4051 of file prep.\-f90.
+
+
+
+References parse\-::get\-\_\-string\-\_\-arg(), parse\-::openit(), readlib(), set\-\_\-default\-\_\-mask(), misc\-::string\-\_\-part(), and topo\-::topo\-\_\-read().
+
+
+
+Referenced by parse\-\_\-command().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_ab2a8422cb6cb324200f5b5bf3083675c}{\index{prep@{prep}!readx@{readx}}
+\index{readx@{readx}!prep@{prep}}
+\paragraph[{readx}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::readx (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_ab2a8422cb6cb324200f5b5bf3083675c}
+
+
+Definition at line 4127 of file prep.\-f90.
+
+
+
+References misc\-::freefile(), parse\-::get\-\_\-string\-\_\-arg(), and parse\-::openit().
+
+
+
+Referenced by parse\-\_\-command().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_aede855ae502ac617ebdefee64cf18581}{\index{prep@{prep}!rwat\-\_\-eff@{rwat\-\_\-eff}}
+\index{rwat\-\_\-eff@{rwat\-\_\-eff}!prep@{prep}}
+\paragraph[{rwat\-\_\-eff}]{\setlength{\rightskip}{0pt plus 5cm}real function prep\-::rwat\-\_\-eff (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_aede855ae502ac617ebdefee64cf18581}
+
+
+Definition at line 5702 of file prep.\-f90.
+
+
+
+References md\-::check\-\_\-alloc().
+
+
+
+Referenced by set\-\_\-cgp(), and set\-\_\-solvent\-\_\-sphere().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a970e6693d83b14e44100bacdd3ad4132}{\index{prep@{prep}!set@{set}}
+\index{set@{set}!prep@{prep}}
+\paragraph[{set}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::set (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a970e6693d83b14e44100bacdd3ad4132}
+
+
+Definition at line 6253 of file prep.\-f90.
+
+
+
+References parse\-::get\-\_\-string\-\_\-arg(), and prefs\-::pref\-\_\-set().
+
+
+
+Referenced by md\-::nbqqlist(), and parse\-\_\-command().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classprep_a970e6693d83b14e44100bacdd3ad4132_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_aa25c6d94bb5bfc531ab510e79422fce5}{\index{prep@{prep}!set\-\_\-bondcodes@{set\-\_\-bondcodes}}
+\index{set\-\_\-bondcodes@{set\-\_\-bondcodes}!prep@{prep}}
+\paragraph[{set\-\_\-bondcodes}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::set\-\_\-bondcodes (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_aa25c6d94bb5bfc531ab510e79422fce5}
+
+
+Definition at line 1497 of file prep.\-f90.
+
+
+
+References bondcode().
+
+
+
+Referenced by maketop().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classprep_aa25c6d94bb5bfc531ab510e79422fce5_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a6cb87d50fe4a6bf0ae27fe34d7316f5b}{\index{prep@{prep}!set\-\_\-boundary\-\_\-condition@{set\-\_\-boundary\-\_\-condition}}
+\index{set\-\_\-boundary\-\_\-condition@{set\-\_\-boundary\-\_\-condition}!prep@{prep}}
+\paragraph[{set\-\_\-boundary\-\_\-condition}]{\setlength{\rightskip}{0pt plus 5cm}logical function prep\-::set\-\_\-boundary\-\_\-condition (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a6cb87d50fe4a6bf0ae27fe34d7316f5b}
+
+
+Definition at line 4528 of file prep.\-f90.
+
+
+
+References parse\-::get\-\_\-string\-\_\-arg(), parse\-::parse\-\_\-reset(), set\-\_\-simulation\-\_\-sphere(), set\-\_\-solvent\-\_\-box(), and misc\-::upcase().
+
+
+
+Referenced by define\-\_\-boundary\-\_\-condition().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a92afff65bcc25e77c24396983122b519}{\index{prep@{prep}!set\-\_\-cgp@{set\-\_\-cgp}}
+\index{set\-\_\-cgp@{set\-\_\-cgp}!prep@{prep}}
+\paragraph[{set\-\_\-cgp}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::set\-\_\-cgp (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a92afff65bcc25e77c24396983122b519}
+
+
+Definition at line 4257 of file prep.\-f90.
+
+
+
+References rwat\-\_\-eff().
+
+
+
+Referenced by maketop().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_aa73f65ac2841ae32010701ac95af166a}{\index{prep@{prep}!set\-\_\-crg@{set\-\_\-crg}}
+\index{set\-\_\-crg@{set\-\_\-crg}!prep@{prep}}
+\paragraph[{set\-\_\-crg}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::set\-\_\-crg (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_aa73f65ac2841ae32010701ac95af166a}
+
+
+Definition at line 4359 of file prep.\-f90.
+
+
+
+Referenced by maketop().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a66e2390289edaef47f6dcefb4a185202}{\index{prep@{prep}!set\-\_\-default\-\_\-mask@{set\-\_\-default\-\_\-mask}}
+\index{set\-\_\-default\-\_\-mask@{set\-\_\-default\-\_\-mask}!prep@{prep}}
+\paragraph[{set\-\_\-default\-\_\-mask}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::set\-\_\-default\-\_\-mask (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a66e2390289edaef47f6dcefb4a185202}
+
+
+Definition at line 2275 of file prep.\-f90.
+
+
+
+References atom\-\_\-mask\-::mask\-\_\-all(), atom\-\_\-mask\-::mask\-\_\-finalize(), and atom\-\_\-mask\-::mask\-\_\-initialize().
+
+
+
+Referenced by maketop(), and readtop().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_ac058180472b1eead5ada468b0ddb2a3b}{\index{prep@{prep}!set\-\_\-iac@{set\-\_\-iac}}
+\index{set\-\_\-iac@{set\-\_\-iac}!prep@{prep}}
+\paragraph[{set\-\_\-iac}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::set\-\_\-iac (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_ac058180472b1eead5ada468b0ddb2a3b}
+
+
+Definition at line 4385 of file prep.\-f90.
+
+
+
+References indexer\-::index\-\_\-get().
+
+
+
+Referenced by get\-\_\-centre\-\_\-by\-\_\-mass(), and maketop().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=288pt]{classprep_ac058180472b1eead5ada468b0ddb2a3b_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a6b313325f97052430b9b558dca9606fd}{\index{prep@{prep}!set\-\_\-irc\-\_\-solvent@{set\-\_\-irc\-\_\-solvent}}
+\index{set\-\_\-irc\-\_\-solvent@{set\-\_\-irc\-\_\-solvent}!prep@{prep}}
+\paragraph[{set\-\_\-irc\-\_\-solvent}]{\setlength{\rightskip}{0pt plus 5cm}logical function prep\-::set\-\_\-irc\-\_\-solvent (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a6b313325f97052430b9b558dca9606fd}
+
+
+Definition at line 4428 of file prep.\-f90.
+
+
+
+Referenced by solvate\-\_\-box\-\_\-file(), solvate\-\_\-box\-\_\-grid(), solvate\-\_\-restart(), solvate\-\_\-sphere\-\_\-file(), and solvate\-\_\-sphere\-\_\-grid().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a35f72f5ffad726d4d9f3f8405837b1a2}{\index{prep@{prep}!set\-\_\-simulation\-\_\-sphere@{set\-\_\-simulation\-\_\-sphere}}
+\index{set\-\_\-simulation\-\_\-sphere@{set\-\_\-simulation\-\_\-sphere}!prep@{prep}}
+\paragraph[{set\-\_\-simulation\-\_\-sphere}]{\setlength{\rightskip}{0pt plus 5cm}logical function prep\-::set\-\_\-simulation\-\_\-sphere (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a35f72f5ffad726d4d9f3f8405837b1a2}
+
+
+Definition at line 4571 of file prep.\-f90.
+
+
+
+References get\-\_\-atom\-\_\-from\-\_\-descriptor(), get\-\_\-centre\-\_\-by\-\_\-mass(), parse\-::get\-\_\-real\-\_\-arg(), and parse\-::get\-\_\-string\-\_\-arg().
+
+
+
+Referenced by set\-\_\-boundary\-\_\-condition().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a28767f39911fb26ba4be630e1b41c4e5}{\index{prep@{prep}!set\-\_\-solvent\-\_\-box@{set\-\_\-solvent\-\_\-box}}
+\index{set\-\_\-solvent\-\_\-box@{set\-\_\-solvent\-\_\-box}!prep@{prep}}
+\paragraph[{set\-\_\-solvent\-\_\-box}]{\setlength{\rightskip}{0pt plus 5cm}logical function prep\-::set\-\_\-solvent\-\_\-box (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a28767f39911fb26ba4be630e1b41c4e5}
+
+
+Definition at line 4630 of file prep.\-f90.
+
+
+
+References get\-\_\-atom\-\_\-from\-\_\-descriptor(), get\-\_\-centre\-\_\-by\-\_\-mass(), parse\-::get\-\_\-real\-\_\-arg(), parse\-::get\-\_\-string\-\_\-arg(), and misc\-::upcase().
+
+
+
+Referenced by set\-\_\-boundary\-\_\-condition().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_abb116903e6c029e9d8ad398fc9968393}{\index{prep@{prep}!set\-\_\-solvent\-\_\-sphere@{set\-\_\-solvent\-\_\-sphere}}
+\index{set\-\_\-solvent\-\_\-sphere@{set\-\_\-solvent\-\_\-sphere}!prep@{prep}}
+\paragraph[{set\-\_\-solvent\-\_\-sphere}]{\setlength{\rightskip}{0pt plus 5cm}logical function prep\-::set\-\_\-solvent\-\_\-sphere (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_abb116903e6c029e9d8ad398fc9968393}
+
+
+Definition at line 5079 of file prep.\-f90.
+
+
+
+References get\-\_\-atom\-\_\-from\-\_\-descriptor(), get\-\_\-centre\-\_\-by\-\_\-mass(), parse\-::get\-\_\-real\-\_\-arg(), parse\-::get\-\_\-string\-\_\-arg(), rwat\-\_\-eff(), and misc\-::upcase().
+
+
+
+Referenced by solvate\-\_\-sphere().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_aa37b27ef2e62436323ff35a371c0d152}{\index{prep@{prep}!set\-\_\-solvent\-\_\-type@{set\-\_\-solvent\-\_\-type}}
+\index{set\-\_\-solvent\-\_\-type@{set\-\_\-solvent\-\_\-type}!prep@{prep}}
+\paragraph[{set\-\_\-solvent\-\_\-type}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::set\-\_\-solvent\-\_\-type (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_aa37b27ef2e62436323ff35a371c0d152}
+
+
+Definition at line 4450 of file prep.\-f90.
+
+
+
+References indexer\-::index\-\_\-get().
+
+
+
+Referenced by maketop().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=331pt]{classprep_aa37b27ef2e62436323ff35a371c0d152_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_ab40618e65f3f9ff77388540cc08fb857}{\index{prep@{prep}!solvate@{solvate}}
+\index{solvate@{solvate}!prep@{prep}}
+\paragraph[{solvate}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::solvate (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_ab40618e65f3f9ff77388540cc08fb857}
+
+
+Definition at line 4699 of file prep.\-f90.
+
+
+
+References solvate\-\_\-box(), and solvate\-\_\-sphere().
+
+
+
+Referenced by parse\-\_\-command().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_adea6f92652c57e735fc1ecfb1c51b307}{\index{prep@{prep}!solvate\-\_\-box@{solvate\-\_\-box}}
+\index{solvate\-\_\-box@{solvate\-\_\-box}!prep@{prep}}
+\paragraph[{solvate\-\_\-box}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::solvate\-\_\-box (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_adea6f92652c57e735fc1ecfb1c51b307}
+
+
+Definition at line 4717 of file prep.\-f90.
+
+
+
+References parse\-::get\-\_\-string\-\_\-arg(), parse\-::parse\-\_\-reset(), solvate\-\_\-box\-\_\-file(), solvate\-\_\-box\-\_\-grid(), solvate\-\_\-restart(), and misc\-::upcase().
+
+
+
+Referenced by solvate().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_acd0632e7396c17a73263117350d795b2}{\index{prep@{prep}!solvate\-\_\-box\-\_\-file@{solvate\-\_\-box\-\_\-file}}
+\index{solvate\-\_\-box\-\_\-file@{solvate\-\_\-box\-\_\-file}!prep@{prep}}
+\paragraph[{solvate\-\_\-box\-\_\-file}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::solvate\-\_\-box\-\_\-file (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_acd0632e7396c17a73263117350d795b2}
+
+
+Definition at line 4834 of file prep.\-f90.
+
+
+
+References add\-\_\-solvent\-\_\-to\-\_\-topology(), md\-::check\-\_\-alloc(), parse\-::get\-\_\-string\-\_\-arg(), parse\-::parse\-\_\-reset(), set\-\_\-irc\-\_\-solvent(), and misc\-::upcase().
+
+
+
+Referenced by solvate\-\_\-box().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a69ec3a8bd439427b2a57259dcf0b7db5}{\index{prep@{prep}!solvate\-\_\-box\-\_\-grid@{solvate\-\_\-box\-\_\-grid}}
+\index{solvate\-\_\-box\-\_\-grid@{solvate\-\_\-box\-\_\-grid}!prep@{prep}}
+\paragraph[{solvate\-\_\-box\-\_\-grid}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::solvate\-\_\-box\-\_\-grid (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a69ec3a8bd439427b2a57259dcf0b7db5}
+
+
+Definition at line 4751 of file prep.\-f90.
+
+
+
+References add\-\_\-solvent\-\_\-to\-\_\-topology(), md\-::check\-\_\-alloc(), parse\-::get\-\_\-string\-\_\-arg(), and set\-\_\-irc\-\_\-solvent().
+
+
+
+Referenced by solvate\-\_\-box().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a5c7e6488cce390d096ff1ba62f9f7e3b}{\index{prep@{prep}!solvate\-\_\-restart@{solvate\-\_\-restart}}
+\index{solvate\-\_\-restart@{solvate\-\_\-restart}!prep@{prep}}
+\paragraph[{solvate\-\_\-restart}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::solvate\-\_\-restart (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a5c7e6488cce390d096ff1ba62f9f7e3b}
+
+
+Definition at line 5428 of file prep.\-f90.
+
+
+
+References add\-\_\-solvent\-\_\-to\-\_\-topology(), misc\-::freefile(), parse\-::get\-\_\-string\-\_\-arg(), grow\-\_\-arrays\-\_\-for\-\_\-solvent(), parse\-::parse\-\_\-reset(), and set\-\_\-irc\-\_\-solvent().
+
+
+
+Referenced by solvate\-\_\-box(), and solvate\-\_\-sphere().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a94b652674f1c868ef55bb9e4a3cd8204}{\index{prep@{prep}!solvate\-\_\-sphere@{solvate\-\_\-sphere}}
+\index{solvate\-\_\-sphere@{solvate\-\_\-sphere}!prep@{prep}}
+\paragraph[{solvate\-\_\-sphere}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::solvate\-\_\-sphere (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a94b652674f1c868ef55bb9e4a3cd8204}
+
+
+Definition at line 5042 of file prep.\-f90.
+
+
+
+References parse\-::get\-\_\-string\-\_\-arg(), parse\-::parse\-\_\-reset(), set\-\_\-solvent\-\_\-sphere(), solvate\-\_\-restart(), solvate\-\_\-sphere\-\_\-file(), solvate\-\_\-sphere\-\_\-grid(), and misc\-::upcase().
+
+
+
+Referenced by solvate().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a41752fc7d46be8f022fbba88f159f4d8}{\index{prep@{prep}!solvate\-\_\-sphere\-\_\-file@{solvate\-\_\-sphere\-\_\-file}}
+\index{solvate\-\_\-sphere\-\_\-file@{solvate\-\_\-sphere\-\_\-file}!prep@{prep}}
+\paragraph[{solvate\-\_\-sphere\-\_\-file}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::solvate\-\_\-sphere\-\_\-file (
+\begin{DoxyParamCaption}
+\item[{logical, intent(in), optional}]{shift}
+\end{DoxyParamCaption}
+)}}\label{classprep_a41752fc7d46be8f022fbba88f159f4d8}
+
+
+Definition at line 5224 of file prep.\-f90.
+
+
+
+References add\-\_\-solvent\-\_\-to\-\_\-topology(), md\-::check\-\_\-alloc(), parse\-::get\-\_\-string\-\_\-arg(), parse\-::parse\-\_\-reset(), set\-\_\-irc\-\_\-solvent(), and misc\-::upcase().
+
+
+
+Referenced by solvate\-\_\-sphere().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a48c69af56814950cb78d8a40679c6389}{\index{prep@{prep}!solvate\-\_\-sphere\-\_\-grid@{solvate\-\_\-sphere\-\_\-grid}}
+\index{solvate\-\_\-sphere\-\_\-grid@{solvate\-\_\-sphere\-\_\-grid}!prep@{prep}}
+\paragraph[{solvate\-\_\-sphere\-\_\-grid}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::solvate\-\_\-sphere\-\_\-grid (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a48c69af56814950cb78d8a40679c6389}
+
+
+Definition at line 5144 of file prep.\-f90.
+
+
+
+References add\-\_\-solvent\-\_\-to\-\_\-topology(), md\-::check\-\_\-alloc(), parse\-::get\-\_\-string\-\_\-arg(), and set\-\_\-irc\-\_\-solvent().
+
+
+
+Referenced by solvate\-\_\-sphere().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a65595c8aac3bb35b611e3222ccd26241}{\index{prep@{prep}!torcode@{torcode}}
+\index{torcode@{torcode}!prep@{prep}}
+\paragraph[{torcode}]{\setlength{\rightskip}{0pt plus 5cm}type(T\-O\-R\-\_\-\-C\-O\-D\-E\-S) function prep\-::torcode (
+\begin{DoxyParamCaption}
+\item[{character(keylength)}]{taci, }
+\item[{character(keylength)}]{tacj, }
+\item[{character(keylength)}]{tack, }
+\item[{character(keylength)}]{tacl}
+\end{DoxyParamCaption}
+)}}\label{classprep_a65595c8aac3bb35b611e3222ccd26241}
+
+
+Definition at line 5755 of file prep.\-f90.
+
+
+
+References wildcard\-\_\-tac().
+
+
+
+Referenced by maketors().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=289pt]{classprep_a65595c8aac3bb35b611e3222ccd26241_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a7ad81d7c12ae2e8a3ddaa2819ff9de90}{\index{prep@{prep}!tors\-\_\-ene@{tors\-\_\-ene}}
+\index{tors\-\_\-ene@{tors\-\_\-ene}!prep@{prep}}
+\paragraph[{tors\-\_\-ene}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::tors\-\_\-ene (
+\begin{DoxyParamCaption}
+\item[{real}]{emax, }
+\item[{integer}]{nlarge, }
+\item[{real}]{av\-\_\-ene}
+\end{DoxyParamCaption}
+)}}\label{classprep_a7ad81d7c12ae2e8a3ddaa2819ff9de90}
+
+
+Definition at line 5852 of file prep.\-f90.
+
+
+
+Referenced by checktors().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_aa25e33c6f5da38aba332f11ca5cff8f3}{\index{prep@{prep}!trajectory@{trajectory}}
+\index{trajectory@{trajectory}!prep@{prep}}
+\paragraph[{trajectory}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::trajectory (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_aa25e33c6f5da38aba332f11ca5cff8f3}
+
+
+Definition at line 4201 of file prep.\-f90.
+
+
+
+References parse\-::get\-\_\-string\-\_\-arg(), trj\-::trj\-\_\-clone\-\_\-mask(), trj\-::trj\-\_\-count(), trj\-::trj\-\_\-intersection(), and trj\-::trj\-\_\-open().
+
+
+
+Referenced by avetr\-::avetr\-\_\-calc(), and parse\-\_\-command().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a794267b8fc71dc3627e499ead4d46036}{\index{prep@{prep}!wildcard\-\_\-tac@{wildcard\-\_\-tac}}
+\index{wildcard\-\_\-tac@{wildcard\-\_\-tac}!prep@{prep}}
+\paragraph[{wildcard\-\_\-tac}]{\setlength{\rightskip}{0pt plus 5cm}character(K\-E\-Y\-L\-E\-N\-G\-T\-H) function prep\-::wildcard\-\_\-tac (
+\begin{DoxyParamCaption}
+\item[{character($\ast$), intent(in)}]{taci}
+\end{DoxyParamCaption}
+)}}\label{classprep_a794267b8fc71dc3627e499ead4d46036}
+
+
+Definition at line 485 of file prep.\-f90.
+
+
+
+Referenced by anglecode(), bondcode(), impcode(), and torcode().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_ad083f95844e256edae2a0a1f08770477}{\index{prep@{prep}!writemol2@{writemol2}}
+\index{writemol2@{writemol2}!prep@{prep}}
+\paragraph[{writemol2}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::writemol2 (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_ad083f95844e256edae2a0a1f08770477}
+
+
+Definition at line 6067 of file prep.\-f90.
+
+
+
+References check\-\_\-residues(), misc\-::freefile(), parse\-::get\-\_\-string\-\_\-arg(), parse\-::openit(), and parse\-::parse\-\_\-reset().
+
+
+
+Referenced by parse\-\_\-command().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a86389b7be94682ea34144a6086ebf289}{\index{prep@{prep}!writepdb@{writepdb}}
+\index{writepdb@{writepdb}!prep@{prep}}
+\paragraph[{writepdb}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::writepdb (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a86389b7be94682ea34144a6086ebf289}
+
+
+Definition at line 5957 of file prep.\-f90.
+
+
+
+References check\-\_\-residues(), parse\-::get\-\_\-string\-\_\-arg(), parse\-::openit(), and parse\-::parse\-\_\-reset().
+
+
+
+Referenced by parse\-\_\-command(), and avetr\-::write\-\_\-average().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classprep_a86389b7be94682ea34144a6086ebf289_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a9c1837f9f9cc480111bc869021782ba7}{\index{prep@{prep}!writetop@{writetop}}
+\index{writetop@{writetop}!prep@{prep}}
+\paragraph[{writetop}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::writetop (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a9c1837f9f9cc480111bc869021782ba7}
+
+
+Definition at line 6219 of file prep.\-f90.
+
+
+
+References parse\-::get\-\_\-string\-\_\-arg(), parse\-::parse\-\_\-reset(), and topo\-::topo\-\_\-save().
+
+
+
+Referenced by parse\-\_\-command().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classprep_a9e4f40f3858e73e7e2e5e520a6e99cf0}{\index{prep@{prep}!xlink@{xlink}}
+\index{xlink@{xlink}!prep@{prep}}
+\paragraph[{xlink}]{\setlength{\rightskip}{0pt plus 5cm}subroutine prep\-::xlink (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classprep_a9e4f40f3858e73e7e2e5e520a6e99cf0}
+
+
+Definition at line 687 of file prep.\-f90.
+
+
+
+References check\-\_\-residues(), and make\-\_\-solute\-\_\-bonds().
+
+
+
+Referenced by parse\-\_\-command().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classprep_a9e4f40f3858e73e7e2e5e520a6e99cf0_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+
+
+\subsubsection{Member Data Documentation}
+\hypertarget{classprep_a87d974b870f3e4297b7616cd4516d489}{\index{prep@{prep}!alloc\-\_\-status@{alloc\-\_\-status}}
+\index{alloc\-\_\-status@{alloc\-\_\-status}!prep@{prep}}
+\paragraph[{alloc\-\_\-status}]{\setlength{\rightskip}{0pt plus 5cm}integer, private prep\-::alloc\-\_\-status\hspace{0.3cm}{\ttfamily [private]}}}\label{classprep_a87d974b870f3e4297b7616cd4516d489}
+
+
+Definition at line 186 of file prep.\-f90.
+
+\hypertarget{classprep_a29c0f063e1579b1087d6e9bd35d11f9f}{\index{prep@{prep}!ang\-\_\-prm@{ang\-\_\-prm}}
+\index{ang\-\_\-prm@{ang\-\_\-prm}!prep@{prep}}
+\paragraph[{ang\-\_\-prm}]{\setlength{\rightskip}{0pt plus 5cm}type(anglib\-\_\-type), dimension(\-:), allocatable prep\-::ang\-\_\-prm}}\label{classprep_a29c0f063e1579b1087d6e9bd35d11f9f}
+
+
+Definition at line 123 of file prep.\-f90.
+
+\hypertarget{classprep_a35c47c52d6cde56a3edbbad318eb0735}{\index{prep@{prep}!ang\-\_\-types@{ang\-\_\-types}}
+\index{ang\-\_\-types@{ang\-\_\-types}!prep@{prep}}
+\paragraph[{ang\-\_\-types}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf angle\-\_\-type\-\_\-type}), dimension(\-:), allocatable prep\-::ang\-\_\-types}}\label{classprep_a35c47c52d6cde56a3edbbad318eb0735}
+
+
+Definition at line 122 of file prep.\-f90.
+
+\hypertarget{classprep_a83b69e52469478c0d64cb6bd2ad3060f}{\index{prep@{prep}!auto\-\_\-name@{auto\-\_\-name}}
+\index{auto\-\_\-name@{auto\-\_\-name}!prep@{prep}}
+\paragraph[{auto\-\_\-name}]{\setlength{\rightskip}{0pt plus 5cm}character(len=80) prep\-::auto\-\_\-name = ''}}\label{classprep_a83b69e52469478c0d64cb6bd2ad3060f}
+
+
+Definition at line 153 of file prep.\-f90.
+
+\hypertarget{classprep_ac427697c7ffa6252f064c2203abbc8d1}{\index{prep@{prep}!bnd\-\_\-prm@{bnd\-\_\-prm}}
+\index{bnd\-\_\-prm@{bnd\-\_\-prm}!prep@{prep}}
+\paragraph[{bnd\-\_\-prm}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf bond\-\_\-prm\-\_\-type}), dimension(\-:), allocatable prep\-::bnd\-\_\-prm}}\label{classprep_ac427697c7ffa6252f064c2203abbc8d1}
+
+
+Definition at line 116 of file prep.\-f90.
+
+\hypertarget{classprep_a8612d16f438fce2fdfab421435fc12b0}{\index{prep@{prep}!bnd\-\_\-types@{bnd\-\_\-types}}
+\index{bnd\-\_\-types@{bnd\-\_\-types}!prep@{prep}}
+\paragraph[{bnd\-\_\-types}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf bond\-\_\-type\-\_\-type}), dimension(\-:), allocatable prep\-::bnd\-\_\-types}}\label{classprep_a8612d16f438fce2fdfab421435fc12b0}
+
+
+Definition at line 115 of file prep.\-f90.
+
+\hypertarget{classprep_a7a6bd6d143339e8bfd4eca5c729d53fc}{\index{prep@{prep}!boundary\-\_\-set@{boundary\-\_\-set}}
+\index{boundary\-\_\-set@{boundary\-\_\-set}!prep@{prep}}
+\paragraph[{boundary\-\_\-set}]{\setlength{\rightskip}{0pt plus 5cm}logical prep\-::boundary\-\_\-set = .false.}}\label{classprep_a7a6bd6d143339e8bfd4eca5c729d53fc}
+
+
+Definition at line 101 of file prep.\-f90.
+
+\hypertarget{classprep_a853f496291d4e6336bc962adf492d392}{\index{prep@{prep}!build\-\_\-rule\-\_\-torsion@{build\-\_\-rule\-\_\-torsion}}
+\index{build\-\_\-rule\-\_\-torsion@{build\-\_\-rule\-\_\-torsion}!prep@{prep}}
+\paragraph[{build\-\_\-rule\-\_\-torsion}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter prep\-::build\-\_\-rule\-\_\-torsion = 1}}\label{classprep_a853f496291d4e6336bc962adf492d392}
+
+
+Definition at line 72 of file prep.\-f90.
+
+\hypertarget{classprep_a23c49c42a55467a3ef357748fb876a49}{\index{prep@{prep}!coord\-\_\-source@{coord\-\_\-source}}
+\index{coord\-\_\-source@{coord\-\_\-source}!prep@{prep}}
+\paragraph[{coord\-\_\-source}]{\setlength{\rightskip}{0pt plus 5cm}character(len=100) prep\-::coord\-\_\-source = ''}}\label{classprep_a23c49c42a55467a3ef357748fb876a49}
+
+
+Definition at line 152 of file prep.\-f90.
+
+\hypertarget{classprep_a7b7c9985659296eb39ad6c6be3b156a7}{\index{prep@{prep}!deg2rad@{deg2rad}}
+\index{deg2rad@{deg2rad}!prep@{prep}}
+\paragraph[{deg2rad}]{\setlength{\rightskip}{0pt plus 5cm}real(8) prep\-::deg2rad}}\label{classprep_a7b7c9985659296eb39ad6c6be3b156a7}
+
+
+Definition at line 170 of file prep.\-f90.
+
+\hypertarget{classprep_ad8cf2067e77b186f2d5601ee6da085c1}{\index{prep@{prep}!extrabnd@{extrabnd}}
+\index{extrabnd@{extrabnd}!prep@{prep}}
+\paragraph[{extrabnd}]{\setlength{\rightskip}{0pt plus 5cm}type(bond\-\_\-type), dimension({\bf max\-\_\-extrabnd}) prep\-::extrabnd}}\label{classprep_ad8cf2067e77b186f2d5601ee6da085c1}
+
+
+Definition at line 161 of file prep.\-f90.
+
+\hypertarget{classprep_ad93c90f3fad2706aabf577cd4a7bc3e5}{\index{prep@{prep}!ff\-\_\-ok@{ff\-\_\-ok}}
+\index{ff\-\_\-ok@{ff\-\_\-ok}!prep@{prep}}
+\paragraph[{ff\-\_\-ok}]{\setlength{\rightskip}{0pt plus 5cm}logical prep\-::ff\-\_\-ok = .false.}}\label{classprep_ad93c90f3fad2706aabf577cd4a7bc3e5}
+
+
+Definition at line 183 of file prep.\-f90.
+
+\hypertarget{classprep_af4d8bdabfcb632efdd69f7f9459d4cb1}{\index{prep@{prep}!have\-\_\-prm\-\_\-file\-\_\-name@{have\-\_\-prm\-\_\-file\-\_\-name}}
+\index{have\-\_\-prm\-\_\-file\-\_\-name@{have\-\_\-prm\-\_\-file\-\_\-name}!prep@{prep}}
+\paragraph[{have\-\_\-prm\-\_\-file\-\_\-name}]{\setlength{\rightskip}{0pt plus 5cm}logical prep\-::have\-\_\-prm\-\_\-file\-\_\-name = .false.}}\label{classprep_af4d8bdabfcb632efdd69f7f9459d4cb1}
+
+
+Definition at line 97 of file prep.\-f90.
+
+\hypertarget{classprep_ae5fc82378da688778b62b1855f535646}{\index{prep@{prep}!have\-\_\-solute\-\_\-sphere@{have\-\_\-solute\-\_\-sphere}}
+\index{have\-\_\-solute\-\_\-sphere@{have\-\_\-solute\-\_\-sphere}!prep@{prep}}
+\paragraph[{have\-\_\-solute\-\_\-sphere}]{\setlength{\rightskip}{0pt plus 5cm}logical prep\-::have\-\_\-solute\-\_\-sphere = .false.}}\label{classprep_ae5fc82378da688778b62b1855f535646}
+
+
+Definition at line 98 of file prep.\-f90.
+
+\hypertarget{classprep_a8c26fbee1c34fbb32339ce304880a6fb}{\index{prep@{prep}!have\-\_\-solvent\-\_\-boundary@{have\-\_\-solvent\-\_\-boundary}}
+\index{have\-\_\-solvent\-\_\-boundary@{have\-\_\-solvent\-\_\-boundary}!prep@{prep}}
+\paragraph[{have\-\_\-solvent\-\_\-boundary}]{\setlength{\rightskip}{0pt plus 5cm}logical prep\-::have\-\_\-solvent\-\_\-boundary = .false.}}\label{classprep_a8c26fbee1c34fbb32339ce304880a6fb}
+
+
+Definition at line 100 of file prep.\-f90.
+
+\hypertarget{classprep_aef51fe5ef8e99e94ce6215e4862693ab}{\index{prep@{prep}!have\-\_\-title@{have\-\_\-title}}
+\index{have\-\_\-title@{have\-\_\-title}!prep@{prep}}
+\paragraph[{have\-\_\-title}]{\setlength{\rightskip}{0pt plus 5cm}logical prep\-::have\-\_\-title = .false.}}\label{classprep_aef51fe5ef8e99e94ce6215e4862693ab}
+
+
+Definition at line 99 of file prep.\-f90.
+
+\hypertarget{classprep_a5a02e0194d123205200fc6c1f8267df4}{\index{prep@{prep}!iconn@{iconn}}
+\index{iconn@{iconn}!prep@{prep}}
+\paragraph[{iconn}]{\setlength{\rightskip}{0pt plus 5cm}integer, dimension(\-:,\-:), allocatable prep\-::iconn}}\label{classprep_a5a02e0194d123205200fc6c1f8267df4}
+
+
+Definition at line 168 of file prep.\-f90.
+
+\hypertarget{classprep_a6de36f3182c32c9e273c5a54632112f7}{\index{prep@{prep}!imp\-\_\-explicit@{imp\-\_\-explicit}}
+\index{imp\-\_\-explicit@{imp\-\_\-explicit}!prep@{prep}}
+\paragraph[{imp\-\_\-explicit}]{\setlength{\rightskip}{0pt plus 5cm}logical prep\-::imp\-\_\-explicit}}\label{classprep_a6de36f3182c32c9e273c5a54632112f7}
+
+
+Definition at line 148 of file prep.\-f90.
+
+\hypertarget{classprep_ad5c72f6c240f7753aff7bbf36a03dbde}{\index{prep@{prep}!imp\-\_\-prm@{imp\-\_\-prm}}
+\index{imp\-\_\-prm@{imp\-\_\-prm}!prep@{prep}}
+\paragraph[{imp\-\_\-prm}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf imp\-\_\-prm\-\_\-type}), dimension(\-:), allocatable prep\-::imp\-\_\-prm}}\label{classprep_ad5c72f6c240f7753aff7bbf36a03dbde}
+
+
+Definition at line 146 of file prep.\-f90.
+
+\hypertarget{classprep_a47b263321dda7fb6c374e3f622fdf735}{\index{prep@{prep}!irc\-\_\-solvent@{irc\-\_\-solvent}}
+\index{irc\-\_\-solvent@{irc\-\_\-solvent}!prep@{prep}}
+\paragraph[{irc\-\_\-solvent}]{\setlength{\rightskip}{0pt plus 5cm}integer prep\-::irc\-\_\-solvent}}\label{classprep_a47b263321dda7fb6c374e3f622fdf735}
+
+
+Definition at line 176 of file prep.\-f90.
+
+\hypertarget{classprep_ade7b1c1c2de355450a64197eefc36d28}{\index{prep@{prep}!keep@{keep}}
+\index{keep@{keep}!prep@{prep}}
+\paragraph[{keep}]{\setlength{\rightskip}{0pt plus 5cm}logical, dimension(\-:), allocatable prep\-::keep}}\label{classprep_ade7b1c1c2de355450a64197eefc36d28}
+
+
+Definition at line 174 of file prep.\-f90.
+
+\hypertarget{classprep_a8d289afb3f6d89fbade57a991736cdbc}{\index{prep@{prep}!lib@{lib}}
+\index{lib@{lib}!prep@{prep}}
+\paragraph[{lib}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf lib\-\_\-entry\-\_\-type}), dimension({\bf max\-\_\-entry}), target prep\-::lib}}\label{classprep_a8d289afb3f6d89fbade57a991736cdbc}
+
+
+Definition at line 93 of file prep.\-f90.
+
+\hypertarget{classprep_a675b91e8d296db8b3cfcf39516b278a3}{\index{prep@{prep}!makeh@{makeh}}
+\index{makeh@{makeh}!prep@{prep}}
+\paragraph[{makeh}]{\setlength{\rightskip}{0pt plus 5cm}logical, dimension(\-:), allocatable prep\-::makeh}}\label{classprep_a675b91e8d296db8b3cfcf39516b278a3}
+
+
+Definition at line 165 of file prep.\-f90.
+
+\hypertarget{classprep_a847c8ade6c795111f259163203927538}{\index{prep@{prep}!mask@{mask}}
+\index{mask@{mask}!prep@{prep}}
+\paragraph[{mask}]{\setlength{\rightskip}{0pt plus 5cm}type(mask\-\_\-type) prep\-::mask}}\label{classprep_a847c8ade6c795111f259163203927538}
+
+
+Definition at line 157 of file prep.\-f90.
+
+\hypertarget{classprep_a1e810276f7b8d213da60f190be18113c}{\index{prep@{prep}!max\-\_\-atcgplib@{max\-\_\-atcgplib}}
+\index{max\-\_\-atcgplib@{max\-\_\-atcgplib}!prep@{prep}}
+\paragraph[{max\-\_\-atcgplib}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter prep\-::max\-\_\-atcgplib = 100}}\label{classprep_a1e810276f7b8d213da60f190be18113c}
+
+
+Definition at line 27 of file prep.\-f90.
+
+\hypertarget{classprep_a6772647467cb95a41202bbe0a01db5b7}{\index{prep@{prep}!max\-\_\-atlib@{max\-\_\-atlib}}
+\index{max\-\_\-atlib@{max\-\_\-atlib}!prep@{prep}}
+\paragraph[{max\-\_\-atlib}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter prep\-::max\-\_\-atlib = 500}}\label{classprep_a6772647467cb95a41202bbe0a01db5b7}
+
+
+Definition at line 25 of file prep.\-f90.
+
+\hypertarget{classprep_a72fc2af9b6f9249f3ef63a2f5e570f0a}{\index{prep@{prep}!max\-\_\-cgplib@{max\-\_\-cgplib}}
+\index{max\-\_\-cgplib@{max\-\_\-cgplib}!prep@{prep}}
+\paragraph[{max\-\_\-cgplib}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter prep\-::max\-\_\-cgplib = 100}}\label{classprep_a72fc2af9b6f9249f3ef63a2f5e570f0a}
+
+
+Definition at line 26 of file prep.\-f90.
+
+\hypertarget{classprep_ae00ce511ccdd1623a7fded5f4cdb237a}{\index{prep@{prep}!max\-\_\-conn@{max\-\_\-conn}}
+\index{max\-\_\-conn@{max\-\_\-conn}!prep@{prep}}
+\paragraph[{max\-\_\-conn}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter prep\-::max\-\_\-conn = 10}}\label{classprep_ae00ce511ccdd1623a7fded5f4cdb237a}
+
+
+Definition at line 39 of file prep.\-f90.
+
+\hypertarget{classprep_ac8c3b3f850c904ceb431889c42d85ee2}{\index{prep@{prep}!max\-\_\-entry@{max\-\_\-entry}}
+\index{max\-\_\-entry@{max\-\_\-entry}!prep@{prep}}
+\paragraph[{max\-\_\-entry}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter prep\-::max\-\_\-entry = 1000}}\label{classprep_ac8c3b3f850c904ceb431889c42d85ee2}
+
+
+Definition at line 23 of file prep.\-f90.
+
+\hypertarget{classprep_a0954fb2199580b767b0fec5e0d190eb0}{\index{prep@{prep}!max\-\_\-extrabnd@{max\-\_\-extrabnd}}
+\index{max\-\_\-extrabnd@{max\-\_\-extrabnd}!prep@{prep}}
+\paragraph[{max\-\_\-extrabnd}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter prep\-::max\-\_\-extrabnd = 100}}\label{classprep_a0954fb2199580b767b0fec5e0d190eb0}
+
+
+Definition at line 33 of file prep.\-f90.
+
+\hypertarget{classprep_afddd5b41836da73acf6f6d7b66741283}{\index{prep@{prep}!max\-\_\-lib@{max\-\_\-lib}}
+\index{max\-\_\-lib@{max\-\_\-lib}!prep@{prep}}
+\paragraph[{max\-\_\-lib}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter prep\-::max\-\_\-lib = 1000}}\label{classprep_afddd5b41836da73acf6f6d7b66741283}
+
+
+Definition at line 36 of file prep.\-f90.
+
+\hypertarget{classprep_a1df01e5c34db215d69c53f52185163a5}{\index{prep@{prep}!max\-\_\-long@{max\-\_\-long}}
+\index{max\-\_\-long@{max\-\_\-long}!prep@{prep}}
+\paragraph[{max\-\_\-long}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter prep\-::max\-\_\-long = 10000}}\label{classprep_a1df01e5c34db215d69c53f52185163a5}
+
+
+Definition at line 37 of file prep.\-f90.
+
+\hypertarget{classprep_aa395d2a6f28f4a82d4f7faef27010bae}{\index{prep@{prep}!max\-\_\-old\-\_\-atyps@{max\-\_\-old\-\_\-atyps}}
+\index{max\-\_\-old\-\_\-atyps@{max\-\_\-old\-\_\-atyps}!prep@{prep}}
+\paragraph[{max\-\_\-old\-\_\-atyps}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter prep\-::max\-\_\-old\-\_\-atyps = 100}}\label{classprep_aa395d2a6f28f4a82d4f7faef27010bae}
+
+
+Definition at line 31 of file prep.\-f90.
+
+\hypertarget{classprep_a85c4693cbc15c5614620bcc7d837e763}{\index{prep@{prep}!max\-\_\-xlink@{max\-\_\-xlink}}
+\index{max\-\_\-xlink@{max\-\_\-xlink}!prep@{prep}}
+\paragraph[{max\-\_\-xlink}]{\setlength{\rightskip}{0pt plus 5cm}real, target prep\-::max\-\_\-xlink = 2.\-1}}\label{classprep_a85c4693cbc15c5614620bcc7d837e763}
+
+
+Definition at line 47 of file prep.\-f90.
+
+\hypertarget{classprep_a1e39aac67364bce4d4389f161fe8555e}{\index{prep@{prep}!module\-\_\-date@{module\-\_\-date}}
+\index{module\-\_\-date@{module\-\_\-date}!prep@{prep}}
+\paragraph[{module\-\_\-date}]{\setlength{\rightskip}{0pt plus 5cm}character($\ast$), parameter, private prep\-::module\-\_\-date = '2005-\/04-\/14'\hspace{0.3cm}{\ttfamily [private]}}}\label{classprep_a1e39aac67364bce4d4389f161fe8555e}
+
+
+Definition at line 19 of file prep.\-f90.
+
+\hypertarget{classprep_af285bdd5135ab10225b55c9a2ed4d0d0}{\index{prep@{prep}!module\-\_\-version@{module\-\_\-version}}
+\index{module\-\_\-version@{module\-\_\-version}!prep@{prep}}
+\paragraph[{module\-\_\-version}]{\setlength{\rightskip}{0pt plus 5cm}character($\ast$), parameter, private prep\-::module\-\_\-version = '5.\-04'\hspace{0.3cm}{\ttfamily [private]}}}\label{classprep_af285bdd5135ab10225b55c9a2ed4d0d0}
+
+
+Definition at line 18 of file prep.\-f90.
+
+\hypertarget{classprep_ac17ec7b95ca0f0ef40679baf2c9c0ae9}{\index{prep@{prep}!nang\-\_\-prm@{nang\-\_\-prm}}
+\index{nang\-\_\-prm@{nang\-\_\-prm}!prep@{prep}}
+\paragraph[{nang\-\_\-prm}]{\setlength{\rightskip}{0pt plus 5cm}integer prep\-::nang\-\_\-prm}}\label{classprep_ac17ec7b95ca0f0ef40679baf2c9c0ae9}
+
+
+Definition at line 125 of file prep.\-f90.
+
+\hypertarget{classprep_a13fc2319ab89b1b88b8fd6a130e08c4e}{\index{prep@{prep}!nang\-\_\-types@{nang\-\_\-types}}
+\index{nang\-\_\-types@{nang\-\_\-types}!prep@{prep}}
+\paragraph[{nang\-\_\-types}]{\setlength{\rightskip}{0pt plus 5cm}integer prep\-::nang\-\_\-types}}\label{classprep_a13fc2319ab89b1b88b8fd6a130e08c4e}
+
+
+Definition at line 124 of file prep.\-f90.
+
+\hypertarget{classprep_a3d0b820d2bd0a7434096e0de29e2752b}{\index{prep@{prep}!nat\-\_\-wat@{nat\-\_\-wat}}
+\index{nat\-\_\-wat@{nat\-\_\-wat}!prep@{prep}}
+\paragraph[{nat\-\_\-wat}]{\setlength{\rightskip}{0pt plus 5cm}integer prep\-::nat\-\_\-wat}}\label{classprep_a3d0b820d2bd0a7434096e0de29e2752b}
+
+
+Definition at line 151 of file prep.\-f90.
+
+\hypertarget{classprep_ab8dbadaf12262e9ad75d242a9d94a7be}{\index{prep@{prep}!natom@{natom}}
+\index{natom@{natom}!prep@{prep}}
+\paragraph[{natom}]{\setlength{\rightskip}{0pt plus 5cm}integer prep\-::natom}}\label{classprep_ab8dbadaf12262e9ad75d242a9d94a7be}
+
+
+Definition at line 151 of file prep.\-f90.
+
+\hypertarget{classprep_a9956f590e2211602a6e5ec0fc78ac75e}{\index{prep@{prep}!nbnd\-\_\-prm@{nbnd\-\_\-prm}}
+\index{nbnd\-\_\-prm@{nbnd\-\_\-prm}!prep@{prep}}
+\paragraph[{nbnd\-\_\-prm}]{\setlength{\rightskip}{0pt plus 5cm}integer prep\-::nbnd\-\_\-prm}}\label{classprep_a9956f590e2211602a6e5ec0fc78ac75e}
+
+
+Definition at line 105 of file prep.\-f90.
+
+\hypertarget{classprep_a2308de44ae31622b6609e54cd66291da}{\index{prep@{prep}!nbnd\-\_\-types@{nbnd\-\_\-types}}
+\index{nbnd\-\_\-types@{nbnd\-\_\-types}!prep@{prep}}
+\paragraph[{nbnd\-\_\-types}]{\setlength{\rightskip}{0pt plus 5cm}integer prep\-::nbnd\-\_\-types}}\label{classprep_a2308de44ae31622b6609e54cd66291da}
+
+
+Definition at line 106 of file prep.\-f90.
+
+\hypertarget{classprep_a61e6a6610a60fcf8e557aeeb68215ccb}{\index{prep@{prep}!nconn@{nconn}}
+\index{nconn@{nconn}!prep@{prep}}
+\paragraph[{nconn}]{\setlength{\rightskip}{0pt plus 5cm}integer, dimension(\-:), allocatable prep\-::nconn}}\label{classprep_a61e6a6610a60fcf8e557aeeb68215ccb}
+
+
+Definition at line 166 of file prep.\-f90.
+
+\hypertarget{classprep_a43c4ae861ddacd4228d5cbbb31ceed7a}{\index{prep@{prep}!nextrabnd@{nextrabnd}}
+\index{nextrabnd@{nextrabnd}!prep@{prep}}
+\paragraph[{nextrabnd}]{\setlength{\rightskip}{0pt plus 5cm}integer prep\-::nextrabnd}}\label{classprep_a43c4ae861ddacd4228d5cbbb31ceed7a}
+
+
+Definition at line 160 of file prep.\-f90.
+
+\hypertarget{classprep_a131a8dff6c39bd140e35d19b2ee9558c}{\index{prep@{prep}!nimp\-\_\-prm@{nimp\-\_\-prm}}
+\index{nimp\-\_\-prm@{nimp\-\_\-prm}!prep@{prep}}
+\paragraph[{nimp\-\_\-prm}]{\setlength{\rightskip}{0pt plus 5cm}integer prep\-::nimp\-\_\-prm}}\label{classprep_a131a8dff6c39bd140e35d19b2ee9558c}
+
+
+Definition at line 147 of file prep.\-f90.
+
+\hypertarget{classprep_a45b6e35c6833923457375f4d56f0f5b5}{\index{prep@{prep}!nlibres@{nlibres}}
+\index{nlibres@{nlibres}!prep@{prep}}
+\paragraph[{nlibres}]{\setlength{\rightskip}{0pt plus 5cm}integer prep\-::nlibres}}\label{classprep_a45b6e35c6833923457375f4d56f0f5b5}
+
+
+Definition at line 92 of file prep.\-f90.
+
+\hypertarget{classprep_abf46f8b225b713c8e1eff53bcecdee8c}{\index{prep@{prep}!ntor\-\_\-prm@{ntor\-\_\-prm}}
+\index{ntor\-\_\-prm@{ntor\-\_\-prm}!prep@{prep}}
+\paragraph[{ntor\-\_\-prm}]{\setlength{\rightskip}{0pt plus 5cm}integer prep\-::ntor\-\_\-prm}}\label{classprep_abf46f8b225b713c8e1eff53bcecdee8c}
+
+
+Definition at line 135 of file prep.\-f90.
+
+\hypertarget{classprep_a1db4f2bef544894cece6f2a4f6df3d15}{\index{prep@{prep}!ntor\-\_\-types@{ntor\-\_\-types}}
+\index{ntor\-\_\-types@{ntor\-\_\-types}!prep@{prep}}
+\paragraph[{ntor\-\_\-types}]{\setlength{\rightskip}{0pt plus 5cm}integer prep\-::ntor\-\_\-types}}\label{classprep_a1db4f2bef544894cece6f2a4f6df3d15}
+
+
+Definition at line 134 of file prep.\-f90.
+
+\hypertarget{classprep_a29b7c355a8f655a65d6589479f27f0f1}{\index{prep@{prep}!nwat@{nwat}}
+\index{nwat@{nwat}!prep@{prep}}
+\paragraph[{nwat}]{\setlength{\rightskip}{0pt plus 5cm}integer prep\-::nwat}}\label{classprep_a29b7c355a8f655a65d6589479f27f0f1}
+
+
+Definition at line 151 of file prep.\-f90.
+
+\hypertarget{classprep_a1e865a41955c21ed803962409e39acf9}{\index{prep@{prep}!pi@{pi}}
+\index{pi@{pi}!prep@{prep}}
+\paragraph[{pi}]{\setlength{\rightskip}{0pt plus 5cm}real(8) prep\-::pi}}\label{classprep_a1e865a41955c21ed803962409e39acf9}
+
+
+Definition at line 170 of file prep.\-f90.
+
+\hypertarget{classprep_a4e1a07eb57a103152818e73c1a23e65c}{\index{prep@{prep}!random\-\_\-seed\-\_\-solute@{random\-\_\-seed\-\_\-solute}}
+\index{random\-\_\-seed\-\_\-solute@{random\-\_\-seed\-\_\-solute}!prep@{prep}}
+\paragraph[{random\-\_\-seed\-\_\-solute}]{\setlength{\rightskip}{0pt plus 5cm}integer, target prep\-::random\-\_\-seed\-\_\-solute = 179857}}\label{classprep_a4e1a07eb57a103152818e73c1a23e65c}
+
+
+Definition at line 50 of file prep.\-f90.
+
+\hypertarget{classprep_a1a7de818be67e3e32a510b0bad624a5b}{\index{prep@{prep}!random\-\_\-seed\-\_\-solvent@{random\-\_\-seed\-\_\-solvent}}
+\index{random\-\_\-seed\-\_\-solvent@{random\-\_\-seed\-\_\-solvent}!prep@{prep}}
+\paragraph[{random\-\_\-seed\-\_\-solvent}]{\setlength{\rightskip}{0pt plus 5cm}integer, target prep\-::random\-\_\-seed\-\_\-solvent = 758971}}\label{classprep_a1a7de818be67e3e32a510b0bad624a5b}
+
+
+Definition at line 51 of file prep.\-f90.
+
+\hypertarget{classprep_ade49a05a54bea9b47761d04a3087afa5}{\index{prep@{prep}!rho\-\_\-solute@{rho\-\_\-solute}}
+\index{rho\-\_\-solute@{rho\-\_\-solute}!prep@{prep}}
+\paragraph[{rho\-\_\-solute}]{\setlength{\rightskip}{0pt plus 5cm}real, target prep\-::rho\-\_\-solute = 0.\-05794}}\label{classprep_ade49a05a54bea9b47761d04a3087afa5}
+
+
+Definition at line 45 of file prep.\-f90.
+
+\hypertarget{classprep_aa665c6e3401ced3ba9d6e361beb2a4b5}{\index{prep@{prep}!solvent\-\_\-name@{solvent\-\_\-name}}
+\index{solvent\-\_\-name@{solvent\-\_\-name}!prep@{prep}}
+\paragraph[{solvent\-\_\-name}]{\setlength{\rightskip}{0pt plus 5cm}character(len=4) prep\-::solvent\-\_\-name}}\label{classprep_aa665c6e3401ced3ba9d6e361beb2a4b5}
+
+
+Definition at line 178 of file prep.\-f90.
+
+\hypertarget{classprep_a23cb9b5f1c2ed42421091cd8a8566d02}{\index{prep@{prep}!solvent\-\_\-names@{solvent\-\_\-names}}
+\index{solvent\-\_\-names@{solvent\-\_\-names}!prep@{prep}}
+\paragraph[{solvent\-\_\-names}]{\setlength{\rightskip}{0pt plus 5cm}character(len=200), target prep\-::solvent\-\_\-names = ''}}\label{classprep_a23cb9b5f1c2ed42421091cd8a8566d02}
+
+
+Definition at line 48 of file prep.\-f90.
+
+\hypertarget{classprep_abbddacbd376e8aca501f6151d3114a5c}{\index{prep@{prep}!solvent\-\_\-pack@{solvent\-\_\-pack}}
+\index{solvent\-\_\-pack@{solvent\-\_\-pack}!prep@{prep}}
+\paragraph[{solvent\-\_\-pack}]{\setlength{\rightskip}{0pt plus 5cm}real, target prep\-::solvent\-\_\-pack = 2.\-4}}\label{classprep_abbddacbd376e8aca501f6151d3114a5c}
+
+
+Definition at line 43 of file prep.\-f90.
+
+\hypertarget{classprep_a2b85c6800fc53b36e3c2c07b5af26dbb}{\index{prep@{prep}!topo\-\_\-ok@{topo\-\_\-ok}}
+\index{topo\-\_\-ok@{topo\-\_\-ok}!prep@{prep}}
+\paragraph[{topo\-\_\-ok}]{\setlength{\rightskip}{0pt plus 5cm}logical prep\-::topo\-\_\-ok = .false.}}\label{classprep_a2b85c6800fc53b36e3c2c07b5af26dbb}
+
+
+Definition at line 182 of file prep.\-f90.
+
+\hypertarget{classprep_a0a44d47429834f891ba1a0e8260f30e9}{\index{prep@{prep}!tor\-\_\-prm@{tor\-\_\-prm}}
+\index{tor\-\_\-prm@{tor\-\_\-prm}!prep@{prep}}
+\paragraph[{tor\-\_\-prm}]{\setlength{\rightskip}{0pt plus 5cm}type(torlib\-\_\-type), dimension(\-:), allocatable prep\-::tor\-\_\-prm}}\label{classprep_a0a44d47429834f891ba1a0e8260f30e9}
+
+
+Definition at line 133 of file prep.\-f90.
+
+\hypertarget{classprep_a9fcc991cb6c52982df60dcab52ddc7b9}{\index{prep@{prep}!tor\-\_\-types@{tor\-\_\-types}}
+\index{tor\-\_\-types@{tor\-\_\-types}!prep@{prep}}
+\paragraph[{tor\-\_\-types}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf torsion\-\_\-type\-\_\-type}), dimension(\-:), allocatable prep\-::tor\-\_\-types}}\label{classprep_a9fcc991cb6c52982df60dcab52ddc7b9}
+
+
+Definition at line 132 of file prep.\-f90.
+
+\hypertarget{classprep_a92c84680f6cd6dc7868c862b571b1a01}{\index{prep@{prep}!trj\-\_\-filnam@{trj\-\_\-filnam}}
+\index{trj\-\_\-filnam@{trj\-\_\-filnam}!prep@{prep}}
+\paragraph[{trj\-\_\-filnam}]{\setlength{\rightskip}{0pt plus 5cm}character(len=180) prep\-::trj\-\_\-filnam}}\label{classprep_a92c84680f6cd6dc7868c862b571b1a01}
+
+
+Definition at line 156 of file prep.\-f90.
+
+\hypertarget{classprep_a67234152a914abc499cb54855d5005ce}{\index{prep@{prep}!trj\-\_\-frame@{trj\-\_\-frame}}
+\index{trj\-\_\-frame@{trj\-\_\-frame}!prep@{prep}}
+\paragraph[{trj\-\_\-frame}]{\setlength{\rightskip}{0pt plus 5cm}integer prep\-::trj\-\_\-frame = 0}}\label{classprep_a67234152a914abc499cb54855d5005ce}
+
+
+Definition at line 155 of file prep.\-f90.
+
+\hypertarget{classprep_a2a8286c4c7bbbdf7837514adf40f56e8}{\index{prep@{prep}!trj\-\_\-unit@{trj\-\_\-unit}}
+\index{trj\-\_\-unit@{trj\-\_\-unit}!prep@{prep}}
+\paragraph[{trj\-\_\-unit}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter prep\-::trj\-\_\-unit = 17}}\label{classprep_a2a8286c4c7bbbdf7837514adf40f56e8}
+
+
+Definition at line 154 of file prep.\-f90.
+
+\hypertarget{classprep_aa9c1e662e10b97582fdefac8e317ab53}{\index{prep@{prep}!xw@{xw}}
+\index{xw@{xw}!prep@{prep}}
+\paragraph[{xw}]{\setlength{\rightskip}{0pt plus 5cm}real(8), dimension(\-:,\-:,\-:), allocatable prep\-::xw}}\label{classprep_aa9c1e662e10b97582fdefac8e317ab53}
+
+
+Definition at line 172 of file prep.\-f90.
+
+
+
+The documentation for this module was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{prep_8f90}{prep.\-f90}\end{DoxyCompactItemize}

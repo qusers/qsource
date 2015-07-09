@@ -1,0 +1,31 @@
+digraph "eigen"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1 [label="eigen",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+  Node1 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="calc_com_ke::com_ke_calc",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classcalc__com__ke.html#a4721321fae51d63d7da0b33189366be2"];
+  Node2 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="calc_all",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$qcalc_8f90.html#a5befd1d444d41d7d1e4bf8b297c17ee2"];
+  Node3 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="process_frame",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$qcalc_8f90.html#a93dcacb957411ed0d0471fe8a31c60d6"];
+  Node4 -> Node5 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="process_data",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$qcalc_8f90.html#a7d2d447954fb385bdca4f228de92b1eb"];
+  Node1 -> Node6 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node6 [label="calc_fit::lsqstr",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classcalc__fit.html#aac8547f0c38c8a8b690d296238ffa70a"];
+  Node6 -> Node7 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node7 [label="calc_entropy::rotationandtranslation",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classcalc__entropy.html#ac138d87a9a4edec83f075e4ae4525ef6"];
+  Node7 -> Node8 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node8 [label="calc_entropy::entropy_calc",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classcalc__entropy.html#aa0d5bd96bcbb6587c5e1e624674e5e4e"];
+  Node8 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node6 -> Node9 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node9 [label="calc_fit::fit_calc",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classcalc__fit.html#a34e3efb2981d1e8ad36d1556e6f69e18"];
+  Node9 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node1 -> Node10 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node10 [label="calc_entropy::pca",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classcalc__entropy.html#afae4ac42e827ba29f7e2dc444a868123"];
+  Node10 -> Node8 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node1 -> Node11 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node11 [label="calc_entropy::quasiharmonic\l_analysis",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classcalc__entropy.html#a2a9d851b8b3e7af4603059175dc539e3"];
+  Node11 -> Node8 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+}

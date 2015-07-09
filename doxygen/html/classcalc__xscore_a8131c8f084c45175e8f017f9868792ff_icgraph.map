@@ -1,0 +1,10 @@
+<map id="calc_xscore::molecule_count_nar_1_4_pair" name="calc_xscore::molecule_count_nar_1_4_pair">
+<area shape="rect" id="node2" href="$classcalc__xscore.html#a1468c0b615c6c387ceebe6e51cd9eb14" title="calc_xscore::molecule\l_calculate_logp" alt="" coords="207,27,360,69"/>
+<area shape="rect" id="node3" href="$classcalc__xscore.html#a0e46016e4d4ad20b05df5806ae4b4c70" title="calc_xscore::ligand\l_value_atom" alt="" coords="408,27,544,69"/>
+<area shape="rect" id="node4" href="$classcalc__xscore.html#a1f2c852d7a1ed801d7b14ce6205a384e" title="calc_xscore::xscore_calc" alt="" coords="592,5,763,32"/>
+<area shape="rect" id="node8" href="$classcalc__xscore.html#a1dd20b02356cb3c99283799d1030d1ba" title="calc_xscore::xscore\l_precalc" alt="" coords="608,57,747,98"/>
+<area shape="rect" id="node5" href="$qcalc_8f90.html#a5befd1d444d41d7d1e4bf8b297c17ee2" title="calc_all" alt="" coords="828,5,895,32"/>
+<area shape="rect" id="node6" href="$qcalc_8f90.html#a93dcacb957411ed0d0471fe8a31c60d6" title="process_frame" alt="" coords="960,5,1071,32"/>
+<area shape="rect" id="node7" href="$qcalc_8f90.html#a7d2d447954fb385bdca4f228de92b1eb" title="process_data" alt="" coords="1119,5,1221,32"/>
+<area shape="rect" id="node9" href="$qcalc_8f90.html#a6de35d783d8e2c1ffead6a9dbf61ebb6" title="do_pre_calcs" alt="" coords="811,64,912,91"/>
+</map>

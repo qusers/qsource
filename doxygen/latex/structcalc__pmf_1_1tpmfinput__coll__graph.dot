@@ -1,0 +1,6 @@
+digraph "calc_pmf::tpmfinput"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node1 [label="{calc_pmf::tpmfinput\n|+ ff\l+ show_abs\l+ show_detailed_abs\l+ show_total\l+ show_ligand\l+ show_protein\l+ show_bonds\l+ show_hydrogens\l+ show_masked\l+ ignore_waters\land 7 more...\l|}",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+}

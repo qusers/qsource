@@ -1,0 +1,131 @@
+\hypertarget{qfep_8f90}{\subsection{qfep.\-f90 File Reference}
+\label{qfep_8f90}\index{qfep.\-f90@{qfep.\-f90}}
+}
+\subsubsection*{Data Types}
+\begin{DoxyCompactItemize}
+\item 
+type \hyperlink{structfep__data__type}{fep\-\_\-data\-\_\-type}
+\end{DoxyCompactItemize}
+\subsubsection*{Functions/\-Subroutines}
+\begin{DoxyCompactItemize}
+\item 
+program \hyperlink{qfep_8f90_aaec37daccae882881d65ac716ea5d7f3}{qfep}
+\item 
+subroutine \hyperlink{qfep_8f90_a897ce0488192cf7f2a3ca4d41e5d73e3}{prompt} (outtxt)
+\item 
+subroutine \hyperlink{qfep_8f90_a99e275410db5922d5bbf54abf17c42c2}{tred2} (A, N, N\-P, D, E)
+\item 
+subroutine \hyperlink{qfep_8f90_a6ab446041388e014e5c4ae186d7c3ab8}{tqli} (D, E, N, N\-P, Z)
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Function/\-Subroutine Documentation}
+\hypertarget{qfep_8f90_a897ce0488192cf7f2a3ca4d41e5d73e3}{\index{qfep.\-f90@{qfep.\-f90}!prompt@{prompt}}
+\index{prompt@{prompt}!qfep.f90@{qfep.\-f90}}
+\paragraph[{prompt}]{\setlength{\rightskip}{0pt plus 5cm}subroutine qfep\-::prompt (
+\begin{DoxyParamCaption}
+\item[{character($\ast$)}]{outtxt}
+\end{DoxyParamCaption}
+)}}\label{qfep_8f90_a897ce0488192cf7f2a3ca4d41e5d73e3}
+
+
+Definition at line 521 of file qfep.\-f90.
+
+
+
+Referenced by prep\-::changeimp(), parse\-::get\-\_\-int\-\_\-arg(), parse\-::get\-\_\-line\-\_\-arg(), parse\-::get\-\_\-real\-\_\-arg(), parse\-::get\-\_\-string\-\_\-arg(), parse\-::get\-\_\-string\-\_\-single\-\_\-line(), and qfep().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{qfep_8f90_aaec37daccae882881d65ac716ea5d7f3}{\index{qfep.\-f90@{qfep.\-f90}!qfep@{qfep}}
+\index{qfep@{qfep}!qfep.f90@{qfep.\-f90}}
+\paragraph[{qfep}]{\setlength{\rightskip}{0pt plus 5cm}program qfep (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{qfep_8f90_aaec37daccae882881d65ac716ea5d7f3}
+
+
+Definition at line 6 of file qfep.\-f90.
+
+\hypertarget{qfep_8f90_a6ab446041388e014e5c4ae186d7c3ab8}{\index{qfep.\-f90@{qfep.\-f90}!tqli@{tqli}}
+\index{tqli@{tqli}!qfep.f90@{qfep.\-f90}}
+\paragraph[{tqli}]{\setlength{\rightskip}{0pt plus 5cm}subroutine qfep\-::tqli (
+\begin{DoxyParamCaption}
+\item[{real(8), dimension(\-:)}]{D, }
+\item[{real(8), dimension(\-:)}]{E, }
+\item[{integer}]{N, }
+\item[{integer}]{N\-P, }
+\item[{real(8), dimension(\-:,\-:)}]{Z}
+\end{DoxyParamCaption}
+)}}\label{qfep_8f90_a6ab446041388e014e5c4ae186d7c3ab8}
+
+
+Definition at line 639 of file qfep.\-f90.
+
+
+
+References calc\-\_\-rdf\-::r().
+
+
+
+Referenced by qfep().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=205pt]{qfep_8f90_a6ab446041388e014e5c4ae186d7c3ab8_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=181pt]{qfep_8f90_a6ab446041388e014e5c4ae186d7c3ab8_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{qfep_8f90_a99e275410db5922d5bbf54abf17c42c2}{\index{qfep.\-f90@{qfep.\-f90}!tred2@{tred2}}
+\index{tred2@{tred2}!qfep.f90@{qfep.\-f90}}
+\paragraph[{tred2}]{\setlength{\rightskip}{0pt plus 5cm}subroutine qfep\-::tred2 (
+\begin{DoxyParamCaption}
+\item[{real(8), dimension(\-:,\-:)}]{A, }
+\item[{integer}]{N, }
+\item[{integer}]{N\-P, }
+\item[{real(8), dimension(\-:)}]{D, }
+\item[{real(8), dimension(\-:)}]{E}
+\end{DoxyParamCaption}
+)}}\label{qfep_8f90_a99e275410db5922d5bbf54abf17c42c2}
+
+
+Definition at line 545 of file qfep.\-f90.
+
+
+
+Referenced by qfep().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=191pt]{qfep_8f90_a99e275410db5922d5bbf54abf17c42c2_icgraph}
+\end{center}
+\end{figure}
+
+

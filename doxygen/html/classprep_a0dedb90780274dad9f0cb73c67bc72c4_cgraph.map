@@ -1,0 +1,8 @@
+<map id="prep::oldreadlib" name="prep::oldreadlib">
+<area shape="rect" id="node2" href="$classparse.html#a0cc676b15a8ab0f5158f0f51a0f30ebf" title="parse::openit" alt="" coords="192,31,291,57"/>
+<area shape="rect" id="node7" href="$classmisc.html#ac0206a84cf8753b6b32b7796a9b6ac39" title="misc::skip_comments" alt="" coords="167,81,316,108"/>
+<area shape="rect" id="node3" href="$classparse.html#a17fdf061a0ee443c4a80c24d8e3cd11f" title="parse::get_string_arg" alt="" coords="364,31,512,57"/>
+<area shape="rect" id="node4" href="$classparse.html#a362c49175b5f2d7f582dde6cb7b871af" title="parse::getline" alt="" coords="560,5,663,32"/>
+<area shape="rect" id="node6" href="$qfep_8f90.html#a897ce0488192cf7f2a3ca4d41e5d73e3" title="prompt" alt="" coords="579,56,643,83"/>
+<area shape="rect" id="node5" href="$classparse.html#a431f0c36309d6174287bde5e4d0e78e8" title="parse::split" alt="" coords="711,5,797,32"/>
+</map>

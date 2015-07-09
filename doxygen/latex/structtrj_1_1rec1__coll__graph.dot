@@ -1,0 +1,6 @@
+digraph "trj::rec1"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node1 [label="{trj::rec1\n|- trj_type\l- n_frames\l- n_steps_before\l- interval\l- n_steps\l- interval_velcheck\l- unused6\l- unused7\l- n_degf\l- n_fixed\land 11 more...\l|}",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+}

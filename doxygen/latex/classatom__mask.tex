@@ -1,0 +1,517 @@
+\hypertarget{classatom__mask}{\subsection{atom\-\_\-mask Module Reference}
+\label{classatom__mask}\index{atom\-\_\-mask@{atom\-\_\-mask}}
+}
+
+
+Collaboration diagram for atom\-\_\-mask\-:
+\subsubsection*{Data Types}
+\begin{DoxyCompactItemize}
+\item 
+type \hyperlink{structatom__mask_1_1mask__type}{mask\-\_\-type}
+\item 
+type \hyperlink{structatom__mask_1_1set}{set}
+\end{DoxyCompactItemize}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine \hyperlink{classatom__mask_a5499bfab148e68b797181ace7ee2e744}{mask\-\_\-startup}
+\item 
+subroutine \hyperlink{classatom__mask_a14396a493fa6fda90515fd946a68e90b}{mask\-\_\-shutdown}
+\item 
+subroutine \hyperlink{classatom__mask_a37135eea76c381c4aacee5cc9fbce046}{mask\-\_\-initialize} (m)
+\item 
+subroutine \hyperlink{classatom__mask_a7059cec5e1eecb2536e9cac6d5fb8ce0}{mask\-\_\-finalize} (m)
+\item 
+subroutine \hyperlink{classatom__mask_aa33256b4eb2abd74f319e47e7f9c67b8}{mask\-\_\-clear} (m)
+\item 
+subroutine \hyperlink{classatom__mask_a06d37d41eecfbd40fcaf33218b64bd57}{mask\-\_\-all} (m)
+\item 
+integer function \hyperlink{classatom__mask_af6beca866515e72f29c7ec884d8672cc}{mask\-\_\-count} (m)
+\item 
+integer function \hyperlink{classatom__mask_ad0a7fae4495fbbde287b61adf5b41d62}{mask\-\_\-add} (m, line, pretop)
+\item 
+subroutine \hyperlink{classatom__mask_a517aeb28af6ea93d97770ace5268b5ee}{get\-\_\-sybylcode} (sybylname)
+\item 
+subroutine \hyperlink{classatom__mask_a9fb5742f563c05202fb3ac7175f80196}{mask\-\_\-get} (m, x, xmasked)
+\item 
+subroutine \hyperlink{classatom__mask_acf07e23d62def4b7355c98065ba086ea}{mask\-\_\-put} (m, x, xmasked)
+\end{DoxyCompactItemize}
+\subsubsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine, private \hyperlink{classatom__mask_a4d3aff857c97591b916a1ee064cb7cef}{set\-\_\-solute}
+\item 
+logical function, private \hyperlink{classatom__mask_adfd3923e784e3ccdebf575c61257f0ea}{get\-\_\-word} (line, word, pos)
+\item 
+integer function, private \hyperlink{classatom__mask_a30b962d0b0f89f142ad386569bab3d42}{update} (s, m)
+\item 
+integer function, private \hyperlink{classatom__mask_ab6d589c395ac5883f6492a3bb59d61e7}{update\-\_\-pretop} (s, m)
+\item 
+subroutine, private \hyperlink{classatom__mask_a1f5d16022ce19bc3de0cba73139d6b04}{finalize\-\_\-storage}
+\end{DoxyCompactItemize}
+\subsubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+character($\ast$), parameter, private \hyperlink{classatom__mask_a64df9ccbd1b3413ead1e8f9b32220e4c}{module\-\_\-version} = '5.\-01'
+\item 
+character($\ast$), parameter, private \hyperlink{classatom__mask_ab78bfda66e905ab2941b555acb0cad8e}{modeule\-\_\-date} = '2003-\/06-\/02'
+\item 
+logical(1), dimension(\-:), \\*
+allocatable, private \hyperlink{classatom__mask_afd305ff17cef09bcbb0a2ee88bc47849}{solute}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+
+
+Definition at line 6 of file mask.\-f90.
+
+
+
+\subsubsection{Member Function/\-Subroutine Documentation}
+\hypertarget{classatom__mask_a1f5d16022ce19bc3de0cba73139d6b04}{\index{atom\-\_\-mask@{atom\-\_\-mask}!finalize\-\_\-storage@{finalize\-\_\-storage}}
+\index{finalize\-\_\-storage@{finalize\-\_\-storage}!atom_mask@{atom\-\_\-mask}}
+\paragraph[{finalize\-\_\-storage}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, private atom\-\_\-mask\-::finalize\-\_\-storage (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classatom__mask_a1f5d16022ce19bc3de0cba73139d6b04}
+
+
+Definition at line 415 of file mask.\-f90.
+
+
+
+Referenced by mask\-\_\-shutdown().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classatom__mask_a517aeb28af6ea93d97770ace5268b5ee}{\index{atom\-\_\-mask@{atom\-\_\-mask}!get\-\_\-sybylcode@{get\-\_\-sybylcode}}
+\index{get\-\_\-sybylcode@{get\-\_\-sybylcode}!atom_mask@{atom\-\_\-mask}}
+\paragraph[{get\-\_\-sybylcode}]{\setlength{\rightskip}{0pt plus 5cm}subroutine atom\-\_\-mask\-::get\-\_\-sybylcode (
+\begin{DoxyParamCaption}
+\item[{character($\ast$)}]{sybylname}
+\end{DoxyParamCaption}
+)}}\label{classatom__mask_a517aeb28af6ea93d97770ace5268b5ee}
+
+
+Definition at line 389 of file mask.\-f90.
+
+
+
+References misc\-::upcase().
+
+
+
+Referenced by mask\-\_\-add().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=329pt]{classatom__mask_a517aeb28af6ea93d97770ace5268b5ee_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classatom__mask_adfd3923e784e3ccdebf575c61257f0ea}{\index{atom\-\_\-mask@{atom\-\_\-mask}!get\-\_\-word@{get\-\_\-word}}
+\index{get\-\_\-word@{get\-\_\-word}!atom_mask@{atom\-\_\-mask}}
+\paragraph[{get\-\_\-word}]{\setlength{\rightskip}{0pt plus 5cm}logical function, private atom\-\_\-mask\-::get\-\_\-word (
+\begin{DoxyParamCaption}
+\item[{character($\ast$)}]{line, }
+\item[{character($\ast$), intent(out)}]{word, }
+\item[{integer, intent(inout)}]{pos}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classatom__mask_adfd3923e784e3ccdebf575c61257f0ea}
+
+
+Definition at line 242 of file mask.\-f90.
+
+
+
+Referenced by mask\-\_\-add().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classatom__mask_ad0a7fae4495fbbde287b61adf5b41d62}{\index{atom\-\_\-mask@{atom\-\_\-mask}!mask\-\_\-add@{mask\-\_\-add}}
+\index{mask\-\_\-add@{mask\-\_\-add}!atom_mask@{atom\-\_\-mask}}
+\paragraph[{mask\-\_\-add}]{\setlength{\rightskip}{0pt plus 5cm}integer function atom\-\_\-mask\-::mask\-\_\-add (
+\begin{DoxyParamCaption}
+\item[{type({\bf mask\-\_\-type})}]{m, }
+\item[{character($\ast$)}]{line, }
+\item[{logical, intent(in), optional}]{pretop}
+\end{DoxyParamCaption}
+)}}\label{classatom__mask_ad0a7fae4495fbbde287b61adf5b41d62}
+
+
+Definition at line 106 of file mask.\-f90.
+
+
+
+References get\-\_\-sybylcode(), get\-\_\-word(), misc\-::upcase(), update(), and update\-\_\-pretop().
+
+
+
+Referenced by maskmanip\-::maskmanip\-\_\-make(), maskmanip\-::maskmanip\-\_\-make\-\_\-pretop(), prep\-::modify\-\_\-mask(), calc\-\_\-nb\-::nb\-\_\-qp\-\_\-add(), trj\-::trj\-\_\-add(), trj\-::trj\-\_\-commit\-\_\-mask(), and trj\-::trj\-\_\-open().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classatom__mask_ad0a7fae4495fbbde287b61adf5b41d62_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classatom__mask_a06d37d41eecfbd40fcaf33218b64bd57}{\index{atom\-\_\-mask@{atom\-\_\-mask}!mask\-\_\-all@{mask\-\_\-all}}
+\index{mask\-\_\-all@{mask\-\_\-all}!atom_mask@{atom\-\_\-mask}}
+\paragraph[{mask\-\_\-all}]{\setlength{\rightskip}{0pt plus 5cm}subroutine atom\-\_\-mask\-::mask\-\_\-all (
+\begin{DoxyParamCaption}
+\item[{type({\bf mask\-\_\-type})}]{m}
+\end{DoxyParamCaption}
+)}}\label{classatom__mask_a06d37d41eecfbd40fcaf33218b64bd57}
+
+
+Definition at line 82 of file mask.\-f90.
+
+
+
+Referenced by prep\-::set\-\_\-default\-\_\-mask().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classatom__mask_aa33256b4eb2abd74f319e47e7f9c67b8}{\index{atom\-\_\-mask@{atom\-\_\-mask}!mask\-\_\-clear@{mask\-\_\-clear}}
+\index{mask\-\_\-clear@{mask\-\_\-clear}!atom_mask@{atom\-\_\-mask}}
+\paragraph[{mask\-\_\-clear}]{\setlength{\rightskip}{0pt plus 5cm}subroutine atom\-\_\-mask\-::mask\-\_\-clear (
+\begin{DoxyParamCaption}
+\item[{type({\bf mask\-\_\-type})}]{m}
+\end{DoxyParamCaption}
+)}}\label{classatom__mask_aa33256b4eb2abd74f319e47e7f9c67b8}
+
+
+Definition at line 72 of file mask.\-f90.
+
+
+
+Referenced by mask\-\_\-initialize(), maskmanip\-::maskmanip\-\_\-make(), maskmanip\-::maskmanip\-\_\-make\-\_\-pretop(), prep\-::modify\-\_\-mask(), and calc\-\_\-nb\-::nb\-\_\-qp\-\_\-add().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classatom__mask_af6beca866515e72f29c7ec884d8672cc}{\index{atom\-\_\-mask@{atom\-\_\-mask}!mask\-\_\-count@{mask\-\_\-count}}
+\index{mask\-\_\-count@{mask\-\_\-count}!atom_mask@{atom\-\_\-mask}}
+\paragraph[{mask\-\_\-count}]{\setlength{\rightskip}{0pt plus 5cm}integer function atom\-\_\-mask\-::mask\-\_\-count (
+\begin{DoxyParamCaption}
+\item[{type({\bf mask\-\_\-type})}]{m}
+\end{DoxyParamCaption}
+)}}\label{classatom__mask_af6beca866515e72f29c7ec884d8672cc}
+
+
+Definition at line 92 of file mask.\-f90.
+
+\hypertarget{classatom__mask_a7059cec5e1eecb2536e9cac6d5fb8ce0}{\index{atom\-\_\-mask@{atom\-\_\-mask}!mask\-\_\-finalize@{mask\-\_\-finalize}}
+\index{mask\-\_\-finalize@{mask\-\_\-finalize}!atom_mask@{atom\-\_\-mask}}
+\paragraph[{mask\-\_\-finalize}]{\setlength{\rightskip}{0pt plus 5cm}subroutine atom\-\_\-mask\-::mask\-\_\-finalize (
+\begin{DoxyParamCaption}
+\item[{type({\bf mask\-\_\-type})}]{m}
+\end{DoxyParamCaption}
+)}}\label{classatom__mask_a7059cec5e1eecb2536e9cac6d5fb8ce0}
+
+
+Definition at line 63 of file mask.\-f90.
+
+
+
+Referenced by calc\-\_\-com\-::com\-\_\-add(), calc\-\_\-com\-::com\-\_\-finalize(), calc\-\_\-com\-\_\-ke\-::com\-\_\-ke\-\_\-add(), calc\-\_\-com\-\_\-ke\-::com\-\_\-ke\-\_\-finalize(), calc\-\_\-entropy\-::entropy\-\_\-add(), calc\-\_\-entropy\-::entropy\-\_\-finalize(), calc\-\_\-fit\-::fit\-\_\-add(), calc\-\_\-fit\-::fit\-\_\-finalize(), calc\-\_\-nb\-::nb\-\_\-add(), calc\-\_\-nb\-::nb\-\_\-qp\-\_\-add(), calc\-\_\-pmf\-::pmf\-\_\-add(), prep\-::prep\-\_\-shutdown(), calc\-\_\-rdf\-::rdf\-\_\-add(), calc\-\_\-rms\-::rms\-\_\-add(), calc\-\_\-rms\-::rms\-\_\-finalize(), calc\-\_\-rmsf\-::rmsf\-\_\-add(), calc\-\_\-rmsf\-::rmsf\-\_\-finalize(), calc\-\_\-chemscore\-::score\-\_\-add(), prep\-::set\-\_\-default\-\_\-mask(), trj\-::trj\-\_\-close(), and calc\-\_\-xscore\-::xscore\-\_\-add().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classatom__mask_a9fb5742f563c05202fb3ac7175f80196}{\index{atom\-\_\-mask@{atom\-\_\-mask}!mask\-\_\-get@{mask\-\_\-get}}
+\index{mask\-\_\-get@{mask\-\_\-get}!atom_mask@{atom\-\_\-mask}}
+\paragraph[{mask\-\_\-get}]{\setlength{\rightskip}{0pt plus 5cm}subroutine atom\-\_\-mask\-::mask\-\_\-get (
+\begin{DoxyParamCaption}
+\item[{type({\bf mask\-\_\-type})}]{m, }
+\item[{real(8), dimension(\-:)}]{x, }
+\item[{real, dimension(\-:)}]{xmasked}
+\end{DoxyParamCaption}
+)}}\label{classatom__mask_a9fb5742f563c05202fb3ac7175f80196}
+
+
+Definition at line 420 of file mask.\-f90.
+
+
+
+Referenced by calc\-\_\-com\-::com\-\_\-calc(), calc\-\_\-com\-\_\-ke\-::com\-\_\-ke\-\_\-calc(), calc\-\_\-entropy\-::entropy\-\_\-calc(), calc\-\_\-rms\-::rms\-\_\-calc(), calc\-\_\-rms\-::rms\-\_\-make\-\_\-ref(), calc\-\_\-rmsf\-::rmsf\-\_\-calc(), calc\-\_\-rmsf\-::rmsf\-\_\-make\-\_\-ref(), and trj\-::trj\-\_\-write().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classatom__mask_a37135eea76c381c4aacee5cc9fbce046}{\index{atom\-\_\-mask@{atom\-\_\-mask}!mask\-\_\-initialize@{mask\-\_\-initialize}}
+\index{mask\-\_\-initialize@{mask\-\_\-initialize}!atom_mask@{atom\-\_\-mask}}
+\paragraph[{mask\-\_\-initialize}]{\setlength{\rightskip}{0pt plus 5cm}subroutine atom\-\_\-mask\-::mask\-\_\-initialize (
+\begin{DoxyParamCaption}
+\item[{type({\bf mask\-\_\-type})}]{m}
+\end{DoxyParamCaption}
+)}}\label{classatom__mask_a37135eea76c381c4aacee5cc9fbce046}
+
+
+Definition at line 51 of file mask.\-f90.
+
+
+
+References mask\-\_\-clear(), and set\-\_\-solute().
+
+
+
+Referenced by calc\-\_\-com\-::com\-\_\-add(), calc\-\_\-com\-\_\-ke\-::com\-\_\-ke\-\_\-add(), calc\-\_\-entropy\-::entropy\-\_\-add(), calc\-\_\-fit\-::fit\-\_\-add(), prep\-::get\-\_\-centre\-\_\-by\-\_\-mass(), calc\-\_\-nb\-::nb\-\_\-add(), calc\-\_\-nb\-::nb\-\_\-qp\-\_\-add(), calc\-\_\-pmf\-::pmf\-\_\-add(), calc\-\_\-rdf\-::rdf\-\_\-add(), calc\-\_\-rms\-::rms\-\_\-add(), calc\-\_\-rmsf\-::rmsf\-\_\-add(), calc\-\_\-chemscore\-::score\-\_\-add(), prep\-::set\-\_\-default\-\_\-mask(), trj\-::trj\-\_\-initialize(), trj\-::trj\-\_\-open(), and calc\-\_\-xscore\-::xscore\-\_\-add().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classatom__mask_a37135eea76c381c4aacee5cc9fbce046_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classatom__mask_acf07e23d62def4b7355c98065ba086ea}{\index{atom\-\_\-mask@{atom\-\_\-mask}!mask\-\_\-put@{mask\-\_\-put}}
+\index{mask\-\_\-put@{mask\-\_\-put}!atom_mask@{atom\-\_\-mask}}
+\paragraph[{mask\-\_\-put}]{\setlength{\rightskip}{0pt plus 5cm}subroutine atom\-\_\-mask\-::mask\-\_\-put (
+\begin{DoxyParamCaption}
+\item[{type({\bf mask\-\_\-type})}]{m, }
+\item[{real(8), dimension(\-:)}]{x, }
+\item[{real, dimension(\-:)}]{xmasked}
+\end{DoxyParamCaption}
+)}}\label{classatom__mask_acf07e23d62def4b7355c98065ba086ea}
+
+
+Definition at line 446 of file mask.\-f90.
+
+
+
+Referenced by trj\-::trj\-\_\-read(), and avetr\-::write\-\_\-average().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classatom__mask_a14396a493fa6fda90515fd946a68e90b}{\index{atom\-\_\-mask@{atom\-\_\-mask}!mask\-\_\-shutdown@{mask\-\_\-shutdown}}
+\index{mask\-\_\-shutdown@{mask\-\_\-shutdown}!atom_mask@{atom\-\_\-mask}}
+\paragraph[{mask\-\_\-shutdown}]{\setlength{\rightskip}{0pt plus 5cm}subroutine atom\-\_\-mask\-::mask\-\_\-shutdown (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classatom__mask_a14396a493fa6fda90515fd946a68e90b}
+
+
+Definition at line 46 of file mask.\-f90.
+
+
+
+References finalize\-\_\-storage().
+
+
+
+Referenced by finalize(), and trj\-::trj\-\_\-shutdown().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classatom__mask_a5499bfab148e68b797181ace7ee2e744}{\index{atom\-\_\-mask@{atom\-\_\-mask}!mask\-\_\-startup@{mask\-\_\-startup}}
+\index{mask\-\_\-startup@{mask\-\_\-startup}!atom_mask@{atom\-\_\-mask}}
+\paragraph[{mask\-\_\-startup}]{\setlength{\rightskip}{0pt plus 5cm}subroutine atom\-\_\-mask\-::mask\-\_\-startup (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classatom__mask_a5499bfab148e68b797181ace7ee2e744}
+
+
+Definition at line 41 of file mask.\-f90.
+
+
+
+References topo\-::topo\-\_\-startup().
+
+
+
+Referenced by startup(), and trj\-::trj\-\_\-startup().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=347pt]{classatom__mask_a5499bfab148e68b797181ace7ee2e744_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classatom__mask_a5499bfab148e68b797181ace7ee2e744_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classatom__mask_a4d3aff857c97591b916a1ee064cb7cef}{\index{atom\-\_\-mask@{atom\-\_\-mask}!set\-\_\-solute@{set\-\_\-solute}}
+\index{set\-\_\-solute@{set\-\_\-solute}!atom_mask@{atom\-\_\-mask}}
+\paragraph[{set\-\_\-solute}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, private atom\-\_\-mask\-::set\-\_\-solute (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classatom__mask_a4d3aff857c97591b916a1ee064cb7cef}
+
+
+Definition at line 98 of file mask.\-f90.
+
+
+
+Referenced by mask\-\_\-initialize().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classatom__mask_a30b962d0b0f89f142ad386569bab3d42}{\index{atom\-\_\-mask@{atom\-\_\-mask}!update@{update}}
+\index{update@{update}!atom_mask@{atom\-\_\-mask}}
+\paragraph[{update}]{\setlength{\rightskip}{0pt plus 5cm}integer function, private atom\-\_\-mask\-::update (
+\begin{DoxyParamCaption}
+\item[{type({\bf set})}]{s, }
+\item[{type({\bf mask\-\_\-type})}]{m}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classatom__mask_a30b962d0b0f89f142ad386569bab3d42}
+
+
+Definition at line 290 of file mask.\-f90.
+
+
+
+References misc\-::upcase().
+
+
+
+Referenced by mask\-\_\-add().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=295pt]{classatom__mask_a30b962d0b0f89f142ad386569bab3d42_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classatom__mask_ab6d589c395ac5883f6492a3bb59d61e7}{\index{atom\-\_\-mask@{atom\-\_\-mask}!update\-\_\-pretop@{update\-\_\-pretop}}
+\index{update\-\_\-pretop@{update\-\_\-pretop}!atom_mask@{atom\-\_\-mask}}
+\paragraph[{update\-\_\-pretop}]{\setlength{\rightskip}{0pt plus 5cm}integer function, private atom\-\_\-mask\-::update\-\_\-pretop (
+\begin{DoxyParamCaption}
+\item[{type({\bf set})}]{s, }
+\item[{type({\bf mask\-\_\-type})}]{m}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classatom__mask_ab6d589c395ac5883f6492a3bb59d61e7}
+
+
+Definition at line 351 of file mask.\-f90.
+
+
+
+Referenced by mask\-\_\-add().
+
+
+
+Here is the caller graph for this function\-:
+
+
+
+
+\subsubsection{Member Data Documentation}
+\hypertarget{classatom__mask_ab78bfda66e905ab2941b555acb0cad8e}{\index{atom\-\_\-mask@{atom\-\_\-mask}!modeule\-\_\-date@{modeule\-\_\-date}}
+\index{modeule\-\_\-date@{modeule\-\_\-date}!atom_mask@{atom\-\_\-mask}}
+\paragraph[{modeule\-\_\-date}]{\setlength{\rightskip}{0pt plus 5cm}character($\ast$), parameter, private atom\-\_\-mask\-::modeule\-\_\-date = '2003-\/06-\/02'\hspace{0.3cm}{\ttfamily [private]}}}\label{classatom__mask_ab78bfda66e905ab2941b555acb0cad8e}
+
+
+Definition at line 13 of file mask.\-f90.
+
+\hypertarget{classatom__mask_a64df9ccbd1b3413ead1e8f9b32220e4c}{\index{atom\-\_\-mask@{atom\-\_\-mask}!module\-\_\-version@{module\-\_\-version}}
+\index{module\-\_\-version@{module\-\_\-version}!atom_mask@{atom\-\_\-mask}}
+\paragraph[{module\-\_\-version}]{\setlength{\rightskip}{0pt plus 5cm}character($\ast$), parameter, private atom\-\_\-mask\-::module\-\_\-version = '5.\-01'\hspace{0.3cm}{\ttfamily [private]}}}\label{classatom__mask_a64df9ccbd1b3413ead1e8f9b32220e4c}
+
+
+Definition at line 12 of file mask.\-f90.
+
+\hypertarget{classatom__mask_afd305ff17cef09bcbb0a2ee88bc47849}{\index{atom\-\_\-mask@{atom\-\_\-mask}!solute@{solute}}
+\index{solute@{solute}!atom_mask@{atom\-\_\-mask}}
+\paragraph[{solute}]{\setlength{\rightskip}{0pt plus 5cm}logical(1), dimension(\-:), allocatable, private atom\-\_\-mask\-::solute\hspace{0.3cm}{\ttfamily [private]}}}\label{classatom__mask_afd305ff17cef09bcbb0a2ee88bc47849}
+
+
+Definition at line 19 of file mask.\-f90.
+
+
+
+The documentation for this module was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{mask_8f90}{mask.\-f90}\end{DoxyCompactItemize}

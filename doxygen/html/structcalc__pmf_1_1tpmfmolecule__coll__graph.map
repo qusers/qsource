@@ -1,0 +1,6 @@
+<map id="calc_pmf::tpmfmolecule" name="calc_pmf::tpmfmolecule">
+<area shape="rect" id="node2" href="$structcalc__pmf_1_1tpmfring.html" title="{calc_pmf::tpmfring\n|+ path\l+ aromatic\l+ planar\l|}" alt="" coords="5,277,136,384"/>
+<area shape="rect" id="node3" href="$structcalc__pmf_1_1tpmfbond.html" title="{calc_pmf::tpmfbond\n|+ ttype\l+ id\l+ valid\l+ atom_1\l+ atom_2\l+ part\l+ ring\l+ num_neib\l+ neib\l|}" alt="" coords="160,233,299,428"/>
+<area shape="rect" id="node4" href="$structcalc__pmf_1_1tpmfatom.html" title="{calc_pmf::tpmfatom\n|+ topindex\l+ ttype\l+ qtype\l+ qtype_long\l+ mol2type\l+ coor\l+ polar\l+ hb\l+ aromatic\l+ charge\land 26 more...\l|}" alt="" coords="323,219,461,443"/>
+<area shape="rect" id="node5" href="$structcalc__pmf_1_1tabsdetail.html" title="{calc_pmf::tabsdetail\n|+ score\l+ r\l+ atom_id\l+ m\l+ k\l+ l\l|}" alt="" coords="322,5,462,156"/>
+</map>

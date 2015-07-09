@@ -1,0 +1,11 @@
+digraph "calc_fit::fit_add"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1 [label="calc_fit::fit_add",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+  Node1 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid"];
+  Node2 [label="add_a_calc",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$qcalc_8f90.html#acb44d1dc6dd86deefc875c180bc5703e"];
+  Node2 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid"];
+  Node3 [label="add_calcs",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$qcalc_8f90.html#acaadc7e7a89c09e2f5d003ad5dca1672"];
+}

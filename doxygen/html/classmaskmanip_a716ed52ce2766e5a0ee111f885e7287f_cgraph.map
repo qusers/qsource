@@ -1,0 +1,12 @@
+<map id="maskmanip::maskmanip_make" name="maskmanip::maskmanip_make">
+<area shape="rect" id="node2" href="$classmisc.html#a49b44c33311a31e874439a6f3caf5801" title="misc::getlin" alt="" coords="313,107,403,133"/>
+<area shape="rect" id="node3" href="$classatom__mask.html#ad0a7fae4495fbbde287b61adf5b41d62" title="atom_mask::mask_add" alt="" coords="278,157,438,184"/>
+<area shape="rect" id="node5" href="$classmisc.html#a3d25ef800766f590365955680ff3ba2c" title="misc::upcase" alt="" coords="737,107,837,133"/>
+<area shape="rect" id="node9" href="$classatom__mask.html#aa33256b4eb2abd74f319e47e7f9c67b8" title="atom_mask::mask_clear" alt="" coords="275,309,441,336"/>
+<area shape="rect" id="node10" href="$classmaskmanip.html#a32c8614b8e223757850273cd6a47927e" title="maskmanip::maskmanip_help" alt="" coords="259,360,457,387"/>
+<area shape="rect" id="node4" href="$classatom__mask.html#a517aeb28af6ea93d97770ace5268b5ee" title="atom_mask::get_sybylcode" alt="" coords="505,5,689,32"/>
+<area shape="rect" id="node6" href="$classatom__mask.html#adfd3923e784e3ccdebf575c61257f0ea" title="atom_mask::get_word" alt="" coords="521,107,674,133"/>
+<area shape="rect" id="node7" href="$classatom__mask.html#a30b962d0b0f89f142ad386569bab3d42" title="atom_mask::update" alt="" coords="528,157,667,184"/>
+<area shape="rect" id="node8" href="$classatom__mask.html#ab6d589c395ac5883f6492a3bb59d61e7" title="atom_mask::update_pretop" alt="" coords="505,208,689,235"/>
+<area shape="rect" id="node11" href="$classmisc.html#ac616bbb70212f3216e099c51f3c217f9" title="misc::centered_heading" alt="" coords="515,360,679,387"/>
+</map>

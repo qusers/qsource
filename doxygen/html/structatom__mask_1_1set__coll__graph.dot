@@ -1,0 +1,6 @@
+digraph "atom_mask::set"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node1 [label="{atom_mask::set\n|- first\l- last\l- residue_numbering\l- solute1\l- solute2\l- excl1\l- excl2\l- restr1\l- restr2\l- heavy1\l- heavy2\l- sybyl1\l- sybyl2\l- notflag\l- sybylcode\l|}",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+}

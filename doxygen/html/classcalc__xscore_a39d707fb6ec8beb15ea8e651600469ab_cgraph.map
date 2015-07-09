@@ -1,0 +1,5 @@
+<map id="calc_xscore::protein_show_contents" name="calc_xscore::protein_show_contents">
+<area shape="rect" id="node2" href="$classcalc__xscore.html#acd543b702a0add567fbfcb3000a77bee" title="calc_xscore::protein\l_show_atoms" alt="" coords="193,5,333,47"/>
+<area shape="rect" id="node3" href="$classcalc__xscore.html#a1cfee236265ab3aacb7a6823fb8d7ffd" title="calc_xscore::protein\l_show_bonds" alt="" coords="193,71,333,112"/>
+<area shape="rect" id="node4" href="$classcalc__xscore.html#af6156e6d7fb6e6f4b3fd8daf6e1e1513" title="calc_xscore::protein\l_show_rings" alt="" coords="193,136,333,177"/>
+</map>

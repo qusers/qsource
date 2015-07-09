@@ -1,0 +1,286 @@
+\hypertarget{classcalc__rms}{\subsection{calc\-\_\-rms Module Reference}
+\label{classcalc__rms}\index{calc\-\_\-rms@{calc\-\_\-rms}}
+}
+
+
+Collaboration diagram for calc\-\_\-rms\-:
+\subsubsection*{Data Types}
+\begin{DoxyCompactItemize}
+\item 
+type \hyperlink{structcalc__rms_1_1rms__coord__type}{rms\-\_\-coord\-\_\-type}
+\end{DoxyCompactItemize}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine \hyperlink{classcalc__rms_aa5acf10d18cc6a1f64f3388951dbd5fd}{rms\-\_\-initialize}
+\item 
+subroutine \hyperlink{classcalc__rms_a4753dc26621e5a66675acefb3e85b0ba}{rms\-\_\-finalize} (i)
+\item 
+integer function \hyperlink{classcalc__rms_ae0ddbab6b86b26808306b08522944087}{rms\-\_\-add} (desc)
+\item 
+subroutine \hyperlink{classcalc__rms_a79e74aee349411bedf7f3c71a81b25bb}{rms\-\_\-calc} (i)
+\item 
+subroutine \hyperlink{classcalc__rms_aa7448d6c01ae57e401ff6ca9cd4cceda}{rms\-\_\-make\-\_\-ref} (i)
+\item 
+subroutine \hyperlink{classcalc__rms_a8d1a0fac027ef6b1f98c5d988fe2f9c8}{rms\-\_\-heading} (i)
+\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+integer, parameter \hyperlink{classcalc__rms_ae2b830ba7835ceafcb4e529ffdaeaa80}{max\-\_\-masks} = 10
+\end{DoxyCompactItemize}
+\subsubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+type(mask\-\_\-type), dimension(\hyperlink{classcalc__rms_ae2b830ba7835ceafcb4e529ffdaeaa80}{max\-\_\-masks}), \\*
+target, private \hyperlink{classcalc__rms_aa6d25b1a7e8948fc7a1357c00d76b99d}{masks}
+\item 
+integer, private \hyperlink{classcalc__rms_a2b9f0f62087252c30ade1e18cf31df42}{nmasks} = 0
+\item 
+type(\hyperlink{structcalc__rms_1_1rms__coord__type}{rms\-\_\-coord\-\_\-type}), \\*
+dimension(\hyperlink{classcalc__rms_ae2b830ba7835ceafcb4e529ffdaeaa80}{max\-\_\-masks}), private \hyperlink{classcalc__rms_a2ddf6442a7569ee46d9033fc1c872c4a}{coords}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+
+
+Definition at line 6 of file calc\-\_\-rms.\-f90.
+
+
+
+\subsubsection{Member Function/\-Subroutine Documentation}
+\hypertarget{classcalc__rms_ae0ddbab6b86b26808306b08522944087}{\index{calc\-\_\-rms@{calc\-\_\-rms}!rms\-\_\-add@{rms\-\_\-add}}
+\index{rms\-\_\-add@{rms\-\_\-add}!calc_rms@{calc\-\_\-rms}}
+\paragraph[{rms\-\_\-add}]{\setlength{\rightskip}{0pt plus 5cm}integer function calc\-\_\-rms\-::rms\-\_\-add (
+\begin{DoxyParamCaption}
+\item[{character($\ast$)}]{desc}
+\end{DoxyParamCaption}
+)}}\label{classcalc__rms_ae0ddbab6b86b26808306b08522944087}
+
+
+Definition at line 31 of file calc\-\_\-rms.\-f90.
+
+
+
+References atom\-\_\-mask\-::mask\-\_\-finalize(), atom\-\_\-mask\-::mask\-\_\-initialize(), maskmanip\-::maskmanip\-\_\-make(), and rms\-\_\-make\-\_\-ref().
+
+
+
+Referenced by add\-\_\-a\-\_\-calc().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__rms_ae0ddbab6b86b26808306b08522944087_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__rms_a79e74aee349411bedf7f3c71a81b25bb}{\index{calc\-\_\-rms@{calc\-\_\-rms}!rms\-\_\-calc@{rms\-\_\-calc}}
+\index{rms\-\_\-calc@{rms\-\_\-calc}!calc_rms@{calc\-\_\-rms}}
+\paragraph[{rms\-\_\-calc}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-rms\-::rms\-\_\-calc (
+\begin{DoxyParamCaption}
+\item[{integer, intent(in)}]{i}
+\end{DoxyParamCaption}
+)}}\label{classcalc__rms_a79e74aee349411bedf7f3c71a81b25bb}
+
+
+Definition at line 61 of file calc\-\_\-rms.\-f90.
+
+
+
+References atom\-\_\-mask\-::mask\-\_\-get(), and calc\-\_\-rdf\-::r().
+
+
+
+Referenced by calc\-\_\-all().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=335pt]{classcalc__rms_a79e74aee349411bedf7f3c71a81b25bb_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__rms_a79e74aee349411bedf7f3c71a81b25bb_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__rms_a4753dc26621e5a66675acefb3e85b0ba}{\index{calc\-\_\-rms@{calc\-\_\-rms}!rms\-\_\-finalize@{rms\-\_\-finalize}}
+\index{rms\-\_\-finalize@{rms\-\_\-finalize}!calc_rms@{calc\-\_\-rms}}
+\paragraph[{rms\-\_\-finalize}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-rms\-::rms\-\_\-finalize (
+\begin{DoxyParamCaption}
+\item[{integer}]{i}
+\end{DoxyParamCaption}
+)}}\label{classcalc__rms_a4753dc26621e5a66675acefb3e85b0ba}
+
+
+Definition at line 25 of file calc\-\_\-rms.\-f90.
+
+
+
+References atom\-\_\-mask\-::mask\-\_\-finalize().
+
+
+
+Referenced by finalize().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classcalc__rms_a8d1a0fac027ef6b1f98c5d988fe2f9c8}{\index{calc\-\_\-rms@{calc\-\_\-rms}!rms\-\_\-heading@{rms\-\_\-heading}}
+\index{rms\-\_\-heading@{rms\-\_\-heading}!calc_rms@{calc\-\_\-rms}}
+\paragraph[{rms\-\_\-heading}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-rms\-::rms\-\_\-heading (
+\begin{DoxyParamCaption}
+\item[{integer}]{i}
+\end{DoxyParamCaption}
+)}}\label{classcalc__rms_a8d1a0fac027ef6b1f98c5d988fe2f9c8}
+
+
+Definition at line 86 of file calc\-\_\-rms.\-f90.
+
+
+
+Referenced by print\-\_\-headings().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=318pt]{classcalc__rms_a8d1a0fac027ef6b1f98c5d988fe2f9c8_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__rms_aa5acf10d18cc6a1f64f3388951dbd5fd}{\index{calc\-\_\-rms@{calc\-\_\-rms}!rms\-\_\-initialize@{rms\-\_\-initialize}}
+\index{rms\-\_\-initialize@{rms\-\_\-initialize}!calc_rms@{calc\-\_\-rms}}
+\paragraph[{rms\-\_\-initialize}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-rms\-::rms\-\_\-initialize (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__rms_aa5acf10d18cc6a1f64f3388951dbd5fd}
+
+
+Definition at line 22 of file calc\-\_\-rms.\-f90.
+
+
+
+Referenced by initialize().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__rms_aa5acf10d18cc6a1f64f3388951dbd5fd_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__rms_aa7448d6c01ae57e401ff6ca9cd4cceda}{\index{calc\-\_\-rms@{calc\-\_\-rms}!rms\-\_\-make\-\_\-ref@{rms\-\_\-make\-\_\-ref}}
+\index{rms\-\_\-make\-\_\-ref@{rms\-\_\-make\-\_\-ref}!calc_rms@{calc\-\_\-rms}}
+\paragraph[{rms\-\_\-make\-\_\-ref}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-rms\-::rms\-\_\-make\-\_\-ref (
+\begin{DoxyParamCaption}
+\item[{integer}]{i}
+\end{DoxyParamCaption}
+)}}\label{classcalc__rms_aa7448d6c01ae57e401ff6ca9cd4cceda}
+
+
+Definition at line 78 of file calc\-\_\-rms.\-f90.
+
+
+
+References atom\-\_\-mask\-::mask\-\_\-get().
+
+
+
+Referenced by make\-\_\-ref\-\_\-all(), and rms\-\_\-add().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__rms_aa7448d6c01ae57e401ff6ca9cd4cceda_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+
+
+\subsubsection{Member Data Documentation}
+\hypertarget{classcalc__rms_a2ddf6442a7569ee46d9033fc1c872c4a}{\index{calc\-\_\-rms@{calc\-\_\-rms}!coords@{coords}}
+\index{coords@{coords}!calc_rms@{calc\-\_\-rms}}
+\paragraph[{coords}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf rms\-\_\-coord\-\_\-type}), dimension({\bf max\-\_\-masks}), private calc\-\_\-rms\-::coords\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__rms_a2ddf6442a7569ee46d9033fc1c872c4a}
+
+
+Definition at line 19 of file calc\-\_\-rms.\-f90.
+
+\hypertarget{classcalc__rms_aa6d25b1a7e8948fc7a1357c00d76b99d}{\index{calc\-\_\-rms@{calc\-\_\-rms}!masks@{masks}}
+\index{masks@{masks}!calc_rms@{calc\-\_\-rms}}
+\paragraph[{masks}]{\setlength{\rightskip}{0pt plus 5cm}type(mask\-\_\-type), dimension({\bf max\-\_\-masks}), target, private calc\-\_\-rms\-::masks\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__rms_aa6d25b1a7e8948fc7a1357c00d76b99d}
+
+
+Definition at line 14 of file calc\-\_\-rms.\-f90.
+
+\hypertarget{classcalc__rms_ae2b830ba7835ceafcb4e529ffdaeaa80}{\index{calc\-\_\-rms@{calc\-\_\-rms}!max\-\_\-masks@{max\-\_\-masks}}
+\index{max\-\_\-masks@{max\-\_\-masks}!calc_rms@{calc\-\_\-rms}}
+\paragraph[{max\-\_\-masks}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter calc\-\_\-rms\-::max\-\_\-masks = 10}}\label{classcalc__rms_ae2b830ba7835ceafcb4e529ffdaeaa80}
+
+
+Definition at line 12 of file calc\-\_\-rms.\-f90.
+
+\hypertarget{classcalc__rms_a2b9f0f62087252c30ade1e18cf31df42}{\index{calc\-\_\-rms@{calc\-\_\-rms}!nmasks@{nmasks}}
+\index{nmasks@{nmasks}!calc_rms@{calc\-\_\-rms}}
+\paragraph[{nmasks}]{\setlength{\rightskip}{0pt plus 5cm}integer, private calc\-\_\-rms\-::nmasks = 0\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__rms_a2b9f0f62087252c30ade1e18cf31df42}
+
+
+Definition at line 15 of file calc\-\_\-rms.\-f90.
+
+
+
+The documentation for this module was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{calc__rms_8f90}{calc\-\_\-rms.\-f90}\end{DoxyCompactItemize}

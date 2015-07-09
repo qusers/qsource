@@ -1,0 +1,5 @@
+<map id="calc_xscore::molecule_show_contents" name="calc_xscore::molecule_show_contents">
+<area shape="rect" id="node2" href="$classcalc__xscore.html#ac0d605722ea0652ff5fd96530a950378" title="calc_xscore::molecule\l_show_atoms" alt="" coords="207,5,360,47"/>
+<area shape="rect" id="node3" href="$classcalc__xscore.html#aa9b25d3ef95ca8a51168910e65c3fd9a" title="calc_xscore::molecule\l_show_bonds" alt="" coords="207,71,360,112"/>
+<area shape="rect" id="node4" href="$classcalc__xscore.html#a002b3884a4fa785e923e4e1dafa1b98c" title="calc_xscore::molecule\l_show_rings" alt="" coords="207,136,360,177"/>
+</map>

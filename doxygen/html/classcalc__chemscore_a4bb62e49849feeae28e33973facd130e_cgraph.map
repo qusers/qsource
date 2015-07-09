@@ -1,0 +1,7 @@
+<map id="calc_chemscore::make_tac_index" name="calc_chemscore::make_tac_index">
+<area shape="rect" id="node2" href="$classindexer.html#a3881b2e3e31c5a3e188e90ad8bc96405" title="indexer::index_add" alt="" coords="212,5,347,32"/>
+<area shape="rect" id="node6" href="$classindexer.html#aa83f2bc15a2dfefd22f4fe96975fd213" title="indexer::index_create" alt="" coords="395,56,544,83"/>
+<area shape="rect" id="node3" href="$classindexer.html#ab6c32d13a4bcca7f5411d6d097cf5cd8" title="indexer::grow" alt="" coords="418,5,521,32"/>
+<area shape="rect" id="node4" href="$classindexer.html#a4c6bb664b3ca6a455aedaed8b6e501fd" title="indexer::index_resize" alt="" coords="592,5,740,32"/>
+<area shape="rect" id="node5" href="$classindexer.html#ac760937d1c86952d78fe2f8ee82c0264" title="indexer::index_clear" alt="" coords="788,31,929,57"/>
+</map>

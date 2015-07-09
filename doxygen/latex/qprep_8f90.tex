@@ -1,0 +1,228 @@
+\hypertarget{qprep_8f90}{\subsection{qprep.\-f90 File Reference}
+\label{qprep_8f90}\index{qprep.\-f90@{qprep.\-f90}}
+}
+\subsubsection*{Functions/\-Subroutines}
+\begin{DoxyCompactItemize}
+\item 
+program \hyperlink{qprep_8f90_a252292cf2c64796a48ab29aae4920d15}{qprep}
+\item 
+subroutine \hyperlink{qprep_8f90_aae7f6285ebd5705125725dcda622efd5}{qprep\-\_\-from\-\_\-inputfile} (filename)
+\item 
+subroutine \hyperlink{qprep_8f90_a509741b66578d6d76b269d0f98128910}{qprep\-\_\-from\-\_\-commandline}
+\item 
+subroutine \hyperlink{qprep_8f90_add7d58759b8d0826b87051647135e024}{parse\-\_\-command} (command)
+\item 
+subroutine \hyperlink{qprep_8f90_af83560a0993e7a1fc40ca7e6f01f7baa}{help}
+\item 
+subroutine \hyperlink{qprep_8f90_a354c056706ff8040f0c9a2541c705f4d}{startup}
+\item 
+subroutine \hyperlink{qprep_8f90_ad94096261d76af50d1489fb738a54422}{shutdown}
+\item 
+logical function \hyperlink{qprep_8f90_a92103455d099485ae7224659782f0d0e}{check\-\_\-inputfile} (infilename)
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Function/\-Subroutine Documentation}
+\hypertarget{qprep_8f90_a92103455d099485ae7224659782f0d0e}{\index{qprep.\-f90@{qprep.\-f90}!check\-\_\-inputfile@{check\-\_\-inputfile}}
+\index{check\-\_\-inputfile@{check\-\_\-inputfile}!qprep.f90@{qprep.\-f90}}
+\paragraph[{check\-\_\-inputfile}]{\setlength{\rightskip}{0pt plus 5cm}logical function qprep\-::check\-\_\-inputfile (
+\begin{DoxyParamCaption}
+\item[{character(200), intent(out)}]{infilename}
+\end{DoxyParamCaption}
+)}}\label{qprep_8f90_a92103455d099485ae7224659782f0d0e}
+
+
+Definition at line 302 of file qprep.\-f90.
+
+
+
+References misc\-::centered\-\_\-heading().
+
+
+
+Referenced by qprep().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{qprep_8f90_af83560a0993e7a1fc40ca7e6f01f7baa}{\index{qprep.\-f90@{qprep.\-f90}!help@{help}}
+\index{help@{help}!qprep.f90@{qprep.\-f90}}
+\paragraph[{help}]{\setlength{\rightskip}{0pt plus 5cm}subroutine qprep\-::help (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{qprep_8f90_af83560a0993e7a1fc40ca7e6f01f7baa}
+
+
+Definition at line 183 of file qprep.\-f90.
+
+
+
+Referenced by parse\-\_\-command().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{qprep_8f90_add7d58759b8d0826b87051647135e024}{\index{qprep.\-f90@{qprep.\-f90}!parse\-\_\-command@{parse\-\_\-command}}
+\index{parse\-\_\-command@{parse\-\_\-command}!qprep.f90@{qprep.\-f90}}
+\paragraph[{parse\-\_\-command}]{\setlength{\rightskip}{0pt plus 5cm}subroutine qprep\-::parse\-\_\-command (
+\begin{DoxyParamCaption}
+\item[{character($\ast$), intent(in)}]{command}
+\end{DoxyParamCaption}
+)}}\label{qprep_8f90_add7d58759b8d0826b87051647135e024}
+
+
+Definition at line 104 of file qprep.\-f90.
+
+
+
+References prep\-::addbond(), avetr\-::avetr\-\_\-calc(), prep\-::changeimp(), prep\-::checkangs(), prep\-::checkbonds(), prep\-::checkimps(), prep\-::checktors(), prep\-::clearbond(), prep\-::clearlib(), prep\-::cleartop(), prep\-::define\-\_\-boundary\-\_\-condition(), help(), prep\-::listprefs(), prep\-::listres(), prep\-::listseq(), md\-::make\-\_\-shell2(), prep\-::maketop(), prep\-::modify\-\_\-mask(), prep\-::readff(), prep\-::readframe(), prep\-::readlib(), prep\-::readnext(), prep\-::readpdb(), prep\-::readtop(), prep\-::readx(), prep\-::set(), prep\-::solvate(), prep\-::trajectory(), prep\-::writemol2(), prep\-::writepdb(), prep\-::writetop(), and prep\-::xlink().
+
+
+
+Referenced by qprep\-\_\-from\-\_\-commandline(), and qprep\-\_\-from\-\_\-inputfile().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{qprep_8f90_a252292cf2c64796a48ab29aae4920d15}{\index{qprep.\-f90@{qprep.\-f90}!qprep@{qprep}}
+\index{qprep@{qprep}!qprep.f90@{qprep.\-f90}}
+\paragraph[{qprep}]{\setlength{\rightskip}{0pt plus 5cm}program qprep (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{qprep_8f90_a252292cf2c64796a48ab29aae4920d15}
+
+
+Definition at line 18 of file qprep.\-f90.
+
+
+
+References check\-\_\-inputfile(), prep\-::clearlib(), qprep\-\_\-from\-\_\-commandline(), qprep\-\_\-from\-\_\-inputfile(), shutdown(), startup(), and topo\-::topo\-\_\-set\-\_\-max().
+
+
+
+Here is the call graph for this function\-:
+
+
+\hypertarget{qprep_8f90_a509741b66578d6d76b269d0f98128910}{\index{qprep.\-f90@{qprep.\-f90}!qprep\-\_\-from\-\_\-commandline@{qprep\-\_\-from\-\_\-commandline}}
+\index{qprep\-\_\-from\-\_\-commandline@{qprep\-\_\-from\-\_\-commandline}!qprep.f90@{qprep.\-f90}}
+\paragraph[{qprep\-\_\-from\-\_\-commandline}]{\setlength{\rightskip}{0pt plus 5cm}subroutine qprep\-::qprep\-\_\-from\-\_\-commandline (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{qprep_8f90_a509741b66578d6d76b269d0f98128910}
+
+
+Definition at line 83 of file qprep.\-f90.
+
+
+
+References parse\-::get\-\_\-string\-\_\-arg(), misc\-::locase(), parse\-\_\-command(), and parse\-::parse\-\_\-reset().
+
+
+
+Referenced by qprep().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=291pt]{qprep_8f90_a509741b66578d6d76b269d0f98128910_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{qprep_8f90_aae7f6285ebd5705125725dcda622efd5}{\index{qprep.\-f90@{qprep.\-f90}!qprep\-\_\-from\-\_\-inputfile@{qprep\-\_\-from\-\_\-inputfile}}
+\index{qprep\-\_\-from\-\_\-inputfile@{qprep\-\_\-from\-\_\-inputfile}!qprep.f90@{qprep.\-f90}}
+\paragraph[{qprep\-\_\-from\-\_\-inputfile}]{\setlength{\rightskip}{0pt plus 5cm}subroutine qprep\-::qprep\-\_\-from\-\_\-inputfile (
+\begin{DoxyParamCaption}
+\item[{character(200)}]{filename}
+\end{DoxyParamCaption}
+)}}\label{qprep_8f90_aae7f6285ebd5705125725dcda622efd5}
+
+
+Definition at line 51 of file qprep.\-f90.
+
+
+
+References parse\-::get\-\_\-string\-\_\-arg(), parse\-\_\-command(), and parse\-::parse\-\_\-open\-\_\-file().
+
+
+
+Referenced by qprep().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{qprep_8f90_ad94096261d76af50d1489fb738a54422}{\index{qprep.\-f90@{qprep.\-f90}!shutdown@{shutdown}}
+\index{shutdown@{shutdown}!qprep.f90@{qprep.\-f90}}
+\paragraph[{shutdown}]{\setlength{\rightskip}{0pt plus 5cm}subroutine qprep\-::shutdown (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{qprep_8f90_ad94096261d76af50d1489fb738a54422}
+
+
+Definition at line 293 of file qprep.\-f90.
+
+
+
+References prep\-::prep\-\_\-shutdown().
+
+
+
+Here is the call graph for this function\-:
+
+
+\hypertarget{qprep_8f90_a354c056706ff8040f0c9a2541c705f4d}{\index{qprep.\-f90@{qprep.\-f90}!startup@{startup}}
+\index{startup@{startup}!qprep.f90@{qprep.\-f90}}
+\paragraph[{startup}]{\setlength{\rightskip}{0pt plus 5cm}subroutine qprep\-::startup (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{qprep_8f90_a354c056706ff8040f0c9a2541c705f4d}
+
+
+Definition at line 278 of file qprep.\-f90.
+
+
+
+References prep\-::prep\-\_\-startup().
+
+
+
+Here is the call graph for this function\-:
+
+

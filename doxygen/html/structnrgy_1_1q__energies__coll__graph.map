@@ -1,0 +1,4 @@
+<map id="nrgy::q_energies" name="nrgy::q_energies">
+<area shape="rect" id="node2" href="$structnrgy_1_1nb__energies.html" title="{nrgy::nb_energies\n|+ el\l+ vdw\l|}" alt="" coords="5,20,135,112"/>
+<area shape="rect" id="node3" href="$structnrgy_1_1bonded__energies.html" title="{nrgy::bonded_energies\n|+ bond\l+ angle\l+ torsion\l+ improper\l|}" alt="" coords="159,5,317,127"/>
+</map>

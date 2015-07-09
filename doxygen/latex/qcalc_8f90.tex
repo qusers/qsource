@@ -1,0 +1,724 @@
+\hypertarget{qcalc_8f90}{\subsection{qcalc.\-f90 File Reference}
+\label{qcalc_8f90}\index{qcalc.\-f90@{qcalc.\-f90}}
+}
+\subsubsection*{Data Types}
+\begin{DoxyCompactItemize}
+\item 
+type \hyperlink{structcalc__type}{calc\-\_\-type}
+\item 
+type \hyperlink{structcalc__kind__type}{calc\-\_\-kind\-\_\-type}
+\end{DoxyCompactItemize}
+\subsubsection*{Functions/\-Subroutines}
+\begin{DoxyCompactItemize}
+\item 
+program \hyperlink{qcalc_8f90_af9a59510ab33b6a61b0bffe1e6679be1}{qcalc}
+\item 
+subroutine \hyperlink{qcalc_8f90_a1c4c0aa57a695916669518b5bf72e5bb}{startup}
+\item 
+subroutine \hyperlink{qcalc_8f90_ab8b2551c119768488c4ce752918274a6}{shutdown}
+\item 
+logical function \hyperlink{qcalc_8f90_aacaa8facde5f0fb39d3129c9777ca2d6}{get\-\_\-topology} ()
+\item 
+subroutine \hyperlink{qcalc_8f90_abfa70c406b1c701bcea2c55234d0642d}{initialize}
+\item 
+subroutine \hyperlink{qcalc_8f90_a6de35d783d8e2c1ffead6a9dbf61ebb6}{do\-\_\-pre\-\_\-calcs}
+\item 
+subroutine \hyperlink{qcalc_8f90_ae13666592a639e38acc4462b8e5ec488}{finalize}
+\item 
+subroutine \hyperlink{qcalc_8f90_a0916b2e52eb485b7c054ceeaa3bcc6bc}{calc\-\_\-help}
+\item 
+subroutine \hyperlink{qcalc_8f90_accba7d2752af0a562a170bd24016fc8b}{process\-\_\-help}
+\item 
+subroutine \hyperlink{qcalc_8f90_ae9f414aacd475e3507c1adf33981cabf}{finishtrj\-\_\-all}
+\item 
+subroutine \hyperlink{qcalc_8f90_a7d2d447954fb385bdca4f228de92b1eb}{process\-\_\-data}
+\item 
+subroutine \hyperlink{qcalc_8f90_a93dcacb957411ed0d0471fe8a31c60d6}{process\-\_\-frame} (cf, frame)
+\item 
+subroutine \hyperlink{qcalc_8f90_a164c08954086777fab0abf50fc431b85}{make\-\_\-mean\-\_\-all}
+\item 
+logical function \hyperlink{qcalc_8f90_a1d82cd2a089e1e0ca370862a88297fad}{get\-\_\-coordfile} (cf, fn, frames)
+\item 
+logical function \hyperlink{qcalc_8f90_a26df16bfa0021f6226b26f2e715cdb91}{load\-\_\-restart} (fn)
+\item 
+subroutine \hyperlink{qcalc_8f90_ad7e945159c2c3479ab13f7fe344ed0ac}{finalize\-\_\-topology}
+\item 
+subroutine \hyperlink{qcalc_8f90_a9afc3a2b4bf9cf9f8ae01bac7640ab19}{add\-\_\-kind} (desc, key, output)
+\item 
+subroutine \hyperlink{qcalc_8f90_abb9b8f865767a4df227883c541fbda4a}{calc\-\_\-menu}
+\item 
+subroutine \hyperlink{qcalc_8f90_acaadc7e7a89c09e2f5d003ad5dca1672}{add\-\_\-calcs}
+\item 
+subroutine \hyperlink{qcalc_8f90_a804c759c2b0626d4cc6a056e0e1fdb4b}{make\-\_\-ref\-\_\-all} (x)
+\item 
+subroutine \hyperlink{qcalc_8f90_ae6fa26c64ed2a712e51850ce137cbdaa}{list\-\_\-calcs}
+\item 
+subroutine \hyperlink{qcalc_8f90_acb44d1dc6dd86deefc875c180bc5703e}{add\-\_\-a\-\_\-calc} (kind)
+\item 
+subroutine \hyperlink{qcalc_8f90_aef9b17e9b0d2c7dda08ad0e502c7369f}{print\-\_\-headings}
+\item 
+subroutine \hyperlink{qcalc_8f90_a5befd1d444d41d7d1e4bf8b297c17ee2}{calc\-\_\-all} (frame)
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Function/\-Subroutine Documentation}
+\hypertarget{qcalc_8f90_acb44d1dc6dd86deefc875c180bc5703e}{\index{qcalc.\-f90@{qcalc.\-f90}!add\-\_\-a\-\_\-calc@{add\-\_\-a\-\_\-calc}}
+\index{add\-\_\-a\-\_\-calc@{add\-\_\-a\-\_\-calc}!qcalc.f90@{qcalc.\-f90}}
+\paragraph[{add\-\_\-a\-\_\-calc}]{\setlength{\rightskip}{0pt plus 5cm}subroutine qcalc\-::add\-\_\-a\-\_\-calc (
+\begin{DoxyParamCaption}
+\item[{integer}]{kind}
+\end{DoxyParamCaption}
+)}}\label{qcalc_8f90_acb44d1dc6dd86deefc875c180bc5703e}
+
+
+Definition at line 528 of file qcalc.\-f90.
+
+
+
+References calc\-\_\-geom\-::angle\-\_\-add(), calc\-\_\-com\-::com\-\_\-add(), calc\-\_\-com\-\_\-ke\-::com\-\_\-ke\-\_\-add(), calc\-\_\-geom\-::dist\-\_\-add(), calc\-\_\-entropy\-::entropy\-\_\-add(), calc\-\_\-fit\-::fit\-\_\-add(), calc\-\_\-nb\-::nb\-\_\-add(), calc\-\_\-nb\-::nb\-\_\-qp\-\_\-add(), calc\-\_\-pmf\-::pmf\-\_\-add(), calc\-\_\-rdf\-::rdf\-\_\-add(), calc\-\_\-rms\-::rms\-\_\-add(), calc\-\_\-rmsf\-::rmsf\-\_\-add(), calc\-\_\-chemscore\-::score\-\_\-add(), calc\-\_\-geom\-::torsion\-\_\-add(), and calc\-\_\-xscore\-::xscore\-\_\-add().
+
+
+
+Referenced by add\-\_\-calcs().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=246pt]{qcalc_8f90_acb44d1dc6dd86deefc875c180bc5703e_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{qcalc_8f90_acaadc7e7a89c09e2f5d003ad5dca1672}{\index{qcalc.\-f90@{qcalc.\-f90}!add\-\_\-calcs@{add\-\_\-calcs}}
+\index{add\-\_\-calcs@{add\-\_\-calcs}!qcalc.f90@{qcalc.\-f90}}
+\paragraph[{add\-\_\-calcs}]{\setlength{\rightskip}{0pt plus 5cm}subroutine qcalc\-::add\-\_\-calcs (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{qcalc_8f90_acaadc7e7a89c09e2f5d003ad5dca1672}
+
+
+Definition at line 455 of file qcalc.\-f90.
+
+
+
+References add\-\_\-a\-\_\-calc(), calc\-\_\-menu(), list\-\_\-calcs(), and misc\-::locase().
+
+
+
+Here is the call graph for this function\-:
+
+
+\hypertarget{qcalc_8f90_a9afc3a2b4bf9cf9f8ae01bac7640ab19}{\index{qcalc.\-f90@{qcalc.\-f90}!add\-\_\-kind@{add\-\_\-kind}}
+\index{add\-\_\-kind@{add\-\_\-kind}!qcalc.f90@{qcalc.\-f90}}
+\paragraph[{add\-\_\-kind}]{\setlength{\rightskip}{0pt plus 5cm}subroutine qcalc\-::add\-\_\-kind (
+\begin{DoxyParamCaption}
+\item[{character($\ast$)}]{desc, }
+\item[{character($\ast$)}]{key, }
+\item[{logical}]{output}
+\end{DoxyParamCaption}
+)}}\label{qcalc_8f90_a9afc3a2b4bf9cf9f8ae01bac7640ab19}
+
+
+Definition at line 426 of file qcalc.\-f90.
+
+\hypertarget{qcalc_8f90_a5befd1d444d41d7d1e4bf8b297c17ee2}{\index{qcalc.\-f90@{qcalc.\-f90}!calc\-\_\-all@{calc\-\_\-all}}
+\index{calc\-\_\-all@{calc\-\_\-all}!qcalc.f90@{qcalc.\-f90}}
+\paragraph[{calc\-\_\-all}]{\setlength{\rightskip}{0pt plus 5cm}subroutine qcalc\-::calc\-\_\-all (
+\begin{DoxyParamCaption}
+\item[{integer}]{frame}
+\end{DoxyParamCaption}
+)}}\label{qcalc_8f90_a5befd1d444d41d7d1e4bf8b297c17ee2}
+
+
+Definition at line 632 of file qcalc.\-f90.
+
+
+
+References calc\-\_\-geom\-::angle\-\_\-calc(), calc\-\_\-com\-::com\-\_\-calc(), calc\-\_\-com\-\_\-ke\-::com\-\_\-ke\-\_\-calc(), calc\-\_\-geom\-::dist\-\_\-calc(), calc\-\_\-entropy\-::entropy\-\_\-calc(), calc\-\_\-fit\-::fit\-\_\-calc(), calc\-\_\-nb\-::nb\-\_\-calc(), calc\-\_\-nb\-::nb\-\_\-qp\-\_\-calc(), calc\-\_\-pmf\-::pmf\-\_\-calc(), calc\-\_\-rdf\-::rdf\-\_\-calc(), calc\-\_\-rms\-::rms\-\_\-calc(), calc\-\_\-rmsf\-::rmsf\-\_\-calc(), calc\-\_\-chemscore\-::score\-\_\-calc(), calc\-\_\-geom\-::torsion\-\_\-calc(), and calc\-\_\-xscore\-::xscore\-\_\-calc().
+
+
+
+Referenced by process\-\_\-frame().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{qcalc_8f90_a5befd1d444d41d7d1e4bf8b297c17ee2_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{qcalc_8f90_a0916b2e52eb485b7c054ceeaa3bcc6bc}{\index{qcalc.\-f90@{qcalc.\-f90}!calc\-\_\-help@{calc\-\_\-help}}
+\index{calc\-\_\-help@{calc\-\_\-help}!qcalc.f90@{qcalc.\-f90}}
+\paragraph[{calc\-\_\-help}]{\setlength{\rightskip}{0pt plus 5cm}subroutine qcalc\-::calc\-\_\-help (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{qcalc_8f90_a0916b2e52eb485b7c054ceeaa3bcc6bc}
+
+
+Definition at line 204 of file qcalc.\-f90.
+
+
+
+Referenced by startup().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=300pt]{qcalc_8f90_a0916b2e52eb485b7c054ceeaa3bcc6bc_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{qcalc_8f90_abb9b8f865767a4df227883c541fbda4a}{\index{qcalc.\-f90@{qcalc.\-f90}!calc\-\_\-menu@{calc\-\_\-menu}}
+\index{calc\-\_\-menu@{calc\-\_\-menu}!qcalc.f90@{qcalc.\-f90}}
+\paragraph[{calc\-\_\-menu}]{\setlength{\rightskip}{0pt plus 5cm}subroutine qcalc\-::calc\-\_\-menu (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{qcalc_8f90_abb9b8f865767a4df227883c541fbda4a}
+
+
+Definition at line 440 of file qcalc.\-f90.
+
+
+
+References misc\-::centered\-\_\-heading().
+
+
+
+Referenced by add\-\_\-calcs().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=304pt]{qcalc_8f90_abb9b8f865767a4df227883c541fbda4a_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=243pt]{qcalc_8f90_abb9b8f865767a4df227883c541fbda4a_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{qcalc_8f90_a6de35d783d8e2c1ffead6a9dbf61ebb6}{\index{qcalc.\-f90@{qcalc.\-f90}!do\-\_\-pre\-\_\-calcs@{do\-\_\-pre\-\_\-calcs}}
+\index{do\-\_\-pre\-\_\-calcs@{do\-\_\-pre\-\_\-calcs}!qcalc.f90@{qcalc.\-f90}}
+\paragraph[{do\-\_\-pre\-\_\-calcs}]{\setlength{\rightskip}{0pt plus 5cm}subroutine qcalc\-::do\-\_\-pre\-\_\-calcs (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{qcalc_8f90_a6de35d783d8e2c1ffead6a9dbf61ebb6}
+
+
+Definition at line 141 of file qcalc.\-f90.
+
+
+
+References calc\-\_\-pmf\-::pmf\-\_\-precalc(), calc\-\_\-chemscore\-::score\-\_\-precalc(), and calc\-\_\-xscore\-::xscore\-\_\-precalc().
+
+
+
+Here is the call graph for this function\-:
+
+
+\hypertarget{qcalc_8f90_ae13666592a639e38acc4462b8e5ec488}{\index{qcalc.\-f90@{qcalc.\-f90}!finalize@{finalize}}
+\index{finalize@{finalize}!qcalc.f90@{qcalc.\-f90}}
+\paragraph[{finalize}]{\setlength{\rightskip}{0pt plus 5cm}subroutine qcalc\-::finalize (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{qcalc_8f90_ae13666592a639e38acc4462b8e5ec488}
+
+
+Definition at line 159 of file qcalc.\-f90.
+
+
+
+References calc\-\_\-chemscore\-::chemscore\-\_\-finalize(), calc\-\_\-com\-::com\-\_\-finalize(), calc\-\_\-com\-\_\-ke\-::com\-\_\-ke\-\_\-finalize(), calc\-\_\-entropy\-::entropy\-\_\-finalize(), calc\-\_\-fit\-::fit\-\_\-finalize(), atom\-\_\-mask\-::mask\-\_\-shutdown(), calc\-\_\-nb\-::nb\-\_\-finalize(), calc\-\_\-nb\-::nb\-\_\-qp\-\_\-finalize(), calc\-\_\-pmf\-::pmf\-\_\-finalize(), calc\-\_\-rdf\-::rdf\-\_\-finalize(), calc\-\_\-rms\-::rms\-\_\-finalize(), calc\-\_\-rmsf\-::rmsf\-\_\-finalize(), and calc\-\_\-xscore\-::xscore\-\_\-finalize().
+
+
+
+Here is the call graph for this function\-:
+
+
+\hypertarget{qcalc_8f90_ad7e945159c2c3479ab13f7fe344ed0ac}{\index{qcalc.\-f90@{qcalc.\-f90}!finalize\-\_\-topology@{finalize\-\_\-topology}}
+\index{finalize\-\_\-topology@{finalize\-\_\-topology}!qcalc.f90@{qcalc.\-f90}}
+\paragraph[{finalize\-\_\-topology}]{\setlength{\rightskip}{0pt plus 5cm}subroutine qcalc\-::finalize\-\_\-topology (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{qcalc_8f90_ad7e945159c2c3479ab13f7fe344ed0ac}
+
+
+Definition at line 422 of file qcalc.\-f90.
+
+
+
+References topo\-::topo\-\_\-deallocate().
+
+
+
+Here is the call graph for this function\-:
+
+
+\hypertarget{qcalc_8f90_ae9f414aacd475e3507c1adf33981cabf}{\index{qcalc.\-f90@{qcalc.\-f90}!finishtrj\-\_\-all@{finishtrj\-\_\-all}}
+\index{finishtrj\-\_\-all@{finishtrj\-\_\-all}!qcalc.f90@{qcalc.\-f90}}
+\paragraph[{finishtrj\-\_\-all}]{\setlength{\rightskip}{0pt plus 5cm}subroutine qcalc\-::finishtrj\-\_\-all (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{qcalc_8f90_ae9f414aacd475e3507c1adf33981cabf}
+
+
+Definition at line 221 of file qcalc.\-f90.
+
+\hypertarget{qcalc_8f90_a1d82cd2a089e1e0ca370862a88297fad}{\index{qcalc.\-f90@{qcalc.\-f90}!get\-\_\-coordfile@{get\-\_\-coordfile}}
+\index{get\-\_\-coordfile@{get\-\_\-coordfile}!qcalc.f90@{qcalc.\-f90}}
+\paragraph[{get\-\_\-coordfile}]{\setlength{\rightskip}{0pt plus 5cm}logical function qcalc\-::get\-\_\-coordfile (
+\begin{DoxyParamCaption}
+\item[{character(len=256), intent(out)}]{cf, }
+\item[{integer, intent(out)}]{fn, }
+\item[{character(len=80), optional}]{frames}
+\end{DoxyParamCaption}
+)}}\label{qcalc_8f90_a1d82cd2a089e1e0ca370862a88297fad}
+
+
+Definition at line 322 of file qcalc.\-f90.
+
+
+
+References misc\-::freefile(), make\-\_\-mean\-\_\-all(), make\-\_\-ref\-\_\-all(), and trj\-::trj\-\_\-open().
+
+
+
+Referenced by process\-\_\-data().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{qcalc_8f90_aacaa8facde5f0fb39d3129c9777ca2d6}{\index{qcalc.\-f90@{qcalc.\-f90}!get\-\_\-topology@{get\-\_\-topology}}
+\index{get\-\_\-topology@{get\-\_\-topology}!qcalc.f90@{qcalc.\-f90}}
+\paragraph[{get\-\_\-topology}]{\setlength{\rightskip}{0pt plus 5cm}logical function qcalc\-::get\-\_\-topology (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{qcalc_8f90_aacaa8facde5f0fb39d3129c9777ca2d6}
+
+
+Definition at line 113 of file qcalc.\-f90.
+
+
+
+References misc\-::getlin(), and topo\-::topo\-\_\-load().
+
+
+
+Here is the call graph for this function\-:
+
+
+\hypertarget{qcalc_8f90_abfa70c406b1c701bcea2c55234d0642d}{\index{qcalc.\-f90@{qcalc.\-f90}!initialize@{initialize}}
+\index{initialize@{initialize}!qcalc.f90@{qcalc.\-f90}}
+\paragraph[{initialize}]{\setlength{\rightskip}{0pt plus 5cm}subroutine qcalc\-::initialize (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{qcalc_8f90_abfa70c406b1c701bcea2c55234d0642d}
+
+
+Definition at line 124 of file qcalc.\-f90.
+
+
+
+References calc\-\_\-com\-::com\-\_\-initialize(), calc\-\_\-com\-\_\-ke\-::com\-\_\-ke\-\_\-initialize(), calc\-\_\-entropy\-::entropy\-\_\-initialize(), calc\-\_\-fit\-::fit\-\_\-initialize(), calc\-\_\-geom\-::geom\-\_\-initialize(), calc\-\_\-nb\-::nb\-\_\-initialize(), calc\-\_\-pmf\-::pmf\-\_\-initialize(), calc\-\_\-rdf\-::rdf\-\_\-initialize(), calc\-\_\-rms\-::rms\-\_\-initialize(), calc\-\_\-rmsf\-::rmsf\-\_\-initialize(), calc\-\_\-chemscore\-::score\-\_\-initialize(), and calc\-\_\-xscore\-::xscore\-\_\-initialize().
+
+
+
+Referenced by md\-::initialize(), and qdyn().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=240pt]{qcalc_8f90_abfa70c406b1c701bcea2c55234d0642d_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{qcalc_8f90_ae6fa26c64ed2a712e51850ce137cbdaa}{\index{qcalc.\-f90@{qcalc.\-f90}!list\-\_\-calcs@{list\-\_\-calcs}}
+\index{list\-\_\-calcs@{list\-\_\-calcs}!qcalc.f90@{qcalc.\-f90}}
+\paragraph[{list\-\_\-calcs}]{\setlength{\rightskip}{0pt plus 5cm}subroutine qcalc\-::list\-\_\-calcs (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{qcalc_8f90_ae6fa26c64ed2a712e51850ce137cbdaa}
+
+
+Definition at line 517 of file qcalc.\-f90.
+
+
+
+References misc\-::centered\-\_\-heading().
+
+
+
+Referenced by add\-\_\-calcs(), and print\-\_\-headings().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=296pt]{qcalc_8f90_ae6fa26c64ed2a712e51850ce137cbdaa_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=255pt]{qcalc_8f90_ae6fa26c64ed2a712e51850ce137cbdaa_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{qcalc_8f90_a26df16bfa0021f6226b26f2e715cdb91}{\index{qcalc.\-f90@{qcalc.\-f90}!load\-\_\-restart@{load\-\_\-restart}}
+\index{load\-\_\-restart@{load\-\_\-restart}!qcalc.f90@{qcalc.\-f90}}
+\paragraph[{load\-\_\-restart}]{\setlength{\rightskip}{0pt plus 5cm}logical function qcalc\-::load\-\_\-restart (
+\begin{DoxyParamCaption}
+\item[{integer, intent(in)}]{fn}
+\end{DoxyParamCaption}
+)}}\label{qcalc_8f90_a26df16bfa0021f6226b26f2e715cdb91}
+
+
+Definition at line 391 of file qcalc.\-f90.
+
+
+
+Referenced by process\-\_\-data().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=262pt]{qcalc_8f90_a26df16bfa0021f6226b26f2e715cdb91_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{qcalc_8f90_a164c08954086777fab0abf50fc431b85}{\index{qcalc.\-f90@{qcalc.\-f90}!make\-\_\-mean\-\_\-all@{make\-\_\-mean\-\_\-all}}
+\index{make\-\_\-mean\-\_\-all@{make\-\_\-mean\-\_\-all}!qcalc.f90@{qcalc.\-f90}}
+\paragraph[{make\-\_\-mean\-\_\-all}]{\setlength{\rightskip}{0pt plus 5cm}subroutine qcalc\-::make\-\_\-mean\-\_\-all (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{qcalc_8f90_a164c08954086777fab0abf50fc431b85}
+
+
+Definition at line 305 of file qcalc.\-f90.
+
+
+
+References calc\-\_\-pmf\-::pmfscore\-\_\-mean(), calc\-\_\-chemscore\-::score\-\_\-mean(), and calc\-\_\-xscore\-::xscore\-\_\-mean().
+
+
+
+Referenced by get\-\_\-coordfile().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{qcalc_8f90_a164c08954086777fab0abf50fc431b85_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{qcalc_8f90_a804c759c2b0626d4cc6a056e0e1fdb4b}{\index{qcalc.\-f90@{qcalc.\-f90}!make\-\_\-ref\-\_\-all@{make\-\_\-ref\-\_\-all}}
+\index{make\-\_\-ref\-\_\-all@{make\-\_\-ref\-\_\-all}!qcalc.f90@{qcalc.\-f90}}
+\paragraph[{make\-\_\-ref\-\_\-all}]{\setlength{\rightskip}{0pt plus 5cm}subroutine qcalc\-::make\-\_\-ref\-\_\-all (
+\begin{DoxyParamCaption}
+\item[{real(8), dimension(\-:)}]{x}
+\end{DoxyParamCaption}
+)}}\label{qcalc_8f90_a804c759c2b0626d4cc6a056e0e1fdb4b}
+
+
+Definition at line 495 of file qcalc.\-f90.
+
+
+
+References calc\-\_\-fit\-::fit\-\_\-make\-\_\-ref(), calc\-\_\-rms\-::rms\-\_\-make\-\_\-ref(), and calc\-\_\-rmsf\-::rmsf\-\_\-make\-\_\-ref().
+
+
+
+Referenced by get\-\_\-coordfile().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{qcalc_8f90_aef9b17e9b0d2c7dda08ad0e502c7369f}{\index{qcalc.\-f90@{qcalc.\-f90}!print\-\_\-headings@{print\-\_\-headings}}
+\index{print\-\_\-headings@{print\-\_\-headings}!qcalc.f90@{qcalc.\-f90}}
+\paragraph[{print\-\_\-headings}]{\setlength{\rightskip}{0pt plus 5cm}subroutine qcalc\-::print\-\_\-headings (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{qcalc_8f90_aef9b17e9b0d2c7dda08ad0e502c7369f}
+
+
+Definition at line 581 of file qcalc.\-f90.
+
+
+
+References calc\-\_\-geom\-::angle\-\_\-heading(), misc\-::centered\-\_\-heading(), calc\-\_\-com\-::com\-\_\-heading(), calc\-\_\-com\-\_\-ke\-::com\-\_\-ke\-\_\-heading(), calc\-\_\-geom\-::dist\-\_\-heading(), list\-\_\-calcs(), calc\-\_\-nb\-::nb\-\_\-heading(), calc\-\_\-pmf\-::pmf\-\_\-heading(), calc\-\_\-rdf\-::rdf\-\_\-heading(), calc\-\_\-rms\-::rms\-\_\-heading(), calc\-\_\-rmsf\-::rmsf\-\_\-heading(), calc\-\_\-chemscore\-::score\-\_\-heading(), calc\-\_\-geom\-::torsion\-\_\-heading(), and calc\-\_\-xscore\-::xscore\-\_\-heading().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{qcalc_8f90_aef9b17e9b0d2c7dda08ad0e502c7369f_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{qcalc_8f90_a7d2d447954fb385bdca4f228de92b1eb}{\index{qcalc.\-f90@{qcalc.\-f90}!process\-\_\-data@{process\-\_\-data}}
+\index{process\-\_\-data@{process\-\_\-data}!qcalc.f90@{qcalc.\-f90}}
+\paragraph[{process\-\_\-data}]{\setlength{\rightskip}{0pt plus 5cm}subroutine qcalc\-::process\-\_\-data (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{qcalc_8f90_a7d2d447954fb385bdca4f228de92b1eb}
+
+
+Definition at line 230 of file qcalc.\-f90.
+
+
+
+References get\-\_\-coordfile(), load\-\_\-restart(), process\-\_\-frame(), trj\-::trj\-\_\-close(), and trj\-::trj\-\_\-read().
+
+
+
+Here is the call graph for this function\-:
+
+
+\hypertarget{qcalc_8f90_a93dcacb957411ed0d0471fe8a31c60d6}{\index{qcalc.\-f90@{qcalc.\-f90}!process\-\_\-frame@{process\-\_\-frame}}
+\index{process\-\_\-frame@{process\-\_\-frame}!qcalc.f90@{qcalc.\-f90}}
+\paragraph[{process\-\_\-frame}]{\setlength{\rightskip}{0pt plus 5cm}subroutine qcalc\-::process\-\_\-frame (
+\begin{DoxyParamCaption}
+\item[{character($\ast$)}]{cf, }
+\item[{integer}]{frame}
+\end{DoxyParamCaption}
+)}}\label{qcalc_8f90_a93dcacb957411ed0d0471fe8a31c60d6}
+
+
+Definition at line 282 of file qcalc.\-f90.
+
+
+
+References calc\-\_\-all().
+
+
+
+Referenced by process\-\_\-data().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=276pt]{qcalc_8f90_a93dcacb957411ed0d0471fe8a31c60d6_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{qcalc_8f90_accba7d2752af0a562a170bd24016fc8b}{\index{qcalc.\-f90@{qcalc.\-f90}!process\-\_\-help@{process\-\_\-help}}
+\index{process\-\_\-help@{process\-\_\-help}!qcalc.f90@{qcalc.\-f90}}
+\paragraph[{process\-\_\-help}]{\setlength{\rightskip}{0pt plus 5cm}subroutine qcalc\-::process\-\_\-help (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{qcalc_8f90_accba7d2752af0a562a170bd24016fc8b}
+
+
+Definition at line 213 of file qcalc.\-f90.
+
+
+
+References misc\-::centered\-\_\-heading().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=315pt]{qcalc_8f90_accba7d2752af0a562a170bd24016fc8b_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{qcalc_8f90_af9a59510ab33b6a61b0bffe1e6679be1}{\index{qcalc.\-f90@{qcalc.\-f90}!qcalc@{qcalc}}
+\index{qcalc@{qcalc}!qcalc.f90@{qcalc.\-f90}}
+\paragraph[{qcalc}]{\setlength{\rightskip}{0pt plus 5cm}program qcalc (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{qcalc_8f90_af9a59510ab33b6a61b0bffe1e6679be1}
+
+
+Definition at line 6 of file qcalc.\-f90.
+
+\hypertarget{qcalc_8f90_ab8b2551c119768488c4ce752918274a6}{\index{qcalc.\-f90@{qcalc.\-f90}!shutdown@{shutdown}}
+\index{shutdown@{shutdown}!qcalc.f90@{qcalc.\-f90}}
+\paragraph[{shutdown}]{\setlength{\rightskip}{0pt plus 5cm}subroutine qcalc\-::shutdown (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{qcalc_8f90_ab8b2551c119768488c4ce752918274a6}
+
+
+Definition at line 110 of file qcalc.\-f90.
+
+
+
+Referenced by qdyn(), and qprep().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=217pt]{qcalc_8f90_ab8b2551c119768488c4ce752918274a6_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{qcalc_8f90_a1c4c0aa57a695916669518b5bf72e5bb}{\index{qcalc.\-f90@{qcalc.\-f90}!startup@{startup}}
+\index{startup@{startup}!qcalc.f90@{qcalc.\-f90}}
+\paragraph[{startup}]{\setlength{\rightskip}{0pt plus 5cm}subroutine qcalc\-::startup (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{qcalc_8f90_a1c4c0aa57a695916669518b5bf72e5bb}
+
+
+Definition at line 97 of file qcalc.\-f90.
+
+
+
+References calc\-\_\-help(), and atom\-\_\-mask\-::mask\-\_\-startup().
+
+
+
+Referenced by qdyn(), and qprep().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{qcalc_8f90_a1c4c0aa57a695916669518b5bf72e5bb_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=205pt]{qcalc_8f90_a1c4c0aa57a695916669518b5bf72e5bb_icgraph}
+\end{center}
+\end{figure}
+
+

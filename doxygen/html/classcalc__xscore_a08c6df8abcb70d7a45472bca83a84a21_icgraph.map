@@ -1,0 +1,13 @@
+<map id="calc_xscore::molecule_adjacent_aromatic_check" name="calc_xscore::molecule_adjacent_aromatic_check">
+<area shape="rect" id="node2" href="$classcalc__xscore.html#aba6a92c17890123962a56df100de88ec" title="calc_xscore::molecule\l_count_o3_1_4_pair" alt="" coords="233,5,387,47"/>
+<area shape="rect" id="node11" href="$classcalc__xscore.html#a14a42045b9ce5634ef0b1cef1b636446" title="calc_xscore::molecule\l_count_salicylic_acid" alt="" coords="233,71,387,112"/>
+<area shape="rect" id="node12" href="$classcalc__xscore.html#a954cd752fdcc2de9900ee6fe9320fd24" title="calc_xscore::molecule\l_count_sulfonic_acid" alt="" coords="233,136,387,177"/>
+<area shape="rect" id="node3" href="$classcalc__xscore.html#a1468c0b615c6c387ceebe6e51cd9eb14" title="calc_xscore::molecule\l_calculate_logp" alt="" coords="435,71,588,112"/>
+<area shape="rect" id="node4" href="$classcalc__xscore.html#a0e46016e4d4ad20b05df5806ae4b4c70" title="calc_xscore::ligand\l_value_atom" alt="" coords="636,71,772,112"/>
+<area shape="rect" id="node5" href="$classcalc__xscore.html#a1f2c852d7a1ed801d7b14ce6205a384e" title="calc_xscore::xscore_calc" alt="" coords="820,49,991,75"/>
+<area shape="rect" id="node9" href="$classcalc__xscore.html#a1dd20b02356cb3c99283799d1030d1ba" title="calc_xscore::xscore\l_precalc" alt="" coords="836,100,975,141"/>
+<area shape="rect" id="node6" href="$qcalc_8f90.html#a5befd1d444d41d7d1e4bf8b297c17ee2" title="calc_all" alt="" coords="1056,49,1123,75"/>
+<area shape="rect" id="node7" href="$qcalc_8f90.html#a93dcacb957411ed0d0471fe8a31c60d6" title="process_frame" alt="" coords="1188,49,1299,75"/>
+<area shape="rect" id="node8" href="$qcalc_8f90.html#a7d2d447954fb385bdca4f228de92b1eb" title="process_data" alt="" coords="1347,49,1449,75"/>
+<area shape="rect" id="node10" href="$qcalc_8f90.html#a6de35d783d8e2c1ffead6a9dbf61ebb6" title="do_pre_calcs" alt="" coords="1039,107,1140,134"/>
+</map>

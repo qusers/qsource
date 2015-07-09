@@ -1,0 +1,2253 @@
+\hypertarget{classcalc__pmf}{\subsection{calc\-\_\-pmf Module Reference}
+\label{classcalc__pmf}\index{calc\-\_\-pmf@{calc\-\_\-pmf}}
+}
+
+
+Collaboration diagram for calc\-\_\-pmf\-:
+\subsubsection*{Data Types}
+\begin{DoxyCompactItemize}
+\item 
+type \hyperlink{structcalc__pmf_1_1atom__type__conversion}{atom\-\_\-type\-\_\-conversion}
+\item 
+type \hyperlink{structcalc__pmf_1_1bond__pointer}{bond\-\_\-pointer}
+\item 
+type \hyperlink{structcalc__pmf_1_1donor}{donor}
+\item 
+type \hyperlink{structcalc__pmf_1_1q__atom}{q\-\_\-atom}
+\item 
+type \hyperlink{structcalc__pmf_1_1q__bond}{q\-\_\-bond}
+\item 
+type \hyperlink{structcalc__pmf_1_1tabsdetail}{tabsdetail}
+\item 
+type \hyperlink{structcalc__pmf_1_1tpmfatom}{tpmfatom}
+\item 
+type \hyperlink{structcalc__pmf_1_1tpmfbond}{tpmfbond}
+\item 
+type \hyperlink{structcalc__pmf_1_1tpmfedge}{tpmfedge}
+\item 
+type \hyperlink{structcalc__pmf_1_1tpmfinput}{tpmfinput}
+\item 
+type \hyperlink{structcalc__pmf_1_1tpmfmolecule}{tpmfmolecule}
+\item 
+type \hyperlink{structcalc__pmf_1_1tpmfnames}{tpmfnames}
+\item 
+type \hyperlink{structcalc__pmf_1_1tpmfring}{tpmfring}
+\item 
+type \hyperlink{structcalc__pmf_1_1tpmfrule}{tpmfrule}
+\item 
+type \hyperlink{structcalc__pmf_1_1tpmfscore}{tpmfscore}
+\item 
+type \hyperlink{structcalc__pmf_1_1tpmfvertex}{tpmfvertex}
+\end{DoxyCompactItemize}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine \hyperlink{classcalc__pmf_ab388d577f0dbb88865c1c9d4366e45be}{pmfreadatomtypeconversions} (filename, ch\-Type)
+\item 
+subroutine \hyperlink{classcalc__pmf_ac3e289539ea4c4398e8c4a01ba575b10}{pmfread\-\_\-input}
+\item 
+subroutine \hyperlink{classcalc__pmf_a90196b4a510babf40a19b3778cca8b10}{pmfread\-\_\-inputqatom}
+\item 
+subroutine \hyperlink{classcalc__pmf_ab9ddf3abf49e6eae6d35801de0fea173}{pmf\-\_\-extract\-\_\-rules} (filename)
+\item 
+subroutine \hyperlink{classcalc__pmf_a65ace29811426cb20f99d06041a8183f}{pmf\-\_\-show\-\_\-rule} (rule)
+\item 
+subroutine \hyperlink{classcalc__pmf_a0ff94f92c888cfa789cc3c62b19e90df}{pmfread\-\_\-data} (filename)
+\item 
+subroutine \hyperlink{classcalc__pmf_aad022993ab21419258605190c44313c7}{pmfread\-\_\-names} (filename)
+\item 
+subroutine \hyperlink{classcalc__pmf_a15f551fc2681bc20e67c32c26f0e6213}{pmf\-\_\-precalc}
+\item 
+subroutine \hyperlink{classcalc__pmf_a638031979f9e34f663de98290b3203bf}{pmfscoring\-\_\-stats} (mol, i\-Atom)
+\item 
+subroutine \hyperlink{classcalc__pmf_aad41bacd5a05bb356118391b53099785}{pmfshow\-\_\-abs} (mol)
+\item 
+real function \hyperlink{classcalc__pmf_a2ce532c8dbd81ccb5221196f08dc3a4c}{pmf\-\_\-score} (lig, prot, inp)
+\item 
+integer function \hyperlink{classcalc__pmf_adb092d3fa3d597aa80099dac1ff51d24}{pmfgetindex} (atom)
+\item 
+real function \hyperlink{classcalc__pmf_ae502584ca9d4449aef004eab08ac0201}{pmf\-\_\-distance} (a, b)
+\item 
+subroutine \hyperlink{classcalc__pmf_a2baa30c7de82768257cedb4c5062089b}{pmfprotein\-\_\-translate} (\hyperlink{classcalc__pmf_aafcf4af6240191b24adac7de7d51fa0d}{protein}, n\-Atoms, coordinates, bond, num\-\_\-bond, transfer\-\_\-waters)
+\item 
+subroutine \hyperlink{classcalc__pmf_a6b259a5b36a4ab2d3c86400f88d2e60c}{pmfligand\-\_\-translate} (\hyperlink{classcalc__pmf_adb3a353d55dd9c86c7a56dfec5bfef05}{ligand}, n\-Atoms, n\-Bonds, a\-Q, a\-B, offset)
+\item 
+subroutine \hyperlink{classcalc__pmf_a7690ff75f872de2ec10eb6d0231a402e}{pmffixatomtypes} (mol)
+\item 
+subroutine \hyperlink{classcalc__pmf_ac556c87ce39732c2e96def3d32dd211f}{pmfvalue\-\_\-molecule} (mol, rule, count, prot, literun)
+\item 
+subroutine \hyperlink{classcalc__pmf_a5312c91d4aaffe8b997730d4f2b6bf67}{pmfassign\-\_\-planar} (mol)
+\item 
+integer function \hyperlink{classcalc__pmf_ab174c72c67e0d863a402fd35c3c083be}{pmfeval\-\_\-rule} (atom, mol, r)
+\item 
+integer function \hyperlink{classcalc__pmf_a70b4bda6690c31f306f3841ace5eb2e4}{pmfeval\-\_\-bonds} (atom, mol, r)
+\item 
+integer function \hyperlink{classcalc__pmf_a60792ec7446f87ede4b5d34f2bb3b35c}{pmfbonds\-\_\-single} (atom, mol)
+\item 
+integer function \hyperlink{classcalc__pmf_ab5af37caedbaef9bae2a639745b82dfe}{pmfbonds\-\_\-double} (atom, mol)
+\item 
+pure integer function \hyperlink{classcalc__pmf_ac419e2969eb5c9bf7a36e28e6de79b12}{pmfbonds\-\_\-triple} (atom, mol)
+\item 
+pure integer function \hyperlink{classcalc__pmf_a3a26d68dccac11776fd3234d355b3213}{pmfbonds\-\_\-aromatic} (atom, mol)
+\item 
+integer function \hyperlink{classcalc__pmf_a5b2a0e542a5fd171c78c65065016c5fe}{pmfbonds\-\_\-metal} (atom, mol)
+\item 
+subroutine \hyperlink{classcalc__pmf_a1f22c5c87d8bdca9659e26942dc01ba8}{pmfassign\-\_\-hybr} (mol)
+\item 
+subroutine \hyperlink{classcalc__pmf_af7f277bf29989d0bfd7312561025f894}{pmfassign\-\_\-polarity} (mol)
+\item 
+subroutine \hyperlink{classcalc__pmf_a75f05266f8b9955425ea1f6b730cf820}{pmfassign\-\_\-rings} (mol, l)
+\item 
+recursive subroutine \hyperlink{classcalc__pmf_a589d5b6b9d660657938509169a92ac1c}{pmfatom\-\_\-walk} (start, mol, path, c, limit)
+\item 
+subroutine \hyperlink{classcalc__pmf_a76cde5345e2a89aa59e0c6aea4555112}{pmfreport\-\_\-ring} (mol, path, c)
+\item 
+subroutine \hyperlink{classcalc__pmf_ab9162aa7283d2b89563977445c48d42e}{pmfint\-\_\-pushback} (array, int)
+\item 
+integer function \hyperlink{classcalc__pmf_a6a8fb6accff9a1c234e056e69cdb12e8}{pmfmolecule\-\_\-look\-\_\-for\-\_\-a\-\_\-ring} (molecule, bond\-\_\-id, atom\-\_\-path, bond\-\_\-path, required\-\_\-size)
+\item 
+subroutine \hyperlink{classcalc__pmf_a4c51d400a72121dbba99d441a2bfea6b}{pmfmolecule\-\_\-clean\-\_\-choices} (molecule, tried\-\_\-choice, choice)
+\item 
+integer function \hyperlink{classcalc__pmf_a5d1b84516b4045d510702abceb249d8a}{pmfmolecule\-\_\-get\-\_\-choices} (molecule, choice, wrong\-\_\-end, current\-\_\-path\-\_\-length, current\-\_\-path)
+\item 
+subroutine \hyperlink{classcalc__pmf_ab349db3ae61f138604db0d9719349fd1}{pmfmolecule\-\_\-reset\-\_\-choices} (molecule, bond\-\_\-id, choice)
+\item 
+integer function \hyperlink{classcalc__pmf_a642a8d188ca37abd91cc59b69fa50158}{pmfmolecule\-\_\-two\-\_\-bonds\-\_\-connection\-\_\-check} (bond1, bond2)
+\item 
+subroutine \hyperlink{classcalc__pmf_a109122bbf10a4b4185decef9463f3009}{pmfassign\-\_\-aromatic} (mol, req\-\_\-ring)
+\item 
+subroutine \hyperlink{classcalc__pmf_a2482f05b2ba60ac224d87f8ce0c89033}{pmfassign\-\_\-charge} (mol)
+\item 
+subroutine \hyperlink{classcalc__pmf_afd6262e11d30c758385ae46fd282c574}{pmfassign\-\_\-hbchar} (mol)
+\item 
+subroutine \hyperlink{classcalc__pmf_a15700c91a9d09ccd6da63e1cf1fe7547}{pmfshow\-\_\-molecule} (mol)
+\item 
+subroutine \hyperlink{classcalc__pmf_ab6f464407bf5090b40e3a0c915eeb283}{pmfsort\-\_\-bonds}
+\item 
+subroutine \hyperlink{classcalc__pmf_a0e57d1409c14150ce20ffbf26376a485}{pmf\-\_\-calc} (i\-Calc, i\-Frame)
+\item 
+subroutine \hyperlink{classcalc__pmf_a464bb7fb9f994fd1ae6318110bc57631}{pmflog\-\_\-frame} (i\-Frame, \hyperlink{classcalc__pmf_adb3a353d55dd9c86c7a56dfec5bfef05}{ligand})
+\item 
+integer function \hyperlink{classcalc__pmf_a4caf9759f3678b95aaa1f48fba8eb333}{pmf\-\_\-add} (desc)
+\item 
+subroutine \hyperlink{classcalc__pmf_acfa385c68b0b238d175af42417a8209b}{pmf\-\_\-initialize}
+\item 
+subroutine \hyperlink{classcalc__pmf_abaffcc0fb18adf0a3084d8a6a0be60e6}{pmf\-\_\-finalize}
+\item 
+subroutine \hyperlink{classcalc__pmf_a7a15b746c74b0245da6842da20bab499}{pmf\-\_\-heading} (i)
+\item 
+subroutine \hyperlink{classcalc__pmf_aeb687d57198896c002165b074ebd8e16}{pmfscore\-\_\-mean}
+\item 
+subroutine \hyperlink{classcalc__pmf_a9dca279d37fdfd1f5f387211c3c6c697}{pmfdetect\-\_\-connections} (molecule)
+\item 
+real function \hyperlink{classcalc__pmf_a3941dce9024f8f1c6b329d9fe5e821f5}{pmfangle\-\_\-of\-\_\-two\-\_\-vectors} (v1, v2)
+\item 
+real function \hyperlink{classcalc__pmf_a752e9d34a54d97679d8cb67ff3f2a91a}{pmfangle} (a, b, c)
+\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+type(\hyperlink{structcalc__pmf_1_1tpmfrule}{tpmfrule}), dimension(\-:), \\*
+pointer \hyperlink{classcalc__pmf_a82f61bada0fda64b2e720d7732f8dadc}{protrule}
+\item 
+integer \hyperlink{classcalc__pmf_a1986439f8b3e283ee8d21e6b0ca9c5ff}{prot\-\_\-num\-\_\-rule}
+\item 
+type(\hyperlink{structcalc__pmf_1_1tpmfrule}{tpmfrule}), dimension(\-:), \\*
+pointer \hyperlink{classcalc__pmf_a2e7a8f9d268914c54cd26c0fd8b01a81}{ligrule}
+\item 
+integer \hyperlink{classcalc__pmf_a0159af94a3cd2d849076c0fadc4ac853}{lig\-\_\-num\-\_\-rule}
+\item 
+integer, public \hyperlink{classcalc__pmf_abe3c333d7711e22367752892c04b6f79}{single} = 1
+\item 
+integer, public \hyperlink{classcalc__pmf_a4d6e176568c5ef696aa451c5bf70d622}{double} = 2
+\item 
+integer, public \hyperlink{classcalc__pmf_ac99fa55cb2e0de3acc03adc92db25756}{aromatic} = 3
+\item 
+integer, public \hyperlink{classcalc__pmf_aa79a18fe363aeaa2831ccf58dd4a7fcc}{amide} = 4
+\item 
+character $\ast$80 \hyperlink{classcalc__pmf_a5e4abdec940eb0d22b396ceda84d2e99}{top\-\_\-file}
+\item 
+character $\ast$80 \hyperlink{classcalc__pmf_a9ed164a5cea390709d7eef68e326a1d4}{fep\-\_\-file}
+\item 
+character $\ast$80 \hyperlink{classcalc__pmf_a934737a3cd94904c0cd91912062ce21f}{atom\-\_\-data\-\_\-file}
+\item 
+character $\ast$80 \hyperlink{classcalc__pmf_a02daa11aa1b64ff1167a0a99779a1f3c}{coord\-\_\-file}
+\item 
+integer, dimension(\-:), allocatable \hyperlink{classcalc__pmf_aab09205514afe9e25c1d4750897417a6}{iqatom}
+\item 
+integer \hyperlink{classcalc__pmf_ab95df575df3eab3d788f4761abf090e5}{nhq}
+\item 
+integer \hyperlink{classcalc__pmf_aaa971de9116dc55c46845c0e34e09384}{nhb}
+\item 
+integer(ai), dimension(\-:), \\*
+allocatable \hyperlink{classcalc__pmf_a3fef19c1e6b623231279e839e8d3488f}{lph\-\_\-r}
+\item 
+integer(ai), dimension(\-:), \\*
+allocatable \hyperlink{classcalc__pmf_a46e29646f71e1615ceac97effe79bf6a}{lph\-\_\-l}
+\item 
+type(\hyperlink{structcalc__pmf_1_1donor}{donor}), dimension(\-:), \\*
+allocatable \hyperlink{classcalc__pmf_a815659caae16f7d11ba50b53fad2ee87}{hbd\-\_\-r}
+\item 
+type(\hyperlink{structcalc__pmf_1_1donor}{donor}), dimension(\-:), \\*
+allocatable \hyperlink{classcalc__pmf_af9825de03053e01cf7ac2ac17545a509}{hbd\-\_\-l}
+\item 
+integer(ai), dimension(\-:), \\*
+allocatable \hyperlink{classcalc__pmf_a72d401bd03d18040c3238d42a07b895c}{hba\-\_\-r}
+\item 
+integer(ai), dimension(\-:), \\*
+allocatable \hyperlink{classcalc__pmf_a977c23a403bfb5eb80a7fefbb104aae5}{hba\-\_\-l}
+\item 
+integer(ai), dimension(\-:), \\*
+allocatable \hyperlink{classcalc__pmf_a66bc38a02eb1454e833ec9e65acc2b5c}{met\-\_\-r}
+\item 
+integer \hyperlink{classcalc__pmf_a10154c74668f9e5a53a5dad472608a62}{nlph\-\_\-r}
+\item 
+integer \hyperlink{classcalc__pmf_a4b04a9f317d4dcb45e3d51751fbac115}{nlph\-\_\-l}
+\item 
+integer \hyperlink{classcalc__pmf_a4e0857a9a7cfd76db79d0a6bd99aa69a}{nhbd\-\_\-r}
+\item 
+integer \hyperlink{classcalc__pmf_a1b095aceba95c04282323155ee1427af}{nhbd\-\_\-l}
+\item 
+integer \hyperlink{classcalc__pmf_adca5f880f0ae8019b40b5d900523f009}{nhba\-\_\-r}
+\item 
+integer \hyperlink{classcalc__pmf_acb89c2967da4f9c0a217cecc08ccf510}{nhba\-\_\-l}
+\item 
+integer \hyperlink{classcalc__pmf_a323b86d254d89f4f5e9f2f9725209b4f}{nmet\-\_\-r}
+\item 
+integer \hyperlink{classcalc__pmf_a4232eda1705ffe1f555323f262740595}{nwaters}
+\item 
+integer \hyperlink{classcalc__pmf_a8a8997db88056a574479b606238ae64b}{nqbonds}
+\item 
+integer \hyperlink{classcalc__pmf_ac47b0e97a6432e5234f23c7d671f441d}{nhbd\-\_\-prot}
+\item 
+integer \hyperlink{classcalc__pmf_a8581bffe627bc8ed70f44137b5f42858}{nhba\-\_\-prot}
+\item 
+integer \hyperlink{classcalc__pmf_a9c8caec9fe50efcc18091801d76510eb}{nrings}
+\item 
+integer, dimension(\-:), allocatable \hyperlink{classcalc__pmf_ae6bac7e8dc202b26e4acf6142e650da7}{pol\-\_\-con}
+\item 
+integer, parameter \hyperlink{classcalc__pmf_acf38a9791fdd978de8bdec1e59e0b164}{max\-\_\-masks} = 10
+\item 
+integer \hyperlink{classcalc__pmf_a6fc1809ea11117a2dcb3b452e1b6b2cc}{bdotopcalc}
+\item 
+integer \hyperlink{classcalc__pmf_a690cfd14223de22b294b928d0e9e2080}{bsecondpass}
+\item 
+type(\hyperlink{structcalc__pmf_1_1tpmfmolecule}{tpmfmolecule}), public \hyperlink{classcalc__pmf_aafcf4af6240191b24adac7de7d51fa0d}{protein}
+\item 
+type(\hyperlink{structcalc__pmf_1_1tpmfmolecule}{tpmfmolecule}), public \hyperlink{classcalc__pmf_adb3a353d55dd9c86c7a56dfec5bfef05}{ligand}
+\item 
+type(\hyperlink{structcalc__pmf_1_1tpmfmolecule}{tpmfmolecule}), dimension(\-:), \\*
+allocatable, public \hyperlink{classcalc__pmf_a3e437b5cee4494c9a9445956c7b996fe}{cofactor}
+\item 
+integer, dimension(\-:), pointer \hyperlink{classcalc__pmf_abf00c9b4eae4e83c041e4b4b732672de}{top2prot}
+\item 
+type(\hyperlink{structcalc__pmf_1_1tpmfinput}{tpmfinput}), public \hyperlink{classcalc__pmf_a05d3af4e1c76e5ab7f299b7db6d74cac}{input}
+\item 
+character(len=256) \hyperlink{classcalc__pmf_a2c7ec15e30c13d5d1cb9ad5727b025a9}{chinput}
+\item 
+type(\hyperlink{structcalc__pmf_1_1tpmfnames}{tpmfnames}), dimension(\-:), \\*
+pointer \hyperlink{classcalc__pmf_a78c8b146350fd4608bf9e835d768a391}{pmf\-\_\-names}
+\item 
+type(\hyperlink{structcalc__pmf_1_1atom__type__conversion}{atom\-\_\-type\-\_\-conversion}), \\*
+dimension(\-:), allocatable \hyperlink{classcalc__pmf_aaea67c47132371b0b4ee5dc74d16f778}{atomtypetable}
+\item 
+integer \hyperlink{classcalc__pmf_a560b5dea51180db59cce9c3106ebc977}{num\-\_\-atomtype}
+\item 
+real, dimension(34, 16, 60) \hyperlink{classcalc__pmf_ae432aff45faf03e082c4198c866338c7}{pmfdata}
+\item 
+character(len=2), dimension(2, 34) \hyperlink{classcalc__pmf_a3030635839201df076cd664a13396090}{pmftype}
+\item 
+integer, parameter \hyperlink{classcalc__pmf_ad041cf7ee1dada3fb4d2be26d5894efd}{nprot} = 16
+\item 
+integer, parameter \hyperlink{classcalc__pmf_a42d85dcb1905a89a8601514bd24a120a}{nlig} = 34
+\item 
+type(\hyperlink{structcalc__pmf_1_1tpmfscore}{tpmfscore}), dimension(\-:), \\*
+pointer \hyperlink{classcalc__pmf_a908cf718c661183b9069614dad8c3ddd}{pmfscores}
+\item 
+integer \hyperlink{classcalc__pmf_ab503cd9dec507e951441afa3c867d4f9}{npmfscores}
+\item 
+integer \hyperlink{classcalc__pmf_ab0dd5e34df9ec5a11fc98c04b6a634de}{maxpmfscores}
+\item 
+integer \hyperlink{classcalc__pmf_a3ec37f70413f821e8521c6368ed69f24}{max\-\_\-bond\-\_\-neib} = 10
+\item 
+integer \hyperlink{classcalc__pmf_a2a1e733c9f112f18e86ac8654f47f873}{max\-\_\-atom\-\_\-neib} = 6
+\item 
+integer, public \hyperlink{classcalc__pmf_aa3f01647c31f0a6aabfa5e04841d826b}{err}
+\item 
+integer, public \hyperlink{classcalc__pmf_a3f47ac8c9ec9c4a161656939a6dce7af}{warn}
+\item 
+integer, public \hyperlink{classcalc__pmf_a3b88bd9f8668a6e062604271a4113c99}{waterwarn}
+\end{DoxyCompactItemize}
+\subsubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+type(\hyperlink{structcalc__pmf_1_1q__atom}{q\-\_\-atom}), dimension(\-:), \\*
+allocatable, target, private \hyperlink{classcalc__pmf_a0d11c4fd5eac8488b13240eac62a1afa}{q\-\_\-atoms}
+\item 
+type(\hyperlink{structcalc__pmf_1_1q__bond}{q\-\_\-bond}), dimension(\-:), \\*
+allocatable, target, private \hyperlink{classcalc__pmf_af9e5c5b8b384db6699d16f3e57547308}{q\-\_\-bonds}
+\item 
+type(\hyperlink{structcalc__pmf_1_1q__atom}{q\-\_\-atom}), dimension(\-:), \\*
+allocatable, target, private \hyperlink{classcalc__pmf_a160db6bef6b383e82b4ad6070a3597a9}{ahq}
+\item 
+type(\hyperlink{structcalc__pmf_1_1q__bond}{q\-\_\-bond}), dimension(\-:), \\*
+allocatable, target, private \hyperlink{classcalc__pmf_a5cf70a0742a922b59d0dab2ccea74f52}{ahb}
+\item 
+type(mask\-\_\-type), dimension(\hyperlink{classcalc__pmf_acf38a9791fdd978de8bdec1e59e0b164}{max\-\_\-masks}), \\*
+target, private \hyperlink{classcalc__pmf_a8aca40bc9c2879edfb104445cf45db0b}{masks}
+\item 
+integer, private \hyperlink{classcalc__pmf_aa222e2cc7f6c9e5df634fd4c513671af}{nmasks} = 0
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+
+
+Definition at line 7 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+\subsubsection{Member Function/\-Subroutine Documentation}
+\hypertarget{classcalc__pmf_a4caf9759f3678b95aaa1f48fba8eb333}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmf\-\_\-add@{pmf\-\_\-add}}
+\index{pmf\-\_\-add@{pmf\-\_\-add}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmf\-\_\-add}]{\setlength{\rightskip}{0pt plus 5cm}integer function calc\-\_\-pmf\-::pmf\-\_\-add (
+\begin{DoxyParamCaption}
+\item[{character($\ast$), intent(out)}]{desc}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_a4caf9759f3678b95aaa1f48fba8eb333}
+
+
+Definition at line 2611 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+References misc\-::getlin(), misc\-::locase(), atom\-\_\-mask\-::mask\-\_\-finalize(), atom\-\_\-mask\-::mask\-\_\-initialize(), and maskmanip\-::maskmanip\-\_\-make().
+
+
+
+Referenced by add\-\_\-a\-\_\-calc().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__pmf_a4caf9759f3678b95aaa1f48fba8eb333_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__pmf_a0e57d1409c14150ce20ffbf26376a485}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmf\-\_\-calc@{pmf\-\_\-calc}}
+\index{pmf\-\_\-calc@{pmf\-\_\-calc}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmf\-\_\-calc}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-pmf\-::pmf\-\_\-calc (
+\begin{DoxyParamCaption}
+\item[{integer, intent(in)}]{i\-Calc, }
+\item[{integer, intent(in)}]{i\-Frame}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_a0e57d1409c14150ce20ffbf26376a485}
+
+
+Definition at line 2557 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+References pmf\-\_\-score(), pmflog\-\_\-frame(), and pmfscoring\-\_\-stats().
+
+
+
+Referenced by calc\-\_\-all().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__pmf_a0e57d1409c14150ce20ffbf26376a485_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__pmf_ae502584ca9d4449aef004eab08ac0201}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmf\-\_\-distance@{pmf\-\_\-distance}}
+\index{pmf\-\_\-distance@{pmf\-\_\-distance}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmf\-\_\-distance}]{\setlength{\rightskip}{0pt plus 5cm}real function calc\-\_\-pmf\-::pmf\-\_\-distance (
+\begin{DoxyParamCaption}
+\item[{real(8), dimension(0\-:2)}]{a, }
+\item[{real(8), dimension(0\-:2)}]{b}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_ae502584ca9d4449aef004eab08ac0201}
+
+
+Definition at line 1021 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+Referenced by pmf\-\_\-score().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__pmf_ae502584ca9d4449aef004eab08ac0201_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__pmf_ab9ddf3abf49e6eae6d35801de0fea173}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmf\-\_\-extract\-\_\-rules@{pmf\-\_\-extract\-\_\-rules}}
+\index{pmf\-\_\-extract\-\_\-rules@{pmf\-\_\-extract\-\_\-rules}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmf\-\_\-extract\-\_\-rules}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-pmf\-::pmf\-\_\-extract\-\_\-rules (
+\begin{DoxyParamCaption}
+\item[{character(len=256)}]{filename}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_ab9ddf3abf49e6eae6d35801de0fea173}
+
+
+Definition at line 570 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+References misc\-::freefile().
+
+
+
+Referenced by pmf\-\_\-precalc().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__pmf_ab9ddf3abf49e6eae6d35801de0fea173_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__pmf_abaffcc0fb18adf0a3084d8a6a0be60e6}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmf\-\_\-finalize@{pmf\-\_\-finalize}}
+\index{pmf\-\_\-finalize@{pmf\-\_\-finalize}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmf\-\_\-finalize}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-pmf\-::pmf\-\_\-finalize (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_abaffcc0fb18adf0a3084d8a6a0be60e6}
+
+
+Definition at line 2667 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+Referenced by finalize().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classcalc__pmf_a7a15b746c74b0245da6842da20bab499}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmf\-\_\-heading@{pmf\-\_\-heading}}
+\index{pmf\-\_\-heading@{pmf\-\_\-heading}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmf\-\_\-heading}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-pmf\-::pmf\-\_\-heading (
+\begin{DoxyParamCaption}
+\item[{integer, intent(in)}]{i}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_a7a15b746c74b0245da6842da20bab499}
+
+
+Definition at line 2689 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+Referenced by print\-\_\-headings().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=318pt]{classcalc__pmf_a7a15b746c74b0245da6842da20bab499_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__pmf_acfa385c68b0b238d175af42417a8209b}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmf\-\_\-initialize@{pmf\-\_\-initialize}}
+\index{pmf\-\_\-initialize@{pmf\-\_\-initialize}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmf\-\_\-initialize}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-pmf\-::pmf\-\_\-initialize (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_acfa385c68b0b238d175af42417a8209b}
+
+
+Definition at line 2659 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+Referenced by initialize().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__pmf_acfa385c68b0b238d175af42417a8209b_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__pmf_a15f551fc2681bc20e67c32c26f0e6213}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmf\-\_\-precalc@{pmf\-\_\-precalc}}
+\index{pmf\-\_\-precalc@{pmf\-\_\-precalc}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmf\-\_\-precalc}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-pmf\-::pmf\-\_\-precalc (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_a15f551fc2681bc20e67c32c26f0e6213}
+
+
+Definition at line 799 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+References pmf\-\_\-extract\-\_\-rules(), pmf\-\_\-score(), pmfligand\-\_\-translate(), pmfprotein\-\_\-translate(), pmfread\-\_\-data(), pmfread\-\_\-input(), pmfread\-\_\-inputqatom(), pmfread\-\_\-names(), pmfreadatomtypeconversions(), pmfscoring\-\_\-stats(), pmfshow\-\_\-molecule(), pmfsort\-\_\-bonds(), pmfvalue\-\_\-molecule(), and qatom\-::qatom\-\_\-load\-\_\-atoms().
+
+
+
+Referenced by do\-\_\-pre\-\_\-calcs().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=309pt]{classcalc__pmf_a15f551fc2681bc20e67c32c26f0e6213_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__pmf_a2ce532c8dbd81ccb5221196f08dc3a4c}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmf\-\_\-score@{pmf\-\_\-score}}
+\index{pmf\-\_\-score@{pmf\-\_\-score}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmf\-\_\-score}]{\setlength{\rightskip}{0pt plus 5cm}real function calc\-\_\-pmf\-::pmf\-\_\-score (
+\begin{DoxyParamCaption}
+\item[{type({\bf tpmfmolecule})}]{lig, }
+\item[{type({\bf tpmfmolecule})}]{prot, }
+\item[{type({\bf tpmfinput})}]{inp}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_a2ce532c8dbd81ccb5221196f08dc3a4c}
+
+
+Definition at line 934 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+References pmf\-\_\-distance(), pmfgetindex(), and calc\-\_\-rdf\-::r().
+
+
+
+Referenced by pmf\-\_\-calc(), and pmf\-\_\-precalc().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=347pt]{classcalc__pmf_a2ce532c8dbd81ccb5221196f08dc3a4c_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__pmf_a2ce532c8dbd81ccb5221196f08dc3a4c_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__pmf_a65ace29811426cb20f99d06041a8183f}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmf\-\_\-show\-\_\-rule@{pmf\-\_\-show\-\_\-rule}}
+\index{pmf\-\_\-show\-\_\-rule@{pmf\-\_\-show\-\_\-rule}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmf\-\_\-show\-\_\-rule}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-pmf\-::pmf\-\_\-show\-\_\-rule (
+\begin{DoxyParamCaption}
+\item[{type({\bf tpmfrule})}]{rule}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_a65ace29811426cb20f99d06041a8183f}
+
+
+Definition at line 676 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a752e9d34a54d97679d8cb67ff3f2a91a}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfangle@{pmfangle}}
+\index{pmfangle@{pmfangle}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfangle}]{\setlength{\rightskip}{0pt plus 5cm}real function calc\-\_\-pmf\-::pmfangle (
+\begin{DoxyParamCaption}
+\item[{real, dimension(0\-:2)}]{a, }
+\item[{real, dimension(0\-:2)}]{b, }
+\item[{real, dimension(0\-:2)}]{c}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_a752e9d34a54d97679d8cb67ff3f2a91a}
+
+
+Definition at line 2931 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+References pmfangle\-\_\-of\-\_\-two\-\_\-vectors().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__pmf_a752e9d34a54d97679d8cb67ff3f2a91a_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__pmf_a3941dce9024f8f1c6b329d9fe5e821f5}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfangle\-\_\-of\-\_\-two\-\_\-vectors@{pmfangle\-\_\-of\-\_\-two\-\_\-vectors}}
+\index{pmfangle\-\_\-of\-\_\-two\-\_\-vectors@{pmfangle\-\_\-of\-\_\-two\-\_\-vectors}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfangle\-\_\-of\-\_\-two\-\_\-vectors}]{\setlength{\rightskip}{0pt plus 5cm}real function calc\-\_\-pmf\-::pmfangle\-\_\-of\-\_\-two\-\_\-vectors (
+\begin{DoxyParamCaption}
+\item[{real, dimension(0\-:2)}]{v1, }
+\item[{real, dimension(0\-:2)}]{v2}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_a3941dce9024f8f1c6b329d9fe5e821f5}
+
+
+Definition at line 2909 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+References calc\-\_\-chemscore\-::angle().
+
+
+
+Referenced by pmfangle().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__pmf_a3941dce9024f8f1c6b329d9fe5e821f5_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=322pt]{classcalc__pmf_a3941dce9024f8f1c6b329d9fe5e821f5_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__pmf_a109122bbf10a4b4185decef9463f3009}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfassign\-\_\-aromatic@{pmfassign\-\_\-aromatic}}
+\index{pmfassign\-\_\-aromatic@{pmfassign\-\_\-aromatic}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfassign\-\_\-aromatic}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-pmf\-::pmfassign\-\_\-aromatic (
+\begin{DoxyParamCaption}
+\item[{type({\bf tpmfmolecule})}]{mol, }
+\item[{integer, optional}]{req\-\_\-ring}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_a109122bbf10a4b4185decef9463f3009}
+
+
+Definition at line 2322 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+Referenced by pmfvalue\-\_\-molecule().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__pmf_a109122bbf10a4b4185decef9463f3009_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__pmf_a2482f05b2ba60ac224d87f8ce0c89033}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfassign\-\_\-charge@{pmfassign\-\_\-charge}}
+\index{pmfassign\-\_\-charge@{pmfassign\-\_\-charge}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfassign\-\_\-charge}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-pmf\-::pmfassign\-\_\-charge (
+\begin{DoxyParamCaption}
+\item[{type({\bf tpmfmolecule})}]{mol}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_a2482f05b2ba60ac224d87f8ce0c89033}
+
+
+Definition at line 2339 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+Referenced by pmfvalue\-\_\-molecule().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__pmf_a2482f05b2ba60ac224d87f8ce0c89033_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__pmf_afd6262e11d30c758385ae46fd282c574}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfassign\-\_\-hbchar@{pmfassign\-\_\-hbchar}}
+\index{pmfassign\-\_\-hbchar@{pmfassign\-\_\-hbchar}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfassign\-\_\-hbchar}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-pmf\-::pmfassign\-\_\-hbchar (
+\begin{DoxyParamCaption}
+\item[{type({\bf tpmfmolecule})}]{mol}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_afd6262e11d30c758385ae46fd282c574}
+
+
+Definition at line 2353 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+Referenced by pmfvalue\-\_\-molecule().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__pmf_afd6262e11d30c758385ae46fd282c574_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__pmf_a1f22c5c87d8bdca9659e26942dc01ba8}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfassign\-\_\-hybr@{pmfassign\-\_\-hybr}}
+\index{pmfassign\-\_\-hybr@{pmfassign\-\_\-hybr}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfassign\-\_\-hybr}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-pmf\-::pmfassign\-\_\-hybr (
+\begin{DoxyParamCaption}
+\item[{type({\bf tpmfmolecule})}]{mol}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_a1f22c5c87d8bdca9659e26942dc01ba8}
+
+
+Definition at line 1675 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+Referenced by pmfvalue\-\_\-molecule().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__pmf_a1f22c5c87d8bdca9659e26942dc01ba8_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__pmf_a5312c91d4aaffe8b997730d4f2b6bf67}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfassign\-\_\-planar@{pmfassign\-\_\-planar}}
+\index{pmfassign\-\_\-planar@{pmfassign\-\_\-planar}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfassign\-\_\-planar}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-pmf\-::pmfassign\-\_\-planar (
+\begin{DoxyParamCaption}
+\item[{type({\bf tpmfmolecule})}]{mol}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_a5312c91d4aaffe8b997730d4f2b6bf67}
+
+
+Definition at line 1410 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+Referenced by pmfvalue\-\_\-molecule().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__pmf_a5312c91d4aaffe8b997730d4f2b6bf67_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__pmf_af7f277bf29989d0bfd7312561025f894}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfassign\-\_\-polarity@{pmfassign\-\_\-polarity}}
+\index{pmfassign\-\_\-polarity@{pmfassign\-\_\-polarity}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfassign\-\_\-polarity}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-pmf\-::pmfassign\-\_\-polarity (
+\begin{DoxyParamCaption}
+\item[{type({\bf tpmfmolecule})}]{mol}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_af7f277bf29989d0bfd7312561025f894}
+
+
+Definition at line 1925 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+Referenced by pmfvalue\-\_\-molecule().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__pmf_af7f277bf29989d0bfd7312561025f894_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__pmf_a75f05266f8b9955425ea1f6b730cf820}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfassign\-\_\-rings@{pmfassign\-\_\-rings}}
+\index{pmfassign\-\_\-rings@{pmfassign\-\_\-rings}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfassign\-\_\-rings}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-pmf\-::pmfassign\-\_\-rings (
+\begin{DoxyParamCaption}
+\item[{type({\bf tpmfmolecule})}]{mol, }
+\item[{integer}]{l}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_a75f05266f8b9955425ea1f6b730cf820}
+
+
+Definition at line 1942 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+References pmfatom\-\_\-walk().
+
+
+
+Referenced by pmfvalue\-\_\-molecule().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__pmf_a75f05266f8b9955425ea1f6b730cf820_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__pmf_a589d5b6b9d660657938509169a92ac1c}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfatom\-\_\-walk@{pmfatom\-\_\-walk}}
+\index{pmfatom\-\_\-walk@{pmfatom\-\_\-walk}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfatom\-\_\-walk}]{\setlength{\rightskip}{0pt plus 5cm}recursive subroutine calc\-\_\-pmf\-::pmfatom\-\_\-walk (
+\begin{DoxyParamCaption}
+\item[{integer}]{start, }
+\item[{type({\bf tpmfmolecule})}]{mol, }
+\item[{integer, dimension(\-:), pointer}]{path, }
+\item[{integer}]{c, }
+\item[{integer}]{limit}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_a589d5b6b9d660657938509169a92ac1c}
+
+
+Definition at line 1986 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+References pmfreport\-\_\-ring(), and calc\-\_\-chemscore\-::start().
+
+
+
+Referenced by pmfassign\-\_\-rings().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__pmf_a589d5b6b9d660657938509169a92ac1c_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__pmf_a3a26d68dccac11776fd3234d355b3213}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfbonds\-\_\-aromatic@{pmfbonds\-\_\-aromatic}}
+\index{pmfbonds\-\_\-aromatic@{pmfbonds\-\_\-aromatic}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfbonds\-\_\-aromatic}]{\setlength{\rightskip}{0pt plus 5cm}pure integer function calc\-\_\-pmf\-::pmfbonds\-\_\-aromatic (
+\begin{DoxyParamCaption}
+\item[{type({\bf tpmfatom}), intent(in)}]{atom, }
+\item[{type({\bf tpmfmolecule}), intent(in)}]{mol}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_a3a26d68dccac11776fd3234d355b3213}
+
+
+Definition at line 1642 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_ab5af37caedbaef9bae2a639745b82dfe}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfbonds\-\_\-double@{pmfbonds\-\_\-double}}
+\index{pmfbonds\-\_\-double@{pmfbonds\-\_\-double}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfbonds\-\_\-double}]{\setlength{\rightskip}{0pt plus 5cm}integer function calc\-\_\-pmf\-::pmfbonds\-\_\-double (
+\begin{DoxyParamCaption}
+\item[{type({\bf tpmfatom}), intent(in)}]{atom, }
+\item[{type({\bf tpmfmolecule}), intent(in)}]{mol}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_ab5af37caedbaef9bae2a639745b82dfe}
+
+
+Definition at line 1620 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a5b2a0e542a5fd171c78c65065016c5fe}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfbonds\-\_\-metal@{pmfbonds\-\_\-metal}}
+\index{pmfbonds\-\_\-metal@{pmfbonds\-\_\-metal}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfbonds\-\_\-metal}]{\setlength{\rightskip}{0pt plus 5cm}integer function calc\-\_\-pmf\-::pmfbonds\-\_\-metal (
+\begin{DoxyParamCaption}
+\item[{type({\bf tpmfatom}), intent(in)}]{atom, }
+\item[{type({\bf tpmfmolecule}), intent(in)}]{mol}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_a5b2a0e542a5fd171c78c65065016c5fe}
+
+
+Definition at line 1653 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+References pmfeval\-\_\-rule().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__pmf_a5b2a0e542a5fd171c78c65065016c5fe_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__pmf_a60792ec7446f87ede4b5d34f2bb3b35c}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfbonds\-\_\-single@{pmfbonds\-\_\-single}}
+\index{pmfbonds\-\_\-single@{pmfbonds\-\_\-single}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfbonds\-\_\-single}]{\setlength{\rightskip}{0pt plus 5cm}integer function calc\-\_\-pmf\-::pmfbonds\-\_\-single (
+\begin{DoxyParamCaption}
+\item[{type({\bf tpmfatom}), intent(in)}]{atom, }
+\item[{type({\bf tpmfmolecule}), intent(in)}]{mol}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_a60792ec7446f87ede4b5d34f2bb3b35c}
+
+
+Definition at line 1609 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_ac419e2969eb5c9bf7a36e28e6de79b12}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfbonds\-\_\-triple@{pmfbonds\-\_\-triple}}
+\index{pmfbonds\-\_\-triple@{pmfbonds\-\_\-triple}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfbonds\-\_\-triple}]{\setlength{\rightskip}{0pt plus 5cm}pure integer function calc\-\_\-pmf\-::pmfbonds\-\_\-triple (
+\begin{DoxyParamCaption}
+\item[{type({\bf tpmfatom}), intent(in)}]{atom, }
+\item[{type({\bf tpmfmolecule}), intent(in)}]{mol}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_ac419e2969eb5c9bf7a36e28e6de79b12}
+
+
+Definition at line 1631 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a9dca279d37fdfd1f5f387211c3c6c697}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfdetect\-\_\-connections@{pmfdetect\-\_\-connections}}
+\index{pmfdetect\-\_\-connections@{pmfdetect\-\_\-connections}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfdetect\-\_\-connections}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-pmf\-::pmfdetect\-\_\-connections (
+\begin{DoxyParamCaption}
+\item[{type({\bf tpmfmolecule}), intent(inout)}]{molecule}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_a9dca279d37fdfd1f5f387211c3c6c697}
+
+
+Definition at line 2714 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+References pmfmolecule\-\_\-two\-\_\-bonds\-\_\-connection\-\_\-check().
+
+
+
+Referenced by pmfvalue\-\_\-molecule().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__pmf_a9dca279d37fdfd1f5f387211c3c6c697_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__pmf_a9dca279d37fdfd1f5f387211c3c6c697_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__pmf_a70b4bda6690c31f306f3841ace5eb2e4}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfeval\-\_\-bonds@{pmfeval\-\_\-bonds}}
+\index{pmfeval\-\_\-bonds@{pmfeval\-\_\-bonds}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfeval\-\_\-bonds}]{\setlength{\rightskip}{0pt plus 5cm}integer function calc\-\_\-pmf\-::pmfeval\-\_\-bonds (
+\begin{DoxyParamCaption}
+\item[{type({\bf tpmfatom}), intent(inout)}]{atom, }
+\item[{type({\bf tpmfmolecule}), intent(in)}]{mol, }
+\item[{character(len=37), intent(in)}]{r}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_a70b4bda6690c31f306f3841ace5eb2e4}
+
+
+Definition at line 1509 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+References calc\-\_\-rdf\-::r().
+
+
+
+Referenced by pmfeval\-\_\-rule().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=306pt]{classcalc__pmf_a70b4bda6690c31f306f3841ace5eb2e4_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__pmf_a70b4bda6690c31f306f3841ace5eb2e4_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__pmf_ab174c72c67e0d863a402fd35c3c083be}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfeval\-\_\-rule@{pmfeval\-\_\-rule}}
+\index{pmfeval\-\_\-rule@{pmfeval\-\_\-rule}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfeval\-\_\-rule}]{\setlength{\rightskip}{0pt plus 5cm}integer function calc\-\_\-pmf\-::pmfeval\-\_\-rule (
+\begin{DoxyParamCaption}
+\item[{type({\bf tpmfatom})}]{atom, }
+\item[{type({\bf tpmfmolecule})}]{mol, }
+\item[{character, intent(in)}]{r}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_ab174c72c67e0d863a402fd35c3c083be}
+
+
+Definition at line 1437 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+References pmfeval\-\_\-bonds(), and calc\-\_\-rdf\-::r().
+
+
+
+Referenced by pmfbonds\-\_\-metal(), and pmfvalue\-\_\-molecule().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__pmf_ab174c72c67e0d863a402fd35c3c083be_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__pmf_ab174c72c67e0d863a402fd35c3c083be_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__pmf_a7690ff75f872de2ec10eb6d0231a402e}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmffixatomtypes@{pmffixatomtypes}}
+\index{pmffixatomtypes@{pmffixatomtypes}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmffixatomtypes}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-pmf\-::pmffixatomtypes (
+\begin{DoxyParamCaption}
+\item[{type({\bf tpmfmolecule})}]{mol}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_a7690ff75f872de2ec10eb6d0231a402e}
+
+
+Definition at line 1262 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+Referenced by pmfvalue\-\_\-molecule().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classcalc__pmf_adb092d3fa3d597aa80099dac1ff51d24}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfgetindex@{pmfgetindex}}
+\index{pmfgetindex@{pmfgetindex}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfgetindex}]{\setlength{\rightskip}{0pt plus 5cm}integer function calc\-\_\-pmf\-::pmfgetindex (
+\begin{DoxyParamCaption}
+\item[{type({\bf tpmfatom})}]{atom}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_adb092d3fa3d597aa80099dac1ff51d24}
+
+
+Definition at line 1005 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+Referenced by pmf\-\_\-score().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__pmf_adb092d3fa3d597aa80099dac1ff51d24_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__pmf_ab9162aa7283d2b89563977445c48d42e}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfint\-\_\-pushback@{pmfint\-\_\-pushback}}
+\index{pmfint\-\_\-pushback@{pmfint\-\_\-pushback}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfint\-\_\-pushback}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-pmf\-::pmfint\-\_\-pushback (
+\begin{DoxyParamCaption}
+\item[{integer, dimension(\-:), pointer}]{array, }
+\item[{integer}]{int}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_ab9162aa7283d2b89563977445c48d42e}
+
+
+Definition at line 2090 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a6b259a5b36a4ab2d3c86400f88d2e60c}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfligand\-\_\-translate@{pmfligand\-\_\-translate}}
+\index{pmfligand\-\_\-translate@{pmfligand\-\_\-translate}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfligand\-\_\-translate}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-pmf\-::pmfligand\-\_\-translate (
+\begin{DoxyParamCaption}
+\item[{type({\bf tpmfmolecule}), intent(out)}]{ligand, }
+\item[{integer, intent(in)}]{n\-Atoms, }
+\item[{integer, intent(in)}]{n\-Bonds, }
+\item[{type({\bf q\-\_\-atom}), dimension(\-:), intent(in)}]{a\-Q, }
+\item[{type({\bf q\-\_\-bond}), dimension(\-:), intent(in)}]{a\-B, }
+\item[{integer}]{offset}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_a6b259a5b36a4ab2d3c86400f88d2e60c}
+
+
+Definition at line 1156 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+Referenced by pmf\-\_\-precalc().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classcalc__pmf_a464bb7fb9f994fd1ae6318110bc57631}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmflog\-\_\-frame@{pmflog\-\_\-frame}}
+\index{pmflog\-\_\-frame@{pmflog\-\_\-frame}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmflog\-\_\-frame}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-pmf\-::pmflog\-\_\-frame (
+\begin{DoxyParamCaption}
+\item[{integer, intent(in)}]{i\-Frame, }
+\item[{type({\bf tpmfmolecule})}]{ligand}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_a464bb7fb9f994fd1ae6318110bc57631}
+
+
+Definition at line 2591 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+Referenced by pmf\-\_\-calc().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classcalc__pmf_a4c51d400a72121dbba99d441a2bfea6b}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfmolecule\-\_\-clean\-\_\-choices@{pmfmolecule\-\_\-clean\-\_\-choices}}
+\index{pmfmolecule\-\_\-clean\-\_\-choices@{pmfmolecule\-\_\-clean\-\_\-choices}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfmolecule\-\_\-clean\-\_\-choices}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-pmf\-::pmfmolecule\-\_\-clean\-\_\-choices (
+\begin{DoxyParamCaption}
+\item[{type({\bf tpmfmolecule})}]{molecule, }
+\item[{integer}]{tried\-\_\-choice, }
+\item[{integer, dimension(0\-:{\bf max\-\_\-bond\-\_\-neib}-\/1)}]{choice}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_a4c51d400a72121dbba99d441a2bfea6b}
+
+
+Definition at line 2205 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+Referenced by pmfmolecule\-\_\-look\-\_\-for\-\_\-a\-\_\-ring().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__pmf_a4c51d400a72121dbba99d441a2bfea6b_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__pmf_a5d1b84516b4045d510702abceb249d8a}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfmolecule\-\_\-get\-\_\-choices@{pmfmolecule\-\_\-get\-\_\-choices}}
+\index{pmfmolecule\-\_\-get\-\_\-choices@{pmfmolecule\-\_\-get\-\_\-choices}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfmolecule\-\_\-get\-\_\-choices}]{\setlength{\rightskip}{0pt plus 5cm}integer function calc\-\_\-pmf\-::pmfmolecule\-\_\-get\-\_\-choices (
+\begin{DoxyParamCaption}
+\item[{type({\bf tpmfmolecule})}]{molecule, }
+\item[{integer, dimension(0\-:{\bf max\-\_\-bond\-\_\-neib} -\/1)}]{choice, }
+\item[{integer}]{wrong\-\_\-end, }
+\item[{integer}]{current\-\_\-path\-\_\-length, }
+\item[{integer, dimension(\-:), pointer}]{current\-\_\-path}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_a5d1b84516b4045d510702abceb249d8a}
+
+
+Definition at line 2223 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+Referenced by pmfmolecule\-\_\-look\-\_\-for\-\_\-a\-\_\-ring().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__pmf_a5d1b84516b4045d510702abceb249d8a_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__pmf_a6a8fb6accff9a1c234e056e69cdb12e8}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfmolecule\-\_\-look\-\_\-for\-\_\-a\-\_\-ring@{pmfmolecule\-\_\-look\-\_\-for\-\_\-a\-\_\-ring}}
+\index{pmfmolecule\-\_\-look\-\_\-for\-\_\-a\-\_\-ring@{pmfmolecule\-\_\-look\-\_\-for\-\_\-a\-\_\-ring}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfmolecule\-\_\-look\-\_\-for\-\_\-a\-\_\-ring}]{\setlength{\rightskip}{0pt plus 5cm}integer function calc\-\_\-pmf\-::pmfmolecule\-\_\-look\-\_\-for\-\_\-a\-\_\-ring (
+\begin{DoxyParamCaption}
+\item[{type({\bf tpmfmolecule}), intent(inout)}]{molecule, }
+\item[{integer}]{bond\-\_\-id, }
+\item[{integer, dimension(\-:), pointer}]{atom\-\_\-path, }
+\item[{integer, dimension(\-:), pointer}]{bond\-\_\-path, }
+\item[{integer}]{required\-\_\-size}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_a6a8fb6accff9a1c234e056e69cdb12e8}
+
+
+Definition at line 2113 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+References pmfmolecule\-\_\-clean\-\_\-choices(), pmfmolecule\-\_\-get\-\_\-choices(), pmfmolecule\-\_\-reset\-\_\-choices(), and pmfmolecule\-\_\-two\-\_\-bonds\-\_\-connection\-\_\-check().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__pmf_a6a8fb6accff9a1c234e056e69cdb12e8_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__pmf_ab349db3ae61f138604db0d9719349fd1}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfmolecule\-\_\-reset\-\_\-choices@{pmfmolecule\-\_\-reset\-\_\-choices}}
+\index{pmfmolecule\-\_\-reset\-\_\-choices@{pmfmolecule\-\_\-reset\-\_\-choices}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfmolecule\-\_\-reset\-\_\-choices}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-pmf\-::pmfmolecule\-\_\-reset\-\_\-choices (
+\begin{DoxyParamCaption}
+\item[{type({\bf tpmfmolecule})}]{molecule, }
+\item[{integer}]{bond\-\_\-id, }
+\item[{integer, dimension(0\-:{\bf max\-\_\-bond\-\_\-neib} -\/1)}]{choice}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_ab349db3ae61f138604db0d9719349fd1}
+
+
+Definition at line 2270 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+Referenced by pmfmolecule\-\_\-look\-\_\-for\-\_\-a\-\_\-ring().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__pmf_ab349db3ae61f138604db0d9719349fd1_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__pmf_a642a8d188ca37abd91cc59b69fa50158}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfmolecule\-\_\-two\-\_\-bonds\-\_\-connection\-\_\-check@{pmfmolecule\-\_\-two\-\_\-bonds\-\_\-connection\-\_\-check}}
+\index{pmfmolecule\-\_\-two\-\_\-bonds\-\_\-connection\-\_\-check@{pmfmolecule\-\_\-two\-\_\-bonds\-\_\-connection\-\_\-check}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfmolecule\-\_\-two\-\_\-bonds\-\_\-connection\-\_\-check}]{\setlength{\rightskip}{0pt plus 5cm}integer function calc\-\_\-pmf\-::pmfmolecule\-\_\-two\-\_\-bonds\-\_\-connection\-\_\-check (
+\begin{DoxyParamCaption}
+\item[{type({\bf tpmfbond})}]{bond1, }
+\item[{type({\bf tpmfbond})}]{bond2}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_a642a8d188ca37abd91cc59b69fa50158}
+
+
+Definition at line 2294 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+Referenced by pmfdetect\-\_\-connections(), and pmfmolecule\-\_\-look\-\_\-for\-\_\-a\-\_\-ring().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__pmf_a642a8d188ca37abd91cc59b69fa50158_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__pmf_a2baa30c7de82768257cedb4c5062089b}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfprotein\-\_\-translate@{pmfprotein\-\_\-translate}}
+\index{pmfprotein\-\_\-translate@{pmfprotein\-\_\-translate}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfprotein\-\_\-translate}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-pmf\-::pmfprotein\-\_\-translate (
+\begin{DoxyParamCaption}
+\item[{type({\bf tpmfmolecule})}]{protein, }
+\item[{integer}]{n\-Atoms, }
+\item[{real(8), dimension(\-:)}]{coordinates, }
+\item[{type(bond\-\_\-type), dimension(\-:)}]{bond, }
+\item[{integer}]{num\-\_\-bond, }
+\item[{integer, optional}]{transfer\-\_\-waters}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_a2baa30c7de82768257cedb4c5062089b}
+
+
+Definition at line 1034 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+References md\-::bond().
+
+
+
+Referenced by pmf\-\_\-precalc().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=283pt]{classcalc__pmf_a2baa30c7de82768257cedb4c5062089b_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__pmf_a2baa30c7de82768257cedb4c5062089b_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__pmf_a0ff94f92c888cfa789cc3c62b19e90df}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfread\-\_\-data@{pmfread\-\_\-data}}
+\index{pmfread\-\_\-data@{pmfread\-\_\-data}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfread\-\_\-data}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-pmf\-::pmfread\-\_\-data (
+\begin{DoxyParamCaption}
+\item[{character(len=256)}]{filename}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_a0ff94f92c888cfa789cc3c62b19e90df}
+
+
+Definition at line 686 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+References misc\-::freefile().
+
+
+
+Referenced by pmf\-\_\-precalc().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__pmf_a0ff94f92c888cfa789cc3c62b19e90df_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__pmf_ac3e289539ea4c4398e8c4a01ba575b10}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfread\-\_\-input@{pmfread\-\_\-input}}
+\index{pmfread\-\_\-input@{pmfread\-\_\-input}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfread\-\_\-input}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-pmf\-::pmfread\-\_\-input (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_ac3e289539ea4c4398e8c4a01ba575b10}
+
+
+Definition at line 425 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+References misc\-::freefile(), and misc\-::upcase().
+
+
+
+Referenced by pmf\-\_\-precalc().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__pmf_ac3e289539ea4c4398e8c4a01ba575b10_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__pmf_a90196b4a510babf40a19b3778cca8b10}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfread\-\_\-inputqatom@{pmfread\-\_\-inputqatom}}
+\index{pmfread\-\_\-inputqatom@{pmfread\-\_\-inputqatom}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfread\-\_\-inputqatom}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-pmf\-::pmfread\-\_\-inputqatom (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_a90196b4a510babf40a19b3778cca8b10}
+
+
+Definition at line 533 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+Referenced by pmf\-\_\-precalc().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__pmf_a90196b4a510babf40a19b3778cca8b10_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__pmf_aad022993ab21419258605190c44313c7}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfread\-\_\-names@{pmfread\-\_\-names}}
+\index{pmfread\-\_\-names@{pmfread\-\_\-names}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfread\-\_\-names}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-pmf\-::pmfread\-\_\-names (
+\begin{DoxyParamCaption}
+\item[{character(len=256)}]{filename}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_aad022993ab21419258605190c44313c7}
+
+
+Definition at line 738 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+References misc\-::freefile().
+
+
+
+Referenced by pmf\-\_\-precalc().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__pmf_aad022993ab21419258605190c44313c7_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__pmf_ab388d577f0dbb88865c1c9d4366e45be}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfreadatomtypeconversions@{pmfreadatomtypeconversions}}
+\index{pmfreadatomtypeconversions@{pmfreadatomtypeconversions}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfreadatomtypeconversions}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-pmf\-::pmfreadatomtypeconversions (
+\begin{DoxyParamCaption}
+\item[{character(len=256)}]{filename, }
+\item[{character(len=20)}]{ch\-Type}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_ab388d577f0dbb88865c1c9d4366e45be}
+
+
+Definition at line 281 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+References misc\-::freefile(), and misc\-::locase().
+
+
+
+Referenced by pmf\-\_\-precalc().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__pmf_ab388d577f0dbb88865c1c9d4366e45be_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__pmf_a76cde5345e2a89aa59e0c6aea4555112}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfreport\-\_\-ring@{pmfreport\-\_\-ring}}
+\index{pmfreport\-\_\-ring@{pmfreport\-\_\-ring}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfreport\-\_\-ring}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-pmf\-::pmfreport\-\_\-ring (
+\begin{DoxyParamCaption}
+\item[{type({\bf tpmfmolecule})}]{mol, }
+\item[{integer, dimension(\-:), pointer}]{path, }
+\item[{integer}]{c}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_a76cde5345e2a89aa59e0c6aea4555112}
+
+
+Definition at line 2030 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+Referenced by pmfatom\-\_\-walk().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__pmf_a76cde5345e2a89aa59e0c6aea4555112_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__pmf_aeb687d57198896c002165b074ebd8e16}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfscore\-\_\-mean@{pmfscore\-\_\-mean}}
+\index{pmfscore\-\_\-mean@{pmfscore\-\_\-mean}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfscore\-\_\-mean}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-pmf\-::pmfscore\-\_\-mean (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_aeb687d57198896c002165b074ebd8e16}
+
+
+Definition at line 2694 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+Referenced by make\-\_\-mean\-\_\-all().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classcalc__pmf_a638031979f9e34f663de98290b3203bf}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfscoring\-\_\-stats@{pmfscoring\-\_\-stats}}
+\index{pmfscoring\-\_\-stats@{pmfscoring\-\_\-stats}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfscoring\-\_\-stats}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-pmf\-::pmfscoring\-\_\-stats (
+\begin{DoxyParamCaption}
+\item[{type({\bf tpmfmolecule})}]{mol, }
+\item[{integer, optional}]{i\-Atom}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_a638031979f9e34f663de98290b3203bf}
+
+
+Definition at line 889 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+Referenced by pmf\-\_\-calc(), and pmf\-\_\-precalc().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__pmf_a638031979f9e34f663de98290b3203bf_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__pmf_aad41bacd5a05bb356118391b53099785}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfshow\-\_\-abs@{pmfshow\-\_\-abs}}
+\index{pmfshow\-\_\-abs@{pmfshow\-\_\-abs}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfshow\-\_\-abs}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-pmf\-::pmfshow\-\_\-abs (
+\begin{DoxyParamCaption}
+\item[{type({\bf tpmfmolecule})}]{mol}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_aad41bacd5a05bb356118391b53099785}
+
+
+Definition at line 924 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a15700c91a9d09ccd6da63e1cf1fe7547}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfshow\-\_\-molecule@{pmfshow\-\_\-molecule}}
+\index{pmfshow\-\_\-molecule@{pmfshow\-\_\-molecule}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfshow\-\_\-molecule}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-pmf\-::pmfshow\-\_\-molecule (
+\begin{DoxyParamCaption}
+\item[{type({\bf tpmfmolecule})}]{mol}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_a15700c91a9d09ccd6da63e1cf1fe7547}
+
+
+Definition at line 2411 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+Referenced by pmf\-\_\-precalc().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__pmf_a15700c91a9d09ccd6da63e1cf1fe7547_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__pmf_ab6f464407bf5090b40e3a0c915eeb283}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfsort\-\_\-bonds@{pmfsort\-\_\-bonds}}
+\index{pmfsort\-\_\-bonds@{pmfsort\-\_\-bonds}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfsort\-\_\-bonds}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-pmf\-::pmfsort\-\_\-bonds (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_ab6f464407bf5090b40e3a0c915eeb283}
+
+
+Definition at line 2515 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+Referenced by pmf\-\_\-precalc().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__pmf_ab6f464407bf5090b40e3a0c915eeb283_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__pmf_ac556c87ce39732c2e96def3d32dd211f}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfvalue\-\_\-molecule@{pmfvalue\-\_\-molecule}}
+\index{pmfvalue\-\_\-molecule@{pmfvalue\-\_\-molecule}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfvalue\-\_\-molecule}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-pmf\-::pmfvalue\-\_\-molecule (
+\begin{DoxyParamCaption}
+\item[{type({\bf tpmfmolecule}), intent(inout)}]{mol, }
+\item[{type({\bf tpmfrule}), dimension(\-:), pointer}]{rule, }
+\item[{integer}]{count, }
+\item[{integer, optional}]{prot, }
+\item[{integer, optional}]{literun}
+\end{DoxyParamCaption}
+)}}\label{classcalc__pmf_ac556c87ce39732c2e96def3d32dd211f}
+
+
+Definition at line 1301 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+References pmfassign\-\_\-aromatic(), pmfassign\-\_\-charge(), pmfassign\-\_\-hbchar(), pmfassign\-\_\-hybr(), pmfassign\-\_\-planar(), pmfassign\-\_\-polarity(), pmfassign\-\_\-rings(), pmfdetect\-\_\-connections(), pmfeval\-\_\-rule(), and pmffixatomtypes().
+
+
+
+Referenced by pmf\-\_\-precalc().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__pmf_ac556c87ce39732c2e96def3d32dd211f_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Data Documentation}
+\hypertarget{classcalc__pmf_a5cf70a0742a922b59d0dab2ccea74f52}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!ahb@{ahb}}
+\index{ahb@{ahb}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{ahb}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf q\-\_\-bond}), dimension(\-:), allocatable, target, private calc\-\_\-pmf\-::ahb\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__pmf_a5cf70a0742a922b59d0dab2ccea74f52}
+
+
+Definition at line 207 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a160db6bef6b383e82b4ad6070a3597a9}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!ahq@{ahq}}
+\index{ahq@{ahq}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{ahq}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf q\-\_\-atom}), dimension(\-:), allocatable, target, private calc\-\_\-pmf\-::ahq\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__pmf_a160db6bef6b383e82b4ad6070a3597a9}
+
+
+Definition at line 206 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_aa79a18fe363aeaa2831ccf58dd4a7fcc}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!amide@{amide}}
+\index{amide@{amide}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{amide}]{\setlength{\rightskip}{0pt plus 5cm}integer, public calc\-\_\-pmf\-::amide = 4}}\label{classcalc__pmf_aa79a18fe363aeaa2831ccf58dd4a7fcc}
+
+
+Definition at line 196 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_ac99fa55cb2e0de3acc03adc92db25756}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!aromatic@{aromatic}}
+\index{aromatic@{aromatic}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{aromatic}]{\setlength{\rightskip}{0pt plus 5cm}integer, public calc\-\_\-pmf\-::aromatic = 3}}\label{classcalc__pmf_ac99fa55cb2e0de3acc03adc92db25756}
+
+
+Definition at line 195 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a934737a3cd94904c0cd91912062ce21f}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!atom\-\_\-data\-\_\-file@{atom\-\_\-data\-\_\-file}}
+\index{atom\-\_\-data\-\_\-file@{atom\-\_\-data\-\_\-file}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{atom\-\_\-data\-\_\-file}]{\setlength{\rightskip}{0pt plus 5cm}character$\ast$80 calc\-\_\-pmf\-::atom\-\_\-data\-\_\-file}}\label{classcalc__pmf_a934737a3cd94904c0cd91912062ce21f}
+
+
+Definition at line 199 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_aaea67c47132371b0b4ee5dc74d16f778}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!atomtypetable@{atomtypetable}}
+\index{atomtypetable@{atomtypetable}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{atomtypetable}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf atom\-\_\-type\-\_\-conversion}), dimension(\-:), allocatable calc\-\_\-pmf\-::atomtypetable}}\label{classcalc__pmf_aaea67c47132371b0b4ee5dc74d16f778}
+
+
+Definition at line 250 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a6fc1809ea11117a2dcb3b452e1b6b2cc}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!bdotopcalc@{bdotopcalc}}
+\index{bdotopcalc@{bdotopcalc}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{bdotopcalc}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-pmf\-::bdotopcalc}}\label{classcalc__pmf_a6fc1809ea11117a2dcb3b452e1b6b2cc}
+
+
+Definition at line 234 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a690cfd14223de22b294b928d0e9e2080}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!bsecondpass@{bsecondpass}}
+\index{bsecondpass@{bsecondpass}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{bsecondpass}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-pmf\-::bsecondpass}}\label{classcalc__pmf_a690cfd14223de22b294b928d0e9e2080}
+
+
+Definition at line 235 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a2c7ec15e30c13d5d1cb9ad5727b025a9}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!chinput@{chinput}}
+\index{chinput@{chinput}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{chinput}]{\setlength{\rightskip}{0pt plus 5cm}character(len=256) calc\-\_\-pmf\-::chinput}}\label{classcalc__pmf_a2c7ec15e30c13d5d1cb9ad5727b025a9}
+
+
+Definition at line 245 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a3e437b5cee4494c9a9445956c7b996fe}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!cofactor@{cofactor}}
+\index{cofactor@{cofactor}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{cofactor}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf tpmfmolecule}), dimension(\-:), allocatable, public calc\-\_\-pmf\-::cofactor}}\label{classcalc__pmf_a3e437b5cee4494c9a9445956c7b996fe}
+
+
+Definition at line 240 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a02daa11aa1b64ff1167a0a99779a1f3c}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!coord\-\_\-file@{coord\-\_\-file}}
+\index{coord\-\_\-file@{coord\-\_\-file}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{coord\-\_\-file}]{\setlength{\rightskip}{0pt plus 5cm}character$\ast$80 calc\-\_\-pmf\-::coord\-\_\-file}}\label{classcalc__pmf_a02daa11aa1b64ff1167a0a99779a1f3c}
+
+
+Definition at line 200 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a4d6e176568c5ef696aa451c5bf70d622}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!double@{double}}
+\index{double@{double}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{double}]{\setlength{\rightskip}{0pt plus 5cm}integer, public calc\-\_\-pmf\-::double = 2}}\label{classcalc__pmf_a4d6e176568c5ef696aa451c5bf70d622}
+
+
+Definition at line 194 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_aa3f01647c31f0a6aabfa5e04841d826b}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!err@{err}}
+\index{err@{err}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{err}]{\setlength{\rightskip}{0pt plus 5cm}integer, public calc\-\_\-pmf\-::err}}\label{classcalc__pmf_aa3f01647c31f0a6aabfa5e04841d826b}
+
+
+Definition at line 276 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a9ed164a5cea390709d7eef68e326a1d4}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!fep\-\_\-file@{fep\-\_\-file}}
+\index{fep\-\_\-file@{fep\-\_\-file}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{fep\-\_\-file}]{\setlength{\rightskip}{0pt plus 5cm}character$\ast$80 calc\-\_\-pmf\-::fep\-\_\-file}}\label{classcalc__pmf_a9ed164a5cea390709d7eef68e326a1d4}
+
+
+Definition at line 198 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a977c23a403bfb5eb80a7fefbb104aae5}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!hba\-\_\-l@{hba\-\_\-l}}
+\index{hba\-\_\-l@{hba\-\_\-l}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{hba\-\_\-l}]{\setlength{\rightskip}{0pt plus 5cm}integer(ai), dimension(\-:), allocatable calc\-\_\-pmf\-::hba\-\_\-l}}\label{classcalc__pmf_a977c23a403bfb5eb80a7fefbb104aae5}
+
+
+Definition at line 217 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a72d401bd03d18040c3238d42a07b895c}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!hba\-\_\-r@{hba\-\_\-r}}
+\index{hba\-\_\-r@{hba\-\_\-r}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{hba\-\_\-r}]{\setlength{\rightskip}{0pt plus 5cm}integer(ai), dimension(\-:), allocatable calc\-\_\-pmf\-::hba\-\_\-r}}\label{classcalc__pmf_a72d401bd03d18040c3238d42a07b895c}
+
+
+Definition at line 216 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_af9825de03053e01cf7ac2ac17545a509}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!hbd\-\_\-l@{hbd\-\_\-l}}
+\index{hbd\-\_\-l@{hbd\-\_\-l}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{hbd\-\_\-l}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf donor}), dimension(\-:), allocatable calc\-\_\-pmf\-::hbd\-\_\-l}}\label{classcalc__pmf_af9825de03053e01cf7ac2ac17545a509}
+
+
+Definition at line 215 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a815659caae16f7d11ba50b53fad2ee87}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!hbd\-\_\-r@{hbd\-\_\-r}}
+\index{hbd\-\_\-r@{hbd\-\_\-r}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{hbd\-\_\-r}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf donor}), dimension(\-:), allocatable calc\-\_\-pmf\-::hbd\-\_\-r}}\label{classcalc__pmf_a815659caae16f7d11ba50b53fad2ee87}
+
+
+Definition at line 214 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a05d3af4e1c76e5ab7f299b7db6d74cac}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!input@{input}}
+\index{input@{input}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{input}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf tpmfinput}), public calc\-\_\-pmf\-::input}}\label{classcalc__pmf_a05d3af4e1c76e5ab7f299b7db6d74cac}
+
+
+Definition at line 244 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_aab09205514afe9e25c1d4750897417a6}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!iqatom@{iqatom}}
+\index{iqatom@{iqatom}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{iqatom}]{\setlength{\rightskip}{0pt plus 5cm}integer, dimension(\-:), allocatable calc\-\_\-pmf\-::iqatom}}\label{classcalc__pmf_aab09205514afe9e25c1d4750897417a6}
+
+
+Definition at line 204 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a0159af94a3cd2d849076c0fadc4ac853}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!lig\-\_\-num\-\_\-rule@{lig\-\_\-num\-\_\-rule}}
+\index{lig\-\_\-num\-\_\-rule@{lig\-\_\-num\-\_\-rule}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{lig\-\_\-num\-\_\-rule}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-pmf\-::lig\-\_\-num\-\_\-rule}}\label{classcalc__pmf_a0159af94a3cd2d849076c0fadc4ac853}
+
+
+Definition at line 187 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_adb3a353d55dd9c86c7a56dfec5bfef05}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!ligand@{ligand}}
+\index{ligand@{ligand}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{ligand}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf tpmfmolecule}), public calc\-\_\-pmf\-::ligand}}\label{classcalc__pmf_adb3a353d55dd9c86c7a56dfec5bfef05}
+
+
+Definition at line 239 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a2e7a8f9d268914c54cd26c0fd8b01a81}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!ligrule@{ligrule}}
+\index{ligrule@{ligrule}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{ligrule}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf tpmfrule}), dimension(\-:), pointer calc\-\_\-pmf\-::ligrule}}\label{classcalc__pmf_a2e7a8f9d268914c54cd26c0fd8b01a81}
+
+
+Definition at line 186 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a46e29646f71e1615ceac97effe79bf6a}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!lph\-\_\-l@{lph\-\_\-l}}
+\index{lph\-\_\-l@{lph\-\_\-l}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{lph\-\_\-l}]{\setlength{\rightskip}{0pt plus 5cm}integer(ai), dimension(\-:), allocatable calc\-\_\-pmf\-::lph\-\_\-l}}\label{classcalc__pmf_a46e29646f71e1615ceac97effe79bf6a}
+
+
+Definition at line 213 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a3fef19c1e6b623231279e839e8d3488f}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!lph\-\_\-r@{lph\-\_\-r}}
+\index{lph\-\_\-r@{lph\-\_\-r}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{lph\-\_\-r}]{\setlength{\rightskip}{0pt plus 5cm}integer(ai), dimension(\-:), allocatable calc\-\_\-pmf\-::lph\-\_\-r}}\label{classcalc__pmf_a3fef19c1e6b623231279e839e8d3488f}
+
+
+Definition at line 212 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a8aca40bc9c2879edfb104445cf45db0b}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!masks@{masks}}
+\index{masks@{masks}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{masks}]{\setlength{\rightskip}{0pt plus 5cm}type(mask\-\_\-type), dimension({\bf max\-\_\-masks}), target, private calc\-\_\-pmf\-::masks\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__pmf_a8aca40bc9c2879edfb104445cf45db0b}
+
+
+Definition at line 230 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a2a1e733c9f112f18e86ac8654f47f873}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!max\-\_\-atom\-\_\-neib@{max\-\_\-atom\-\_\-neib}}
+\index{max\-\_\-atom\-\_\-neib@{max\-\_\-atom\-\_\-neib}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{max\-\_\-atom\-\_\-neib}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-pmf\-::max\-\_\-atom\-\_\-neib = 6}}\label{classcalc__pmf_a2a1e733c9f112f18e86ac8654f47f873}
+
+
+Definition at line 275 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a3ec37f70413f821e8521c6368ed69f24}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!max\-\_\-bond\-\_\-neib@{max\-\_\-bond\-\_\-neib}}
+\index{max\-\_\-bond\-\_\-neib@{max\-\_\-bond\-\_\-neib}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{max\-\_\-bond\-\_\-neib}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-pmf\-::max\-\_\-bond\-\_\-neib = 10}}\label{classcalc__pmf_a3ec37f70413f821e8521c6368ed69f24}
+
+
+Definition at line 274 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_acf38a9791fdd978de8bdec1e59e0b164}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!max\-\_\-masks@{max\-\_\-masks}}
+\index{max\-\_\-masks@{max\-\_\-masks}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{max\-\_\-masks}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter calc\-\_\-pmf\-::max\-\_\-masks = 10}}\label{classcalc__pmf_acf38a9791fdd978de8bdec1e59e0b164}
+
+
+Definition at line 229 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_ab0dd5e34df9ec5a11fc98c04b6a634de}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!maxpmfscores@{maxpmfscores}}
+\index{maxpmfscores@{maxpmfscores}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{maxpmfscores}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-pmf\-::maxpmfscores}}\label{classcalc__pmf_ab0dd5e34df9ec5a11fc98c04b6a634de}
+
+
+Definition at line 271 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a66bc38a02eb1454e833ec9e65acc2b5c}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!met\-\_\-r@{met\-\_\-r}}
+\index{met\-\_\-r@{met\-\_\-r}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{met\-\_\-r}]{\setlength{\rightskip}{0pt plus 5cm}integer(ai), dimension(\-:), allocatable calc\-\_\-pmf\-::met\-\_\-r}}\label{classcalc__pmf_a66bc38a02eb1454e833ec9e65acc2b5c}
+
+
+Definition at line 218 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_aaa971de9116dc55c46845c0e34e09384}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!nhb@{nhb}}
+\index{nhb@{nhb}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{nhb}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-pmf\-::nhb}}\label{classcalc__pmf_aaa971de9116dc55c46845c0e34e09384}
+
+
+Definition at line 210 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_acb89c2967da4f9c0a217cecc08ccf510}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!nhba\-\_\-l@{nhba\-\_\-l}}
+\index{nhba\-\_\-l@{nhba\-\_\-l}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{nhba\-\_\-l}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-pmf\-::nhba\-\_\-l}}\label{classcalc__pmf_acb89c2967da4f9c0a217cecc08ccf510}
+
+
+Definition at line 223 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a8581bffe627bc8ed70f44137b5f42858}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!nhba\-\_\-prot@{nhba\-\_\-prot}}
+\index{nhba\-\_\-prot@{nhba\-\_\-prot}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{nhba\-\_\-prot}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-pmf\-::nhba\-\_\-prot}}\label{classcalc__pmf_a8581bffe627bc8ed70f44137b5f42858}
+
+
+Definition at line 224 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_adca5f880f0ae8019b40b5d900523f009}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!nhba\-\_\-r@{nhba\-\_\-r}}
+\index{nhba\-\_\-r@{nhba\-\_\-r}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{nhba\-\_\-r}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-pmf\-::nhba\-\_\-r}}\label{classcalc__pmf_adca5f880f0ae8019b40b5d900523f009}
+
+
+Definition at line 223 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a1b095aceba95c04282323155ee1427af}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!nhbd\-\_\-l@{nhbd\-\_\-l}}
+\index{nhbd\-\_\-l@{nhbd\-\_\-l}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{nhbd\-\_\-l}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-pmf\-::nhbd\-\_\-l}}\label{classcalc__pmf_a1b095aceba95c04282323155ee1427af}
+
+
+Definition at line 222 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_ac47b0e97a6432e5234f23c7d671f441d}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!nhbd\-\_\-prot@{nhbd\-\_\-prot}}
+\index{nhbd\-\_\-prot@{nhbd\-\_\-prot}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{nhbd\-\_\-prot}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-pmf\-::nhbd\-\_\-prot}}\label{classcalc__pmf_ac47b0e97a6432e5234f23c7d671f441d}
+
+
+Definition at line 224 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a4e0857a9a7cfd76db79d0a6bd99aa69a}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!nhbd\-\_\-r@{nhbd\-\_\-r}}
+\index{nhbd\-\_\-r@{nhbd\-\_\-r}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{nhbd\-\_\-r}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-pmf\-::nhbd\-\_\-r}}\label{classcalc__pmf_a4e0857a9a7cfd76db79d0a6bd99aa69a}
+
+
+Definition at line 222 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_ab95df575df3eab3d788f4761abf090e5}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!nhq@{nhq}}
+\index{nhq@{nhq}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{nhq}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-pmf\-::nhq}}\label{classcalc__pmf_ab95df575df3eab3d788f4761abf090e5}
+
+
+Definition at line 209 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a42d85dcb1905a89a8601514bd24a120a}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!nlig@{nlig}}
+\index{nlig@{nlig}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{nlig}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter calc\-\_\-pmf\-::nlig = 34}}\label{classcalc__pmf_a42d85dcb1905a89a8601514bd24a120a}
+
+
+Definition at line 257 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a4b04a9f317d4dcb45e3d51751fbac115}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!nlph\-\_\-l@{nlph\-\_\-l}}
+\index{nlph\-\_\-l@{nlph\-\_\-l}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{nlph\-\_\-l}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-pmf\-::nlph\-\_\-l}}\label{classcalc__pmf_a4b04a9f317d4dcb45e3d51751fbac115}
+
+
+Definition at line 222 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a10154c74668f9e5a53a5dad472608a62}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!nlph\-\_\-r@{nlph\-\_\-r}}
+\index{nlph\-\_\-r@{nlph\-\_\-r}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{nlph\-\_\-r}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-pmf\-::nlph\-\_\-r}}\label{classcalc__pmf_a10154c74668f9e5a53a5dad472608a62}
+
+
+Definition at line 222 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_aa222e2cc7f6c9e5df634fd4c513671af}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!nmasks@{nmasks}}
+\index{nmasks@{nmasks}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{nmasks}]{\setlength{\rightskip}{0pt plus 5cm}integer, private calc\-\_\-pmf\-::nmasks = 0\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__pmf_aa222e2cc7f6c9e5df634fd4c513671af}
+
+
+Definition at line 231 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a323b86d254d89f4f5e9f2f9725209b4f}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!nmet\-\_\-r@{nmet\-\_\-r}}
+\index{nmet\-\_\-r@{nmet\-\_\-r}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{nmet\-\_\-r}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-pmf\-::nmet\-\_\-r}}\label{classcalc__pmf_a323b86d254d89f4f5e9f2f9725209b4f}
+
+
+Definition at line 223 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_ab503cd9dec507e951441afa3c867d4f9}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!npmfscores@{npmfscores}}
+\index{npmfscores@{npmfscores}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{npmfscores}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-pmf\-::npmfscores}}\label{classcalc__pmf_ab503cd9dec507e951441afa3c867d4f9}
+
+
+Definition at line 271 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_ad041cf7ee1dada3fb4d2be26d5894efd}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!nprot@{nprot}}
+\index{nprot@{nprot}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{nprot}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter calc\-\_\-pmf\-::nprot = 16}}\label{classcalc__pmf_ad041cf7ee1dada3fb4d2be26d5894efd}
+
+
+Definition at line 257 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a8a8997db88056a574479b606238ae64b}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!nqbonds@{nqbonds}}
+\index{nqbonds@{nqbonds}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{nqbonds}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-pmf\-::nqbonds}}\label{classcalc__pmf_a8a8997db88056a574479b606238ae64b}
+
+
+Definition at line 223 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a9c8caec9fe50efcc18091801d76510eb}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!nrings@{nrings}}
+\index{nrings@{nrings}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{nrings}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-pmf\-::nrings}}\label{classcalc__pmf_a9c8caec9fe50efcc18091801d76510eb}
+
+
+Definition at line 225 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a560b5dea51180db59cce9c3106ebc977}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!num\-\_\-atomtype@{num\-\_\-atomtype}}
+\index{num\-\_\-atomtype@{num\-\_\-atomtype}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{num\-\_\-atomtype}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-pmf\-::num\-\_\-atomtype}}\label{classcalc__pmf_a560b5dea51180db59cce9c3106ebc977}
+
+
+Definition at line 251 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a4232eda1705ffe1f555323f262740595}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!nwaters@{nwaters}}
+\index{nwaters@{nwaters}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{nwaters}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-pmf\-::nwaters}}\label{classcalc__pmf_a4232eda1705ffe1f555323f262740595}
+
+
+Definition at line 223 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a78c8b146350fd4608bf9e835d768a391}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmf\-\_\-names@{pmf\-\_\-names}}
+\index{pmf\-\_\-names@{pmf\-\_\-names}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmf\-\_\-names}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf tpmfnames}), dimension(\-:), pointer calc\-\_\-pmf\-::pmf\-\_\-names}}\label{classcalc__pmf_a78c8b146350fd4608bf9e835d768a391}
+
+
+Definition at line 249 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_ae432aff45faf03e082c4198c866338c7}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfdata@{pmfdata}}
+\index{pmfdata@{pmfdata}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfdata}]{\setlength{\rightskip}{0pt plus 5cm}real, dimension(34,16,60) calc\-\_\-pmf\-::pmfdata}}\label{classcalc__pmf_ae432aff45faf03e082c4198c866338c7}
+
+
+Definition at line 254 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a908cf718c661183b9069614dad8c3ddd}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmfscores@{pmfscores}}
+\index{pmfscores@{pmfscores}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmfscores}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf tpmfscore}), dimension(\-:), pointer calc\-\_\-pmf\-::pmfscores}}\label{classcalc__pmf_a908cf718c661183b9069614dad8c3ddd}
+
+
+Definition at line 270 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a3030635839201df076cd664a13396090}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pmftype@{pmftype}}
+\index{pmftype@{pmftype}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pmftype}]{\setlength{\rightskip}{0pt plus 5cm}character(len=2), dimension(2,34) calc\-\_\-pmf\-::pmftype}}\label{classcalc__pmf_a3030635839201df076cd664a13396090}
+
+
+Definition at line 255 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_ae6bac7e8dc202b26e4acf6142e650da7}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!pol\-\_\-con@{pol\-\_\-con}}
+\index{pol\-\_\-con@{pol\-\_\-con}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{pol\-\_\-con}]{\setlength{\rightskip}{0pt plus 5cm}integer, dimension(\-:), allocatable calc\-\_\-pmf\-::pol\-\_\-con}}\label{classcalc__pmf_ae6bac7e8dc202b26e4acf6142e650da7}
+
+
+Definition at line 227 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a1986439f8b3e283ee8d21e6b0ca9c5ff}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!prot\-\_\-num\-\_\-rule@{prot\-\_\-num\-\_\-rule}}
+\index{prot\-\_\-num\-\_\-rule@{prot\-\_\-num\-\_\-rule}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{prot\-\_\-num\-\_\-rule}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-pmf\-::prot\-\_\-num\-\_\-rule}}\label{classcalc__pmf_a1986439f8b3e283ee8d21e6b0ca9c5ff}
+
+
+Definition at line 185 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_aafcf4af6240191b24adac7de7d51fa0d}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!protein@{protein}}
+\index{protein@{protein}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{protein}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf tpmfmolecule}), public calc\-\_\-pmf\-::protein}}\label{classcalc__pmf_aafcf4af6240191b24adac7de7d51fa0d}
+
+
+Definition at line 238 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a82f61bada0fda64b2e720d7732f8dadc}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!protrule@{protrule}}
+\index{protrule@{protrule}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{protrule}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf tpmfrule}), dimension(\-:), pointer calc\-\_\-pmf\-::protrule}}\label{classcalc__pmf_a82f61bada0fda64b2e720d7732f8dadc}
+
+
+Definition at line 184 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a0d11c4fd5eac8488b13240eac62a1afa}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!q\-\_\-atoms@{q\-\_\-atoms}}
+\index{q\-\_\-atoms@{q\-\_\-atoms}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{q\-\_\-atoms}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf q\-\_\-atom}), dimension(\-:), allocatable, target, private calc\-\_\-pmf\-::q\-\_\-atoms\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__pmf_a0d11c4fd5eac8488b13240eac62a1afa}
+
+
+Definition at line 202 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_af9e5c5b8b384db6699d16f3e57547308}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!q\-\_\-bonds@{q\-\_\-bonds}}
+\index{q\-\_\-bonds@{q\-\_\-bonds}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{q\-\_\-bonds}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf q\-\_\-bond}), dimension(\-:), allocatable, target, private calc\-\_\-pmf\-::q\-\_\-bonds\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__pmf_af9e5c5b8b384db6699d16f3e57547308}
+
+
+Definition at line 203 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_abe3c333d7711e22367752892c04b6f79}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!single@{single}}
+\index{single@{single}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{single}]{\setlength{\rightskip}{0pt plus 5cm}integer, public calc\-\_\-pmf\-::single = 1}}\label{classcalc__pmf_abe3c333d7711e22367752892c04b6f79}
+
+
+Definition at line 193 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_abf00c9b4eae4e83c041e4b4b732672de}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!top2prot@{top2prot}}
+\index{top2prot@{top2prot}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{top2prot}]{\setlength{\rightskip}{0pt plus 5cm}integer, dimension(\-:), pointer calc\-\_\-pmf\-::top2prot}}\label{classcalc__pmf_abf00c9b4eae4e83c041e4b4b732672de}
+
+
+Definition at line 241 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a5e4abdec940eb0d22b396ceda84d2e99}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!top\-\_\-file@{top\-\_\-file}}
+\index{top\-\_\-file@{top\-\_\-file}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{top\-\_\-file}]{\setlength{\rightskip}{0pt plus 5cm}character$\ast$80 calc\-\_\-pmf\-::top\-\_\-file}}\label{classcalc__pmf_a5e4abdec940eb0d22b396ceda84d2e99}
+
+
+Definition at line 198 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a3f47ac8c9ec9c4a161656939a6dce7af}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!warn@{warn}}
+\index{warn@{warn}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{warn}]{\setlength{\rightskip}{0pt plus 5cm}integer, public calc\-\_\-pmf\-::warn}}\label{classcalc__pmf_a3f47ac8c9ec9c4a161656939a6dce7af}
+
+
+Definition at line 277 of file calc\-\_\-pmfscore.\-f90.
+
+\hypertarget{classcalc__pmf_a3b88bd9f8668a6e062604271a4113c99}{\index{calc\-\_\-pmf@{calc\-\_\-pmf}!waterwarn@{waterwarn}}
+\index{waterwarn@{waterwarn}!calc_pmf@{calc\-\_\-pmf}}
+\paragraph[{waterwarn}]{\setlength{\rightskip}{0pt plus 5cm}integer, public calc\-\_\-pmf\-::waterwarn}}\label{classcalc__pmf_a3b88bd9f8668a6e062604271a4113c99}
+
+
+Definition at line 277 of file calc\-\_\-pmfscore.\-f90.
+
+
+
+The documentation for this module was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{calc__pmfscore_8f90}{calc\-\_\-pmfscore.\-f90}\end{DoxyCompactItemize}

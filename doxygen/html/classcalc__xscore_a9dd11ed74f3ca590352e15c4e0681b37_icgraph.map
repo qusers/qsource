@@ -1,0 +1,13 @@
+<map id="calc_xscore::atom_operator_copy" name="calc_xscore::atom_operator_copy">
+<area shape="rect" id="node2" href="$classcalc__xscore.html#a023c3ce3e347ae0ab1c7474e9dd42baa" title="calc_xscore::hbond\l_operator_copy" alt="" coords="276,8,413,49"/>
+<area shape="rect" id="node12" href="$classcalc__xscore.html#a97b49af827f51159f455c9a90c4f8e35" title="calc_xscore::protein\l_merge_cofactor" alt="" coords="461,71,601,112"/>
+<area shape="rect" id="node3" href="$classcalc__xscore.html#aea7c036990db363fca0024d160a853bd" title="calc_xscore::ligand\l_sum_hbonds" alt="" coords="463,5,599,47"/>
+<area shape="rect" id="node4" href="$classcalc__xscore.html#aec79b7e53911e002ecaae12b252c93e0" title="calc_xscore::ligand\l_calculate_hb" alt="" coords="649,7,785,48"/>
+<area shape="rect" id="node5" href="$classcalc__xscore.html#aa21b212c6de7c3b229d8d91ee336630a" title="calc_xscore::ligand\l_calculate_binding_score" alt="" coords="833,8,1005,49"/>
+<area shape="rect" id="node6" href="$classcalc__xscore.html#a1dd20b02356cb3c99283799d1030d1ba" title="calc_xscore::xscore\l_precalc" alt="" coords="1069,67,1208,108"/>
+<area shape="rect" id="node8" href="$classcalc__xscore.html#a1f2c852d7a1ed801d7b14ce6205a384e" title="calc_xscore::xscore_calc" alt="" coords="1053,15,1224,42"/>
+<area shape="rect" id="node7" href="$qcalc_8f90.html#a6de35d783d8e2c1ffead6a9dbf61ebb6" title="do_pre_calcs" alt="" coords="1272,74,1373,101"/>
+<area shape="rect" id="node9" href="$qcalc_8f90.html#a5befd1d444d41d7d1e4bf8b297c17ee2" title="calc_all" alt="" coords="1289,15,1356,42"/>
+<area shape="rect" id="node10" href="$qcalc_8f90.html#a93dcacb957411ed0d0471fe8a31c60d6" title="process_frame" alt="" coords="1421,15,1532,42"/>
+<area shape="rect" id="node11" href="$qcalc_8f90.html#a7d2d447954fb385bdca4f228de92b1eb" title="process_data" alt="" coords="1580,15,1683,42"/>
+</map>

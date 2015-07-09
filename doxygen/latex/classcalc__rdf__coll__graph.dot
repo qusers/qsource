@@ -1,0 +1,10 @@
+digraph "calc_rdf"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node1 [label="{calc_rdf\n|+ max_masks\l+ pi\l- temp_masks\l- ats1\l- ats2\l- nmasks\l|+ rdf_initialize()\l+ rdf_finalize()\l+ rdf_add()\l+ rdf_calc()\l+ rdf_heading()\l+ r()\l+ rdf_make_list()\l}",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+  Node2 -> Node1 [color="grey25",fontsize="10",style="solid",label=" -rdf_calcs" ,arrowhead="odiamond"];
+  Node2 [label="{calc_rdf::rdf_calc_type\n|+ atoms_in_mask1\l+ frames\l+ nbins\l+ rdf_radius\l+ bins\l|}",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structcalc__rdf_1_1rdf__calc__type.html"];
+  Node3 -> Node1 [color="grey25",fontsize="10",style="solid",label=" -rdf_listan" ,arrowhead="odiamond"];
+  Node3 [label="{calc_rdf::rdf_list_type\n|+ number_of_pairs\l+ atom1\l+ atom2\l|}",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structcalc__rdf_1_1rdf__list__type.html"];
+}

@@ -1,0 +1,8 @@
+<map id="calc_chemscore::trace_ring" name="calc_chemscore::trace_ring">
+<area shape="rect" id="node2" href="$classcalc__chemscore.html#a414b73e7646faa655654d38f811747f4" title="calc_chemscore::mark_ring" alt="" coords="239,13,424,39"/>
+<area shape="rect" id="node3" href="$classcalc__chemscore.html#a52f0eaac7653260916cc115ae99209b1" title="calc_chemscore::search_ring" alt="" coords="472,13,668,39"/>
+<area shape="rect" id="node4" href="$classcalc__chemscore.html#ace212f3ac54af67d6c9b4219bcfe2f54" title="calc_chemscore::set\l_rings" alt="" coords="716,5,860,47"/>
+<area shape="rect" id="node5" href="$classcalc__chemscore.html#a1a0ba4ea42a592ed4c0017e204372e0b" title="calc_chemscore::set\l_ligand" alt="" coords="908,5,1052,47"/>
+<area shape="rect" id="node6" href="$classcalc__chemscore.html#a1dbdeb7c4eb3b9068a041f3b08224417" title="calc_chemscore::score\l_precalc" alt="" coords="1100,5,1259,47"/>
+<area shape="rect" id="node7" href="$qcalc_8f90.html#a6de35d783d8e2c1ffead6a9dbf61ebb6" title="do_pre_calcs" alt="" coords="1307,13,1408,39"/>
+</map>

@@ -1,0 +1,8 @@
+<map id="calc_xscore::hbond_value_hbond_2" name="calc_xscore::hbond_value_hbond_2">
+<area shape="rect" id="node2" href="$classcalc__chemscore.html#a8af51a917f080c281be0bce50c1e6d76" title="calc_chemscore::angle" alt="" coords="191,5,349,32"/>
+<area shape="rect" id="node4" href="$classcalc__xscore.html#a9549d00bc3dbc987d9161e831a433493" title="calc_xscore::distance" alt="" coords="195,56,345,83"/>
+<area shape="rect" id="node5" href="$classcalc__xscore.html#a33b3bcfd977e5d66722bbfa063081162" title="calc_xscore::hbond\l_determine_da_type" alt="" coords="198,107,342,149"/>
+<area shape="rect" id="node3" href="$classcalc__chemscore.html#a0538eec23e42416be4896f6501beec20" title="calc_chemscore::distsq" alt="" coords="397,5,557,32"/>
+<area shape="rect" id="node6" href="$classcalc__xscore.html#ae4cd9edeba662e37372e473f30c51f84" title="calc_xscore::atom_get\l_acceptor_type" alt="" coords="399,82,555,123"/>
+<area shape="rect" id="node7" href="$classcalc__xscore.html#a0b94ce79878b2a744552e7b49e404318" title="calc_xscore::atom_get\l_donor_type" alt="" coords="399,147,555,189"/>
+</map>

@@ -1,0 +1,42 @@
+digraph "finalize"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1 [label="finalize",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+  Node1 -> Node2 [color="midnightblue",fontsize="10",style="solid"];
+  Node2 [label="calc_chemscore::chemscore\l_finalize",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classcalc__chemscore.html#ae933b171a206adf49ec5cde460082f5a"];
+  Node1 -> Node3 [color="midnightblue",fontsize="10",style="solid"];
+  Node3 [label="calc_com::com_finalize",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classcalc__com.html#a45389417b8edfa5f656068b71161be03"];
+  Node3 -> Node4 [color="midnightblue",fontsize="10",style="solid"];
+  Node4 [label="atom_mask::mask_finalize",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classatom__mask.html#a7059cec5e1eecb2536e9cac6d5fb8ce0"];
+  Node1 -> Node5 [color="midnightblue",fontsize="10",style="solid"];
+  Node5 [label="calc_com_ke::com_ke\l_finalize",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classcalc__com__ke.html#a089d44e2e8eacfbd26da425a497530c5"];
+  Node5 -> Node4 [color="midnightblue",fontsize="10",style="solid"];
+  Node1 -> Node6 [color="midnightblue",fontsize="10",style="solid"];
+  Node6 [label="calc_entropy::entropy\l_finalize",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classcalc__entropy.html#a8b7097d5478f130ec2b04ac4eb69e156"];
+  Node6 -> Node4 [color="midnightblue",fontsize="10",style="solid"];
+  Node1 -> Node7 [color="midnightblue",fontsize="10",style="solid"];
+  Node7 [label="calc_fit::fit_finalize",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classcalc__fit.html#ad14c1235965e5604af2221fe382c98dd"];
+  Node7 -> Node4 [color="midnightblue",fontsize="10",style="solid"];
+  Node1 -> Node8 [color="midnightblue",fontsize="10",style="solid"];
+  Node8 [label="atom_mask::mask_shutdown",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classatom__mask.html#a14396a493fa6fda90515fd946a68e90b"];
+  Node8 -> Node9 [color="midnightblue",fontsize="10",style="solid"];
+  Node9 [label="atom_mask::finalize\l_storage",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classatom__mask.html#a1f5d16022ce19bc3de0cba73139d6b04"];
+  Node1 -> Node10 [color="midnightblue",fontsize="10",style="solid"];
+  Node10 [label="calc_nb::nb_finalize",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classcalc__nb.html#ad4b4eb1aad0d5e40cbf07579ca5306de"];
+  Node1 -> Node11 [color="midnightblue",fontsize="10",style="solid"];
+  Node11 [label="calc_nb::nb_qp_finalize",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classcalc__nb.html#ac6032c768a8f42bc47e597e359478356"];
+  Node1 -> Node12 [color="midnightblue",fontsize="10",style="solid"];
+  Node12 [label="calc_pmf::pmf_finalize",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classcalc__pmf.html#abaffcc0fb18adf0a3084d8a6a0be60e6"];
+  Node1 -> Node13 [color="midnightblue",fontsize="10",style="solid"];
+  Node13 [label="calc_rdf::rdf_finalize",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classcalc__rdf.html#a4fe98fe00b67ceadd0ce93d9a9eae6a7"];
+  Node1 -> Node14 [color="midnightblue",fontsize="10",style="solid"];
+  Node14 [label="calc_rms::rms_finalize",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classcalc__rms.html#a4753dc26621e5a66675acefb3e85b0ba"];
+  Node14 -> Node4 [color="midnightblue",fontsize="10",style="solid"];
+  Node1 -> Node15 [color="midnightblue",fontsize="10",style="solid"];
+  Node15 [label="calc_rmsf::rmsf_finalize",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classcalc__rmsf.html#a7ea65c84cbb1c6f49010270f617d3340"];
+  Node15 -> Node4 [color="midnightblue",fontsize="10",style="solid"];
+  Node1 -> Node16 [color="midnightblue",fontsize="10",style="solid"];
+  Node16 [label="calc_xscore::xscore\l_finalize",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classcalc__xscore.html#a520f096fd642c5abc03bcb0cd9ee421b"];
+}

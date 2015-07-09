@@ -1,0 +1,12 @@
+<map id="calc_chemscore::g1_hb" name="calc_chemscore::g1_hb">
+<area shape="rect" id="node2" href="$classcalc__chemscore.html#ac93b5a3a788abe9cc8dc2e98dc9c50bc" title="calc_chemscore::calc\l_hbonds" alt="" coords="423,5,572,47"/>
+<area shape="rect" id="node10" href="$classcalc__chemscore.html#acdc0c2f07cc5b0046e6fa9acf7cbfa20" title="calc_chemscore::score\l_waters" alt="" coords="216,68,375,109"/>
+<area shape="rect" id="node3" href="$classcalc__chemscore.html#ac685deaa80ea9769e36c6b9ac8c8462d" title="calc_chemscore::calc\l_scores" alt="" coords="620,39,769,80"/>
+<area shape="rect" id="node4" href="$classcalc__chemscore.html#a678c1ccc18920a66c00a8fe528997561" title="calc_chemscore::score_calc" alt="" coords="817,17,1007,43"/>
+<area shape="rect" id="node8" href="$classcalc__chemscore.html#a1dbdeb7c4eb3b9068a041f3b08224417" title="calc_chemscore::score\l_precalc" alt="" coords="833,68,991,109"/>
+<area shape="rect" id="node5" href="$qcalc_8f90.html#a5befd1d444d41d7d1e4bf8b297c17ee2" title="calc_all" alt="" coords="1072,17,1139,43"/>
+<area shape="rect" id="node6" href="$qcalc_8f90.html#a93dcacb957411ed0d0471fe8a31c60d6" title="process_frame" alt="" coords="1204,17,1315,43"/>
+<area shape="rect" id="node7" href="$qcalc_8f90.html#a7d2d447954fb385bdca4f228de92b1eb" title="process_data" alt="" coords="1363,17,1465,43"/>
+<area shape="rect" id="node9" href="$qcalc_8f90.html#a6de35d783d8e2c1ffead6a9dbf61ebb6" title="do_pre_calcs" alt="" coords="1055,75,1156,102"/>
+<area shape="rect" id="node11" href="$classcalc__chemscore.html#a81ef9a983f650189ae781ea35f2d2699" title="calc_chemscore::set\l_waters" alt="" coords="425,71,569,112"/>
+</map>

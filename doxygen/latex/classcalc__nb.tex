@@ -1,0 +1,787 @@
+\hypertarget{classcalc__nb}{\subsection{calc\-\_\-nb Module Reference}
+\label{classcalc__nb}\index{calc\-\_\-nb@{calc\-\_\-nb}}
+}
+
+
+Collaboration diagram for calc\-\_\-nb\-:
+\subsubsection*{Data Types}
+\begin{DoxyCompactItemize}
+\item 
+type \hyperlink{structcalc__nb_1_1averages}{averages}
+\item 
+type \hyperlink{structcalc__nb_1_1nb__list__type}{nb\-\_\-list\-\_\-type}
+\item 
+type \hyperlink{structcalc__nb_1_1nb__qp__type}{nb\-\_\-qp\-\_\-type}
+\end{DoxyCompactItemize}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine \hyperlink{classcalc__nb_a1bbfcf548dec05c1bb35e51bb01451ee}{nb\-\_\-initialize}
+\item 
+subroutine \hyperlink{classcalc__nb_ad4b4eb1aad0d5e40cbf07579ca5306de}{nb\-\_\-finalize} (i)
+\item 
+integer function \hyperlink{classcalc__nb_a1476bae2c246aa70d62c2d574e1c3878}{nb\-\_\-add} (desc)
+\item 
+subroutine \hyperlink{classcalc__nb_ab5ed70a50d41bb040e21f2e88ca8a207}{nb\-\_\-calc} (i)
+\item 
+subroutine \hyperlink{classcalc__nb_a600889d4c85c927366dcdf744c4299e9}{nb\-\_\-calc\-\_\-lists} (N\-B\-\_\-\-Vlj, N\-B\-\_\-\-Vel, nb\-\_\-list)
+\item 
+subroutine \hyperlink{classcalc__nb_a89a57b491ed84c3a4ddc05a0c379613d}{nb\-\_\-make\-\_\-list} (mask1, mask2, nb\-\_\-list)
+\item 
+subroutine \hyperlink{classcalc__nb_aa0c90f5c7303a22f778585374acc4a5f}{nb\-\_\-heading} (i)
+\item 
+integer function \hyperlink{classcalc__nb_a6d26079e3680e2780d8c7f302b538596}{nb\-\_\-qp\-\_\-add} (desc)
+\item 
+subroutine \hyperlink{classcalc__nb_a936e04ca43919cd2cacfd48dbfac7d52}{nb\-\_\-qp\-\_\-calc} ()
+\item 
+subroutine \hyperlink{classcalc__nb_ac6032c768a8f42bc47e597e359478356}{nb\-\_\-qp\-\_\-finalize} ()
+\item 
+subroutine \hyperlink{classcalc__nb_a1bbfcf548dec05c1bb35e51bb01451ee}{nb\-\_\-initialize}
+\item 
+subroutine \hyperlink{classcalc__nb_ad4b4eb1aad0d5e40cbf07579ca5306de}{nb\-\_\-finalize} (i)
+\item 
+integer function \hyperlink{classcalc__nb_a1476bae2c246aa70d62c2d574e1c3878}{nb\-\_\-add} (desc)
+\item 
+subroutine \hyperlink{classcalc__nb_a164c516267a3ae4e3afc88523d7155fc}{calc\-\_\-center} ()
+\item 
+integer function \hyperlink{classcalc__nb_afe6975ab0a29b879c799dba1d76b9b8f}{dist\-\_\-group1} (atom2)
+\item 
+subroutine \hyperlink{classcalc__nb_ab5ed70a50d41bb040e21f2e88ca8a207}{nb\-\_\-calc} (i)
+\item 
+subroutine \hyperlink{classcalc__nb_a600889d4c85c927366dcdf744c4299e9}{nb\-\_\-calc\-\_\-lists} (N\-B\-\_\-\-Vlj, N\-B\-\_\-\-Vel, nb\-\_\-list)
+\item 
+subroutine \hyperlink{classcalc__nb_a89a57b491ed84c3a4ddc05a0c379613d}{nb\-\_\-make\-\_\-list} (mask1, mask2, nb\-\_\-list)
+\item 
+subroutine \hyperlink{classcalc__nb_aa0c90f5c7303a22f778585374acc4a5f}{nb\-\_\-heading} (i)
+\item 
+integer function \hyperlink{classcalc__nb_a6d26079e3680e2780d8c7f302b538596}{nb\-\_\-qp\-\_\-add} (desc)
+\item 
+subroutine \hyperlink{classcalc__nb_a936e04ca43919cd2cacfd48dbfac7d52}{nb\-\_\-qp\-\_\-calc} ()
+\item 
+subroutine \hyperlink{classcalc__nb_ac6032c768a8f42bc47e597e359478356}{nb\-\_\-qp\-\_\-finalize} ()
+\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+integer, parameter \hyperlink{classcalc__nb_a7608a4a45c4aa5ef92f94d77f1f5e48a}{max\-\_\-lists} = 20
+\item 
+integer, parameter \hyperlink{classcalc__nb_a7c528e28ccdf3d8e12a25c6e41456704}{max\-\_\-nb\-\_\-qp} = 1
+\item 
+type(\hyperlink{structcalc__nb_1_1averages}{averages}), dimension(\-:), \\*
+allocatable \hyperlink{classcalc__nb_a7c88dc0e90934920f9ea37a05ba4c394}{aves}
+\item 
+type(\hyperlink{structcalc__nb_1_1averages}{averages}), dimension(\-:), \\*
+allocatable \hyperlink{classcalc__nb_a8f4b9b4a7f6179d3b4284f88af41c5ae}{qp\-\_\-aves}
+\item 
+integer, dimension(\-:), allocatable \hyperlink{classcalc__nb_a6a6b018f0e4740dd22802db5b67c5d4a}{total\-\_\-frames}
+\item 
+integer \hyperlink{classcalc__nb_a3eecb536afb1b6d651d1f853fc767a40}{total\-\_\-qp\-\_\-frames} = 0
+\item 
+real, dimension(3) \hyperlink{classcalc__nb_abe9b066386968d07626e3187008e5b95}{center\-\_\-mask1}
+\item 
+real, dimension(10, 100) \hyperlink{classcalc__nb_aebba0b48c6600b0defb99f924c13adcd}{ave\-\_\-elj\-\_\-r}
+\item 
+real, dimension(100) \hyperlink{classcalc__nb_a7b2f5b555609710957cf5a10976a4033}{elj\-\_\-r}
+\end{DoxyCompactItemize}
+\subsubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+type(mask\-\_\-type), dimension(2), \\*
+target, private \hyperlink{classcalc__nb_a0fc3fbf8b087c068aa67046a251575ff}{masks}
+\item 
+integer, private \hyperlink{classcalc__nb_a2ca020a3bfebca620427efddfdf4b9a7}{nlists} = 0
+\item 
+integer, private \hyperlink{classcalc__nb_ac24ad37a8d5b587e2014a9f637a63a75}{n\-\_\-nb\-\_\-qp} = 0
+\item 
+type(\hyperlink{structcalc__nb_1_1nb__list__type}{nb\-\_\-list\-\_\-type}), dimension(\-:), \\*
+allocatable, private \hyperlink{classcalc__nb_a154f77fd66aa211714c4de1ecf541bd3}{nb\-\_\-listan}
+\item 
+type(\hyperlink{structcalc__nb_1_1nb__list__type}{nb\-\_\-list\-\_\-type}), dimension(\-:), \\*
+allocatable, private \hyperlink{classcalc__nb_a0f1fd0b4399b22ef787aa8a3c9276ebb}{nb\-\_\-list\-\_\-res}
+\item 
+type(\hyperlink{structcalc__nb_1_1nb__qp__type}{nb\-\_\-qp\-\_\-type}), private \hyperlink{classcalc__nb_ad1b1d273afd69b5db4d7d4ddc74264d9}{qp\-\_\-calc}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+
+
+Definition at line 9 of file calc\-\_\-nb.\-f90.
+
+
+
+\subsubsection{Member Function/\-Subroutine Documentation}
+\hypertarget{classcalc__nb_a164c516267a3ae4e3afc88523d7155fc}{\index{calc\-\_\-nb@{calc\-\_\-nb}!calc\-\_\-center@{calc\-\_\-center}}
+\index{calc\-\_\-center@{calc\-\_\-center}!calc_nb@{calc\-\_\-nb}}
+\paragraph[{calc\-\_\-center}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-nb\-::calc\-\_\-center (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__nb_a164c516267a3ae4e3afc88523d7155fc}
+
+
+Definition at line 152 of file calc\-\_\-nb\-\_\-radius.\-f90.
+
+
+
+Referenced by nb\-\_\-calc\-\_\-lists().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=338pt]{classcalc__nb_a164c516267a3ae4e3afc88523d7155fc_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__nb_afe6975ab0a29b879c799dba1d76b9b8f}{\index{calc\-\_\-nb@{calc\-\_\-nb}!dist\-\_\-group1@{dist\-\_\-group1}}
+\index{dist\-\_\-group1@{dist\-\_\-group1}!calc_nb@{calc\-\_\-nb}}
+\paragraph[{dist\-\_\-group1}]{\setlength{\rightskip}{0pt plus 5cm}integer function calc\-\_\-nb\-::dist\-\_\-group1 (
+\begin{DoxyParamCaption}
+\item[{integer}]{atom2}
+\end{DoxyParamCaption}
+)}}\label{classcalc__nb_afe6975ab0a29b879c799dba1d76b9b8f}
+
+
+Definition at line 194 of file calc\-\_\-nb\-\_\-radius.\-f90.
+
+
+
+Referenced by nb\-\_\-calc\-\_\-lists().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{classcalc__nb_afe6975ab0a29b879c799dba1d76b9b8f_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__nb_a1476bae2c246aa70d62c2d574e1c3878}{\index{calc\-\_\-nb@{calc\-\_\-nb}!nb\-\_\-add@{nb\-\_\-add}}
+\index{nb\-\_\-add@{nb\-\_\-add}!calc_nb@{calc\-\_\-nb}}
+\paragraph[{nb\-\_\-add}]{\setlength{\rightskip}{0pt plus 5cm}integer function calc\-\_\-nb\-::nb\-\_\-add (
+\begin{DoxyParamCaption}
+\item[{character($\ast$)}]{desc}
+\end{DoxyParamCaption}
+)}}\label{classcalc__nb_a1476bae2c246aa70d62c2d574e1c3878}
+
+
+Definition at line 70 of file calc\-\_\-nb.\-f90.
+
+
+
+References atom\-\_\-mask\-::mask\-\_\-finalize(), atom\-\_\-mask\-::mask\-\_\-initialize(), maskmanip\-::maskmanip\-\_\-make(), and nb\-\_\-make\-\_\-list().
+
+
+
+Referenced by add\-\_\-a\-\_\-calc(), and nb\-\_\-add().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__nb_a1476bae2c246aa70d62c2d574e1c3878_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__nb_a1476bae2c246aa70d62c2d574e1c3878}{\index{calc\-\_\-nb@{calc\-\_\-nb}!nb\-\_\-add@{nb\-\_\-add}}
+\index{nb\-\_\-add@{nb\-\_\-add}!calc_nb@{calc\-\_\-nb}}
+\paragraph[{nb\-\_\-add}]{\setlength{\rightskip}{0pt plus 5cm}integer function calc\-\_\-nb\-::nb\-\_\-add (
+\begin{DoxyParamCaption}
+\item[{character($\ast$)}]{desc}
+\end{DoxyParamCaption}
+)}}\label{classcalc__nb_a1476bae2c246aa70d62c2d574e1c3878}
+
+
+Definition at line 77 of file calc\-\_\-nb\-\_\-radius.\-f90.
+
+
+
+References atom\-\_\-mask\-::mask\-\_\-finalize(), atom\-\_\-mask\-::mask\-\_\-initialize(), maskmanip\-::maskmanip\-\_\-make(), nb\-\_\-add(), and nb\-\_\-make\-\_\-list().
+
+
+
+Here is the call graph for this function\-:
+
+
+\hypertarget{classcalc__nb_ab5ed70a50d41bb040e21f2e88ca8a207}{\index{calc\-\_\-nb@{calc\-\_\-nb}!nb\-\_\-calc@{nb\-\_\-calc}}
+\index{nb\-\_\-calc@{nb\-\_\-calc}!calc_nb@{calc\-\_\-nb}}
+\paragraph[{nb\-\_\-calc}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-nb\-::nb\-\_\-calc (
+\begin{DoxyParamCaption}
+\item[{integer}]{i}
+\end{DoxyParamCaption}
+)}}\label{classcalc__nb_ab5ed70a50d41bb040e21f2e88ca8a207}
+
+
+Definition at line 142 of file calc\-\_\-nb.\-f90.
+
+
+
+References nb\-\_\-calc\-\_\-lists().
+
+
+
+Referenced by calc\-\_\-all().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__nb_ab5ed70a50d41bb040e21f2e88ca8a207_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__nb_ab5ed70a50d41bb040e21f2e88ca8a207_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__nb_ab5ed70a50d41bb040e21f2e88ca8a207}{\index{calc\-\_\-nb@{calc\-\_\-nb}!nb\-\_\-calc@{nb\-\_\-calc}}
+\index{nb\-\_\-calc@{nb\-\_\-calc}!calc_nb@{calc\-\_\-nb}}
+\paragraph[{nb\-\_\-calc}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-nb\-::nb\-\_\-calc (
+\begin{DoxyParamCaption}
+\item[{integer}]{i}
+\end{DoxyParamCaption}
+)}}\label{classcalc__nb_ab5ed70a50d41bb040e21f2e88ca8a207}
+
+
+Definition at line 217 of file calc\-\_\-nb\-\_\-radius.\-f90.
+
+
+
+References nb\-\_\-calc\-\_\-lists().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__nb_ab5ed70a50d41bb040e21f2e88ca8a207_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__nb_a600889d4c85c927366dcdf744c4299e9}{\index{calc\-\_\-nb@{calc\-\_\-nb}!nb\-\_\-calc\-\_\-lists@{nb\-\_\-calc\-\_\-lists}}
+\index{nb\-\_\-calc\-\_\-lists@{nb\-\_\-calc\-\_\-lists}!calc_nb@{calc\-\_\-nb}}
+\paragraph[{nb\-\_\-calc\-\_\-lists}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-nb\-::nb\-\_\-calc\-\_\-lists (
+\begin{DoxyParamCaption}
+\item[{real(8), intent(out)}]{N\-B\-\_\-\-Vlj, }
+\item[{real(8), intent(out)}]{N\-B\-\_\-\-Vel, }
+\item[{type({\bf nb\-\_\-list\-\_\-type}), intent(in)}]{nb\-\_\-list}
+\end{DoxyParamCaption}
+)}}\label{classcalc__nb_a600889d4c85c927366dcdf744c4299e9}
+
+
+Definition at line 239 of file calc\-\_\-nb\-\_\-radius.\-f90.
+
+
+
+References calc\-\_\-center(), dist\-\_\-group1(), and calc\-\_\-rdf\-::r().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=290pt]{classcalc__nb_a600889d4c85c927366dcdf744c4299e9_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__nb_a600889d4c85c927366dcdf744c4299e9}{\index{calc\-\_\-nb@{calc\-\_\-nb}!nb\-\_\-calc\-\_\-lists@{nb\-\_\-calc\-\_\-lists}}
+\index{nb\-\_\-calc\-\_\-lists@{nb\-\_\-calc\-\_\-lists}!calc_nb@{calc\-\_\-nb}}
+\paragraph[{nb\-\_\-calc\-\_\-lists}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-nb\-::nb\-\_\-calc\-\_\-lists (
+\begin{DoxyParamCaption}
+\item[{real(8), intent(out)}]{N\-B\-\_\-\-Vlj, }
+\item[{real(8), intent(out)}]{N\-B\-\_\-\-Vel, }
+\item[{type({\bf nb\-\_\-list\-\_\-type}), intent(in)}]{nb\-\_\-list}
+\end{DoxyParamCaption}
+)}}\label{classcalc__nb_a600889d4c85c927366dcdf744c4299e9}
+
+
+Definition at line 162 of file calc\-\_\-nb.\-f90.
+
+
+
+References calc\-\_\-rdf\-::r().
+
+
+
+Referenced by nb\-\_\-calc(), and nb\-\_\-qp\-\_\-calc().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=290pt]{classcalc__nb_a600889d4c85c927366dcdf744c4299e9_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__nb_a600889d4c85c927366dcdf744c4299e9_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__nb_ad4b4eb1aad0d5e40cbf07579ca5306de}{\index{calc\-\_\-nb@{calc\-\_\-nb}!nb\-\_\-finalize@{nb\-\_\-finalize}}
+\index{nb\-\_\-finalize@{nb\-\_\-finalize}!calc_nb@{calc\-\_\-nb}}
+\paragraph[{nb\-\_\-finalize}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-nb\-::nb\-\_\-finalize (
+\begin{DoxyParamCaption}
+\item[{integer}]{i}
+\end{DoxyParamCaption}
+)}}\label{classcalc__nb_ad4b4eb1aad0d5e40cbf07579ca5306de}
+
+
+Definition at line 56 of file calc\-\_\-nb.\-f90.
+
+
+
+Referenced by finalize().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classcalc__nb_ad4b4eb1aad0d5e40cbf07579ca5306de}{\index{calc\-\_\-nb@{calc\-\_\-nb}!nb\-\_\-finalize@{nb\-\_\-finalize}}
+\index{nb\-\_\-finalize@{nb\-\_\-finalize}!calc_nb@{calc\-\_\-nb}}
+\paragraph[{nb\-\_\-finalize}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-nb\-::nb\-\_\-finalize (
+\begin{DoxyParamCaption}
+\item[{integer}]{i}
+\end{DoxyParamCaption}
+)}}\label{classcalc__nb_ad4b4eb1aad0d5e40cbf07579ca5306de}
+
+
+Definition at line 58 of file calc\-\_\-nb\-\_\-radius.\-f90.
+
+\hypertarget{classcalc__nb_aa0c90f5c7303a22f778585374acc4a5f}{\index{calc\-\_\-nb@{calc\-\_\-nb}!nb\-\_\-heading@{nb\-\_\-heading}}
+\index{nb\-\_\-heading@{nb\-\_\-heading}!calc_nb@{calc\-\_\-nb}}
+\paragraph[{nb\-\_\-heading}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-nb\-::nb\-\_\-heading (
+\begin{DoxyParamCaption}
+\item[{integer}]{i}
+\end{DoxyParamCaption}
+)}}\label{classcalc__nb_aa0c90f5c7303a22f778585374acc4a5f}
+
+
+Definition at line 449 of file calc\-\_\-nb\-\_\-radius.\-f90.
+
+\hypertarget{classcalc__nb_aa0c90f5c7303a22f778585374acc4a5f}{\index{calc\-\_\-nb@{calc\-\_\-nb}!nb\-\_\-heading@{nb\-\_\-heading}}
+\index{nb\-\_\-heading@{nb\-\_\-heading}!calc_nb@{calc\-\_\-nb}}
+\paragraph[{nb\-\_\-heading}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-nb\-::nb\-\_\-heading (
+\begin{DoxyParamCaption}
+\item[{integer}]{i}
+\end{DoxyParamCaption}
+)}}\label{classcalc__nb_aa0c90f5c7303a22f778585374acc4a5f}
+
+
+Definition at line 360 of file calc\-\_\-nb.\-f90.
+
+
+
+Referenced by print\-\_\-headings().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=307pt]{classcalc__nb_aa0c90f5c7303a22f778585374acc4a5f_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__nb_a1bbfcf548dec05c1bb35e51bb01451ee}{\index{calc\-\_\-nb@{calc\-\_\-nb}!nb\-\_\-initialize@{nb\-\_\-initialize}}
+\index{nb\-\_\-initialize@{nb\-\_\-initialize}!calc_nb@{calc\-\_\-nb}}
+\paragraph[{nb\-\_\-initialize}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-nb\-::nb\-\_\-initialize (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__nb_a1bbfcf548dec05c1bb35e51bb01451ee}
+
+
+Definition at line 47 of file calc\-\_\-nb.\-f90.
+
+
+
+Referenced by initialize().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__nb_a1bbfcf548dec05c1bb35e51bb01451ee_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__nb_a1bbfcf548dec05c1bb35e51bb01451ee}{\index{calc\-\_\-nb@{calc\-\_\-nb}!nb\-\_\-initialize@{nb\-\_\-initialize}}
+\index{nb\-\_\-initialize@{nb\-\_\-initialize}!calc_nb@{calc\-\_\-nb}}
+\paragraph[{nb\-\_\-initialize}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-nb\-::nb\-\_\-initialize (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__nb_a1bbfcf548dec05c1bb35e51bb01451ee}
+
+
+Definition at line 49 of file calc\-\_\-nb\-\_\-radius.\-f90.
+
+\hypertarget{classcalc__nb_a89a57b491ed84c3a4ddc05a0c379613d}{\index{calc\-\_\-nb@{calc\-\_\-nb}!nb\-\_\-make\-\_\-list@{nb\-\_\-make\-\_\-list}}
+\index{nb\-\_\-make\-\_\-list@{nb\-\_\-make\-\_\-list}!calc_nb@{calc\-\_\-nb}}
+\paragraph[{nb\-\_\-make\-\_\-list}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-nb\-::nb\-\_\-make\-\_\-list (
+\begin{DoxyParamCaption}
+\item[{type(mask\-\_\-type), intent(in)}]{mask1, }
+\item[{type(mask\-\_\-type), intent(in)}]{mask2, }
+\item[{type({\bf nb\-\_\-list\-\_\-type})}]{nb\-\_\-list}
+\end{DoxyParamCaption}
+)}}\label{classcalc__nb_a89a57b491ed84c3a4ddc05a0c379613d}
+
+
+Definition at line 295 of file calc\-\_\-nb\-\_\-radius.\-f90.
+
+\hypertarget{classcalc__nb_a89a57b491ed84c3a4ddc05a0c379613d}{\index{calc\-\_\-nb@{calc\-\_\-nb}!nb\-\_\-make\-\_\-list@{nb\-\_\-make\-\_\-list}}
+\index{nb\-\_\-make\-\_\-list@{nb\-\_\-make\-\_\-list}!calc_nb@{calc\-\_\-nb}}
+\paragraph[{nb\-\_\-make\-\_\-list}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-nb\-::nb\-\_\-make\-\_\-list (
+\begin{DoxyParamCaption}
+\item[{type(mask\-\_\-type), intent(in)}]{mask1, }
+\item[{type(mask\-\_\-type), intent(in)}]{mask2, }
+\item[{type({\bf nb\-\_\-list\-\_\-type})}]{nb\-\_\-list}
+\end{DoxyParamCaption}
+)}}\label{classcalc__nb_a89a57b491ed84c3a4ddc05a0c379613d}
+
+
+Definition at line 206 of file calc\-\_\-nb.\-f90.
+
+
+
+Referenced by nb\-\_\-add(), and nb\-\_\-qp\-\_\-add().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__nb_a89a57b491ed84c3a4ddc05a0c379613d_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__nb_a6d26079e3680e2780d8c7f302b538596}{\index{calc\-\_\-nb@{calc\-\_\-nb}!nb\-\_\-qp\-\_\-add@{nb\-\_\-qp\-\_\-add}}
+\index{nb\-\_\-qp\-\_\-add@{nb\-\_\-qp\-\_\-add}!calc_nb@{calc\-\_\-nb}}
+\paragraph[{nb\-\_\-qp\-\_\-add}]{\setlength{\rightskip}{0pt plus 5cm}integer function calc\-\_\-nb\-::nb\-\_\-qp\-\_\-add (
+\begin{DoxyParamCaption}
+\item[{character($\ast$)}]{desc}
+\end{DoxyParamCaption}
+)}}\label{classcalc__nb_a6d26079e3680e2780d8c7f302b538596}
+
+
+Definition at line 375 of file calc\-\_\-nb.\-f90.
+
+
+
+References parse\-::get\-\_\-int\-\_\-arg(), atom\-\_\-mask\-::mask\-\_\-add(), atom\-\_\-mask\-::mask\-\_\-clear(), atom\-\_\-mask\-::mask\-\_\-finalize(), atom\-\_\-mask\-::mask\-\_\-initialize(), maskmanip\-::maskmanip\-\_\-make(), and nb\-\_\-make\-\_\-list().
+
+
+
+Referenced by add\-\_\-a\-\_\-calc(), and nb\-\_\-qp\-\_\-add().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__nb_a6d26079e3680e2780d8c7f302b538596_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__nb_a6d26079e3680e2780d8c7f302b538596}{\index{calc\-\_\-nb@{calc\-\_\-nb}!nb\-\_\-qp\-\_\-add@{nb\-\_\-qp\-\_\-add}}
+\index{nb\-\_\-qp\-\_\-add@{nb\-\_\-qp\-\_\-add}!calc_nb@{calc\-\_\-nb}}
+\paragraph[{nb\-\_\-qp\-\_\-add}]{\setlength{\rightskip}{0pt plus 5cm}integer function calc\-\_\-nb\-::nb\-\_\-qp\-\_\-add (
+\begin{DoxyParamCaption}
+\item[{character($\ast$)}]{desc}
+\end{DoxyParamCaption}
+)}}\label{classcalc__nb_a6d26079e3680e2780d8c7f302b538596}
+
+
+Definition at line 464 of file calc\-\_\-nb\-\_\-radius.\-f90.
+
+
+
+References parse\-::get\-\_\-int\-\_\-arg(), atom\-\_\-mask\-::mask\-\_\-add(), atom\-\_\-mask\-::mask\-\_\-clear(), atom\-\_\-mask\-::mask\-\_\-finalize(), atom\-\_\-mask\-::mask\-\_\-initialize(), maskmanip\-::maskmanip\-\_\-make(), nb\-\_\-make\-\_\-list(), and nb\-\_\-qp\-\_\-add().
+
+
+
+Here is the call graph for this function\-:
+
+
+\hypertarget{classcalc__nb_a936e04ca43919cd2cacfd48dbfac7d52}{\index{calc\-\_\-nb@{calc\-\_\-nb}!nb\-\_\-qp\-\_\-calc@{nb\-\_\-qp\-\_\-calc}}
+\index{nb\-\_\-qp\-\_\-calc@{nb\-\_\-qp\-\_\-calc}!calc_nb@{calc\-\_\-nb}}
+\paragraph[{nb\-\_\-qp\-\_\-calc}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-nb\-::nb\-\_\-qp\-\_\-calc (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__nb_a936e04ca43919cd2cacfd48dbfac7d52}
+
+
+Definition at line 436 of file calc\-\_\-nb.\-f90.
+
+
+
+References nb\-\_\-calc\-\_\-lists().
+
+
+
+Referenced by calc\-\_\-all().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__nb_a936e04ca43919cd2cacfd48dbfac7d52_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__nb_a936e04ca43919cd2cacfd48dbfac7d52_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__nb_a936e04ca43919cd2cacfd48dbfac7d52}{\index{calc\-\_\-nb@{calc\-\_\-nb}!nb\-\_\-qp\-\_\-calc@{nb\-\_\-qp\-\_\-calc}}
+\index{nb\-\_\-qp\-\_\-calc@{nb\-\_\-qp\-\_\-calc}!calc_nb@{calc\-\_\-nb}}
+\paragraph[{nb\-\_\-qp\-\_\-calc}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-nb\-::nb\-\_\-qp\-\_\-calc (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__nb_a936e04ca43919cd2cacfd48dbfac7d52}
+
+
+Definition at line 523 of file calc\-\_\-nb\-\_\-radius.\-f90.
+
+
+
+References nb\-\_\-calc\-\_\-lists().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__nb_a936e04ca43919cd2cacfd48dbfac7d52_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__nb_ac6032c768a8f42bc47e597e359478356}{\index{calc\-\_\-nb@{calc\-\_\-nb}!nb\-\_\-qp\-\_\-finalize@{nb\-\_\-qp\-\_\-finalize}}
+\index{nb\-\_\-qp\-\_\-finalize@{nb\-\_\-qp\-\_\-finalize}!calc_nb@{calc\-\_\-nb}}
+\paragraph[{nb\-\_\-qp\-\_\-finalize}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-nb\-::nb\-\_\-qp\-\_\-finalize (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__nb_ac6032c768a8f42bc47e597e359478356}
+
+
+Definition at line 542 of file calc\-\_\-nb\-\_\-radius.\-f90.
+
+\hypertarget{classcalc__nb_ac6032c768a8f42bc47e597e359478356}{\index{calc\-\_\-nb@{calc\-\_\-nb}!nb\-\_\-qp\-\_\-finalize@{nb\-\_\-qp\-\_\-finalize}}
+\index{nb\-\_\-qp\-\_\-finalize@{nb\-\_\-qp\-\_\-finalize}!calc_nb@{calc\-\_\-nb}}
+\paragraph[{nb\-\_\-qp\-\_\-finalize}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-nb\-::nb\-\_\-qp\-\_\-finalize (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__nb_ac6032c768a8f42bc47e597e359478356}
+
+
+Definition at line 455 of file calc\-\_\-nb.\-f90.
+
+
+
+Referenced by finalize().
+
+
+
+Here is the caller graph for this function\-:
+
+
+
+
+\subsubsection{Member Data Documentation}
+\hypertarget{classcalc__nb_aebba0b48c6600b0defb99f924c13adcd}{\index{calc\-\_\-nb@{calc\-\_\-nb}!ave\-\_\-elj\-\_\-r@{ave\-\_\-elj\-\_\-r}}
+\index{ave\-\_\-elj\-\_\-r@{ave\-\_\-elj\-\_\-r}!calc_nb@{calc\-\_\-nb}}
+\paragraph[{ave\-\_\-elj\-\_\-r}]{\setlength{\rightskip}{0pt plus 5cm}real, dimension(10,100) calc\-\_\-nb\-::ave\-\_\-elj\-\_\-r}}\label{classcalc__nb_aebba0b48c6600b0defb99f924c13adcd}
+
+
+Definition at line 43 of file calc\-\_\-nb\-\_\-radius.\-f90.
+
+\hypertarget{classcalc__nb_a7c88dc0e90934920f9ea37a05ba4c394}{\index{calc\-\_\-nb@{calc\-\_\-nb}!aves@{aves}}
+\index{aves@{aves}!calc_nb@{calc\-\_\-nb}}
+\paragraph[{aves}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf averages}), dimension(\-:), allocatable calc\-\_\-nb\-::aves}}\label{classcalc__nb_a7c88dc0e90934920f9ea37a05ba4c394}
+
+
+Definition at line 33 of file calc\-\_\-nb.\-f90.
+
+\hypertarget{classcalc__nb_abe9b066386968d07626e3187008e5b95}{\index{calc\-\_\-nb@{calc\-\_\-nb}!center\-\_\-mask1@{center\-\_\-mask1}}
+\index{center\-\_\-mask1@{center\-\_\-mask1}!calc_nb@{calc\-\_\-nb}}
+\paragraph[{center\-\_\-mask1}]{\setlength{\rightskip}{0pt plus 5cm}real, dimension(3) calc\-\_\-nb\-::center\-\_\-mask1}}\label{classcalc__nb_abe9b066386968d07626e3187008e5b95}
+
+
+Definition at line 43 of file calc\-\_\-nb\-\_\-radius.\-f90.
+
+\hypertarget{classcalc__nb_a7b2f5b555609710957cf5a10976a4033}{\index{calc\-\_\-nb@{calc\-\_\-nb}!elj\-\_\-r@{elj\-\_\-r}}
+\index{elj\-\_\-r@{elj\-\_\-r}!calc_nb@{calc\-\_\-nb}}
+\paragraph[{elj\-\_\-r}]{\setlength{\rightskip}{0pt plus 5cm}real, dimension(100) calc\-\_\-nb\-::elj\-\_\-r}}\label{classcalc__nb_a7b2f5b555609710957cf5a10976a4033}
+
+
+Definition at line 43 of file calc\-\_\-nb\-\_\-radius.\-f90.
+
+\hypertarget{classcalc__nb_a0fc3fbf8b087c068aa67046a251575ff}{\index{calc\-\_\-nb@{calc\-\_\-nb}!masks@{masks}}
+\index{masks@{masks}!calc_nb@{calc\-\_\-nb}}
+\paragraph[{masks}]{\setlength{\rightskip}{0pt plus 5cm}type(mask\-\_\-type), dimension(2), target, private calc\-\_\-nb\-::masks\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__nb_a0fc3fbf8b087c068aa67046a251575ff}
+
+
+Definition at line 20 of file calc\-\_\-nb.\-f90.
+
+\hypertarget{classcalc__nb_a7608a4a45c4aa5ef92f94d77f1f5e48a}{\index{calc\-\_\-nb@{calc\-\_\-nb}!max\-\_\-lists@{max\-\_\-lists}}
+\index{max\-\_\-lists@{max\-\_\-lists}!calc_nb@{calc\-\_\-nb}}
+\paragraph[{max\-\_\-lists}]{\setlength{\rightskip}{0pt plus 5cm}integer parameter calc\-\_\-nb\-::max\-\_\-lists = 20}}\label{classcalc__nb_a7608a4a45c4aa5ef92f94d77f1f5e48a}
+
+
+Definition at line 17 of file calc\-\_\-nb.\-f90.
+
+\hypertarget{classcalc__nb_a7c528e28ccdf3d8e12a25c6e41456704}{\index{calc\-\_\-nb@{calc\-\_\-nb}!max\-\_\-nb\-\_\-qp@{max\-\_\-nb\-\_\-qp}}
+\index{max\-\_\-nb\-\_\-qp@{max\-\_\-nb\-\_\-qp}!calc_nb@{calc\-\_\-nb}}
+\paragraph[{max\-\_\-nb\-\_\-qp}]{\setlength{\rightskip}{0pt plus 5cm}integer parameter calc\-\_\-nb\-::max\-\_\-nb\-\_\-qp = 1}}\label{classcalc__nb_a7c528e28ccdf3d8e12a25c6e41456704}
+
+
+Definition at line 18 of file calc\-\_\-nb.\-f90.
+
+\hypertarget{classcalc__nb_ac24ad37a8d5b587e2014a9f637a63a75}{\index{calc\-\_\-nb@{calc\-\_\-nb}!n\-\_\-nb\-\_\-qp@{n\-\_\-nb\-\_\-qp}}
+\index{n\-\_\-nb\-\_\-qp@{n\-\_\-nb\-\_\-qp}!calc_nb@{calc\-\_\-nb}}
+\paragraph[{n\-\_\-nb\-\_\-qp}]{\setlength{\rightskip}{0pt plus 5cm}integer private calc\-\_\-nb\-::n\-\_\-nb\-\_\-qp = 0\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__nb_ac24ad37a8d5b587e2014a9f637a63a75}
+
+
+Definition at line 22 of file calc\-\_\-nb.\-f90.
+
+\hypertarget{classcalc__nb_a0f1fd0b4399b22ef787aa8a3c9276ebb}{\index{calc\-\_\-nb@{calc\-\_\-nb}!nb\-\_\-list\-\_\-res@{nb\-\_\-list\-\_\-res}}
+\index{nb\-\_\-list\-\_\-res@{nb\-\_\-list\-\_\-res}!calc_nb@{calc\-\_\-nb}}
+\paragraph[{nb\-\_\-list\-\_\-res}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf nb\-\_\-list\-\_\-type}), dimension(\-:), allocatable, private calc\-\_\-nb\-::nb\-\_\-list\-\_\-res\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__nb_a0f1fd0b4399b22ef787aa8a3c9276ebb}
+
+
+Definition at line 29 of file calc\-\_\-nb.\-f90.
+
+\hypertarget{classcalc__nb_a154f77fd66aa211714c4de1ecf541bd3}{\index{calc\-\_\-nb@{calc\-\_\-nb}!nb\-\_\-listan@{nb\-\_\-listan}}
+\index{nb\-\_\-listan@{nb\-\_\-listan}!calc_nb@{calc\-\_\-nb}}
+\paragraph[{nb\-\_\-listan}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf nb\-\_\-list\-\_\-type}), dimension(\-:), allocatable, private calc\-\_\-nb\-::nb\-\_\-listan\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__nb_a154f77fd66aa211714c4de1ecf541bd3}
+
+
+Definition at line 28 of file calc\-\_\-nb.\-f90.
+
+\hypertarget{classcalc__nb_a2ca020a3bfebca620427efddfdf4b9a7}{\index{calc\-\_\-nb@{calc\-\_\-nb}!nlists@{nlists}}
+\index{nlists@{nlists}!calc_nb@{calc\-\_\-nb}}
+\paragraph[{nlists}]{\setlength{\rightskip}{0pt plus 5cm}integer private calc\-\_\-nb\-::nlists = 0\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__nb_a2ca020a3bfebca620427efddfdf4b9a7}
+
+
+Definition at line 21 of file calc\-\_\-nb.\-f90.
+
+\hypertarget{classcalc__nb_a8f4b9b4a7f6179d3b4284f88af41c5ae}{\index{calc\-\_\-nb@{calc\-\_\-nb}!qp\-\_\-aves@{qp\-\_\-aves}}
+\index{qp\-\_\-aves@{qp\-\_\-aves}!calc_nb@{calc\-\_\-nb}}
+\paragraph[{qp\-\_\-aves}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf averages}), dimension(\-:), allocatable calc\-\_\-nb\-::qp\-\_\-aves}}\label{classcalc__nb_a8f4b9b4a7f6179d3b4284f88af41c5ae}
+
+
+Definition at line 34 of file calc\-\_\-nb.\-f90.
+
+\hypertarget{classcalc__nb_ad1b1d273afd69b5db4d7d4ddc74264d9}{\index{calc\-\_\-nb@{calc\-\_\-nb}!qp\-\_\-calc@{qp\-\_\-calc}}
+\index{qp\-\_\-calc@{qp\-\_\-calc}!calc_nb@{calc\-\_\-nb}}
+\paragraph[{qp\-\_\-calc}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf nb\-\_\-qp\-\_\-type}), private calc\-\_\-nb\-::qp\-\_\-calc\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__nb_ad1b1d273afd69b5db4d7d4ddc74264d9}
+
+
+Definition at line 41 of file calc\-\_\-nb.\-f90.
+
+\hypertarget{classcalc__nb_a6a6b018f0e4740dd22802db5b67c5d4a}{\index{calc\-\_\-nb@{calc\-\_\-nb}!total\-\_\-frames@{total\-\_\-frames}}
+\index{total\-\_\-frames@{total\-\_\-frames}!calc_nb@{calc\-\_\-nb}}
+\paragraph[{total\-\_\-frames}]{\setlength{\rightskip}{0pt plus 5cm}integer, dimension(\-:), allocatable calc\-\_\-nb\-::total\-\_\-frames}}\label{classcalc__nb_a6a6b018f0e4740dd22802db5b67c5d4a}
+
+
+Definition at line 35 of file calc\-\_\-nb.\-f90.
+
+\hypertarget{classcalc__nb_a3eecb536afb1b6d651d1f853fc767a40}{\index{calc\-\_\-nb@{calc\-\_\-nb}!total\-\_\-qp\-\_\-frames@{total\-\_\-qp\-\_\-frames}}
+\index{total\-\_\-qp\-\_\-frames@{total\-\_\-qp\-\_\-frames}!calc_nb@{calc\-\_\-nb}}
+\paragraph[{total\-\_\-qp\-\_\-frames}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-nb\-::total\-\_\-qp\-\_\-frames = 0}}\label{classcalc__nb_a3eecb536afb1b6d651d1f853fc767a40}
+
+
+Definition at line 36 of file calc\-\_\-nb.\-f90.
+
+
+
+The documentation for this module was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{calc__nb_8f90}{calc\-\_\-nb.\-f90}\item 
+\hyperlink{calc__nb__radius_8f90}{calc\-\_\-nb\-\_\-radius.\-f90}\end{DoxyCompactItemize}

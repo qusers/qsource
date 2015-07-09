@@ -1,0 +1,346 @@
+%===============================================================================
+%  Preamble
+%===============================================================================
+\documentclass[10pt, oneside, pdftex]{article}
+\renewcommand{\thefootnote}{\roman{footnote}}
+\usepackage{amsmath, amstext, amsfonts, amssymb}
+\usepackage{xcolor}
+\definecolor{bl}{rgb}{0.0,0.2,0.6}
+\usepackage{sectsty}
+\usepackage{url}
+\usepackage{fancyvrb}
+\usepackage{setspace}
+\singlespacing
+\usepackage[left=2.54cm,bottom=2.00cm,top=2.00cm,right=2.54cm]{geometry}
+\usepackage[compact]{titlesec}
+%\allsectionsfont{\color{bl}\scshape\selectfont}
+\allsectionsfont{\color{bl}}
+%\usepackage{chapterbib}
+%\includeonly{chapter1}
+%\usepackage{pdflscape}
+%\usepackage[style=reading, sorting=ynt]{biblatex}
+
+
+%===============================================================================
+% Setup of lstlisting
+%===============================================================================
+\usepackage{listings}
+\usepackage{color}
+\definecolor{deepblue}{rgb}{0,0,0.5}
+\definecolor{deepred}{rgb}{0.6,0,0}
+\definecolor{deepgreen}{rgb}{0,0.5,0}
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb, 
+language=bash, 
+aboveskip=3mm,
+belowskip=3mm, 
+showstringspaces=false, 
+columns=flexible,
+basicstyle={\small\ttfamily}, 
+numbers=none,
+numberstyle=\tiny\color{gray}, 
+keywordstyle=\color{blue},
+commentstyle=\color{dkgreen},
+stringstyle=\color{mauve},
+breaklines=true,
+breakatwhitespace=true,
+tabsize=3}
+
+
+
+%===============================================================================
+%  Fonts in Document
+%===============================================================================
+%\usepackage{times}
+%\usepackage{pslatex}
+%\usepackage{newcent}
+%\usepackage{palatcm}
+%\usepackage{palatino}
+%\usepackage[T1]{fontenc}
+\usepackage[scaled]{helvet}
+\renewcommand*\familydefault{\sfdefault}
+%\renewcommand*{\encodingdefault}{T1}
+% For more options go to: http://www.tug.dk/FontCatalogue/
+\usepackage[colorinlistoftodos]{todonotes}
+
+
+%===============================================================================
+% Definitions
+%===============================================================================
+% Define a new command that prints the title only
+\makeatletter                                           % Begin definition
+\def\printtitle{                                        % Define command: \printtitle
+{\color{bl} \centering \huge \sc \textbf{\@title}\par}} % Typesetting
+\makeatother                                            % End definition
+
+\title{Q DEVELOPERS MANUAL} %\\
+%    \large \vspace*{-10pt}A Developers Manual for Q.\vspace*{10pt}}
+
+% Define a new command that prints the author(s) only
+\makeatletter                            % Begin definition
+\def\printauthor{                        % Define command: \printauthor
+{\centering \small \@author}}            % Typesetting
+\makeatother                             % End definition
+
+\author{
+    Mauricio Esguerra \\
+    mauricio.esguerra@gmail.com \\
+    \vspace{20pt}
+    }
+
+% Custom headers and footers
+\usepackage{fancyhdr}
+\pagestyle{fancy}                    % Enabling the custom headers/footers
+\usepackage{lastpage}
+% Header (empty)
+\lhead{}
+\chead{}
+\rhead{}
+% Footer (you may change this to your own needs)
+\lfoot{\footnotesize \texttt{mesguerra.org} - Q Development}
+\cfoot{}
+\rfoot{\footnotesize page \thepage\ }%of \pageref{LastPage}}    % "Page 1 of 2"
+\renewcommand{\headrulewidth}{0.0pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% Change the abstract environment
+\usepackage[runin]{abstract}             % runin option for a run-in title
+\setlength\absleftindent{30pt}           % left margin
+\setlength\absrightindent{30pt}          % right margin
+\abslabeldelim{\quad}                    %
+\setlength{\abstitleskip}{-10pt}
+\renewcommand{\abstractname}{}
+\renewcommand{\abstracttextfont}{\color{bl} \small \slshape}    % slanted text
+
+%===============================================================================
+% Start document
+%===============================================================================
+\begin{document}
+\printtitle
+\printauthor
+\tableofcontents
+%\bibliographystyle{plainurl}
+\bibliographystyle{nar}
+\section{Introduction}
+This is the developers manual for \textbf{Q}. the free enegies from molecular dynamics
+program.
+Q is entirely writen in Fortran. It's initial development was in Fortran 90, but
+the incorporation of object oriented paradigms into modern Fortran have seen
+the code evolve to take advantage of the evolution of the language.
+
+A very convenient trick fro cleaning up the code is:
+
+emacs --batch md.f90 -f mark-whole-buffer -f f90-indent-subprogram -f save-buffer
+
+\label{makefile}
+\subsection{makefile}
+
+\label{clusterarchitectures}
+\subsection{Cluster Architectures}
+
+\label{debugging}
+\subsection{Debugging}
+
+\label{profiling}
+\subsection{profiling}
+
+\label{bestpractices}
+\subsection{Best Practices}
+
+\url{http://www.fortran90.org/src/best-practices.html}
+
+\label{changelog}
+\section{ChangeLog}
+
+\label{schedule}
+\section{Release Schedule}
+
+\label{qprep}
+\section{qprep}
+\textbf{qprep} is the utility which allows the translation of pdb files into
+a format which the dynamics engine can understand. The main file generated
+by \textbf{qprep} is refered to as the topology.
+
+\lstset{language=sh, frame=single}
+%\begin{Verbatim}[numbers=left]
+\fvset{frame=single, fontfamily=courier, fontsize=\small}
+%\fvset{frame=single, fontfamily=courier}
+\begin{Verbatim}
+bash-3.1\$ qprep generate.inp >& generate.out &
+\end{Verbatim}
+
+
+\begin{Verbatim}
+bash-3.1\$ pwd
+/home/username
+bash-3.1\$ cd Desktop
+bash-3.1\$ ls
+Trash
+\end{Verbatim}
+
+
+\section{qdyn}
+\textbf{qdyn} is compiled using the following explicit rules:
+-ffree-line-length-none
+-fcray-pointer
+-fall-intrinsics 
+-std=legacy 
+-Wall 
+-Wtabs 
+-fstack-protector 
+-O3 
+-DG95=1 -c 
+
+Development flags recommended from fortran90.org:
+-Wall -Wextra -Wimplicit-interface -fPIC -fmax-errors=1 -g -fcheck=all -fbacktrace
+
+Production flags recommended from fortran90.org:
+-Wall -Wextra -Wimplicit-interface -fPIC -Werror -fmax-errors=1 -O3 -march=native -ffast-math -funroll-loops
+
+
+sizes: Does this.
+Modules used= NONE
+
+
+nrgy: Does this.
+Modules used= sizes
+Subroutines: 
+  nrgy\_startup = empty
+  put\_ene = 
+
+Functions:
+
+
+mpiglob: Declares global variables for MPI parallelization of qdyn
+Modules used = nrgy
+Subroutines:
+
+Functions:
+
+
+misc:
+Modules used = sizes
+Subroutines:
+
+Functions:
+
+
+prmfile: Data files parser.
+Modules used = misc
+Subroutines: 
+  prmfile\_startup = EMPTY ? WTF
+
+
+Functions:
+
+
+index:
+Modules used = NONE
+
+
+topo:
+Modules used = sizes, misc
+Subroutines: 
+  topo\_startup = EMPTY ? WTF
+
+
+Functions:
+
+
+qatom:
+Modules used = sizes, nrgy, misc, prmfile, indexer, topo
+
+
+mask:
+Modules used = topo
+
+
+trj:
+Modules used = atom\_mask, misc
+
+
+
+
+-DG95=1 -cpp -c
+
+md: This is the main molecular dynamics \textit{module}.
+Modules used = 
+
+
+qdyn: This file contains the main \textbf{qdyn} \textit{program} code.
+Modules used = 
+
+
+
+
+\subsection{subsection 1}
+
+Make sure to have the location of the binaries on your path.\\
+
+\noindent
+Make sure to modify rungms to have the path to the gamess binary and
+also the location of scratch.\\
+
+\noindent
+Make a  symbolic link to the  mac executable which comes  with a funky
+name.
+
+\section{qfep}
+
+
+\section{qcalc}
+
+\section{Links}
+The following  is a  collection of reference  links useful  for fotran
+programers.
+
+The description of the GNU Compiler Collection (gcc) version 5.1.0
+\url{https://gcc.gnu.org/onlinedocs/gcc-5.1.0/gfortran.pdf}
+
+
+\subsection{Doxygen}
+To  automatically document  fortran  code the  only current  available
+option is doxygen.
+To  use doxygen  a  configuration  file is  necessary.  This has  been
+downloaded from:\\
+
+\url{https://modelingguru.nasa.gov/docs/DOC-1811}
+
+And modified to our needs.
+
+Just doing:
+
+\begin{lstlisting}
+doxygen DoxygenConfigFortran
+\end{lstlisting}
+
+
+Generates html code which we make available at:
+
+doxygen.qdyn.org
+
+A mainfile document is included in the file maintext.txt
+
+
+
+\subsection{Fortran codes available online}
+
+These  projects  are  a  good resource  to  check-out  development  and
+practices on coding.
+
+Gyro-Kinetics at Warwick. A program for turbulence study in plasmas.\\
+\url{https://bitbucket.org/gkw/gkw/wiki/Home}
+
+OpenMC. A Monte Carlo code.\\
+\url{https://github.com/mit-crpg/openmc}
+
+
+A collection of generic Fortran routines.
+\url{https://github.com/astrofrog/fortranlib}
+
+
+\bibliography{biblio}
+\end{document}

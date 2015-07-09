@@ -1,0 +1,6 @@
+<map id="calc_xscore::molecule_look_for_a_ring" name="calc_xscore::molecule_look_for_a_ring">
+<area shape="rect" id="node2" href="$classcalc__xscore.html#afe09b13e46b154cabd9436e46b49af46" title="calc_xscore::molecule\l_clean_choices" alt="" coords="234,5,387,47"/>
+<area shape="rect" id="node3" href="$classcalc__xscore.html#afadd2d70a94b99a5425e95d68277955a" title="calc_xscore::molecule\l_get_choices" alt="" coords="234,71,387,112"/>
+<area shape="rect" id="node4" href="$classcalc__xscore.html#a7b3d7dc22dbf0fcbf737f0e145c250db" title="calc_xscore::molecule\l_reset_choices" alt="" coords="234,136,387,177"/>
+<area shape="rect" id="node5" href="$classcalc__xscore.html#a17318018eb24d9905711f7408ae387d0" title="calc_xscore::molecule\l_two_bonds_connection_check" alt="" coords="207,201,415,243"/>
+</map>

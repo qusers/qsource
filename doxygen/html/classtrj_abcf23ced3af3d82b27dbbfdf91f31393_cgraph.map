@@ -1,0 +1,5 @@
+<map id="trj::trj_initialize" name="trj::trj_initialize">
+<area shape="rect" id="node2" href="$classatom__mask.html#a37135eea76c381c4aacee5cc9fbce046" title="atom_mask::mask_initialize" alt="" coords="160,31,345,57"/>
+<area shape="rect" id="node3" href="$classatom__mask.html#aa33256b4eb2abd74f319e47e7f9c67b8" title="atom_mask::mask_clear" alt="" coords="393,5,560,32"/>
+<area shape="rect" id="node4" href="$classatom__mask.html#a4d3aff857c97591b916a1ee064cb7cef" title="atom_mask::set_solute" alt="" coords="397,56,556,83"/>
+</map>

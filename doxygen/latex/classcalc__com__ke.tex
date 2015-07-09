@@ -1,0 +1,515 @@
+\hypertarget{classcalc__com__ke}{\subsection{calc\-\_\-com\-\_\-ke Module Reference}
+\label{classcalc__com__ke}\index{calc\-\_\-com\-\_\-ke@{calc\-\_\-com\-\_\-ke}}
+}
+
+
+Collaboration diagram for calc\-\_\-com\-\_\-ke\-:
+\subsubsection*{Data Types}
+\begin{DoxyCompactItemize}
+\item 
+type \hyperlink{structcalc__com__ke_1_1com__ke__coord__type}{com\-\_\-ke\-\_\-coord\-\_\-type}
+\item 
+type \hyperlink{structcalc__com__ke_1_1com__ke__velocity__type}{com\-\_\-ke\-\_\-velocity\-\_\-type}
+\item 
+type \hyperlink{structcalc__com__ke_1_1coord__type}{coord\-\_\-type}
+\item 
+type \hyperlink{structcalc__com__ke_1_1dp__type}{dp\-\_\-type}
+\item 
+type \hyperlink{structcalc__com__ke_1_1eigen__stuff__type}{eigen\-\_\-stuff\-\_\-type}
+\item 
+type \hyperlink{structcalc__com__ke_1_1mass__ave__type}{mass\-\_\-ave\-\_\-type}
+\end{DoxyCompactItemize}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine \hyperlink{classcalc__com__ke_abc5eddcd6ef58c3f77818ce4e55e32f2}{com\-\_\-ke\-\_\-initialize}
+\item 
+subroutine \hyperlink{classcalc__com__ke_a089d44e2e8eacfbd26da425a497530c5}{com\-\_\-ke\-\_\-finalize} (i)
+\item 
+integer function \hyperlink{classcalc__com__ke_a3c4a60a828ca4c037ffd87b608f6a8f7}{com\-\_\-ke\-\_\-add} (desc)
+\item 
+subroutine \hyperlink{classcalc__com__ke_a4721321fae51d63d7da0b33189366be2}{com\-\_\-ke\-\_\-calc} (i)
+\item 
+subroutine \hyperlink{classcalc__com__ke_adbdad96c615f5ba3734dbb189d877196}{com\-\_\-ke\-\_\-put\-\_\-mass} (i)
+\item 
+subroutine \hyperlink{classcalc__com__ke_a174b352e5b338775e20a4c1c0e547a35}{com\-\_\-ke\-\_\-heading} (i)
+\item 
+subroutine \hyperlink{classcalc__com__ke_a103eff9968044cf67aae4fcef67d0192}{eigen} (A, R, N, M\-V)
+\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+integer, parameter \hyperlink{classcalc__com__ke_aa0ccd626cbe2c83360fc3f3f322a49e3}{max\-\_\-masks} = 10
+\item 
+real(8), dimension(\-:), allocatable \hyperlink{classcalc__com__ke_a248bef710a3fedc054f7af9a972aaa5f}{kineticenergy}
+\end{DoxyCompactItemize}
+\subsubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+integer, parameter, private \hyperlink{classcalc__com__ke_afdf7cc08c8fb9e8f9a433c4919663503}{conversion\-\_\-factor} = 2390.\-0574
+\item 
+integer, dimension(\hyperlink{classcalc__com__ke_aa0ccd626cbe2c83360fc3f3f322a49e3}{max\-\_\-masks}), \\*
+private \hyperlink{classcalc__com__ke_a1d9d59d1dc719a2be09f5b5484fdb8b1}{frames}
+\item 
+integer, private \hyperlink{classcalc__com__ke_a7be3639c20eb8ceb3a5180b4d48f22ab}{apa}
+\item 
+type(mask\-\_\-type), dimension(\hyperlink{classcalc__com__ke_aa0ccd626cbe2c83360fc3f3f322a49e3}{max\-\_\-masks}), \\*
+target, private \hyperlink{classcalc__com__ke_a41821b7546d671ba29964180d9d536ed}{masks}
+\item 
+integer, private \hyperlink{classcalc__com__ke_a0c21c8581f9203021d13114bb2febf6f}{nmasks} = 0
+\item 
+type(\hyperlink{structcalc__com__ke_1_1com__ke__coord__type}{com\-\_\-ke\-\_\-coord\-\_\-type}), \\*
+dimension(\hyperlink{classcalc__com__ke_aa0ccd626cbe2c83360fc3f3f322a49e3}{max\-\_\-masks}), private \hyperlink{classcalc__com__ke_a99b829fb93b7f8b50f1886f5cdc00cfe}{coords\-\_\-mass}
+\item 
+type(\hyperlink{structcalc__com__ke_1_1com__ke__coord__type}{com\-\_\-ke\-\_\-coord\-\_\-type}), \\*
+dimension(\hyperlink{classcalc__com__ke_aa0ccd626cbe2c83360fc3f3f322a49e3}{max\-\_\-masks}), private \hyperlink{classcalc__com__ke_a5291cdd2e129d0f9af13b186501cb4be}{prev\-\_\-coords\-\_\-mass}
+\item 
+type(\hyperlink{structcalc__com__ke_1_1com__ke__velocity__type}{com\-\_\-ke\-\_\-velocity\-\_\-type}), \\*
+dimension(\hyperlink{classcalc__com__ke_aa0ccd626cbe2c83360fc3f3f322a49e3}{max\-\_\-masks}), private \hyperlink{classcalc__com__ke_a23f9559a29dfbfe86caa7f7b1c64fca3}{velocity}
+\item 
+type(\hyperlink{structcalc__com__ke_1_1com__ke__velocity__type}{com\-\_\-ke\-\_\-velocity\-\_\-type}), \\*
+dimension(\hyperlink{classcalc__com__ke_aa0ccd626cbe2c83360fc3f3f322a49e3}{max\-\_\-masks}), private \hyperlink{classcalc__com__ke_adeeef7662bb6f9e230674e2cdd1a9052}{rel\-\_\-coords}
+\item 
+type(\hyperlink{structcalc__com__ke_1_1com__ke__velocity__type}{com\-\_\-ke\-\_\-velocity\-\_\-type}), \\*
+dimension(\hyperlink{classcalc__com__ke_aa0ccd626cbe2c83360fc3f3f322a49e3}{max\-\_\-masks}), private \hyperlink{classcalc__com__ke_a15c550633f7b3816a88580eaa15f66f8}{prev\-\_\-rel\-\_\-coords}
+\item 
+type(\hyperlink{structcalc__com__ke_1_1com__ke__velocity__type}{com\-\_\-ke\-\_\-velocity\-\_\-type}), \\*
+dimension(\hyperlink{classcalc__com__ke_aa0ccd626cbe2c83360fc3f3f322a49e3}{max\-\_\-masks}, \\*
+3), private \hyperlink{classcalc__com__ke_a61064252381e46ec3bd532069234fc1d}{rad\-\_\-vec}
+\item 
+type(\hyperlink{structcalc__com__ke_1_1coord__type}{coord\-\_\-type}), dimension(\hyperlink{classcalc__com__ke_aa0ccd626cbe2c83360fc3f3f322a49e3}{max\-\_\-masks}), \\*
+private \hyperlink{classcalc__com__ke_addbd4c3ed8ec1df3151b8b40b69a06dd}{coords}
+\item 
+type(\hyperlink{structcalc__com__ke_1_1coord__type}{coord\-\_\-type}), dimension(\hyperlink{classcalc__com__ke_aa0ccd626cbe2c83360fc3f3f322a49e3}{max\-\_\-masks}), \\*
+private \hyperlink{classcalc__com__ke_aa0c81fdb3bca271a5cbd1d8db205dd9d}{prev\-\_\-coords}
+\item 
+type(\hyperlink{structcalc__com__ke_1_1dp__type}{dp\-\_\-type}), dimension(\hyperlink{classcalc__com__ke_aa0ccd626cbe2c83360fc3f3f322a49e3}{max\-\_\-masks}), \\*
+private \hyperlink{classcalc__com__ke_aa5cda373aecf567fcffcdb4103785cdc}{dp\-\_\-vect}
+\item 
+type(\hyperlink{structcalc__com__ke_1_1mass__ave__type}{mass\-\_\-ave\-\_\-type}), dimension(\hyperlink{classcalc__com__ke_aa0ccd626cbe2c83360fc3f3f322a49e3}{max\-\_\-masks}), \\*
+private \hyperlink{classcalc__com__ke_a3f05fe3d94a0af06d38aa7d063ccacc4}{mass\-\_\-ave}
+\item 
+type(\hyperlink{structcalc__com__ke_1_1mass__ave__type}{mass\-\_\-ave\-\_\-type}), dimension(\hyperlink{classcalc__com__ke_aa0ccd626cbe2c83360fc3f3f322a49e3}{max\-\_\-masks}), \\*
+private \hyperlink{classcalc__com__ke_acfb72c0740a9626bae7bd565ff0a9844}{prev\-\_\-mass\-\_\-ave}
+\item 
+type(\hyperlink{structcalc__com__ke_1_1mass__ave__type}{mass\-\_\-ave\-\_\-type}), dimension(\hyperlink{classcalc__com__ke_aa0ccd626cbe2c83360fc3f3f322a49e3}{max\-\_\-masks}, \\*
+3), private \hyperlink{classcalc__com__ke_a64928951c01426eecbeff5f6310dbab9}{ang\-\_\-momentum}
+\item 
+type(\hyperlink{structcalc__com__ke_1_1eigen__stuff__type}{eigen\-\_\-stuff\-\_\-type}), \\*
+dimension(\hyperlink{classcalc__com__ke_aa0ccd626cbe2c83360fc3f3f322a49e3}{max\-\_\-masks}), private \hyperlink{classcalc__com__ke_a5cfdb84100f1ab18b77834edb7640dfd}{eigen\-\_\-stuff}
+\item 
+real, dimension(\hyperlink{classcalc__com__ke_aa0ccd626cbe2c83360fc3f3f322a49e3}{max\-\_\-masks}), private \hyperlink{classcalc__com__ke_a267edd7154fc7328559b2166aaa09a6f}{tot\-\_\-mass}
+\item 
+real, dimension(\hyperlink{classcalc__com__ke_aa0ccd626cbe2c83360fc3f3f322a49e3}{max\-\_\-masks}, \\*
+3), private \hyperlink{classcalc__com__ke_ab6b98a0e1a1174c347a566ee87d6968f}{ke\-\_\-rot}
+\item 
+logical, dimension(\hyperlink{classcalc__com__ke_aa0ccd626cbe2c83360fc3f3f322a49e3}{max\-\_\-masks}), \\*
+private \hyperlink{classcalc__com__ke_aaa14f98bd5343cc4fbdb740b7a6936b2}{first\-\_\-frame} = .true.
+\item 
+real, private \hyperlink{classcalc__com__ke_a2d596d2857cde02b13a7f4626d66c877}{frame\-\_\-length} = 0
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+
+
+Definition at line 6 of file calc\-\_\-com\-\_\-ke.\-f90.
+
+
+
+\subsubsection{Member Function/\-Subroutine Documentation}
+\hypertarget{classcalc__com__ke_a3c4a60a828ca4c037ffd87b608f6a8f7}{\index{calc\-\_\-com\-\_\-ke@{calc\-\_\-com\-\_\-ke}!com\-\_\-ke\-\_\-add@{com\-\_\-ke\-\_\-add}}
+\index{com\-\_\-ke\-\_\-add@{com\-\_\-ke\-\_\-add}!calc_com_ke@{calc\-\_\-com\-\_\-ke}}
+\paragraph[{com\-\_\-ke\-\_\-add}]{\setlength{\rightskip}{0pt plus 5cm}integer function calc\-\_\-com\-\_\-ke\-::com\-\_\-ke\-\_\-add (
+\begin{DoxyParamCaption}
+\item[{character($\ast$)}]{desc}
+\end{DoxyParamCaption}
+)}}\label{classcalc__com__ke_a3c4a60a828ca4c037ffd87b608f6a8f7}
+
+
+Definition at line 71 of file calc\-\_\-com\-\_\-ke.\-f90.
+
+
+
+References com\-\_\-ke\-\_\-put\-\_\-mass(), atom\-\_\-mask\-::mask\-\_\-finalize(), atom\-\_\-mask\-::mask\-\_\-initialize(), and maskmanip\-::maskmanip\-\_\-make().
+
+
+
+Referenced by add\-\_\-a\-\_\-calc().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__com__ke_a3c4a60a828ca4c037ffd87b608f6a8f7_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__com__ke_a4721321fae51d63d7da0b33189366be2}{\index{calc\-\_\-com\-\_\-ke@{calc\-\_\-com\-\_\-ke}!com\-\_\-ke\-\_\-calc@{com\-\_\-ke\-\_\-calc}}
+\index{com\-\_\-ke\-\_\-calc@{com\-\_\-ke\-\_\-calc}!calc_com_ke@{calc\-\_\-com\-\_\-ke}}
+\paragraph[{com\-\_\-ke\-\_\-calc}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-com\-\_\-ke\-::com\-\_\-ke\-\_\-calc (
+\begin{DoxyParamCaption}
+\item[{integer, intent(in)}]{i}
+\end{DoxyParamCaption}
+)}}\label{classcalc__com__ke_a4721321fae51d63d7da0b33189366be2}
+
+
+Definition at line 138 of file calc\-\_\-com\-\_\-ke.\-f90.
+
+
+
+References eigen(), and atom\-\_\-mask\-::mask\-\_\-get().
+
+
+
+Referenced by calc\-\_\-all().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__com__ke_a4721321fae51d63d7da0b33189366be2_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__com__ke_a4721321fae51d63d7da0b33189366be2_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__com__ke_a089d44e2e8eacfbd26da425a497530c5}{\index{calc\-\_\-com\-\_\-ke@{calc\-\_\-com\-\_\-ke}!com\-\_\-ke\-\_\-finalize@{com\-\_\-ke\-\_\-finalize}}
+\index{com\-\_\-ke\-\_\-finalize@{com\-\_\-ke\-\_\-finalize}!calc_com_ke@{calc\-\_\-com\-\_\-ke}}
+\paragraph[{com\-\_\-ke\-\_\-finalize}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-com\-\_\-ke\-::com\-\_\-ke\-\_\-finalize (
+\begin{DoxyParamCaption}
+\item[{integer}]{i}
+\end{DoxyParamCaption}
+)}}\label{classcalc__com__ke_a089d44e2e8eacfbd26da425a497530c5}
+
+
+Definition at line 65 of file calc\-\_\-com\-\_\-ke.\-f90.
+
+
+
+References atom\-\_\-mask\-::mask\-\_\-finalize().
+
+
+
+Referenced by finalize().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classcalc__com__ke_a174b352e5b338775e20a4c1c0e547a35}{\index{calc\-\_\-com\-\_\-ke@{calc\-\_\-com\-\_\-ke}!com\-\_\-ke\-\_\-heading@{com\-\_\-ke\-\_\-heading}}
+\index{com\-\_\-ke\-\_\-heading@{com\-\_\-ke\-\_\-heading}!calc_com_ke@{calc\-\_\-com\-\_\-ke}}
+\paragraph[{com\-\_\-ke\-\_\-heading}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-com\-\_\-ke\-::com\-\_\-ke\-\_\-heading (
+\begin{DoxyParamCaption}
+\item[{integer}]{i}
+\end{DoxyParamCaption}
+)}}\label{classcalc__com__ke_a174b352e5b338775e20a4c1c0e547a35}
+
+
+Definition at line 306 of file calc\-\_\-com\-\_\-ke.\-f90.
+
+
+
+Referenced by print\-\_\-headings().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{classcalc__com__ke_a174b352e5b338775e20a4c1c0e547a35_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__com__ke_abc5eddcd6ef58c3f77818ce4e55e32f2}{\index{calc\-\_\-com\-\_\-ke@{calc\-\_\-com\-\_\-ke}!com\-\_\-ke\-\_\-initialize@{com\-\_\-ke\-\_\-initialize}}
+\index{com\-\_\-ke\-\_\-initialize@{com\-\_\-ke\-\_\-initialize}!calc_com_ke@{calc\-\_\-com\-\_\-ke}}
+\paragraph[{com\-\_\-ke\-\_\-initialize}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-com\-\_\-ke\-::com\-\_\-ke\-\_\-initialize (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__com__ke_abc5eddcd6ef58c3f77818ce4e55e32f2}
+
+
+Definition at line 62 of file calc\-\_\-com\-\_\-ke.\-f90.
+
+
+
+Referenced by initialize().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__com__ke_abc5eddcd6ef58c3f77818ce4e55e32f2_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__com__ke_adbdad96c615f5ba3734dbb189d877196}{\index{calc\-\_\-com\-\_\-ke@{calc\-\_\-com\-\_\-ke}!com\-\_\-ke\-\_\-put\-\_\-mass@{com\-\_\-ke\-\_\-put\-\_\-mass}}
+\index{com\-\_\-ke\-\_\-put\-\_\-mass@{com\-\_\-ke\-\_\-put\-\_\-mass}!calc_com_ke@{calc\-\_\-com\-\_\-ke}}
+\paragraph[{com\-\_\-ke\-\_\-put\-\_\-mass}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-com\-\_\-ke\-::com\-\_\-ke\-\_\-put\-\_\-mass (
+\begin{DoxyParamCaption}
+\item[{integer}]{i}
+\end{DoxyParamCaption}
+)}}\label{classcalc__com__ke_adbdad96c615f5ba3734dbb189d877196}
+
+
+Definition at line 283 of file calc\-\_\-com\-\_\-ke.\-f90.
+
+
+
+Referenced by com\-\_\-ke\-\_\-add().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__com__ke_adbdad96c615f5ba3734dbb189d877196_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__com__ke_a103eff9968044cf67aae4fcef67d0192}{\index{calc\-\_\-com\-\_\-ke@{calc\-\_\-com\-\_\-ke}!eigen@{eigen}}
+\index{eigen@{eigen}!calc_com_ke@{calc\-\_\-com\-\_\-ke}}
+\paragraph[{eigen}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-com\-\_\-ke\-::eigen (
+\begin{DoxyParamCaption}
+\item[{double precision, dimension(1)}]{A, }
+\item[{double precision, dimension(1)}]{R, }
+\item[{integer}]{N, }
+\item[{integer}]{M\-V}
+\end{DoxyParamCaption}
+)}}\label{classcalc__com__ke_a103eff9968044cf67aae4fcef67d0192}
+
+
+Definition at line 313 of file calc\-\_\-com\-\_\-ke.\-f90.
+
+
+
+References calc\-\_\-rdf\-::r().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=281pt]{classcalc__com__ke_a103eff9968044cf67aae4fcef67d0192_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Data Documentation}
+\hypertarget{classcalc__com__ke_a64928951c01426eecbeff5f6310dbab9}{\index{calc\-\_\-com\-\_\-ke@{calc\-\_\-com\-\_\-ke}!ang\-\_\-momentum@{ang\-\_\-momentum}}
+\index{ang\-\_\-momentum@{ang\-\_\-momentum}!calc_com_ke@{calc\-\_\-com\-\_\-ke}}
+\paragraph[{ang\-\_\-momentum}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf mass\-\_\-ave\-\_\-type}), dimension({\bf max\-\_\-masks},3), private calc\-\_\-com\-\_\-ke\-::ang\-\_\-momentum\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__com__ke_a64928951c01426eecbeff5f6310dbab9}
+
+
+Definition at line 45 of file calc\-\_\-com\-\_\-ke.\-f90.
+
+\hypertarget{classcalc__com__ke_a7be3639c20eb8ceb3a5180b4d48f22ab}{\index{calc\-\_\-com\-\_\-ke@{calc\-\_\-com\-\_\-ke}!apa@{apa}}
+\index{apa@{apa}!calc_com_ke@{calc\-\_\-com\-\_\-ke}}
+\paragraph[{apa}]{\setlength{\rightskip}{0pt plus 5cm}integer, private calc\-\_\-com\-\_\-ke\-::apa\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__com__ke_a7be3639c20eb8ceb3a5180b4d48f22ab}
+
+
+Definition at line 16 of file calc\-\_\-com\-\_\-ke.\-f90.
+
+\hypertarget{classcalc__com__ke_afdf7cc08c8fb9e8f9a433c4919663503}{\index{calc\-\_\-com\-\_\-ke@{calc\-\_\-com\-\_\-ke}!conversion\-\_\-factor@{conversion\-\_\-factor}}
+\index{conversion\-\_\-factor@{conversion\-\_\-factor}!calc_com_ke@{calc\-\_\-com\-\_\-ke}}
+\paragraph[{conversion\-\_\-factor}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter, private calc\-\_\-com\-\_\-ke\-::conversion\-\_\-factor = 2390.\-0574\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__com__ke_afdf7cc08c8fb9e8f9a433c4919663503}
+
+
+Definition at line 15 of file calc\-\_\-com\-\_\-ke.\-f90.
+
+\hypertarget{classcalc__com__ke_addbd4c3ed8ec1df3151b8b40b69a06dd}{\index{calc\-\_\-com\-\_\-ke@{calc\-\_\-com\-\_\-ke}!coords@{coords}}
+\index{coords@{coords}!calc_com_ke@{calc\-\_\-com\-\_\-ke}}
+\paragraph[{coords}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf coord\-\_\-type}), dimension({\bf max\-\_\-masks}), private calc\-\_\-com\-\_\-ke\-::coords\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__com__ke_addbd4c3ed8ec1df3151b8b40b69a06dd}
+
+
+Definition at line 33 of file calc\-\_\-com\-\_\-ke.\-f90.
+
+\hypertarget{classcalc__com__ke_a99b829fb93b7f8b50f1886f5cdc00cfe}{\index{calc\-\_\-com\-\_\-ke@{calc\-\_\-com\-\_\-ke}!coords\-\_\-mass@{coords\-\_\-mass}}
+\index{coords\-\_\-mass@{coords\-\_\-mass}!calc_com_ke@{calc\-\_\-com\-\_\-ke}}
+\paragraph[{coords\-\_\-mass}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf com\-\_\-ke\-\_\-coord\-\_\-type}), dimension({\bf max\-\_\-masks}), private calc\-\_\-com\-\_\-ke\-::coords\-\_\-mass\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__com__ke_a99b829fb93b7f8b50f1886f5cdc00cfe}
+
+
+Definition at line 23 of file calc\-\_\-com\-\_\-ke.\-f90.
+
+\hypertarget{classcalc__com__ke_aa5cda373aecf567fcffcdb4103785cdc}{\index{calc\-\_\-com\-\_\-ke@{calc\-\_\-com\-\_\-ke}!dp\-\_\-vect@{dp\-\_\-vect}}
+\index{dp\-\_\-vect@{dp\-\_\-vect}!calc_com_ke@{calc\-\_\-com\-\_\-ke}}
+\paragraph[{dp\-\_\-vect}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf dp\-\_\-type}), dimension({\bf max\-\_\-masks}), private calc\-\_\-com\-\_\-ke\-::dp\-\_\-vect\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__com__ke_aa5cda373aecf567fcffcdb4103785cdc}
+
+
+Definition at line 38 of file calc\-\_\-com\-\_\-ke.\-f90.
+
+\hypertarget{classcalc__com__ke_a5cfdb84100f1ab18b77834edb7640dfd}{\index{calc\-\_\-com\-\_\-ke@{calc\-\_\-com\-\_\-ke}!eigen\-\_\-stuff@{eigen\-\_\-stuff}}
+\index{eigen\-\_\-stuff@{eigen\-\_\-stuff}!calc_com_ke@{calc\-\_\-com\-\_\-ke}}
+\paragraph[{eigen\-\_\-stuff}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf eigen\-\_\-stuff\-\_\-type}), dimension({\bf max\-\_\-masks}), private calc\-\_\-com\-\_\-ke\-::eigen\-\_\-stuff\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__com__ke_a5cfdb84100f1ab18b77834edb7640dfd}
+
+
+Definition at line 50 of file calc\-\_\-com\-\_\-ke.\-f90.
+
+\hypertarget{classcalc__com__ke_aaa14f98bd5343cc4fbdb740b7a6936b2}{\index{calc\-\_\-com\-\_\-ke@{calc\-\_\-com\-\_\-ke}!first\-\_\-frame@{first\-\_\-frame}}
+\index{first\-\_\-frame@{first\-\_\-frame}!calc_com_ke@{calc\-\_\-com\-\_\-ke}}
+\paragraph[{first\-\_\-frame}]{\setlength{\rightskip}{0pt plus 5cm}logical, dimension({\bf max\-\_\-masks}), private calc\-\_\-com\-\_\-ke\-::first\-\_\-frame = .true.\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__com__ke_aaa14f98bd5343cc4fbdb740b7a6936b2}
+
+
+Definition at line 56 of file calc\-\_\-com\-\_\-ke.\-f90.
+
+\hypertarget{classcalc__com__ke_a2d596d2857cde02b13a7f4626d66c877}{\index{calc\-\_\-com\-\_\-ke@{calc\-\_\-com\-\_\-ke}!frame\-\_\-length@{frame\-\_\-length}}
+\index{frame\-\_\-length@{frame\-\_\-length}!calc_com_ke@{calc\-\_\-com\-\_\-ke}}
+\paragraph[{frame\-\_\-length}]{\setlength{\rightskip}{0pt plus 5cm}real, private calc\-\_\-com\-\_\-ke\-::frame\-\_\-length = 0\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__com__ke_a2d596d2857cde02b13a7f4626d66c877}
+
+
+Definition at line 58 of file calc\-\_\-com\-\_\-ke.\-f90.
+
+\hypertarget{classcalc__com__ke_a1d9d59d1dc719a2be09f5b5484fdb8b1}{\index{calc\-\_\-com\-\_\-ke@{calc\-\_\-com\-\_\-ke}!frames@{frames}}
+\index{frames@{frames}!calc_com_ke@{calc\-\_\-com\-\_\-ke}}
+\paragraph[{frames}]{\setlength{\rightskip}{0pt plus 5cm}integer, dimension({\bf max\-\_\-masks}), private calc\-\_\-com\-\_\-ke\-::frames\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__com__ke_a1d9d59d1dc719a2be09f5b5484fdb8b1}
+
+
+Definition at line 16 of file calc\-\_\-com\-\_\-ke.\-f90.
+
+\hypertarget{classcalc__com__ke_ab6b98a0e1a1174c347a566ee87d6968f}{\index{calc\-\_\-com\-\_\-ke@{calc\-\_\-com\-\_\-ke}!ke\-\_\-rot@{ke\-\_\-rot}}
+\index{ke\-\_\-rot@{ke\-\_\-rot}!calc_com_ke@{calc\-\_\-com\-\_\-ke}}
+\paragraph[{ke\-\_\-rot}]{\setlength{\rightskip}{0pt plus 5cm}real, dimension({\bf max\-\_\-masks},3), private calc\-\_\-com\-\_\-ke\-::ke\-\_\-rot\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__com__ke_ab6b98a0e1a1174c347a566ee87d6968f}
+
+
+Definition at line 55 of file calc\-\_\-com\-\_\-ke.\-f90.
+
+\hypertarget{classcalc__com__ke_a248bef710a3fedc054f7af9a972aaa5f}{\index{calc\-\_\-com\-\_\-ke@{calc\-\_\-com\-\_\-ke}!kineticenergy@{kineticenergy}}
+\index{kineticenergy@{kineticenergy}!calc_com_ke@{calc\-\_\-com\-\_\-ke}}
+\paragraph[{kineticenergy}]{\setlength{\rightskip}{0pt plus 5cm}real(8), dimension(\-:), allocatable calc\-\_\-com\-\_\-ke\-::kineticenergy}}\label{classcalc__com__ke_a248bef710a3fedc054f7af9a972aaa5f}
+
+
+Definition at line 17 of file calc\-\_\-com\-\_\-ke.\-f90.
+
+\hypertarget{classcalc__com__ke_a41821b7546d671ba29964180d9d536ed}{\index{calc\-\_\-com\-\_\-ke@{calc\-\_\-com\-\_\-ke}!masks@{masks}}
+\index{masks@{masks}!calc_com_ke@{calc\-\_\-com\-\_\-ke}}
+\paragraph[{masks}]{\setlength{\rightskip}{0pt plus 5cm}type(mask\-\_\-type), dimension({\bf max\-\_\-masks}), target, private calc\-\_\-com\-\_\-ke\-::masks\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__com__ke_a41821b7546d671ba29964180d9d536ed}
+
+
+Definition at line 18 of file calc\-\_\-com\-\_\-ke.\-f90.
+
+\hypertarget{classcalc__com__ke_a3f05fe3d94a0af06d38aa7d063ccacc4}{\index{calc\-\_\-com\-\_\-ke@{calc\-\_\-com\-\_\-ke}!mass\-\_\-ave@{mass\-\_\-ave}}
+\index{mass\-\_\-ave@{mass\-\_\-ave}!calc_com_ke@{calc\-\_\-com\-\_\-ke}}
+\paragraph[{mass\-\_\-ave}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf mass\-\_\-ave\-\_\-type}), dimension({\bf max\-\_\-masks}), private calc\-\_\-com\-\_\-ke\-::mass\-\_\-ave\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__com__ke_a3f05fe3d94a0af06d38aa7d063ccacc4}
+
+
+Definition at line 45 of file calc\-\_\-com\-\_\-ke.\-f90.
+
+\hypertarget{classcalc__com__ke_aa0ccd626cbe2c83360fc3f3f322a49e3}{\index{calc\-\_\-com\-\_\-ke@{calc\-\_\-com\-\_\-ke}!max\-\_\-masks@{max\-\_\-masks}}
+\index{max\-\_\-masks@{max\-\_\-masks}!calc_com_ke@{calc\-\_\-com\-\_\-ke}}
+\paragraph[{max\-\_\-masks}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter calc\-\_\-com\-\_\-ke\-::max\-\_\-masks = 10}}\label{classcalc__com__ke_aa0ccd626cbe2c83360fc3f3f322a49e3}
+
+
+Definition at line 13 of file calc\-\_\-com\-\_\-ke.\-f90.
+
+\hypertarget{classcalc__com__ke_a0c21c8581f9203021d13114bb2febf6f}{\index{calc\-\_\-com\-\_\-ke@{calc\-\_\-com\-\_\-ke}!nmasks@{nmasks}}
+\index{nmasks@{nmasks}!calc_com_ke@{calc\-\_\-com\-\_\-ke}}
+\paragraph[{nmasks}]{\setlength{\rightskip}{0pt plus 5cm}integer, private calc\-\_\-com\-\_\-ke\-::nmasks = 0\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__com__ke_a0c21c8581f9203021d13114bb2febf6f}
+
+
+Definition at line 19 of file calc\-\_\-com\-\_\-ke.\-f90.
+
+\hypertarget{classcalc__com__ke_aa0c81fdb3bca271a5cbd1d8db205dd9d}{\index{calc\-\_\-com\-\_\-ke@{calc\-\_\-com\-\_\-ke}!prev\-\_\-coords@{prev\-\_\-coords}}
+\index{prev\-\_\-coords@{prev\-\_\-coords}!calc_com_ke@{calc\-\_\-com\-\_\-ke}}
+\paragraph[{prev\-\_\-coords}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf coord\-\_\-type}), dimension({\bf max\-\_\-masks}), private calc\-\_\-com\-\_\-ke\-::prev\-\_\-coords\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__com__ke_aa0c81fdb3bca271a5cbd1d8db205dd9d}
+
+
+Definition at line 33 of file calc\-\_\-com\-\_\-ke.\-f90.
+
+\hypertarget{classcalc__com__ke_a5291cdd2e129d0f9af13b186501cb4be}{\index{calc\-\_\-com\-\_\-ke@{calc\-\_\-com\-\_\-ke}!prev\-\_\-coords\-\_\-mass@{prev\-\_\-coords\-\_\-mass}}
+\index{prev\-\_\-coords\-\_\-mass@{prev\-\_\-coords\-\_\-mass}!calc_com_ke@{calc\-\_\-com\-\_\-ke}}
+\paragraph[{prev\-\_\-coords\-\_\-mass}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf com\-\_\-ke\-\_\-coord\-\_\-type}), dimension({\bf max\-\_\-masks}), private calc\-\_\-com\-\_\-ke\-::prev\-\_\-coords\-\_\-mass\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__com__ke_a5291cdd2e129d0f9af13b186501cb4be}
+
+
+Definition at line 23 of file calc\-\_\-com\-\_\-ke.\-f90.
+
+\hypertarget{classcalc__com__ke_acfb72c0740a9626bae7bd565ff0a9844}{\index{calc\-\_\-com\-\_\-ke@{calc\-\_\-com\-\_\-ke}!prev\-\_\-mass\-\_\-ave@{prev\-\_\-mass\-\_\-ave}}
+\index{prev\-\_\-mass\-\_\-ave@{prev\-\_\-mass\-\_\-ave}!calc_com_ke@{calc\-\_\-com\-\_\-ke}}
+\paragraph[{prev\-\_\-mass\-\_\-ave}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf mass\-\_\-ave\-\_\-type}), dimension({\bf max\-\_\-masks}), private calc\-\_\-com\-\_\-ke\-::prev\-\_\-mass\-\_\-ave\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__com__ke_acfb72c0740a9626bae7bd565ff0a9844}
+
+
+Definition at line 45 of file calc\-\_\-com\-\_\-ke.\-f90.
+
+\hypertarget{classcalc__com__ke_a15c550633f7b3816a88580eaa15f66f8}{\index{calc\-\_\-com\-\_\-ke@{calc\-\_\-com\-\_\-ke}!prev\-\_\-rel\-\_\-coords@{prev\-\_\-rel\-\_\-coords}}
+\index{prev\-\_\-rel\-\_\-coords@{prev\-\_\-rel\-\_\-coords}!calc_com_ke@{calc\-\_\-com\-\_\-ke}}
+\paragraph[{prev\-\_\-rel\-\_\-coords}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf com\-\_\-ke\-\_\-velocity\-\_\-type}), dimension({\bf max\-\_\-masks}), private calc\-\_\-com\-\_\-ke\-::prev\-\_\-rel\-\_\-coords\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__com__ke_a15c550633f7b3816a88580eaa15f66f8}
+
+
+Definition at line 28 of file calc\-\_\-com\-\_\-ke.\-f90.
+
+\hypertarget{classcalc__com__ke_a61064252381e46ec3bd532069234fc1d}{\index{calc\-\_\-com\-\_\-ke@{calc\-\_\-com\-\_\-ke}!rad\-\_\-vec@{rad\-\_\-vec}}
+\index{rad\-\_\-vec@{rad\-\_\-vec}!calc_com_ke@{calc\-\_\-com\-\_\-ke}}
+\paragraph[{rad\-\_\-vec}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf com\-\_\-ke\-\_\-velocity\-\_\-type}), dimension({\bf max\-\_\-masks},3), private calc\-\_\-com\-\_\-ke\-::rad\-\_\-vec\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__com__ke_a61064252381e46ec3bd532069234fc1d}
+
+
+Definition at line 28 of file calc\-\_\-com\-\_\-ke.\-f90.
+
+\hypertarget{classcalc__com__ke_adeeef7662bb6f9e230674e2cdd1a9052}{\index{calc\-\_\-com\-\_\-ke@{calc\-\_\-com\-\_\-ke}!rel\-\_\-coords@{rel\-\_\-coords}}
+\index{rel\-\_\-coords@{rel\-\_\-coords}!calc_com_ke@{calc\-\_\-com\-\_\-ke}}
+\paragraph[{rel\-\_\-coords}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf com\-\_\-ke\-\_\-velocity\-\_\-type}), dimension({\bf max\-\_\-masks}), private calc\-\_\-com\-\_\-ke\-::rel\-\_\-coords\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__com__ke_adeeef7662bb6f9e230674e2cdd1a9052}
+
+
+Definition at line 28 of file calc\-\_\-com\-\_\-ke.\-f90.
+
+\hypertarget{classcalc__com__ke_a267edd7154fc7328559b2166aaa09a6f}{\index{calc\-\_\-com\-\_\-ke@{calc\-\_\-com\-\_\-ke}!tot\-\_\-mass@{tot\-\_\-mass}}
+\index{tot\-\_\-mass@{tot\-\_\-mass}!calc_com_ke@{calc\-\_\-com\-\_\-ke}}
+\paragraph[{tot\-\_\-mass}]{\setlength{\rightskip}{0pt plus 5cm}real, dimension({\bf max\-\_\-masks}), private calc\-\_\-com\-\_\-ke\-::tot\-\_\-mass\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__com__ke_a267edd7154fc7328559b2166aaa09a6f}
+
+
+Definition at line 55 of file calc\-\_\-com\-\_\-ke.\-f90.
+
+\hypertarget{classcalc__com__ke_a23f9559a29dfbfe86caa7f7b1c64fca3}{\index{calc\-\_\-com\-\_\-ke@{calc\-\_\-com\-\_\-ke}!velocity@{velocity}}
+\index{velocity@{velocity}!calc_com_ke@{calc\-\_\-com\-\_\-ke}}
+\paragraph[{velocity}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf com\-\_\-ke\-\_\-velocity\-\_\-type}), dimension({\bf max\-\_\-masks}), private calc\-\_\-com\-\_\-ke\-::velocity\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__com__ke_a23f9559a29dfbfe86caa7f7b1c64fca3}
+
+
+Definition at line 28 of file calc\-\_\-com\-\_\-ke.\-f90.
+
+
+
+The documentation for this module was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{calc__com__ke_8f90}{calc\-\_\-com\-\_\-ke.\-f90}\end{DoxyCompactItemize}

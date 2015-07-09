@@ -1,0 +1,26 @@
+digraph "calc_chemscore"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node1 [label="{calc_chemscore\n|+ score\l+ frame\l+ stat\l+ i\l+ trj_type\l+ top_file\l+ fep_file\l+ max_masks\l+ nscores\l+ maxscores\land 46 more...\l- iprecalc\l- maxprecalc\l- masks\l- nmasks\l- bdotopcalc\l- irestartcalc\l- busexin\l- warn\l|+ score_initialize()\l+ chemscore_finalize()\l+ log_frame()\l+ score_heading()\l+ calc_hbonds()\l+ calc_lipo()\l+ calc_metals()\l+ calc_rot()\l+ calc_scores()\l+ count_qlipo()\land 35 more...\l}",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+  Node2 -> Node1 [color="grey25",fontsize="10",style="solid",label=" +waters" ,arrowhead="odiamond"];
+  Node2 [label="{calc_chemscore::wat\n|+ o\l+ h1\l+ h2\l+ score\l|}",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structcalc__chemscore_1_1wat.html"];
+  Node3 -> Node1 [color="grey25",fontsize="10",style="solid",label=" -q_atoms" ,arrowhead="odiamond"];
+  Node3 [label="{calc_chemscore::q_atom\n|+ top_nr\l+ n\l+ contact\l+ at_type\l+ hybrid\l+ been_there\l+ cyclic\l+ active\l|}",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structcalc__chemscore_1_1q__atom.html"];
+  Node4 -> Node3 [color="grey25",fontsize="10",style="solid",label=" +bd" ,arrowhead="odiamond"];
+  Node4 [label="{calc_chemscore::bond\l_pointer\n||}",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structcalc__chemscore_1_1bond__pointer.html"];
+  Node5 -> Node4 [color="grey25",fontsize="10",style="solid",label=" +qb" ,arrowhead="odiamond"];
+  Node5 [label="{calc_chemscore::q_bond\n|+ rotatable\l+ acontact\l+ bcontact\l+ been_there\l+ a_nonlip\l+ b_nonlip\l+ a_lip\l+ b_lip\l+ cyclic\l+ active\l|}",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structcalc__chemscore_1_1q__bond.html"];
+  Node3 -> Node5 [color="grey25",fontsize="10",style="solid",label=" +a\n+b" ,arrowhead="odiamond"];
+  Node6 -> Node1 [color="grey25",fontsize="10",style="solid",label=" -aprecalc" ,arrowhead="odiamond"];
+  Node6 [label="{calc_chemscore::score\l_precalc_type\n|+ chfilename\l+ itype\l|}",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structcalc__chemscore_1_1score__precalc__type.html"];
+  Node7 -> Node1 [color="grey25",fontsize="10",style="solid",label=" +atom_data" ,arrowhead="odiamond"];
+  Node7 [label="{calc_chemscore::atom\l_data_type\n|+ radius\l+ prop\l|}",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structcalc__chemscore_1_1atom__data__type.html"];
+  Node8 -> Node1 [color="grey25",fontsize="10",style="solid",label=" +hbd_l\n+hbd_r" ,arrowhead="odiamond"];
+  Node8 [label="{calc_chemscore::donor\n|+ heavy\l+ hydr\l|}",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structcalc__chemscore_1_1donor.html"];
+  Node9 -> Node1 [color="grey25",fontsize="10",style="solid",label=" -coords" ,arrowhead="odiamond"];
+  Node9 [label="{calc_chemscore::score\l_coord_type\n|+ xr\l+ xrcm\l|}",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structcalc__chemscore_1_1score__coord__type.html"];
+  Node10 -> Node1 [color="grey25",fontsize="10",style="solid",label=" -ascore" ,arrowhead="odiamond"];
+  Node10 [label="{calc_chemscore::score_type\n|+ chfilename\l+ frame\l+ score\l+ h_bonds\l+ metal\l+ lipophil\l+ rot_bond\l|}",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structcalc__chemscore_1_1score__type.html"];
+  Node5 -> Node1 [color="grey25",fontsize="10",style="solid",label=" -q_bonds" ,arrowhead="odiamond"];
+}

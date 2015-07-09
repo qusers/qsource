@@ -1,0 +1,8 @@
+digraph "calc_fit"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node1 [label="{calc_fit\n|+ max_masks\l- masks\l- nmasks\l|+ fit_initialize()\l+ fit_finalize()\l+ fit_add()\l+ fit_calc()\l+ fit_make_ref()\l+ lsqstr()\l}",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+  Node2 -> Node1 [color="grey25",fontsize="10",style="solid",label=" -coords" ,arrowhead="odiamond"];
+  Node2 [label="{calc_fit::fit_coord_type\n|+ xr\l+ xrcm\l|}",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structcalc__fit_1_1fit__coord__type.html"];
+}

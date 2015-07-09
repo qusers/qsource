@@ -1,0 +1,6 @@
+<map id="calc_pmf::pmfmolecule_look_for_a_ring" name="calc_pmf::pmfmolecule_look_for_a_ring">
+<area shape="rect" id="node2" href="$classcalc__pmf.html#a4c51d400a72121dbba99d441a2bfea6b" title="calc_pmf::pmfmolecule\l_clean_choices" alt="" coords="237,5,395,47"/>
+<area shape="rect" id="node3" href="$classcalc__pmf.html#a5d1b84516b4045d510702abceb249d8a" title="calc_pmf::pmfmolecule\l_get_choices" alt="" coords="237,71,395,112"/>
+<area shape="rect" id="node4" href="$classcalc__pmf.html#ab349db3ae61f138604db0d9719349fd1" title="calc_pmf::pmfmolecule\l_reset_choices" alt="" coords="237,136,395,177"/>
+<area shape="rect" id="node5" href="$classcalc__pmf.html#a642a8d188ca37abd91cc59b69fa50158" title="calc_pmf::pmfmolecule\l_two_bonds_connection_check" alt="" coords="212,201,420,243"/>
+</map>

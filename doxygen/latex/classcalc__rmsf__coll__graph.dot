@@ -1,0 +1,8 @@
+digraph "calc_rmsf"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node1 [label="{calc_rmsf\n|+ max_masks\l+ rmsf\l- frames\l- apa\l- masks\l- nmasks\l|+ rmsf_initialize()\l+ rmsf_finalize()\l+ rmsf_add()\l+ rmsf_calc()\l+ rmsf_make_ref()\l+ rmsf_heading()\l}",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+  Node2 -> Node1 [color="grey25",fontsize="10",style="solid",label=" -coords" ,arrowhead="odiamond"];
+  Node2 [label="{calc_rmsf::rmsf_coord_type\n|+ x\l+ x0\l+ x2\l|}",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structcalc__rmsf_1_1rmsf__coord__type.html"];
+}

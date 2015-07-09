@@ -1,0 +1,6 @@
+digraph "calc_chemscore::score_type"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node1 [label="{calc_chemscore::score_type\n|+ chfilename\l+ frame\l+ score\l+ h_bonds\l+ metal\l+ lipophil\l+ rot_bond\l|}",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+}

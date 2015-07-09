@@ -1,0 +1,12 @@
+digraph "calc_nb"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node1 [label="{calc_nb\n|+ max_lists\l+ max_nb_qp\l+ total_frames\l+ total_qp_frames\l+ center_mask1\l+ ave_elj_r\l+ elj_r\l- masks\l- nlists\l- n_nb_qp\l|+ nb_initialize()\l+ nb_finalize()\l+ nb_add()\l+ nb_calc()\l+ nb_calc_lists()\l+ nb_make_list()\l+ nb_heading()\l+ nb_qp_add()\l+ nb_qp_calc()\l+ nb_qp_finalize()\land 12 more...\l}",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+  Node2 -> Node1 [color="grey25",fontsize="10",style="solid",label=" -qp_calc" ,arrowhead="odiamond"];
+  Node2 [label="{calc_nb::nb_qp_type\n|+ p_first\l+ p_last\l+ q_first\l+ q_last\l|}",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structcalc__nb_1_1nb__qp__type.html"];
+  Node3 -> Node1 [color="grey25",fontsize="10",style="solid",label=" +qp_aves\n+aves" ,arrowhead="odiamond"];
+  Node3 [label="{calc_nb::averages\n|+ lj\l+ el\l|}",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structcalc__nb_1_1averages.html"];
+  Node4 -> Node1 [color="grey25",fontsize="10",style="solid",label=" -nb_listan\n-nb_list_res" ,arrowhead="odiamond"];
+  Node4 [label="{calc_nb::nb_list_type\n|+ number_of_nb\l+ atom1\l+ atom2\l+ aa\l+ bb\l+ qq\l|}",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structcalc__nb_1_1nb__list__type.html"];
+}

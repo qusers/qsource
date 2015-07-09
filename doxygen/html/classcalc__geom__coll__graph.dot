@@ -1,0 +1,8 @@
+digraph "calc_geom"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node1 [label="{calc_geom\n|+ max_measurements\l+ pi\l- nmeas\l|+ geom_initialize()\l+ geom_finalize()\l+ dist_add()\l+ angle_add()\l+ torsion_add()\l+ dist_calc()\l+ angle_calc()\l+ torsion_calc()\l+ dist_heading()\l+ angle_heading()\l+ torsion_heading()\l}",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+  Node2 -> Node1 [color="grey25",fontsize="10",style="solid",label=" -geom" ,arrowhead="odiamond",fontname="Helvetica"];
+  Node2 [label="{calc_geom::geom_type\n|+ i\l+ j\l+ k\l+ l\l+ cod\l+ kind\l|}",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structcalc__geom_1_1geom__type.html"];
+}

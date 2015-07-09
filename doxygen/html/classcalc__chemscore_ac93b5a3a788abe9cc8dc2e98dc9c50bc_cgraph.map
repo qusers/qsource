@@ -1,0 +1,7 @@
+<map id="calc_chemscore::calc_hbonds" name="calc_chemscore::calc_hbonds">
+<area shape="rect" id="node2" href="$classcalc__chemscore.html#a43c74c5136c8bd28466d9be8129c0c41" title="calc_chemscore::g1_hb" alt="" coords="203,5,365,32"/>
+<area shape="rect" id="node4" href="$classcalc__chemscore.html#ad76a52480cfdcf6a556fd98bab1a3f5a" title="calc_chemscore::g2_hb" alt="" coords="203,56,365,83"/>
+<area shape="rect" id="node3" href="$classcalc__chemscore.html#aae7e243df77ac184d4fcd6cff5b0c0f2" title="calc_chemscore::dist" alt="" coords="419,5,566,32"/>
+<area shape="rect" id="node5" href="$classcalc__chemscore.html#a8af51a917f080c281be0bce50c1e6d76" title="calc_chemscore::angle" alt="" coords="413,56,572,83"/>
+<area shape="rect" id="node6" href="$classcalc__chemscore.html#a0538eec23e42416be4896f6501beec20" title="calc_chemscore::distsq" alt="" coords="620,56,780,83"/>
+</map>

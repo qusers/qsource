@@ -1,0 +1,4 @@
+<map id="calc_xscore::txgroup" name="calc_xscore::txgroup">
+<area shape="rect" id="node2" href="$structcalc__xscore_1_1txbond.html" title="{calc_xscore::txbond\n|+ id\l+ valid\l+ atom_1\l+ atom_2\l+ ttype\l+ part\l+ ring\l+ length\l+ num_neib\l+ neib\l|}" alt="" coords="5,13,145,222"/>
+<area shape="rect" id="node3" href="$structcalc__xscore_1_1txatom.html" title="{calc_xscore::txatom\n|+ topindex\l+ id\l+ valid\l+ mask\l+ name\l+ ttype\l+ xtype\l+ type2\l+ residue\l+ old_residue\land 25 more...\l|}" alt="" coords="169,5,309,229"/>
+</map>

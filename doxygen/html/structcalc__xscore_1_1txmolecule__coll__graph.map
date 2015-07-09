@@ -1,0 +1,6 @@
+<map id="calc_xscore::txmolecule" name="calc_xscore::txmolecule">
+<area shape="rect" id="node2" href="$structcalc__xscore_1_1txring.html" title="{calc_xscore::txring\n|+ valid\l+ ttype\l+ num_member\l+ atom_id\l+ atom_count\l+ atom_max\l+ bond_id\l+ bond_count\l+ bond_max\l+ centroid\l|}" alt="" coords="5,13,137,222"/>
+<area shape="rect" id="node3" href="$structcalc__xscore_1_1txbond.html" title="{calc_xscore::txbond\n|+ id\l+ valid\l+ atom_1\l+ atom_2\l+ ttype\l+ part\l+ ring\l+ length\l+ num_neib\l+ neib\l|}" alt="" coords="161,13,301,222"/>
+<area shape="rect" id="node4" href="$structcalc__xscore_1_1txdot.html" title="{calc_xscore::txdot\n|+ valid\l+ ttype\l+ coor\l+ unit\l+ score\l|}" alt="" coords="325,49,455,185"/>
+<area shape="rect" id="node5" href="$structcalc__xscore_1_1txatom.html" title="{calc_xscore::txatom\n|+ topindex\l+ id\l+ valid\l+ mask\l+ name\l+ ttype\l+ xtype\l+ type2\l+ residue\l+ old_residue\land 25 more...\l|}" alt="" coords="479,5,619,229"/>
+</map>

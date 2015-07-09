@@ -1,0 +1,5 @@
+<map id="make_mean_all" name="make_mean_all">
+<area shape="rect" id="node2" href="$classcalc__pmf.html#aeb687d57198896c002165b074ebd8e16" title="calc_pmf::pmfscore_mean" alt="" coords="179,5,358,32"/>
+<area shape="rect" id="node3" href="$classcalc__chemscore.html#a745d266685ca3b123d11d20d0baf1dec" title="calc_chemscore::score_mean" alt="" coords="169,56,368,83"/>
+<area shape="rect" id="node4" href="$classcalc__xscore.html#a9f44d606adb68d2cfa8ada438d0580bd" title="calc_xscore::xscore_mean" alt="" coords="179,107,359,133"/>
+</map>

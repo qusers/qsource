@@ -1,0 +1,11 @@
+<map id="calc_xscore::hbond_clear" name="calc_xscore::hbond_clear">
+<area shape="rect" id="node2" href="$classcalc__xscore.html#ae97596aac5895fa621029e53165c933a" title="calc_xscore::ligand\l_get_hbond_pair_pl" alt="" coords="191,35,331,76"/>
+<area shape="rect" id="node3" href="$classcalc__xscore.html#aec79b7e53911e002ecaae12b252c93e0" title="calc_xscore::ligand\l_calculate_hb" alt="" coords="379,35,515,76"/>
+<area shape="rect" id="node4" href="$classcalc__xscore.html#aa21b212c6de7c3b229d8d91ee336630a" title="calc_xscore::ligand\l_calculate_binding_score" alt="" coords="563,35,735,76"/>
+<area shape="rect" id="node5" href="$classcalc__xscore.html#a1dd20b02356cb3c99283799d1030d1ba" title="calc_xscore::xscore\l_precalc" alt="" coords="799,5,937,47"/>
+<area shape="rect" id="node7" href="$classcalc__xscore.html#a1f2c852d7a1ed801d7b14ce6205a384e" title="calc_xscore::xscore_calc" alt="" coords="783,71,953,98"/>
+<area shape="rect" id="node6" href="$qcalc_8f90.html#a6de35d783d8e2c1ffead6a9dbf61ebb6" title="do_pre_calcs" alt="" coords="1001,13,1103,39"/>
+<area shape="rect" id="node8" href="$qcalc_8f90.html#a5befd1d444d41d7d1e4bf8b297c17ee2" title="calc_all" alt="" coords="1019,71,1085,98"/>
+<area shape="rect" id="node9" href="$qcalc_8f90.html#a93dcacb957411ed0d0471fe8a31c60d6" title="process_frame" alt="" coords="1151,71,1261,98"/>
+<area shape="rect" id="node10" href="$qcalc_8f90.html#a7d2d447954fb385bdca4f228de92b1eb" title="process_data" alt="" coords="1309,71,1412,98"/>
+</map>

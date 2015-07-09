@@ -1,0 +1,763 @@
+\hypertarget{classcalc__entropy}{\subsection{calc\-\_\-entropy Module Reference}
+\label{classcalc__entropy}\index{calc\-\_\-entropy@{calc\-\_\-entropy}}
+}
+
+
+Collaboration diagram for calc\-\_\-entropy\-:
+\subsubsection*{Data Types}
+\begin{DoxyCompactItemize}
+\item 
+type \hyperlink{structcalc__entropy_1_1covariance__matrix}{covariance\-\_\-matrix}
+\item 
+type \hyperlink{structcalc__entropy_1_1entropy__coord__type}{entropy\-\_\-coord\-\_\-type}
+\item 
+type \hyperlink{structcalc__entropy_1_1trajectory}{trajectory}
+\end{DoxyCompactItemize}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+integer function \hyperlink{classcalc__entropy_aed82d686b07a9020efcd8f4587376359}{entropy\-\_\-add} (desc)
+\item 
+subroutine \hyperlink{classcalc__entropy_a2706ab3575d4580b597c79e13eb3bb5d}{construct\-\_\-trajectory} (t, Temp, startframe, endframe, no\-\_\-atoms, Calc\-\_\-type)
+\item 
+subroutine \hyperlink{classcalc__entropy_a9d1d1405c17e8adf37d4832bc14142c5}{entropy\-\_\-initialize}
+\item 
+subroutine \hyperlink{classcalc__entropy_a8b7097d5478f130ec2b04ac4eb69e156}{entropy\-\_\-finalize} (i)
+\item 
+subroutine \hyperlink{classcalc__entropy_a45c5006942f4bd7795537dcafd948a49}{entropy\-\_\-heading} (i)
+\item 
+subroutine \hyperlink{classcalc__entropy_aa0d5bd96bcbb6587c5e1e624674e5e4e}{entropy\-\_\-calc} (i)
+\item 
+subroutine \hyperlink{classcalc__entropy_a3755d627dc2eefc79df4b59a4250ed9a}{covariancematrix} (t)
+\item 
+subroutine \hyperlink{classcalc__entropy_aa6f0af095a3daa755f27611c7ee3a137}{schlittersformula} (t, det)
+\item 
+subroutine \hyperlink{classcalc__entropy_a1bf295689ab7aa8ba66f5d835758c3ca}{multiplymatrices} (t)
+\item 
+subroutine \hyperlink{classcalc__entropy_ab9136e2396446b5059a5fe7d36125573}{choleskyfactorization} (t)
+\item 
+subroutine \hyperlink{classcalc__entropy_ac138d87a9a4edec83f075e4ae4525ef6}{rotationandtranslation} (t, i)
+\item 
+subroutine \hyperlink{classcalc__entropy_a874a920bba323f41659a5a5b14988c01}{fit\-\_\-make\-\_\-reference} (i)
+\item 
+subroutine \hyperlink{classcalc__entropy_a2a9d851b8b3e7af4603059175dc539e3}{quasiharmonic\-\_\-analysis} (i, t, det)
+\item 
+subroutine \hyperlink{classcalc__entropy_aaf7cfa4698786aa90ec49a0534983b2c}{massweight} (t)
+\item 
+subroutine \hyperlink{classcalc__entropy_ab1305be69ef87d449d6e0a83f557ef80}{viz} (t)
+\item 
+subroutine \hyperlink{classcalc__entropy_ab614cb6e56be859a584badf06fdbc1fa}{entropy\-\_\-ho} (m, t, det)
+\item 
+subroutine \hyperlink{classcalc__entropy_afae4ac42e827ba29f7e2dc444a868123}{pca} (t, det)
+\item 
+subroutine \hyperlink{classcalc__entropy_ae9756fd0464bdb3c038ac5d3388a1847}{euler\-\_\-angles} (t)
+\item 
+subroutine \hyperlink{classcalc__entropy_abb832ec2f5a651941ccad38b1b20b9be}{updatecovariancematrix} (t, i)
+\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+real(8) \hyperlink{classcalc__entropy_ace4e0d6c83bde96c914718bedb3d95b6}{pi\-\_\-val}
+\item 
+real(8) \hyperlink{classcalc__entropy_a365c453093f33984755407e59cd2b03f}{hs}
+\item 
+real(8) \hyperlink{classcalc__entropy_a254c581937b3c10459355e8b4ee78169}{r}
+\item 
+real(8) \hyperlink{classcalc__entropy_a5d2d8c2c9a3880bcf294eeb9c9e59990}{ref\-\_\-vol}
+\item 
+real(8) \hyperlink{classcalc__entropy_ae17fb9f97d704cb0eb48b1c7b7b0ccaa}{e}
+\item 
+real(8) \hyperlink{classcalc__entropy_ab98127dc795d8a07522c22aff868c11b}{u}
+\item 
+real(8) \hyperlink{classcalc__entropy_a535551365a6e86ba63b99605509d12d8}{kb}
+\item 
+real(8) \hyperlink{classcalc__entropy_a849ddf2db70a1dd6e4098d51b05f195f}{cm}
+\item 
+integer \hyperlink{classcalc__entropy_a530d9ffe62a5dde36d2b21a72da0be95}{entropy\-\_\-frame}
+\item 
+integer \hyperlink{classcalc__entropy_a956e6d4e2fc8c2d4dbc414d534e5c49d}{start}
+\end{DoxyCompactItemize}
+\subsubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+type(mask\-\_\-type), dimension(max\-\_\-masks), \\*
+target, private \hyperlink{classcalc__entropy_aec8b2f5549506f769e3281da73e1e70d}{masks}
+\item 
+integer, private \hyperlink{classcalc__entropy_a65df17917d4604d8aff01d32b1d9d2c2}{nmasks} = 0
+\item 
+type(\hyperlink{structcalc__entropy_1_1entropy__coord__type}{entropy\-\_\-coord\-\_\-type}), \\*
+dimension(max\-\_\-masks), private \hyperlink{classcalc__entropy_a146c2e38467ec52f4c216e2a18b5aaa1}{coords}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+
+
+Definition at line 5 of file calc\-\_\-entropy.\-f90.
+
+
+
+\subsubsection{Member Function/\-Subroutine Documentation}
+\hypertarget{classcalc__entropy_ab9136e2396446b5059a5fe7d36125573}{\index{calc\-\_\-entropy@{calc\-\_\-entropy}!choleskyfactorization@{choleskyfactorization}}
+\index{choleskyfactorization@{choleskyfactorization}!calc_entropy@{calc\-\_\-entropy}}
+\paragraph[{choleskyfactorization}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-entropy\-::choleskyfactorization (
+\begin{DoxyParamCaption}
+\item[{type({\bf trajectory})}]{t}
+\end{DoxyParamCaption}
+)}}\label{classcalc__entropy_ab9136e2396446b5059a5fe7d36125573}
+
+
+Definition at line 445 of file calc\-\_\-entropy.\-f90.
+
+
+
+Referenced by schlittersformula().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__entropy_ab9136e2396446b5059a5fe7d36125573_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__entropy_a2706ab3575d4580b597c79e13eb3bb5d}{\index{calc\-\_\-entropy@{calc\-\_\-entropy}!construct\-\_\-trajectory@{construct\-\_\-trajectory}}
+\index{construct\-\_\-trajectory@{construct\-\_\-trajectory}!calc_entropy@{calc\-\_\-entropy}}
+\paragraph[{construct\-\_\-trajectory}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-entropy\-::construct\-\_\-trajectory (
+\begin{DoxyParamCaption}
+\item[{type({\bf trajectory})}]{t, }
+\item[{real(8)}]{Temp, }
+\item[{integer}]{startframe, }
+\item[{integer}]{endframe, }
+\item[{integer}]{no\-\_\-atoms, }
+\item[{integer}]{Calc\-\_\-type}
+\end{DoxyParamCaption}
+)}}\label{classcalc__entropy_a2706ab3575d4580b597c79e13eb3bb5d}
+
+
+Definition at line 142 of file calc\-\_\-entropy.\-f90.
+
+
+
+Referenced by entropy\-\_\-calc().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__entropy_a2706ab3575d4580b597c79e13eb3bb5d_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__entropy_a3755d627dc2eefc79df4b59a4250ed9a}{\index{calc\-\_\-entropy@{calc\-\_\-entropy}!covariancematrix@{covariancematrix}}
+\index{covariancematrix@{covariancematrix}!calc_entropy@{calc\-\_\-entropy}}
+\paragraph[{covariancematrix}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-entropy\-::covariancematrix (
+\begin{DoxyParamCaption}
+\item[{type({\bf trajectory})}]{t}
+\end{DoxyParamCaption}
+)}}\label{classcalc__entropy_a3755d627dc2eefc79df4b59a4250ed9a}
+
+
+Definition at line 359 of file calc\-\_\-entropy.\-f90.
+
+
+
+Referenced by entropy\-\_\-calc(), and pca().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__entropy_a3755d627dc2eefc79df4b59a4250ed9a_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__entropy_aed82d686b07a9020efcd8f4587376359}{\index{calc\-\_\-entropy@{calc\-\_\-entropy}!entropy\-\_\-add@{entropy\-\_\-add}}
+\index{entropy\-\_\-add@{entropy\-\_\-add}!calc_entropy@{calc\-\_\-entropy}}
+\paragraph[{entropy\-\_\-add}]{\setlength{\rightskip}{0pt plus 5cm}integer function calc\-\_\-entropy\-::entropy\-\_\-add (
+\begin{DoxyParamCaption}
+\item[{character($\ast$)}]{desc}
+\end{DoxyParamCaption}
+)}}\label{classcalc__entropy_aed82d686b07a9020efcd8f4587376359}
+
+
+Definition at line 58 of file calc\-\_\-entropy.\-f90.
+
+
+
+References misc\-::getlin(), atom\-\_\-mask\-::mask\-\_\-finalize(), atom\-\_\-mask\-::mask\-\_\-initialize(), and maskmanip\-::maskmanip\-\_\-make().
+
+
+
+Referenced by add\-\_\-a\-\_\-calc().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__entropy_aed82d686b07a9020efcd8f4587376359_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__entropy_aa0d5bd96bcbb6587c5e1e624674e5e4e}{\index{calc\-\_\-entropy@{calc\-\_\-entropy}!entropy\-\_\-calc@{entropy\-\_\-calc}}
+\index{entropy\-\_\-calc@{entropy\-\_\-calc}!calc_entropy@{calc\-\_\-entropy}}
+\paragraph[{entropy\-\_\-calc}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-entropy\-::entropy\-\_\-calc (
+\begin{DoxyParamCaption}
+\item[{integer, intent(in)}]{i}
+\end{DoxyParamCaption}
+)}}\label{classcalc__entropy_aa0d5bd96bcbb6587c5e1e624674e5e4e}
+
+
+Definition at line 201 of file calc\-\_\-entropy.\-f90.
+
+
+
+References construct\-\_\-trajectory(), covariancematrix(), fit\-\_\-make\-\_\-reference(), md\-::gauss(), atom\-\_\-mask\-::mask\-\_\-get(), pca(), quasiharmonic\-\_\-analysis(), rotationandtranslation(), and schlittersformula().
+
+
+
+Referenced by calc\-\_\-all().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__entropy_aa0d5bd96bcbb6587c5e1e624674e5e4e_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__entropy_a8b7097d5478f130ec2b04ac4eb69e156}{\index{calc\-\_\-entropy@{calc\-\_\-entropy}!entropy\-\_\-finalize@{entropy\-\_\-finalize}}
+\index{entropy\-\_\-finalize@{entropy\-\_\-finalize}!calc_entropy@{calc\-\_\-entropy}}
+\paragraph[{entropy\-\_\-finalize}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-entropy\-::entropy\-\_\-finalize (
+\begin{DoxyParamCaption}
+\item[{integer}]{i}
+\end{DoxyParamCaption}
+)}}\label{classcalc__entropy_a8b7097d5478f130ec2b04ac4eb69e156}
+
+
+Definition at line 182 of file calc\-\_\-entropy.\-f90.
+
+
+
+References atom\-\_\-mask\-::mask\-\_\-finalize().
+
+
+
+Referenced by finalize().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classcalc__entropy_a45c5006942f4bd7795537dcafd948a49}{\index{calc\-\_\-entropy@{calc\-\_\-entropy}!entropy\-\_\-heading@{entropy\-\_\-heading}}
+\index{entropy\-\_\-heading@{entropy\-\_\-heading}!calc_entropy@{calc\-\_\-entropy}}
+\paragraph[{entropy\-\_\-heading}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-entropy\-::entropy\-\_\-heading (
+\begin{DoxyParamCaption}
+\item[{integer}]{i}
+\end{DoxyParamCaption}
+)}}\label{classcalc__entropy_a45c5006942f4bd7795537dcafd948a49}
+
+
+Definition at line 192 of file calc\-\_\-entropy.\-f90.
+
+\hypertarget{classcalc__entropy_ab614cb6e56be859a584badf06fdbc1fa}{\index{calc\-\_\-entropy@{calc\-\_\-entropy}!entropy\-\_\-ho@{entropy\-\_\-ho}}
+\index{entropy\-\_\-ho@{entropy\-\_\-ho}!calc_entropy@{calc\-\_\-entropy}}
+\paragraph[{entropy\-\_\-ho}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-entropy\-::entropy\-\_\-ho (
+\begin{DoxyParamCaption}
+\item[{integer}]{m, }
+\item[{type({\bf trajectory})}]{t, }
+\item[{real(8)}]{det}
+\end{DoxyParamCaption}
+)}}\label{classcalc__entropy_ab614cb6e56be859a584badf06fdbc1fa}
+
+
+Definition at line 661 of file calc\-\_\-entropy.\-f90.
+
+
+
+Referenced by quasiharmonic\-\_\-analysis().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__entropy_ab614cb6e56be859a584badf06fdbc1fa_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__entropy_a9d1d1405c17e8adf37d4832bc14142c5}{\index{calc\-\_\-entropy@{calc\-\_\-entropy}!entropy\-\_\-initialize@{entropy\-\_\-initialize}}
+\index{entropy\-\_\-initialize@{entropy\-\_\-initialize}!calc_entropy@{calc\-\_\-entropy}}
+\paragraph[{entropy\-\_\-initialize}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-entropy\-::entropy\-\_\-initialize (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classcalc__entropy_a9d1d1405c17e8adf37d4832bc14142c5}
+
+
+Definition at line 162 of file calc\-\_\-entropy.\-f90.
+
+
+
+Referenced by initialize().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__entropy_a9d1d1405c17e8adf37d4832bc14142c5_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__entropy_ae9756fd0464bdb3c038ac5d3388a1847}{\index{calc\-\_\-entropy@{calc\-\_\-entropy}!euler\-\_\-angles@{euler\-\_\-angles}}
+\index{euler\-\_\-angles@{euler\-\_\-angles}!calc_entropy@{calc\-\_\-entropy}}
+\paragraph[{euler\-\_\-angles}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-entropy\-::euler\-\_\-angles (
+\begin{DoxyParamCaption}
+\item[{type({\bf trajectory})}]{t}
+\end{DoxyParamCaption}
+)}}\label{classcalc__entropy_ae9756fd0464bdb3c038ac5d3388a1847}
+
+
+Definition at line 767 of file calc\-\_\-entropy.\-f90.
+
+
+
+Referenced by rotationandtranslation().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__entropy_ae9756fd0464bdb3c038ac5d3388a1847_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__entropy_a874a920bba323f41659a5a5b14988c01}{\index{calc\-\_\-entropy@{calc\-\_\-entropy}!fit\-\_\-make\-\_\-reference@{fit\-\_\-make\-\_\-reference}}
+\index{fit\-\_\-make\-\_\-reference@{fit\-\_\-make\-\_\-reference}!calc_entropy@{calc\-\_\-entropy}}
+\paragraph[{fit\-\_\-make\-\_\-reference}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-entropy\-::fit\-\_\-make\-\_\-reference (
+\begin{DoxyParamCaption}
+\item[{integer}]{i}
+\end{DoxyParamCaption}
+)}}\label{classcalc__entropy_a874a920bba323f41659a5a5b14988c01}
+
+
+Definition at line 560 of file calc\-\_\-entropy.\-f90.
+
+
+
+Referenced by entropy\-\_\-calc().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classcalc__entropy_aaf7cfa4698786aa90ec49a0534983b2c}{\index{calc\-\_\-entropy@{calc\-\_\-entropy}!massweight@{massweight}}
+\index{massweight@{massweight}!calc_entropy@{calc\-\_\-entropy}}
+\paragraph[{massweight}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-entropy\-::massweight (
+\begin{DoxyParamCaption}
+\item[{type({\bf trajectory})}]{t}
+\end{DoxyParamCaption}
+)}}\label{classcalc__entropy_aaf7cfa4698786aa90ec49a0534983b2c}
+
+
+Definition at line 616 of file calc\-\_\-entropy.\-f90.
+
+
+
+Referenced by quasiharmonic\-\_\-analysis().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__entropy_aaf7cfa4698786aa90ec49a0534983b2c_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__entropy_a1bf295689ab7aa8ba66f5d835758c3ca}{\index{calc\-\_\-entropy@{calc\-\_\-entropy}!multiplymatrices@{multiplymatrices}}
+\index{multiplymatrices@{multiplymatrices}!calc_entropy@{calc\-\_\-entropy}}
+\paragraph[{multiplymatrices}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-entropy\-::multiplymatrices (
+\begin{DoxyParamCaption}
+\item[{type({\bf trajectory})}]{t}
+\end{DoxyParamCaption}
+)}}\label{classcalc__entropy_a1bf295689ab7aa8ba66f5d835758c3ca}
+
+
+Definition at line 405 of file calc\-\_\-entropy.\-f90.
+
+
+
+Referenced by schlittersformula().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__entropy_a1bf295689ab7aa8ba66f5d835758c3ca_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__entropy_afae4ac42e827ba29f7e2dc444a868123}{\index{calc\-\_\-entropy@{calc\-\_\-entropy}!pca@{pca}}
+\index{pca@{pca}!calc_entropy@{calc\-\_\-entropy}}
+\paragraph[{pca}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-entropy\-::pca (
+\begin{DoxyParamCaption}
+\item[{type({\bf trajectory})}]{t, }
+\item[{real(8)}]{det}
+\end{DoxyParamCaption}
+)}}\label{classcalc__entropy_afae4ac42e827ba29f7e2dc444a868123}
+
+
+Definition at line 720 of file calc\-\_\-entropy.\-f90.
+
+
+
+References covariancematrix(), eigen(), and viz().
+
+
+
+Referenced by entropy\-\_\-calc().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__entropy_afae4ac42e827ba29f7e2dc444a868123_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__entropy_afae4ac42e827ba29f7e2dc444a868123_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__entropy_a2a9d851b8b3e7af4603059175dc539e3}{\index{calc\-\_\-entropy@{calc\-\_\-entropy}!quasiharmonic\-\_\-analysis@{quasiharmonic\-\_\-analysis}}
+\index{quasiharmonic\-\_\-analysis@{quasiharmonic\-\_\-analysis}!calc_entropy@{calc\-\_\-entropy}}
+\paragraph[{quasiharmonic\-\_\-analysis}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-entropy\-::quasiharmonic\-\_\-analysis (
+\begin{DoxyParamCaption}
+\item[{integer}]{i, }
+\item[{type({\bf trajectory})}]{t, }
+\item[{real(8)}]{det}
+\end{DoxyParamCaption}
+)}}\label{classcalc__entropy_a2a9d851b8b3e7af4603059175dc539e3}
+
+
+Definition at line 598 of file calc\-\_\-entropy.\-f90.
+
+
+
+References eigen(), entropy\-\_\-ho(), massweight(), and viz().
+
+
+
+Referenced by entropy\-\_\-calc().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__entropy_a2a9d851b8b3e7af4603059175dc539e3_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__entropy_a2a9d851b8b3e7af4603059175dc539e3_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__entropy_ac138d87a9a4edec83f075e4ae4525ef6}{\index{calc\-\_\-entropy@{calc\-\_\-entropy}!rotationandtranslation@{rotationandtranslation}}
+\index{rotationandtranslation@{rotationandtranslation}!calc_entropy@{calc\-\_\-entropy}}
+\paragraph[{rotationandtranslation}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-entropy\-::rotationandtranslation (
+\begin{DoxyParamCaption}
+\item[{type({\bf trajectory})}]{t, }
+\item[{integer, intent(in)}]{i}
+\end{DoxyParamCaption}
+)}}\label{classcalc__entropy_ac138d87a9a4edec83f075e4ae4525ef6}
+
+
+Definition at line 471 of file calc\-\_\-entropy.\-f90.
+
+
+
+References euler\-\_\-angles(), and calc\-\_\-fit\-::lsqstr().
+
+
+
+Referenced by entropy\-\_\-calc().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__entropy_ac138d87a9a4edec83f075e4ae4525ef6_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__entropy_aa6f0af095a3daa755f27611c7ee3a137}{\index{calc\-\_\-entropy@{calc\-\_\-entropy}!schlittersformula@{schlittersformula}}
+\index{schlittersformula@{schlittersformula}!calc_entropy@{calc\-\_\-entropy}}
+\paragraph[{schlittersformula}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-entropy\-::schlittersformula (
+\begin{DoxyParamCaption}
+\item[{type({\bf trajectory})}]{t, }
+\item[{real(8)}]{det}
+\end{DoxyParamCaption}
+)}}\label{classcalc__entropy_aa6f0af095a3daa755f27611c7ee3a137}
+
+
+Definition at line 382 of file calc\-\_\-entropy.\-f90.
+
+
+
+References choleskyfactorization(), and multiplymatrices().
+
+
+
+Referenced by entropy\-\_\-calc().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__entropy_aa6f0af095a3daa755f27611c7ee3a137_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__entropy_aa6f0af095a3daa755f27611c7ee3a137_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classcalc__entropy_abb832ec2f5a651941ccad38b1b20b9be}{\index{calc\-\_\-entropy@{calc\-\_\-entropy}!updatecovariancematrix@{updatecovariancematrix}}
+\index{updatecovariancematrix@{updatecovariancematrix}!calc_entropy@{calc\-\_\-entropy}}
+\paragraph[{updatecovariancematrix}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-entropy\-::updatecovariancematrix (
+\begin{DoxyParamCaption}
+\item[{type({\bf trajectory})}]{t, }
+\item[{integer}]{i}
+\end{DoxyParamCaption}
+)}}\label{classcalc__entropy_abb832ec2f5a651941ccad38b1b20b9be}
+
+
+Definition at line 801 of file calc\-\_\-entropy.\-f90.
+
+\hypertarget{classcalc__entropy_ab1305be69ef87d449d6e0a83f557ef80}{\index{calc\-\_\-entropy@{calc\-\_\-entropy}!viz@{viz}}
+\index{viz@{viz}!calc_entropy@{calc\-\_\-entropy}}
+\paragraph[{viz}]{\setlength{\rightskip}{0pt plus 5cm}subroutine calc\-\_\-entropy\-::viz (
+\begin{DoxyParamCaption}
+\item[{type({\bf trajectory})}]{t}
+\end{DoxyParamCaption}
+)}}\label{classcalc__entropy_ab1305be69ef87d449d6e0a83f557ef80}
+
+
+Definition at line 639 of file calc\-\_\-entropy.\-f90.
+
+
+
+Referenced by pca(), and quasiharmonic\-\_\-analysis().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classcalc__entropy_ab1305be69ef87d449d6e0a83f557ef80_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Data Documentation}
+\hypertarget{classcalc__entropy_a849ddf2db70a1dd6e4098d51b05f195f}{\index{calc\-\_\-entropy@{calc\-\_\-entropy}!cm@{cm}}
+\index{cm@{cm}!calc_entropy@{calc\-\_\-entropy}}
+\paragraph[{cm}]{\setlength{\rightskip}{0pt plus 5cm}real(8) calc\-\_\-entropy\-::cm}}\label{classcalc__entropy_a849ddf2db70a1dd6e4098d51b05f195f}
+
+
+Definition at line 16 of file calc\-\_\-entropy.\-f90.
+
+\hypertarget{classcalc__entropy_a146c2e38467ec52f4c216e2a18b5aaa1}{\index{calc\-\_\-entropy@{calc\-\_\-entropy}!coords@{coords}}
+\index{coords@{coords}!calc_entropy@{calc\-\_\-entropy}}
+\paragraph[{coords}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf entropy\-\_\-coord\-\_\-type}), dimension(max\-\_\-masks), private calc\-\_\-entropy\-::coords\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__entropy_a146c2e38467ec52f4c216e2a18b5aaa1}
+
+
+Definition at line 40 of file calc\-\_\-entropy.\-f90.
+
+\hypertarget{classcalc__entropy_ae17fb9f97d704cb0eb48b1c7b7b0ccaa}{\index{calc\-\_\-entropy@{calc\-\_\-entropy}!e@{e}}
+\index{e@{e}!calc_entropy@{calc\-\_\-entropy}}
+\paragraph[{e}]{\setlength{\rightskip}{0pt plus 5cm}real(8) calc\-\_\-entropy\-::e}}\label{classcalc__entropy_ae17fb9f97d704cb0eb48b1c7b7b0ccaa}
+
+
+Definition at line 16 of file calc\-\_\-entropy.\-f90.
+
+\hypertarget{classcalc__entropy_a530d9ffe62a5dde36d2b21a72da0be95}{\index{calc\-\_\-entropy@{calc\-\_\-entropy}!entropy\-\_\-frame@{entropy\-\_\-frame}}
+\index{entropy\-\_\-frame@{entropy\-\_\-frame}!calc_entropy@{calc\-\_\-entropy}}
+\paragraph[{entropy\-\_\-frame}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-entropy\-::entropy\-\_\-frame}}\label{classcalc__entropy_a530d9ffe62a5dde36d2b21a72da0be95}
+
+
+Definition at line 41 of file calc\-\_\-entropy.\-f90.
+
+\hypertarget{classcalc__entropy_a365c453093f33984755407e59cd2b03f}{\index{calc\-\_\-entropy@{calc\-\_\-entropy}!hs@{hs}}
+\index{hs@{hs}!calc_entropy@{calc\-\_\-entropy}}
+\paragraph[{hs}]{\setlength{\rightskip}{0pt plus 5cm}real(8) calc\-\_\-entropy\-::hs}}\label{classcalc__entropy_a365c453093f33984755407e59cd2b03f}
+
+
+Definition at line 16 of file calc\-\_\-entropy.\-f90.
+
+\hypertarget{classcalc__entropy_a535551365a6e86ba63b99605509d12d8}{\index{calc\-\_\-entropy@{calc\-\_\-entropy}!kb@{kb}}
+\index{kb@{kb}!calc_entropy@{calc\-\_\-entropy}}
+\paragraph[{kb}]{\setlength{\rightskip}{0pt plus 5cm}real(8) calc\-\_\-entropy\-::kb}}\label{classcalc__entropy_a535551365a6e86ba63b99605509d12d8}
+
+
+Definition at line 16 of file calc\-\_\-entropy.\-f90.
+
+\hypertarget{classcalc__entropy_aec8b2f5549506f769e3281da73e1e70d}{\index{calc\-\_\-entropy@{calc\-\_\-entropy}!masks@{masks}}
+\index{masks@{masks}!calc_entropy@{calc\-\_\-entropy}}
+\paragraph[{masks}]{\setlength{\rightskip}{0pt plus 5cm}type(mask\-\_\-type), dimension(max\-\_\-masks), target, private calc\-\_\-entropy\-::masks\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__entropy_aec8b2f5549506f769e3281da73e1e70d}
+
+
+Definition at line 21 of file calc\-\_\-entropy.\-f90.
+
+\hypertarget{classcalc__entropy_a65df17917d4604d8aff01d32b1d9d2c2}{\index{calc\-\_\-entropy@{calc\-\_\-entropy}!nmasks@{nmasks}}
+\index{nmasks@{nmasks}!calc_entropy@{calc\-\_\-entropy}}
+\paragraph[{nmasks}]{\setlength{\rightskip}{0pt plus 5cm}integer, private calc\-\_\-entropy\-::nmasks = 0\hspace{0.3cm}{\ttfamily [private]}}}\label{classcalc__entropy_a65df17917d4604d8aff01d32b1d9d2c2}
+
+
+Definition at line 22 of file calc\-\_\-entropy.\-f90.
+
+\hypertarget{classcalc__entropy_ace4e0d6c83bde96c914718bedb3d95b6}{\index{calc\-\_\-entropy@{calc\-\_\-entropy}!pi\-\_\-val@{pi\-\_\-val}}
+\index{pi\-\_\-val@{pi\-\_\-val}!calc_entropy@{calc\-\_\-entropy}}
+\paragraph[{pi\-\_\-val}]{\setlength{\rightskip}{0pt plus 5cm}real(8) calc\-\_\-entropy\-::pi\-\_\-val}}\label{classcalc__entropy_ace4e0d6c83bde96c914718bedb3d95b6}
+
+
+Definition at line 16 of file calc\-\_\-entropy.\-f90.
+
+\hypertarget{classcalc__entropy_a254c581937b3c10459355e8b4ee78169}{\index{calc\-\_\-entropy@{calc\-\_\-entropy}!r@{r}}
+\index{r@{r}!calc_entropy@{calc\-\_\-entropy}}
+\paragraph[{r}]{\setlength{\rightskip}{0pt plus 5cm}real(8) calc\-\_\-entropy\-::r}}\label{classcalc__entropy_a254c581937b3c10459355e8b4ee78169}
+
+
+Definition at line 16 of file calc\-\_\-entropy.\-f90.
+
+\hypertarget{classcalc__entropy_a5d2d8c2c9a3880bcf294eeb9c9e59990}{\index{calc\-\_\-entropy@{calc\-\_\-entropy}!ref\-\_\-vol@{ref\-\_\-vol}}
+\index{ref\-\_\-vol@{ref\-\_\-vol}!calc_entropy@{calc\-\_\-entropy}}
+\paragraph[{ref\-\_\-vol}]{\setlength{\rightskip}{0pt plus 5cm}real(8) calc\-\_\-entropy\-::ref\-\_\-vol}}\label{classcalc__entropy_a5d2d8c2c9a3880bcf294eeb9c9e59990}
+
+
+Definition at line 16 of file calc\-\_\-entropy.\-f90.
+
+\hypertarget{classcalc__entropy_a956e6d4e2fc8c2d4dbc414d534e5c49d}{\index{calc\-\_\-entropy@{calc\-\_\-entropy}!start@{start}}
+\index{start@{start}!calc_entropy@{calc\-\_\-entropy}}
+\paragraph[{start}]{\setlength{\rightskip}{0pt plus 5cm}integer calc\-\_\-entropy\-::start}}\label{classcalc__entropy_a956e6d4e2fc8c2d4dbc414d534e5c49d}
+
+
+Definition at line 41 of file calc\-\_\-entropy.\-f90.
+
+\hypertarget{classcalc__entropy_ab98127dc795d8a07522c22aff868c11b}{\index{calc\-\_\-entropy@{calc\-\_\-entropy}!u@{u}}
+\index{u@{u}!calc_entropy@{calc\-\_\-entropy}}
+\paragraph[{u}]{\setlength{\rightskip}{0pt plus 5cm}real(8) calc\-\_\-entropy\-::u}}\label{classcalc__entropy_ab98127dc795d8a07522c22aff868c11b}
+
+
+Definition at line 16 of file calc\-\_\-entropy.\-f90.
+
+
+
+The documentation for this module was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{calc__entropy_8f90}{calc\-\_\-entropy.\-f90}\end{DoxyCompactItemize}

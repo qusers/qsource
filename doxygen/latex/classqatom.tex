@@ -1,0 +1,1114 @@
+\hypertarget{classqatom}{\subsection{qatom Module Reference}
+\label{classqatom}\index{qatom@{qatom}}
+}
+
+
+Collaboration diagram for qatom\-:
+\subsubsection*{Data Types}
+\begin{DoxyCompactItemize}
+\item 
+type \hyperlink{structqatom_1_1monitor__atom__group__type}{monitor\-\_\-atom\-\_\-group\-\_\-type}
+\item 
+type \hyperlink{structqatom_1_1monitor__group__pair__type}{monitor\-\_\-group\-\_\-pair\-\_\-type}
+\item 
+type \hyperlink{structqatom_1_1qangle__type}{qangle\-\_\-type}
+\item 
+type \hyperlink{structqatom_1_1qbond__type}{qbond\-\_\-type}
+\item 
+type \hyperlink{structqatom_1_1qbondlib__type}{qbondlib\-\_\-type}
+\item 
+type \hyperlink{structqatom_1_1qq__el__scale__type}{qq\-\_\-el\-\_\-scale\-\_\-type}
+\item 
+type \hyperlink{structqatom_1_1specex__type}{specex\-\_\-type}
+\end{DoxyCompactItemize}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine \hyperlink{classqatom_ad48fcf42edfdf81acc64377a370ad3e7}{qatom\-\_\-startup}
+\item 
+subroutine \hyperlink{classqatom_acb92aaa41f9f9e05292944bcc695c9e8}{qatom\-\_\-shutdown}
+\item 
+logical function \hyperlink{classqatom_aa3713b065bf60ea863b49aeaa868bc4f}{qatom\-\_\-old\-\_\-load\-\_\-atoms} (fep\-\_\-file)
+\item 
+logical function \hyperlink{classqatom_a00e760eda3603bb0bd51f6f84a4e5c9b}{qatom\-\_\-load\-\_\-atoms} (fep\-\_\-file)
+\item 
+logical function \hyperlink{classqatom_a245143a6153dc19a58f06aba637a9ed0}{qatom\-\_\-old\-\_\-load\-\_\-fep} ()
+\item 
+logical function \hyperlink{classqatom_abbf41d36e873b10c022ff757a1271b0e}{qatom\-\_\-load\-\_\-fep} (fep\-\_\-file)
+\item 
+logical function \hyperlink{classqatom_a821169504601d2a8e250c069b14fc1ee}{bond\-\_\-harmonic\-\_\-in\-\_\-any\-\_\-state} (k)
+\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+integer, parameter \hyperlink{classqatom_ad89179e7bcdef29e13211330d1b8fd20}{max\-\_\-states} = 10
+\item 
+integer, parameter \hyperlink{classqatom_aed28407cee717496e5e81de3a1768577}{max\-\_\-qat} = 100
+\item 
+integer, parameter \hyperlink{classqatom_a9ffa057551e3d0e26b8055ea44231d33}{max\-\_\-link} = 10
+\item 
+integer \hyperlink{classqatom_ab24f0d8ce5d78bc90af82d3f9d155b3f}{nstates}
+\item 
+integer \hyperlink{classqatom_a15d48d2e096025002da510e477603e61}{nqat}
+\item 
+integer \hyperlink{classqatom_a3e50342ab7867b2480379e7b998bc882}{qswitch}
+\item 
+integer \hyperlink{classqatom_abb91d88c31c0e0523c8d566cc351f656}{offset}
+\item 
+logical \hyperlink{classqatom_ae27d6b6c13977933ac2f66796ae54de9}{qvdw\-\_\-flag}
+\item 
+logical \hyperlink{classqatom_af0b20b09ab7e5b34ab609d49ebccba3a}{qq\-\_\-use\-\_\-library\-\_\-charges}
+\item 
+integer(ai), dimension(\-:), \\*
+allocatable \hyperlink{classqatom_abb14d4ee8a5fb947e6552af656fbe0e7}{iqseq}
+\item 
+integer, dimension(\-:,\-:), \\*
+allocatable \hyperlink{classqatom_a98b6c947f4fc7a3f0eb6d5c3120def21}{qiac}
+\item 
+character(len=keylength), \\*
+dimension(\-:), allocatable \hyperlink{classqatom_a6762a3f40177cdb6f7c42c0a4918b61c}{qtac}
+\item 
+integer \hyperlink{classqatom_aee32251394714177be381e83d6eb066a}{nqexpnb}
+\item 
+integer(ai), dimension(\-:), \\*
+allocatable \hyperlink{classqatom_aa99790e204a2a46a0e30dcc5c7db2ff6}{iqexpnb}
+\item 
+integer(ai), dimension(\-:), \\*
+allocatable \hyperlink{classqatom_a7d7c0be138a07450adc6f97ff114f3e9}{jqexpnb}
+\item 
+integer \hyperlink{classqatom_a89b0c646995581a2d8b5579f3f013795}{nqlib}
+\item 
+real(4), dimension(\-:,\-:), \\*
+allocatable \hyperlink{classqatom_a64f11bcf0290f6852b578ee62ace7a5e}{qcrg}
+\item 
+real(8), dimension(\-:), allocatable \hyperlink{classqatom_a501fb9488ebd37b0d1b650f9a72fd58e}{qmass}
+\item 
+real(8), dimension(\-:,\-:), \\*
+allocatable \hyperlink{classqatom_ac9881de6ce1fc95c2451db03f280b3fc}{qavdw}
+\item 
+real(8), dimension(\-:,\-:), \\*
+allocatable \hyperlink{classqatom_a2a1d93acc56540aa6051e266e8cacacd}{qbvdw}
+\item 
+integer \hyperlink{classqatom_a25a6842fa30f963e66849606eed652c7}{nqbond}
+\item 
+type(\hyperlink{structqatom_1_1qbond__type}{qbond\-\_\-type}), dimension(\-:), \\*
+allocatable \hyperlink{classqatom_ac7698e27cffcd0d73aa5d9f2d63be5df}{qbnd}
+\item 
+type(\hyperlink{structqatom_1_1qbondlib__type}{qbondlib\-\_\-type}), dimension(\-:), \\*
+allocatable \hyperlink{classqatom_a196079879269f180af8f7182248bbeaa}{qbondlib}
+\item 
+integer \hyperlink{classqatom_acb4dee7d6a9679f6b90735784ead412a}{nqangle}
+\item 
+type(\hyperlink{structqatom_1_1qangle__type}{qangle\-\_\-type}), dimension(\-:), \\*
+allocatable \hyperlink{classqatom_ac67c4e289c7027f5966b90f8c449cc7c}{qang}
+\item 
+type(anglib\-\_\-type), dimension(\-:), \\*
+allocatable \hyperlink{classqatom_a9a304992d62b752bdc4ea9e236e9d496}{qanglib}
+\item 
+integer \hyperlink{classqatom_acaadc57dc029a20be016f75b558883e1}{nqtor}
+\item 
+integer(ai), dimension(\-:), \\*
+allocatable \hyperlink{classqatom_ae7a6c8483c92e6ee4a12477a427bb9f9}{iqtor}
+\item 
+integer(ai), dimension(\-:), \\*
+allocatable \hyperlink{classqatom_af6de1185567eec0f9322e4d6430a2d96}{jqtor}
+\item 
+integer(ai), dimension(\-:), \\*
+allocatable \hyperlink{classqatom_a77756a8eee8ab11823bd3ac6f10153b8}{kqtor}
+\item 
+integer(ai), dimension(\-:), \\*
+allocatable \hyperlink{classqatom_a6c4163a7d53e88f2062f1f52f7641e15}{lqtor}
+\item 
+integer(tiny), dimension(\-:,\-:), \\*
+allocatable \hyperlink{classqatom_a958c8fbc0b25411aa55098f9bc4755c2}{qtorcod}
+\item 
+real(8), dimension(\-:), allocatable \hyperlink{classqatom_a9d161240de494aa5e3246b9e57a600bc}{qfktor}
+\item 
+real(8), dimension(\-:), allocatable \hyperlink{classqatom_a75748cbd598a3a40c2fa8589e3306cc2}{qrmult}
+\item 
+real(8), dimension(\-:), allocatable \hyperlink{classqatom_a6cb08436e73ba064c40610f3c1692a9e}{qdeltor}
+\item 
+integer \hyperlink{classqatom_af6bd0663972383ffa21ce1ee24b7ae78}{nqimp}
+\item 
+integer(ai), dimension(\-:), \\*
+allocatable \hyperlink{classqatom_acf0713070153169232f5dc042a5b41fa}{iqimp}
+\item 
+integer(ai), dimension(\-:), \\*
+allocatable \hyperlink{classqatom_aec8261584efc3ec4cf10a8b4c030ffb5}{jqimp}
+\item 
+integer(ai), dimension(\-:), \\*
+allocatable \hyperlink{classqatom_ab4e982414614c382ce533e5a67a5b8a6}{kqimp}
+\item 
+integer(ai), dimension(\-:), \\*
+allocatable \hyperlink{classqatom_acf6c9a22703cc70e002c3b47528fa0a2}{lqimp}
+\item 
+integer(tiny), dimension(\-:,\-:), \\*
+allocatable \hyperlink{classqatom_ae79130031f46f5c006af90af79bdd169}{qimpcod}
+\item 
+real(8), dimension(\-:), allocatable \hyperlink{classqatom_a365c7af276378468e52670e7da26e41a}{qfkimp}
+\item 
+real(8), dimension(\-:), allocatable \hyperlink{classqatom_ab74e49ee8c35e3aa9ddebdcb7177b382}{qimp0}
+\item 
+integer \hyperlink{classqatom_a08d7f9f7144e8187c01c14f85ea1672e}{nang\-\_\-coupl}
+\item 
+integer \hyperlink{classqatom_ad94d81bad971192e231778440b5d818c}{ntor\-\_\-coupl}
+\item 
+integer \hyperlink{classqatom_a4afd5a33301007292bca9293ee2df063}{nimp\-\_\-coupl}
+\item 
+integer(ai), dimension(3, \hyperlink{classqatom_aed28407cee717496e5e81de3a1768577}{max\-\_\-qat}) \hyperlink{classqatom_ab5f70e89148ed3cbe2685d0e324e4dc7}{iang\-\_\-coupl}
+\item 
+integer(ai), dimension(3, \hyperlink{classqatom_aed28407cee717496e5e81de3a1768577}{max\-\_\-qat}) \hyperlink{classqatom_a155b1e58a34b7c1d1757b9db290dd60b}{itor\-\_\-coupl}
+\item 
+integer(ai), dimension(3, \hyperlink{classqatom_aed28407cee717496e5e81de3a1768577}{max\-\_\-qat}) \hyperlink{classqatom_ac136119a98cb2d0bc7bbaec7becef89f}{iimp\-\_\-coupl}
+\item 
+integer \hyperlink{classqatom_a358d1217d3ef3822b8631ba69079912d}{nqshake}
+\item 
+integer(ai), dimension(\hyperlink{classqatom_aed28407cee717496e5e81de3a1768577}{max\-\_\-qat}) \hyperlink{classqatom_a45d0fea31b19ee37b386b811bb6ebfc7}{iqshake}
+\item 
+integer(ai), dimension(\hyperlink{classqatom_aed28407cee717496e5e81de3a1768577}{max\-\_\-qat}) \hyperlink{classqatom_a4f1103b4b5324b7f4f1e5fc06365984a}{jqshake}
+\item 
+real(8), dimension(\hyperlink{classqatom_aed28407cee717496e5e81de3a1768577}{max\-\_\-qat}, \\*
+\hyperlink{classqatom_ad89179e7bcdef29e13211330d1b8fd20}{max\-\_\-states}) \hyperlink{classqatom_aa4f7d5fe66a06eedb3c584c3c4d0d43c}{qshake\-\_\-dist}
+\item 
+integer \hyperlink{classqatom_a87bc07bd4a86830062583403e3438dfa}{noffd}
+\item 
+type(offdiag\-\_\-save), dimension(\-:), \\*
+allocatable \hyperlink{classqatom_a9cb55eb282cdfb465aafddab998a1669}{offd}
+\item 
+type(offdiag\-\_\-aux), dimension(\-:), \\*
+allocatable \hyperlink{classqatom_ab508173c538653aec2949bedb6858896}{offd2}
+\item 
+integer \hyperlink{classqatom_ad23eb0f3674a085828b3536f2d2d0129}{nexspec}
+\item 
+type(\hyperlink{structqatom_1_1specex__type}{specex\-\_\-type}), dimension(\-:), \\*
+allocatable \hyperlink{classqatom_a8056cd41f167e8804510eb741ab0228d}{exspec}
+\item 
+type(\hyperlink{structqatom_1_1monitor__group__pair__type}{monitor\-\_\-group\-\_\-pair\-\_\-type}), \\*
+dimension(\-:), allocatable \hyperlink{classqatom_ad8e7674c5d54028519bc6bf0a478b406}{monitor\-\_\-group\-\_\-pair}
+\item 
+type(\hyperlink{structqatom_1_1monitor__atom__group__type}{monitor\-\_\-atom\-\_\-group\-\_\-type}), \\*
+dimension(\-:), allocatable \hyperlink{classqatom_a352dcbf92faa65e207f697f694626a05}{monitor\-\_\-atom\-\_\-group}
+\item 
+integer, parameter \hyperlink{classqatom_a6c96fd8bffab81fc806521b1099447d7}{max\-\_\-atoms\-\_\-in\-\_\-special\-\_\-group} =30
+\item 
+integer \hyperlink{classqatom_ab181049f3af87e317940072e8dcb0b8c}{monitor\-\_\-group\-\_\-pairs}
+\item 
+integer \hyperlink{classqatom_a5a430edee24994b0451d502eeba4354d}{monitor\-\_\-groups}
+\item 
+type(\hyperlink{structqatom_1_1qq__el__scale__type}{qq\-\_\-el\-\_\-scale\-\_\-type}), \\*
+dimension(\-:), allocatable \hyperlink{classqatom_a40ab497921d3e628b1881dca1bb118ad}{qq\-\_\-el\-\_\-scale}
+\item 
+integer \hyperlink{classqatom_a1faef5321ae7b901fb70e24a9f56c40b}{nel\-\_\-scale}
+\item 
+integer \hyperlink{classqatom_ac84c7edf661c77c14c60cdcb6ee92973}{tmpindex}
+\item 
+integer \hyperlink{classqatom_a71b6ebba3830ff9fe1f2066c379301bd}{numsoftlines}
+\item 
+integer \hyperlink{classqatom_a9b9c6e05cf898fc0e178dd98559a901b}{i2}
+\item 
+real(8), dimension(\-:,\-:,\-:), \\*
+allocatable \hyperlink{classqatom_a9ca6379ec541fa296e227ea83bcf6f94}{sc\-\_\-lookup}
+\item 
+real(8), dimension(\-:,\-:), \\*
+allocatable \hyperlink{classqatom_a539962282a5ac4df02663098dd0b9c28}{alpha\-\_\-max}
+\item 
+real(8) \hyperlink{classqatom_af56339fd8259d6632f7e06c37e9deaa7}{sc\-\_\-aq}
+\item 
+real(8) \hyperlink{classqatom_acc86f0be8389897d652e9d809d4e2eca}{sc\-\_\-bq}
+\item 
+real(8) \hyperlink{classqatom_a4d79d466c4cb3aa0de5b1b066b07837f}{sc\-\_\-aj}
+\item 
+real(8) \hyperlink{classqatom_a168762bea0f4f31236cd876b85ca85e6}{sc\-\_\-bj}
+\item 
+real(8) \hyperlink{classqatom_a1c31e7a76874fa00e07aa110513040f4}{alpha\-\_\-max\-\_\-tmp}
+\item 
+logical \hyperlink{classqatom_a15eb3bdac362b92205027b5d76b11bf4}{softcore\-\_\-use\-\_\-max\-\_\-potential}
+\item 
+type(q\-\_\-energies), dimension(\-:), \\*
+allocatable \hyperlink{classqatom_a1460f80a9398e8412e72c0f510d5af4d}{eq}
+\item 
+real(8), dimension(\hyperlink{classqatom_ad89179e7bcdef29e13211330d1b8fd20}{max\-\_\-states}, \\*
+\hyperlink{classqatom_ad89179e7bcdef29e13211330d1b8fd20}{max\-\_\-states}) \hyperlink{classqatom_af43d041f4c6cd4cbdcb6a176ff0ecd62}{hij}
+\item 
+real(8), dimension(\hyperlink{classqatom_aed28407cee717496e5e81de3a1768577}{max\-\_\-qat}) \hyperlink{classqatom_a27e9080641bfc27dddb1925910a424f7}{emorsed}
+\item 
+real(8), dimension(3, \hyperlink{classqatom_aed28407cee717496e5e81de3a1768577}{max\-\_\-qat}) \hyperlink{classqatom_a3424db0cbb148216b22871cc6c1e054b}{dmorse\-\_\-i}
+\item 
+real(8), dimension(3, \hyperlink{classqatom_aed28407cee717496e5e81de3a1768577}{max\-\_\-qat}) \hyperlink{classqatom_a0cb9138f02b1243e97d04dc9c55d195f}{dmorse\-\_\-j}
+\item 
+logical \hyperlink{classqatom_ae60329e231213e5892113334daa1821e}{use\-\_\-new\-\_\-fep\-\_\-format}
+\end{DoxyCompactItemize}
+\subsubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+character($\ast$), parameter, private \hyperlink{classqatom_a80c441b3b38961821d4ad264eadda14f}{module\-\_\-name} = 'Q-\/atom'
+\item 
+character($\ast$), parameter, private \hyperlink{classqatom_af98e04952aced53fdd440012346897b2}{module\-\_\-version} = '5.\-01'
+\item 
+character($\ast$), parameter, private \hyperlink{classqatom_a4ff02bb91e09846e9cfcc26a57bfd818}{module\-\_\-date} = '2003-\/06-\/02'
+\item 
+real(8), private \hyperlink{classqatom_a895c809a1075c6a8114729f30cea7d59}{pi}
+\item 
+real(8), private \hyperlink{classqatom_afa086ac14fec6687dfcc7f13d5cd599f}{deg2rad}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+
+
+Definition at line 6 of file qatom.\-f90.
+
+
+
+\subsubsection{Member Function/\-Subroutine Documentation}
+\hypertarget{classqatom_a821169504601d2a8e250c069b14fc1ee}{\index{qatom@{qatom}!bond\-\_\-harmonic\-\_\-in\-\_\-any\-\_\-state@{bond\-\_\-harmonic\-\_\-in\-\_\-any\-\_\-state}}
+\index{bond\-\_\-harmonic\-\_\-in\-\_\-any\-\_\-state@{bond\-\_\-harmonic\-\_\-in\-\_\-any\-\_\-state}!qatom@{qatom}}
+\paragraph[{bond\-\_\-harmonic\-\_\-in\-\_\-any\-\_\-state}]{\setlength{\rightskip}{0pt plus 5cm}logical function qatom\-::bond\-\_\-harmonic\-\_\-in\-\_\-any\-\_\-state (
+\begin{DoxyParamCaption}
+\item[{integer, intent(in)}]{k}
+\end{DoxyParamCaption}
+)}}\label{classqatom_a821169504601d2a8e250c069b14fc1ee}
+
+
+Definition at line 1724 of file qatom.\-f90.
+
+
+
+Referenced by qatom\-\_\-load\-\_\-fep().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classqatom_a821169504601d2a8e250c069b14fc1ee_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classqatom_a00e760eda3603bb0bd51f6f84a4e5c9b}{\index{qatom@{qatom}!qatom\-\_\-load\-\_\-atoms@{qatom\-\_\-load\-\_\-atoms}}
+\index{qatom\-\_\-load\-\_\-atoms@{qatom\-\_\-load\-\_\-atoms}!qatom@{qatom}}
+\paragraph[{qatom\-\_\-load\-\_\-atoms}]{\setlength{\rightskip}{0pt plus 5cm}logical function qatom\-::qatom\-\_\-load\-\_\-atoms (
+\begin{DoxyParamCaption}
+\item[{character($\ast$), intent(in)}]{fep\-\_\-file}
+\end{DoxyParamCaption}
+)}}\label{classqatom_a00e760eda3603bb0bd51f6f84a4e5c9b}
+
+
+Definition at line 232 of file qatom.\-f90.
+
+
+
+References misc\-::centered\-\_\-heading(), prmfile\-::prm\-\_\-close(), prmfile\-::prm\-\_\-count(), prmfile\-::prm\-\_\-get\-\_\-int\-\_\-int(), prmfile\-::prm\-\_\-get\-\_\-integer\-\_\-by\-\_\-key(), prmfile\-::prm\-\_\-get\-\_\-line(), prmfile\-::prm\-\_\-get\-\_\-logical\-\_\-by\-\_\-key(), prmfile\-::prm\-\_\-get\-\_\-string\-\_\-by\-\_\-key(), prmfile\-::prm\-\_\-get\-\_\-string\-\_\-int(), prmfile\-::prm\-\_\-get\-\_\-string\-\_\-string(), prmfile\-::prm\-\_\-max\-\_\-enum(), prmfile\-::prm\-\_\-max\-\_\-enum2(), prmfile\-::prm\-\_\-open\-\_\-section(), qatom\-\_\-old\-\_\-load\-\_\-atoms(), and misc\-::upcase().
+
+
+
+Referenced by md\-::get\-\_\-fep(), calc\-\_\-pmf\-::pmf\-\_\-precalc(), calc\-\_\-chemscore\-::start(), and calc\-\_\-xscore\-::xscore\-\_\-precalc().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classqatom_abbf41d36e873b10c022ff757a1271b0e}{\index{qatom@{qatom}!qatom\-\_\-load\-\_\-fep@{qatom\-\_\-load\-\_\-fep}}
+\index{qatom\-\_\-load\-\_\-fep@{qatom\-\_\-load\-\_\-fep}!qatom@{qatom}}
+\paragraph[{qatom\-\_\-load\-\_\-fep}]{\setlength{\rightskip}{0pt plus 5cm}logical function qatom\-::qatom\-\_\-load\-\_\-fep (
+\begin{DoxyParamCaption}
+\item[{character($\ast$), intent(in)}]{fep\-\_\-file}
+\end{DoxyParamCaption}
+)}}\label{classqatom_abbf41d36e873b10c022ff757a1271b0e}
+
+
+Definition at line 853 of file qatom.\-f90.
+
+
+
+References bond\-\_\-harmonic\-\_\-in\-\_\-any\-\_\-state(), misc\-::centered\-\_\-heading(), indexer\-::index\-\_\-add(), indexer\-::index\-\_\-create(), indexer\-::index\-\_\-get(), prmfile\-::prm\-\_\-close(), prmfile\-::prm\-\_\-count(), prmfile\-::prm\-\_\-get\-\_\-field(), prmfile\-::prm\-\_\-get\-\_\-int\-\_\-int(), prmfile\-::prm\-\_\-get\-\_\-integer\-\_\-by\-\_\-key(), prmfile\-::prm\-\_\-get\-\_\-line(), prmfile\-::prm\-\_\-max\-\_\-enum(), prmfile\-::prm\-\_\-open(), prmfile\-::prm\-\_\-open\-\_\-section(), and qatom\-\_\-old\-\_\-load\-\_\-fep().
+
+
+
+Referenced by md\-::get\-\_\-fep().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classqatom_abbf41d36e873b10c022ff757a1271b0e_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classqatom_aa3713b065bf60ea863b49aeaa868bc4f}{\index{qatom@{qatom}!qatom\-\_\-old\-\_\-load\-\_\-atoms@{qatom\-\_\-old\-\_\-load\-\_\-atoms}}
+\index{qatom\-\_\-old\-\_\-load\-\_\-atoms@{qatom\-\_\-old\-\_\-load\-\_\-atoms}!qatom@{qatom}}
+\paragraph[{qatom\-\_\-old\-\_\-load\-\_\-atoms}]{\setlength{\rightskip}{0pt plus 5cm}logical function qatom\-::qatom\-\_\-old\-\_\-load\-\_\-atoms (
+\begin{DoxyParamCaption}
+\item[{character($\ast$), intent(in)}]{fep\-\_\-file}
+\end{DoxyParamCaption}
+)}}\label{classqatom_aa3713b065bf60ea863b49aeaa868bc4f}
+
+
+Definition at line 200 of file qatom.\-f90.
+
+
+
+References misc\-::centered\-\_\-heading().
+
+
+
+Referenced by qatom\-\_\-load\-\_\-atoms().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classqatom_aa3713b065bf60ea863b49aeaa868bc4f_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classqatom_a245143a6153dc19a58f06aba637a9ed0}{\index{qatom@{qatom}!qatom\-\_\-old\-\_\-load\-\_\-fep@{qatom\-\_\-old\-\_\-load\-\_\-fep}}
+\index{qatom\-\_\-old\-\_\-load\-\_\-fep@{qatom\-\_\-old\-\_\-load\-\_\-fep}!qatom@{qatom}}
+\paragraph[{qatom\-\_\-old\-\_\-load\-\_\-fep}]{\setlength{\rightskip}{0pt plus 5cm}logical function qatom\-::qatom\-\_\-old\-\_\-load\-\_\-fep (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classqatom_a245143a6153dc19a58f06aba637a9ed0}
+
+
+Definition at line 528 of file qatom.\-f90.
+
+
+
+References misc\-::centered\-\_\-heading().
+
+
+
+Referenced by qatom\-\_\-load\-\_\-fep().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classqatom_a245143a6153dc19a58f06aba637a9ed0_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classqatom_a245143a6153dc19a58f06aba637a9ed0_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classqatom_acb92aaa41f9f9e05292944bcc695c9e8}{\index{qatom@{qatom}!qatom\-\_\-shutdown@{qatom\-\_\-shutdown}}
+\index{qatom\-\_\-shutdown@{qatom\-\_\-shutdown}!qatom@{qatom}}
+\paragraph[{qatom\-\_\-shutdown}]{\setlength{\rightskip}{0pt plus 5cm}subroutine qatom\-::qatom\-\_\-shutdown (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classqatom_acb92aaa41f9f9e05292944bcc695c9e8}
+
+
+Definition at line 180 of file qatom.\-f90.
+
+
+
+Referenced by md\-::md\-\_\-shutdown().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classqatom_acb92aaa41f9f9e05292944bcc695c9e8_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classqatom_ad48fcf42edfdf81acc64377a370ad3e7}{\index{qatom@{qatom}!qatom\-\_\-startup@{qatom\-\_\-startup}}
+\index{qatom\-\_\-startup@{qatom\-\_\-startup}!qatom@{qatom}}
+\paragraph[{qatom\-\_\-startup}]{\setlength{\rightskip}{0pt plus 5cm}subroutine qatom\-::qatom\-\_\-startup (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classqatom_ad48fcf42edfdf81acc64377a370ad3e7}
+
+
+Definition at line 166 of file qatom.\-f90.
+
+
+
+References nrgy\-::nrgy\-\_\-startup(), and prmfile\-::prmfile\-\_\-startup().
+
+
+
+Referenced by md\-::md\-\_\-startup().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classqatom_ad48fcf42edfdf81acc64377a370ad3e7_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Data Documentation}
+\hypertarget{classqatom_a539962282a5ac4df02663098dd0b9c28}{\index{qatom@{qatom}!alpha\-\_\-max@{alpha\-\_\-max}}
+\index{alpha\-\_\-max@{alpha\-\_\-max}!qatom@{qatom}}
+\paragraph[{alpha\-\_\-max}]{\setlength{\rightskip}{0pt plus 5cm}real(8), dimension(\-:,\-:), allocatable qatom\-::alpha\-\_\-max}}\label{classqatom_a539962282a5ac4df02663098dd0b9c28}
+
+
+Definition at line 146 of file qatom.\-f90.
+
+\hypertarget{classqatom_a1c31e7a76874fa00e07aa110513040f4}{\index{qatom@{qatom}!alpha\-\_\-max\-\_\-tmp@{alpha\-\_\-max\-\_\-tmp}}
+\index{alpha\-\_\-max\-\_\-tmp@{alpha\-\_\-max\-\_\-tmp}!qatom@{qatom}}
+\paragraph[{alpha\-\_\-max\-\_\-tmp}]{\setlength{\rightskip}{0pt plus 5cm}real(8) qatom\-::alpha\-\_\-max\-\_\-tmp}}\label{classqatom_a1c31e7a76874fa00e07aa110513040f4}
+
+
+Definition at line 147 of file qatom.\-f90.
+
+\hypertarget{classqatom_afa086ac14fec6687dfcc7f13d5cd599f}{\index{qatom@{qatom}!deg2rad@{deg2rad}}
+\index{deg2rad@{deg2rad}!qatom@{qatom}}
+\paragraph[{deg2rad}]{\setlength{\rightskip}{0pt plus 5cm}real(8), private qatom\-::deg2rad\hspace{0.3cm}{\ttfamily [private]}}}\label{classqatom_afa086ac14fec6687dfcc7f13d5cd599f}
+
+
+Definition at line 23 of file qatom.\-f90.
+
+\hypertarget{classqatom_a3424db0cbb148216b22871cc6c1e054b}{\index{qatom@{qatom}!dmorse\-\_\-i@{dmorse\-\_\-i}}
+\index{dmorse\-\_\-i@{dmorse\-\_\-i}!qatom@{qatom}}
+\paragraph[{dmorse\-\_\-i}]{\setlength{\rightskip}{0pt plus 5cm}real(8), dimension(3,{\bf max\-\_\-qat}) qatom\-::dmorse\-\_\-i}}\label{classqatom_a3424db0cbb148216b22871cc6c1e054b}
+
+
+Definition at line 156 of file qatom.\-f90.
+
+\hypertarget{classqatom_a0cb9138f02b1243e97d04dc9c55d195f}{\index{qatom@{qatom}!dmorse\-\_\-j@{dmorse\-\_\-j}}
+\index{dmorse\-\_\-j@{dmorse\-\_\-j}!qatom@{qatom}}
+\paragraph[{dmorse\-\_\-j}]{\setlength{\rightskip}{0pt plus 5cm}real(8), dimension(3,{\bf max\-\_\-qat}) qatom\-::dmorse\-\_\-j}}\label{classqatom_a0cb9138f02b1243e97d04dc9c55d195f}
+
+
+Definition at line 157 of file qatom.\-f90.
+
+\hypertarget{classqatom_a27e9080641bfc27dddb1925910a424f7}{\index{qatom@{qatom}!emorsed@{emorsed}}
+\index{emorsed@{emorsed}!qatom@{qatom}}
+\paragraph[{emorsed}]{\setlength{\rightskip}{0pt plus 5cm}real(8), dimension({\bf max\-\_\-qat}) qatom\-::emorsed}}\label{classqatom_a27e9080641bfc27dddb1925910a424f7}
+
+
+Definition at line 155 of file qatom.\-f90.
+
+\hypertarget{classqatom_a1460f80a9398e8412e72c0f510d5af4d}{\index{qatom@{qatom}!eq@{eq}}
+\index{eq@{eq}!qatom@{qatom}}
+\paragraph[{eq}]{\setlength{\rightskip}{0pt plus 5cm}type(q\-\_\-energies), dimension(\-:), allocatable qatom\-::eq}}\label{classqatom_a1460f80a9398e8412e72c0f510d5af4d}
+
+
+Definition at line 153 of file qatom.\-f90.
+
+\hypertarget{classqatom_a8056cd41f167e8804510eb741ab0228d}{\index{qatom@{qatom}!exspec@{exspec}}
+\index{exspec@{exspec}!qatom@{qatom}}
+\paragraph[{exspec}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf specex\-\_\-type}), dimension(\-:), allocatable qatom\-::exspec}}\label{classqatom_a8056cd41f167e8804510eb741ab0228d}
+
+
+Definition at line 110 of file qatom.\-f90.
+
+\hypertarget{classqatom_af43d041f4c6cd4cbdcb6a176ff0ecd62}{\index{qatom@{qatom}!hij@{hij}}
+\index{hij@{hij}!qatom@{qatom}}
+\paragraph[{hij}]{\setlength{\rightskip}{0pt plus 5cm}real(8), dimension({\bf max\-\_\-states},{\bf max\-\_\-states}) qatom\-::hij}}\label{classqatom_af43d041f4c6cd4cbdcb6a176ff0ecd62}
+
+
+Definition at line 154 of file qatom.\-f90.
+
+\hypertarget{classqatom_a9b9c6e05cf898fc0e178dd98559a901b}{\index{qatom@{qatom}!i2@{i2}}
+\index{i2@{i2}!qatom@{qatom}}
+\paragraph[{i2}]{\setlength{\rightskip}{0pt plus 5cm}integer qatom\-::i2}}\label{classqatom_a9b9c6e05cf898fc0e178dd98559a901b}
+
+
+Definition at line 145 of file qatom.\-f90.
+
+\hypertarget{classqatom_ab5f70e89148ed3cbe2685d0e324e4dc7}{\index{qatom@{qatom}!iang\-\_\-coupl@{iang\-\_\-coupl}}
+\index{iang\-\_\-coupl@{iang\-\_\-coupl}!qatom@{qatom}}
+\paragraph[{iang\-\_\-coupl}]{\setlength{\rightskip}{0pt plus 5cm}integer(ai), dimension(3,{\bf max\-\_\-qat}) qatom\-::iang\-\_\-coupl}}\label{classqatom_ab5f70e89148ed3cbe2685d0e324e4dc7}
+
+
+Definition at line 93 of file qatom.\-f90.
+
+\hypertarget{classqatom_ac136119a98cb2d0bc7bbaec7becef89f}{\index{qatom@{qatom}!iimp\-\_\-coupl@{iimp\-\_\-coupl}}
+\index{iimp\-\_\-coupl@{iimp\-\_\-coupl}!qatom@{qatom}}
+\paragraph[{iimp\-\_\-coupl}]{\setlength{\rightskip}{0pt plus 5cm}integer(ai), dimension(3,{\bf max\-\_\-qat}) qatom\-::iimp\-\_\-coupl}}\label{classqatom_ac136119a98cb2d0bc7bbaec7becef89f}
+
+
+Definition at line 95 of file qatom.\-f90.
+
+\hypertarget{classqatom_aa99790e204a2a46a0e30dcc5c7db2ff6}{\index{qatom@{qatom}!iqexpnb@{iqexpnb}}
+\index{iqexpnb@{iqexpnb}!qatom@{qatom}}
+\paragraph[{iqexpnb}]{\setlength{\rightskip}{0pt plus 5cm}integer(ai), dimension(\-:), allocatable qatom\-::iqexpnb}}\label{classqatom_aa99790e204a2a46a0e30dcc5c7db2ff6}
+
+
+Definition at line 47 of file qatom.\-f90.
+
+\hypertarget{classqatom_acf0713070153169232f5dc042a5b41fa}{\index{qatom@{qatom}!iqimp@{iqimp}}
+\index{iqimp@{iqimp}!qatom@{qatom}}
+\paragraph[{iqimp}]{\setlength{\rightskip}{0pt plus 5cm}integer(ai), dimension(\-:), allocatable qatom\-::iqimp}}\label{classqatom_acf0713070153169232f5dc042a5b41fa}
+
+
+Definition at line 88 of file qatom.\-f90.
+
+\hypertarget{classqatom_abb14d4ee8a5fb947e6552af656fbe0e7}{\index{qatom@{qatom}!iqseq@{iqseq}}
+\index{iqseq@{iqseq}!qatom@{qatom}}
+\paragraph[{iqseq}]{\setlength{\rightskip}{0pt plus 5cm}integer(ai), dimension(\-:), allocatable qatom\-::iqseq}}\label{classqatom_abb14d4ee8a5fb947e6552af656fbe0e7}
+
+
+Definition at line 43 of file qatom.\-f90.
+
+\hypertarget{classqatom_a45d0fea31b19ee37b386b811bb6ebfc7}{\index{qatom@{qatom}!iqshake@{iqshake}}
+\index{iqshake@{iqshake}!qatom@{qatom}}
+\paragraph[{iqshake}]{\setlength{\rightskip}{0pt plus 5cm}integer(ai), dimension({\bf max\-\_\-qat}) qatom\-::iqshake}}\label{classqatom_a45d0fea31b19ee37b386b811bb6ebfc7}
+
+
+Definition at line 98 of file qatom.\-f90.
+
+\hypertarget{classqatom_ae7a6c8483c92e6ee4a12477a427bb9f9}{\index{qatom@{qatom}!iqtor@{iqtor}}
+\index{iqtor@{iqtor}!qatom@{qatom}}
+\paragraph[{iqtor}]{\setlength{\rightskip}{0pt plus 5cm}integer(ai), dimension(\-:), allocatable qatom\-::iqtor}}\label{classqatom_ae7a6c8483c92e6ee4a12477a427bb9f9}
+
+
+Definition at line 83 of file qatom.\-f90.
+
+\hypertarget{classqatom_a155b1e58a34b7c1d1757b9db290dd60b}{\index{qatom@{qatom}!itor\-\_\-coupl@{itor\-\_\-coupl}}
+\index{itor\-\_\-coupl@{itor\-\_\-coupl}!qatom@{qatom}}
+\paragraph[{itor\-\_\-coupl}]{\setlength{\rightskip}{0pt plus 5cm}integer(ai), dimension(3,{\bf max\-\_\-qat}) qatom\-::itor\-\_\-coupl}}\label{classqatom_a155b1e58a34b7c1d1757b9db290dd60b}
+
+
+Definition at line 94 of file qatom.\-f90.
+
+\hypertarget{classqatom_a7d7c0be138a07450adc6f97ff114f3e9}{\index{qatom@{qatom}!jqexpnb@{jqexpnb}}
+\index{jqexpnb@{jqexpnb}!qatom@{qatom}}
+\paragraph[{jqexpnb}]{\setlength{\rightskip}{0pt plus 5cm}integer(ai), dimension(\-:), allocatable qatom\-::jqexpnb}}\label{classqatom_a7d7c0be138a07450adc6f97ff114f3e9}
+
+
+Definition at line 47 of file qatom.\-f90.
+
+\hypertarget{classqatom_aec8261584efc3ec4cf10a8b4c030ffb5}{\index{qatom@{qatom}!jqimp@{jqimp}}
+\index{jqimp@{jqimp}!qatom@{qatom}}
+\paragraph[{jqimp}]{\setlength{\rightskip}{0pt plus 5cm}integer(ai), dimension(\-:), allocatable qatom\-::jqimp}}\label{classqatom_aec8261584efc3ec4cf10a8b4c030ffb5}
+
+
+Definition at line 88 of file qatom.\-f90.
+
+\hypertarget{classqatom_a4f1103b4b5324b7f4f1e5fc06365984a}{\index{qatom@{qatom}!jqshake@{jqshake}}
+\index{jqshake@{jqshake}!qatom@{qatom}}
+\paragraph[{jqshake}]{\setlength{\rightskip}{0pt plus 5cm}integer(ai), dimension({\bf max\-\_\-qat}) qatom\-::jqshake}}\label{classqatom_a4f1103b4b5324b7f4f1e5fc06365984a}
+
+
+Definition at line 98 of file qatom.\-f90.
+
+\hypertarget{classqatom_af6de1185567eec0f9322e4d6430a2d96}{\index{qatom@{qatom}!jqtor@{jqtor}}
+\index{jqtor@{jqtor}!qatom@{qatom}}
+\paragraph[{jqtor}]{\setlength{\rightskip}{0pt plus 5cm}integer(ai), dimension(\-:), allocatable qatom\-::jqtor}}\label{classqatom_af6de1185567eec0f9322e4d6430a2d96}
+
+
+Definition at line 83 of file qatom.\-f90.
+
+\hypertarget{classqatom_ab4e982414614c382ce533e5a67a5b8a6}{\index{qatom@{qatom}!kqimp@{kqimp}}
+\index{kqimp@{kqimp}!qatom@{qatom}}
+\paragraph[{kqimp}]{\setlength{\rightskip}{0pt plus 5cm}integer(ai), dimension(\-:), allocatable qatom\-::kqimp}}\label{classqatom_ab4e982414614c382ce533e5a67a5b8a6}
+
+
+Definition at line 88 of file qatom.\-f90.
+
+\hypertarget{classqatom_a77756a8eee8ab11823bd3ac6f10153b8}{\index{qatom@{qatom}!kqtor@{kqtor}}
+\index{kqtor@{kqtor}!qatom@{qatom}}
+\paragraph[{kqtor}]{\setlength{\rightskip}{0pt plus 5cm}integer(ai), dimension(\-:), allocatable qatom\-::kqtor}}\label{classqatom_a77756a8eee8ab11823bd3ac6f10153b8}
+
+
+Definition at line 83 of file qatom.\-f90.
+
+\hypertarget{classqatom_acf6c9a22703cc70e002c3b47528fa0a2}{\index{qatom@{qatom}!lqimp@{lqimp}}
+\index{lqimp@{lqimp}!qatom@{qatom}}
+\paragraph[{lqimp}]{\setlength{\rightskip}{0pt plus 5cm}integer(ai), dimension(\-:), allocatable qatom\-::lqimp}}\label{classqatom_acf6c9a22703cc70e002c3b47528fa0a2}
+
+
+Definition at line 88 of file qatom.\-f90.
+
+\hypertarget{classqatom_a6c4163a7d53e88f2062f1f52f7641e15}{\index{qatom@{qatom}!lqtor@{lqtor}}
+\index{lqtor@{lqtor}!qatom@{qatom}}
+\paragraph[{lqtor}]{\setlength{\rightskip}{0pt plus 5cm}integer(ai), dimension(\-:), allocatable qatom\-::lqtor}}\label{classqatom_a6c4163a7d53e88f2062f1f52f7641e15}
+
+
+Definition at line 83 of file qatom.\-f90.
+
+\hypertarget{classqatom_a6c96fd8bffab81fc806521b1099447d7}{\index{qatom@{qatom}!max\-\_\-atoms\-\_\-in\-\_\-special\-\_\-group@{max\-\_\-atoms\-\_\-in\-\_\-special\-\_\-group}}
+\index{max\-\_\-atoms\-\_\-in\-\_\-special\-\_\-group@{max\-\_\-atoms\-\_\-in\-\_\-special\-\_\-group}!qatom@{qatom}}
+\paragraph[{max\-\_\-atoms\-\_\-in\-\_\-special\-\_\-group}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter qatom\-::max\-\_\-atoms\-\_\-in\-\_\-special\-\_\-group =30}}\label{classqatom_a6c96fd8bffab81fc806521b1099447d7}
+
+
+Definition at line 131 of file qatom.\-f90.
+
+\hypertarget{classqatom_a9ffa057551e3d0e26b8055ea44231d33}{\index{qatom@{qatom}!max\-\_\-link@{max\-\_\-link}}
+\index{max\-\_\-link@{max\-\_\-link}!qatom@{qatom}}
+\paragraph[{max\-\_\-link}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter qatom\-::max\-\_\-link = 10}}\label{classqatom_a9ffa057551e3d0e26b8055ea44231d33}
+
+
+Definition at line 31 of file qatom.\-f90.
+
+\hypertarget{classqatom_aed28407cee717496e5e81de3a1768577}{\index{qatom@{qatom}!max\-\_\-qat@{max\-\_\-qat}}
+\index{max\-\_\-qat@{max\-\_\-qat}!qatom@{qatom}}
+\paragraph[{max\-\_\-qat}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter qatom\-::max\-\_\-qat = 100}}\label{classqatom_aed28407cee717496e5e81de3a1768577}
+
+
+Definition at line 30 of file qatom.\-f90.
+
+\hypertarget{classqatom_ad89179e7bcdef29e13211330d1b8fd20}{\index{qatom@{qatom}!max\-\_\-states@{max\-\_\-states}}
+\index{max\-\_\-states@{max\-\_\-states}!qatom@{qatom}}
+\paragraph[{max\-\_\-states}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter qatom\-::max\-\_\-states = 10}}\label{classqatom_ad89179e7bcdef29e13211330d1b8fd20}
+
+
+Definition at line 29 of file qatom.\-f90.
+
+\hypertarget{classqatom_a4ff02bb91e09846e9cfcc26a57bfd818}{\index{qatom@{qatom}!module\-\_\-date@{module\-\_\-date}}
+\index{module\-\_\-date@{module\-\_\-date}!qatom@{qatom}}
+\paragraph[{module\-\_\-date}]{\setlength{\rightskip}{0pt plus 5cm}character($\ast$), parameter, private qatom\-::module\-\_\-date = '2003-\/06-\/02'\hspace{0.3cm}{\ttfamily [private]}}}\label{classqatom_a4ff02bb91e09846e9cfcc26a57bfd818}
+
+
+Definition at line 20 of file qatom.\-f90.
+
+\hypertarget{classqatom_a80c441b3b38961821d4ad264eadda14f}{\index{qatom@{qatom}!module\-\_\-name@{module\-\_\-name}}
+\index{module\-\_\-name@{module\-\_\-name}!qatom@{qatom}}
+\paragraph[{module\-\_\-name}]{\setlength{\rightskip}{0pt plus 5cm}character($\ast$), parameter, private qatom\-::module\-\_\-name = 'Q-\/atom'\hspace{0.3cm}{\ttfamily [private]}}}\label{classqatom_a80c441b3b38961821d4ad264eadda14f}
+
+
+Definition at line 18 of file qatom.\-f90.
+
+\hypertarget{classqatom_af98e04952aced53fdd440012346897b2}{\index{qatom@{qatom}!module\-\_\-version@{module\-\_\-version}}
+\index{module\-\_\-version@{module\-\_\-version}!qatom@{qatom}}
+\paragraph[{module\-\_\-version}]{\setlength{\rightskip}{0pt plus 5cm}character($\ast$), parameter, private qatom\-::module\-\_\-version = '5.\-01'\hspace{0.3cm}{\ttfamily [private]}}}\label{classqatom_af98e04952aced53fdd440012346897b2}
+
+
+Definition at line 19 of file qatom.\-f90.
+
+\hypertarget{classqatom_a352dcbf92faa65e207f697f694626a05}{\index{qatom@{qatom}!monitor\-\_\-atom\-\_\-group@{monitor\-\_\-atom\-\_\-group}}
+\index{monitor\-\_\-atom\-\_\-group@{monitor\-\_\-atom\-\_\-group}!qatom@{qatom}}
+\paragraph[{monitor\-\_\-atom\-\_\-group}]{\setlength{\rightskip}{0pt plus 5cm}type ({\bf monitor\-\_\-atom\-\_\-group\-\_\-type}), dimension(\-:), allocatable qatom\-::monitor\-\_\-atom\-\_\-group}}\label{classqatom_a352dcbf92faa65e207f697f694626a05}
+
+
+Definition at line 126 of file qatom.\-f90.
+
+\hypertarget{classqatom_ad8e7674c5d54028519bc6bf0a478b406}{\index{qatom@{qatom}!monitor\-\_\-group\-\_\-pair@{monitor\-\_\-group\-\_\-pair}}
+\index{monitor\-\_\-group\-\_\-pair@{monitor\-\_\-group\-\_\-pair}!qatom@{qatom}}
+\paragraph[{monitor\-\_\-group\-\_\-pair}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf monitor\-\_\-group\-\_\-pair\-\_\-type}), dimension(\-:), allocatable qatom\-::monitor\-\_\-group\-\_\-pair}}\label{classqatom_ad8e7674c5d54028519bc6bf0a478b406}
+
+
+Definition at line 119 of file qatom.\-f90.
+
+\hypertarget{classqatom_ab181049f3af87e317940072e8dcb0b8c}{\index{qatom@{qatom}!monitor\-\_\-group\-\_\-pairs@{monitor\-\_\-group\-\_\-pairs}}
+\index{monitor\-\_\-group\-\_\-pairs@{monitor\-\_\-group\-\_\-pairs}!qatom@{qatom}}
+\paragraph[{monitor\-\_\-group\-\_\-pairs}]{\setlength{\rightskip}{0pt plus 5cm}integer qatom\-::monitor\-\_\-group\-\_\-pairs}}\label{classqatom_ab181049f3af87e317940072e8dcb0b8c}
+
+
+Definition at line 133 of file qatom.\-f90.
+
+\hypertarget{classqatom_a5a430edee24994b0451d502eeba4354d}{\index{qatom@{qatom}!monitor\-\_\-groups@{monitor\-\_\-groups}}
+\index{monitor\-\_\-groups@{monitor\-\_\-groups}!qatom@{qatom}}
+\paragraph[{monitor\-\_\-groups}]{\setlength{\rightskip}{0pt plus 5cm}integer qatom\-::monitor\-\_\-groups}}\label{classqatom_a5a430edee24994b0451d502eeba4354d}
+
+
+Definition at line 133 of file qatom.\-f90.
+
+\hypertarget{classqatom_a08d7f9f7144e8187c01c14f85ea1672e}{\index{qatom@{qatom}!nang\-\_\-coupl@{nang\-\_\-coupl}}
+\index{nang\-\_\-coupl@{nang\-\_\-coupl}!qatom@{qatom}}
+\paragraph[{nang\-\_\-coupl}]{\setlength{\rightskip}{0pt plus 5cm}integer qatom\-::nang\-\_\-coupl}}\label{classqatom_a08d7f9f7144e8187c01c14f85ea1672e}
+
+
+Definition at line 92 of file qatom.\-f90.
+
+\hypertarget{classqatom_a1faef5321ae7b901fb70e24a9f56c40b}{\index{qatom@{qatom}!nel\-\_\-scale@{nel\-\_\-scale}}
+\index{nel\-\_\-scale@{nel\-\_\-scale}!qatom@{qatom}}
+\paragraph[{nel\-\_\-scale}]{\setlength{\rightskip}{0pt plus 5cm}integer qatom\-::nel\-\_\-scale}}\label{classqatom_a1faef5321ae7b901fb70e24a9f56c40b}
+
+
+Definition at line 143 of file qatom.\-f90.
+
+\hypertarget{classqatom_ad23eb0f3674a085828b3536f2d2d0129}{\index{qatom@{qatom}!nexspec@{nexspec}}
+\index{nexspec@{nexspec}!qatom@{qatom}}
+\paragraph[{nexspec}]{\setlength{\rightskip}{0pt plus 5cm}integer qatom\-::nexspec}}\label{classqatom_ad23eb0f3674a085828b3536f2d2d0129}
+
+
+Definition at line 105 of file qatom.\-f90.
+
+\hypertarget{classqatom_a4afd5a33301007292bca9293ee2df063}{\index{qatom@{qatom}!nimp\-\_\-coupl@{nimp\-\_\-coupl}}
+\index{nimp\-\_\-coupl@{nimp\-\_\-coupl}!qatom@{qatom}}
+\paragraph[{nimp\-\_\-coupl}]{\setlength{\rightskip}{0pt plus 5cm}integer qatom\-::nimp\-\_\-coupl}}\label{classqatom_a4afd5a33301007292bca9293ee2df063}
+
+
+Definition at line 92 of file qatom.\-f90.
+
+\hypertarget{classqatom_a87bc07bd4a86830062583403e3438dfa}{\index{qatom@{qatom}!noffd@{noffd}}
+\index{noffd@{noffd}!qatom@{qatom}}
+\paragraph[{noffd}]{\setlength{\rightskip}{0pt plus 5cm}integer qatom\-::noffd}}\label{classqatom_a87bc07bd4a86830062583403e3438dfa}
+
+
+Definition at line 101 of file qatom.\-f90.
+
+\hypertarget{classqatom_acb4dee7d6a9679f6b90735784ead412a}{\index{qatom@{qatom}!nqangle@{nqangle}}
+\index{nqangle@{nqangle}!qatom@{qatom}}
+\paragraph[{nqangle}]{\setlength{\rightskip}{0pt plus 5cm}integer qatom\-::nqangle}}\label{classqatom_acb4dee7d6a9679f6b90735784ead412a}
+
+
+Definition at line 77 of file qatom.\-f90.
+
+\hypertarget{classqatom_a15d48d2e096025002da510e477603e61}{\index{qatom@{qatom}!nqat@{nqat}}
+\index{nqat@{nqat}!qatom@{qatom}}
+\paragraph[{nqat}]{\setlength{\rightskip}{0pt plus 5cm}integer qatom\-::nqat}}\label{classqatom_a15d48d2e096025002da510e477603e61}
+
+
+Definition at line 33 of file qatom.\-f90.
+
+\hypertarget{classqatom_a25a6842fa30f963e66849606eed652c7}{\index{qatom@{qatom}!nqbond@{nqbond}}
+\index{nqbond@{nqbond}!qatom@{qatom}}
+\paragraph[{nqbond}]{\setlength{\rightskip}{0pt plus 5cm}integer qatom\-::nqbond}}\label{classqatom_a25a6842fa30f963e66849606eed652c7}
+
+
+Definition at line 54 of file qatom.\-f90.
+
+\hypertarget{classqatom_aee32251394714177be381e83d6eb066a}{\index{qatom@{qatom}!nqexpnb@{nqexpnb}}
+\index{nqexpnb@{nqexpnb}!qatom@{qatom}}
+\paragraph[{nqexpnb}]{\setlength{\rightskip}{0pt plus 5cm}integer qatom\-::nqexpnb}}\label{classqatom_aee32251394714177be381e83d6eb066a}
+
+
+Definition at line 46 of file qatom.\-f90.
+
+\hypertarget{classqatom_af6bd0663972383ffa21ce1ee24b7ae78}{\index{qatom@{qatom}!nqimp@{nqimp}}
+\index{nqimp@{nqimp}!qatom@{qatom}}
+\paragraph[{nqimp}]{\setlength{\rightskip}{0pt plus 5cm}integer qatom\-::nqimp}}\label{classqatom_af6bd0663972383ffa21ce1ee24b7ae78}
+
+
+Definition at line 87 of file qatom.\-f90.
+
+\hypertarget{classqatom_a89b0c646995581a2d8b5579f3f013795}{\index{qatom@{qatom}!nqlib@{nqlib}}
+\index{nqlib@{nqlib}!qatom@{qatom}}
+\paragraph[{nqlib}]{\setlength{\rightskip}{0pt plus 5cm}integer qatom\-::nqlib}}\label{classqatom_a89b0c646995581a2d8b5579f3f013795}
+
+
+Definition at line 49 of file qatom.\-f90.
+
+\hypertarget{classqatom_a358d1217d3ef3822b8631ba69079912d}{\index{qatom@{qatom}!nqshake@{nqshake}}
+\index{nqshake@{nqshake}!qatom@{qatom}}
+\paragraph[{nqshake}]{\setlength{\rightskip}{0pt plus 5cm}integer qatom\-::nqshake}}\label{classqatom_a358d1217d3ef3822b8631ba69079912d}
+
+
+Definition at line 97 of file qatom.\-f90.
+
+\hypertarget{classqatom_acaadc57dc029a20be016f75b558883e1}{\index{qatom@{qatom}!nqtor@{nqtor}}
+\index{nqtor@{nqtor}!qatom@{qatom}}
+\paragraph[{nqtor}]{\setlength{\rightskip}{0pt plus 5cm}integer qatom\-::nqtor}}\label{classqatom_acaadc57dc029a20be016f75b558883e1}
+
+
+Definition at line 82 of file qatom.\-f90.
+
+\hypertarget{classqatom_ab24f0d8ce5d78bc90af82d3f9d155b3f}{\index{qatom@{qatom}!nstates@{nstates}}
+\index{nstates@{nstates}!qatom@{qatom}}
+\paragraph[{nstates}]{\setlength{\rightskip}{0pt plus 5cm}integer qatom\-::nstates}}\label{classqatom_ab24f0d8ce5d78bc90af82d3f9d155b3f}
+
+
+Definition at line 33 of file qatom.\-f90.
+
+\hypertarget{classqatom_ad94d81bad971192e231778440b5d818c}{\index{qatom@{qatom}!ntor\-\_\-coupl@{ntor\-\_\-coupl}}
+\index{ntor\-\_\-coupl@{ntor\-\_\-coupl}!qatom@{qatom}}
+\paragraph[{ntor\-\_\-coupl}]{\setlength{\rightskip}{0pt plus 5cm}integer qatom\-::ntor\-\_\-coupl}}\label{classqatom_ad94d81bad971192e231778440b5d818c}
+
+
+Definition at line 92 of file qatom.\-f90.
+
+\hypertarget{classqatom_a71b6ebba3830ff9fe1f2066c379301bd}{\index{qatom@{qatom}!numsoftlines@{numsoftlines}}
+\index{numsoftlines@{numsoftlines}!qatom@{qatom}}
+\paragraph[{numsoftlines}]{\setlength{\rightskip}{0pt plus 5cm}integer qatom\-::numsoftlines}}\label{classqatom_a71b6ebba3830ff9fe1f2066c379301bd}
+
+
+Definition at line 145 of file qatom.\-f90.
+
+\hypertarget{classqatom_a9cb55eb282cdfb465aafddab998a1669}{\index{qatom@{qatom}!offd@{offd}}
+\index{offd@{offd}!qatom@{qatom}}
+\paragraph[{offd}]{\setlength{\rightskip}{0pt plus 5cm}type(offdiag\-\_\-save), dimension(\-:), allocatable qatom\-::offd}}\label{classqatom_a9cb55eb282cdfb465aafddab998a1669}
+
+
+Definition at line 102 of file qatom.\-f90.
+
+\hypertarget{classqatom_ab508173c538653aec2949bedb6858896}{\index{qatom@{qatom}!offd2@{offd2}}
+\index{offd2@{offd2}!qatom@{qatom}}
+\paragraph[{offd2}]{\setlength{\rightskip}{0pt plus 5cm}type(offdiag\-\_\-aux), dimension(\-:), allocatable qatom\-::offd2}}\label{classqatom_ab508173c538653aec2949bedb6858896}
+
+
+Definition at line 103 of file qatom.\-f90.
+
+\hypertarget{classqatom_abb91d88c31c0e0523c8d566cc351f656}{\index{qatom@{qatom}!offset@{offset}}
+\index{offset@{offset}!qatom@{qatom}}
+\paragraph[{offset}]{\setlength{\rightskip}{0pt plus 5cm}integer qatom\-::offset}}\label{classqatom_abb91d88c31c0e0523c8d566cc351f656}
+
+
+Definition at line 40 of file qatom.\-f90.
+
+\hypertarget{classqatom_a895c809a1075c6a8114729f30cea7d59}{\index{qatom@{qatom}!pi@{pi}}
+\index{pi@{pi}!qatom@{qatom}}
+\paragraph[{pi}]{\setlength{\rightskip}{0pt plus 5cm}real(8), private qatom\-::pi\hspace{0.3cm}{\ttfamily [private]}}}\label{classqatom_a895c809a1075c6a8114729f30cea7d59}
+
+
+Definition at line 23 of file qatom.\-f90.
+
+\hypertarget{classqatom_ac67c4e289c7027f5966b90f8c449cc7c}{\index{qatom@{qatom}!qang@{qang}}
+\index{qang@{qang}!qatom@{qatom}}
+\paragraph[{qang}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf qangle\-\_\-type}), dimension(\-:), allocatable qatom\-::qang}}\label{classqatom_ac67c4e289c7027f5966b90f8c449cc7c}
+
+
+Definition at line 79 of file qatom.\-f90.
+
+\hypertarget{classqatom_a9a304992d62b752bdc4ea9e236e9d496}{\index{qatom@{qatom}!qanglib@{qanglib}}
+\index{qanglib@{qanglib}!qatom@{qatom}}
+\paragraph[{qanglib}]{\setlength{\rightskip}{0pt plus 5cm}type(anglib\-\_\-type), dimension(\-:), allocatable qatom\-::qanglib}}\label{classqatom_a9a304992d62b752bdc4ea9e236e9d496}
+
+
+Definition at line 80 of file qatom.\-f90.
+
+\hypertarget{classqatom_ac9881de6ce1fc95c2451db03f280b3fc}{\index{qatom@{qatom}!qavdw@{qavdw}}
+\index{qavdw@{qavdw}!qatom@{qatom}}
+\paragraph[{qavdw}]{\setlength{\rightskip}{0pt plus 5cm}real(8), dimension(\-:,\-:), allocatable qatom\-::qavdw}}\label{classqatom_ac9881de6ce1fc95c2451db03f280b3fc}
+
+
+Definition at line 52 of file qatom.\-f90.
+
+\hypertarget{classqatom_ac7698e27cffcd0d73aa5d9f2d63be5df}{\index{qatom@{qatom}!qbnd@{qbnd}}
+\index{qbnd@{qbnd}!qatom@{qatom}}
+\paragraph[{qbnd}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf qbond\-\_\-type}), dimension(\-:), allocatable qatom\-::qbnd}}\label{classqatom_ac7698e27cffcd0d73aa5d9f2d63be5df}
+
+
+Definition at line 68 of file qatom.\-f90.
+
+\hypertarget{classqatom_a196079879269f180af8f7182248bbeaa}{\index{qatom@{qatom}!qbondlib@{qbondlib}}
+\index{qbondlib@{qbondlib}!qatom@{qatom}}
+\paragraph[{qbondlib}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf qbondlib\-\_\-type}), dimension(\-:), allocatable qatom\-::qbondlib}}\label{classqatom_a196079879269f180af8f7182248bbeaa}
+
+
+Definition at line 69 of file qatom.\-f90.
+
+\hypertarget{classqatom_a2a1d93acc56540aa6051e266e8cacacd}{\index{qatom@{qatom}!qbvdw@{qbvdw}}
+\index{qbvdw@{qbvdw}!qatom@{qatom}}
+\paragraph[{qbvdw}]{\setlength{\rightskip}{0pt plus 5cm}real(8), dimension(\-:,\-:), allocatable qatom\-::qbvdw}}\label{classqatom_a2a1d93acc56540aa6051e266e8cacacd}
+
+
+Definition at line 52 of file qatom.\-f90.
+
+\hypertarget{classqatom_a64f11bcf0290f6852b578ee62ace7a5e}{\index{qatom@{qatom}!qcrg@{qcrg}}
+\index{qcrg@{qcrg}!qatom@{qatom}}
+\paragraph[{qcrg}]{\setlength{\rightskip}{0pt plus 5cm}real(4), dimension(\-:,\-:), allocatable qatom\-::qcrg}}\label{classqatom_a64f11bcf0290f6852b578ee62ace7a5e}
+
+
+Definition at line 50 of file qatom.\-f90.
+
+\hypertarget{classqatom_a6cb08436e73ba064c40610f3c1692a9e}{\index{qatom@{qatom}!qdeltor@{qdeltor}}
+\index{qdeltor@{qdeltor}!qatom@{qatom}}
+\paragraph[{qdeltor}]{\setlength{\rightskip}{0pt plus 5cm}real(8), dimension(\-:), allocatable qatom\-::qdeltor}}\label{classqatom_a6cb08436e73ba064c40610f3c1692a9e}
+
+
+Definition at line 85 of file qatom.\-f90.
+
+\hypertarget{classqatom_a365c7af276378468e52670e7da26e41a}{\index{qatom@{qatom}!qfkimp@{qfkimp}}
+\index{qfkimp@{qfkimp}!qatom@{qatom}}
+\paragraph[{qfkimp}]{\setlength{\rightskip}{0pt plus 5cm}real(8), dimension(\-:), allocatable qatom\-::qfkimp}}\label{classqatom_a365c7af276378468e52670e7da26e41a}
+
+
+Definition at line 90 of file qatom.\-f90.
+
+\hypertarget{classqatom_a9d161240de494aa5e3246b9e57a600bc}{\index{qatom@{qatom}!qfktor@{qfktor}}
+\index{qfktor@{qfktor}!qatom@{qatom}}
+\paragraph[{qfktor}]{\setlength{\rightskip}{0pt plus 5cm}real(8), dimension(\-:), allocatable qatom\-::qfktor}}\label{classqatom_a9d161240de494aa5e3246b9e57a600bc}
+
+
+Definition at line 85 of file qatom.\-f90.
+
+\hypertarget{classqatom_a98b6c947f4fc7a3f0eb6d5c3120def21}{\index{qatom@{qatom}!qiac@{qiac}}
+\index{qiac@{qiac}!qatom@{qatom}}
+\paragraph[{qiac}]{\setlength{\rightskip}{0pt plus 5cm}integer, dimension(\-:,\-:), allocatable qatom\-::qiac}}\label{classqatom_a98b6c947f4fc7a3f0eb6d5c3120def21}
+
+
+Definition at line 44 of file qatom.\-f90.
+
+\hypertarget{classqatom_ab74e49ee8c35e3aa9ddebdcb7177b382}{\index{qatom@{qatom}!qimp0@{qimp0}}
+\index{qimp0@{qimp0}!qatom@{qatom}}
+\paragraph[{qimp0}]{\setlength{\rightskip}{0pt plus 5cm}real(8), dimension(\-:), allocatable qatom\-::qimp0}}\label{classqatom_ab74e49ee8c35e3aa9ddebdcb7177b382}
+
+
+Definition at line 90 of file qatom.\-f90.
+
+\hypertarget{classqatom_ae79130031f46f5c006af90af79bdd169}{\index{qatom@{qatom}!qimpcod@{qimpcod}}
+\index{qimpcod@{qimpcod}!qatom@{qatom}}
+\paragraph[{qimpcod}]{\setlength{\rightskip}{0pt plus 5cm}integer(tiny), dimension(\-:,\-:), allocatable qatom\-::qimpcod}}\label{classqatom_ae79130031f46f5c006af90af79bdd169}
+
+
+Definition at line 89 of file qatom.\-f90.
+
+\hypertarget{classqatom_a501fb9488ebd37b0d1b650f9a72fd58e}{\index{qatom@{qatom}!qmass@{qmass}}
+\index{qmass@{qmass}!qatom@{qatom}}
+\paragraph[{qmass}]{\setlength{\rightskip}{0pt plus 5cm}real(8), dimension(\-:), allocatable qatom\-::qmass}}\label{classqatom_a501fb9488ebd37b0d1b650f9a72fd58e}
+
+
+Definition at line 51 of file qatom.\-f90.
+
+\hypertarget{classqatom_a40ab497921d3e628b1881dca1bb118ad}{\index{qatom@{qatom}!qq\-\_\-el\-\_\-scale@{qq\-\_\-el\-\_\-scale}}
+\index{qq\-\_\-el\-\_\-scale@{qq\-\_\-el\-\_\-scale}!qatom@{qatom}}
+\paragraph[{qq\-\_\-el\-\_\-scale}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf qq\-\_\-el\-\_\-scale\-\_\-type}), dimension(\-:), allocatable qatom\-::qq\-\_\-el\-\_\-scale}}\label{classqatom_a40ab497921d3e628b1881dca1bb118ad}
+
+
+Definition at line 141 of file qatom.\-f90.
+
+\hypertarget{classqatom_af0b20b09ab7e5b34ab609d49ebccba3a}{\index{qatom@{qatom}!qq\-\_\-use\-\_\-library\-\_\-charges@{qq\-\_\-use\-\_\-library\-\_\-charges}}
+\index{qq\-\_\-use\-\_\-library\-\_\-charges@{qq\-\_\-use\-\_\-library\-\_\-charges}!qatom@{qatom}}
+\paragraph[{qq\-\_\-use\-\_\-library\-\_\-charges}]{\setlength{\rightskip}{0pt plus 5cm}logical qatom\-::qq\-\_\-use\-\_\-library\-\_\-charges}}\label{classqatom_af0b20b09ab7e5b34ab609d49ebccba3a}
+
+
+Definition at line 42 of file qatom.\-f90.
+
+\hypertarget{classqatom_a75748cbd598a3a40c2fa8589e3306cc2}{\index{qatom@{qatom}!qrmult@{qrmult}}
+\index{qrmult@{qrmult}!qatom@{qatom}}
+\paragraph[{qrmult}]{\setlength{\rightskip}{0pt plus 5cm}real(8), dimension(\-:), allocatable qatom\-::qrmult}}\label{classqatom_a75748cbd598a3a40c2fa8589e3306cc2}
+
+
+Definition at line 85 of file qatom.\-f90.
+
+\hypertarget{classqatom_aa4f7d5fe66a06eedb3c584c3c4d0d43c}{\index{qatom@{qatom}!qshake\-\_\-dist@{qshake\-\_\-dist}}
+\index{qshake\-\_\-dist@{qshake\-\_\-dist}!qatom@{qatom}}
+\paragraph[{qshake\-\_\-dist}]{\setlength{\rightskip}{0pt plus 5cm}real(8), dimension({\bf max\-\_\-qat},{\bf max\-\_\-states}) qatom\-::qshake\-\_\-dist}}\label{classqatom_aa4f7d5fe66a06eedb3c584c3c4d0d43c}
+
+
+Definition at line 99 of file qatom.\-f90.
+
+\hypertarget{classqatom_a3e50342ab7867b2480379e7b998bc882}{\index{qatom@{qatom}!qswitch@{qswitch}}
+\index{qswitch@{qswitch}!qatom@{qatom}}
+\paragraph[{qswitch}]{\setlength{\rightskip}{0pt plus 5cm}integer qatom\-::qswitch}}\label{classqatom_a3e50342ab7867b2480379e7b998bc882}
+
+
+Definition at line 38 of file qatom.\-f90.
+
+\hypertarget{classqatom_a6762a3f40177cdb6f7c42c0a4918b61c}{\index{qatom@{qatom}!qtac@{qtac}}
+\index{qtac@{qtac}!qatom@{qatom}}
+\paragraph[{qtac}]{\setlength{\rightskip}{0pt plus 5cm}character(len=keylength), dimension(\-:), allocatable qatom\-::qtac}}\label{classqatom_a6762a3f40177cdb6f7c42c0a4918b61c}
+
+
+Definition at line 45 of file qatom.\-f90.
+
+\hypertarget{classqatom_a958c8fbc0b25411aa55098f9bc4755c2}{\index{qatom@{qatom}!qtorcod@{qtorcod}}
+\index{qtorcod@{qtorcod}!qatom@{qatom}}
+\paragraph[{qtorcod}]{\setlength{\rightskip}{0pt plus 5cm}integer(tiny), dimension(\-:,\-:), allocatable qatom\-::qtorcod}}\label{classqatom_a958c8fbc0b25411aa55098f9bc4755c2}
+
+
+Definition at line 84 of file qatom.\-f90.
+
+\hypertarget{classqatom_ae27d6b6c13977933ac2f66796ae54de9}{\index{qatom@{qatom}!qvdw\-\_\-flag@{qvdw\-\_\-flag}}
+\index{qvdw\-\_\-flag@{qvdw\-\_\-flag}!qatom@{qatom}}
+\paragraph[{qvdw\-\_\-flag}]{\setlength{\rightskip}{0pt plus 5cm}logical qatom\-::qvdw\-\_\-flag}}\label{classqatom_ae27d6b6c13977933ac2f66796ae54de9}
+
+
+Definition at line 41 of file qatom.\-f90.
+
+\hypertarget{classqatom_a4d79d466c4cb3aa0de5b1b066b07837f}{\index{qatom@{qatom}!sc\-\_\-aj@{sc\-\_\-aj}}
+\index{sc\-\_\-aj@{sc\-\_\-aj}!qatom@{qatom}}
+\paragraph[{sc\-\_\-aj}]{\setlength{\rightskip}{0pt plus 5cm}real(8) qatom\-::sc\-\_\-aj}}\label{classqatom_a4d79d466c4cb3aa0de5b1b066b07837f}
+
+
+Definition at line 147 of file qatom.\-f90.
+
+\hypertarget{classqatom_af56339fd8259d6632f7e06c37e9deaa7}{\index{qatom@{qatom}!sc\-\_\-aq@{sc\-\_\-aq}}
+\index{sc\-\_\-aq@{sc\-\_\-aq}!qatom@{qatom}}
+\paragraph[{sc\-\_\-aq}]{\setlength{\rightskip}{0pt plus 5cm}real(8) qatom\-::sc\-\_\-aq}}\label{classqatom_af56339fd8259d6632f7e06c37e9deaa7}
+
+
+Definition at line 147 of file qatom.\-f90.
+
+\hypertarget{classqatom_a168762bea0f4f31236cd876b85ca85e6}{\index{qatom@{qatom}!sc\-\_\-bj@{sc\-\_\-bj}}
+\index{sc\-\_\-bj@{sc\-\_\-bj}!qatom@{qatom}}
+\paragraph[{sc\-\_\-bj}]{\setlength{\rightskip}{0pt plus 5cm}real(8) qatom\-::sc\-\_\-bj}}\label{classqatom_a168762bea0f4f31236cd876b85ca85e6}
+
+
+Definition at line 147 of file qatom.\-f90.
+
+\hypertarget{classqatom_acc86f0be8389897d652e9d809d4e2eca}{\index{qatom@{qatom}!sc\-\_\-bq@{sc\-\_\-bq}}
+\index{sc\-\_\-bq@{sc\-\_\-bq}!qatom@{qatom}}
+\paragraph[{sc\-\_\-bq}]{\setlength{\rightskip}{0pt plus 5cm}real(8) qatom\-::sc\-\_\-bq}}\label{classqatom_acc86f0be8389897d652e9d809d4e2eca}
+
+
+Definition at line 147 of file qatom.\-f90.
+
+\hypertarget{classqatom_a9ca6379ec541fa296e227ea83bcf6f94}{\index{qatom@{qatom}!sc\-\_\-lookup@{sc\-\_\-lookup}}
+\index{sc\-\_\-lookup@{sc\-\_\-lookup}!qatom@{qatom}}
+\paragraph[{sc\-\_\-lookup}]{\setlength{\rightskip}{0pt plus 5cm}real(8), dimension(\-:,\-:,\-:), allocatable qatom\-::sc\-\_\-lookup}}\label{classqatom_a9ca6379ec541fa296e227ea83bcf6f94}
+
+
+Definition at line 146 of file qatom.\-f90.
+
+\hypertarget{classqatom_a15eb3bdac362b92205027b5d76b11bf4}{\index{qatom@{qatom}!softcore\-\_\-use\-\_\-max\-\_\-potential@{softcore\-\_\-use\-\_\-max\-\_\-potential}}
+\index{softcore\-\_\-use\-\_\-max\-\_\-potential@{softcore\-\_\-use\-\_\-max\-\_\-potential}!qatom@{qatom}}
+\paragraph[{softcore\-\_\-use\-\_\-max\-\_\-potential}]{\setlength{\rightskip}{0pt plus 5cm}logical qatom\-::softcore\-\_\-use\-\_\-max\-\_\-potential}}\label{classqatom_a15eb3bdac362b92205027b5d76b11bf4}
+
+
+Definition at line 148 of file qatom.\-f90.
+
+\hypertarget{classqatom_ac84c7edf661c77c14c60cdcb6ee92973}{\index{qatom@{qatom}!tmpindex@{tmpindex}}
+\index{tmpindex@{tmpindex}!qatom@{qatom}}
+\paragraph[{tmpindex}]{\setlength{\rightskip}{0pt plus 5cm}integer qatom\-::tmpindex}}\label{classqatom_ac84c7edf661c77c14c60cdcb6ee92973}
+
+
+Definition at line 145 of file qatom.\-f90.
+
+\hypertarget{classqatom_ae60329e231213e5892113334daa1821e}{\index{qatom@{qatom}!use\-\_\-new\-\_\-fep\-\_\-format@{use\-\_\-new\-\_\-fep\-\_\-format}}
+\index{use\-\_\-new\-\_\-fep\-\_\-format@{use\-\_\-new\-\_\-fep\-\_\-format}!qatom@{qatom}}
+\paragraph[{use\-\_\-new\-\_\-fep\-\_\-format}]{\setlength{\rightskip}{0pt plus 5cm}logical qatom\-::use\-\_\-new\-\_\-fep\-\_\-format}}\label{classqatom_ae60329e231213e5892113334daa1821e}
+
+
+Definition at line 160 of file qatom.\-f90.
+
+
+
+The documentation for this module was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{qatom_8f90}{qatom.\-f90}\end{DoxyCompactItemize}

@@ -1,0 +1,1428 @@
+\hypertarget{classtopo}{\subsection{topo Module Reference}
+\label{classtopo}\index{topo@{topo}}
+}
+
+
+Collaboration diagram for topo\-:
+\subsubsection*{Data Types}
+\begin{DoxyCompactItemize}
+\item 
+type \hyperlink{structtopo_1_1ang__type}{ang\-\_\-type}
+\item 
+type \hyperlink{structtopo_1_1anglib__type}{anglib\-\_\-type}
+\item 
+type \hyperlink{structtopo_1_1bond__type}{bond\-\_\-type}
+\item 
+type \hyperlink{structtopo_1_1bondlib__type}{bondlib\-\_\-type}
+\item 
+type \hyperlink{structtopo_1_1cgp__type}{cgp\-\_\-type}
+\item 
+type \hyperlink{structtopo_1_1iac__type}{iac\-\_\-type}
+\item 
+type \hyperlink{structtopo_1_1implib__type}{implib\-\_\-type}
+\item 
+type \hyperlink{structtopo_1_1lj2__type}{lj2\-\_\-type}
+\item 
+type \hyperlink{structtopo_1_1residue__type}{residue\-\_\-type}
+\item 
+type \hyperlink{structtopo_1_1tor__type}{tor\-\_\-type}
+\item 
+type \hyperlink{structtopo_1_1torlib__type}{torlib\-\_\-type}
+\end{DoxyCompactItemize}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine \hyperlink{classtopo_a02f3feddf37e4a6fc41c1d2321db3e02}{topo\-\_\-startup}
+\item 
+subroutine \hyperlink{classtopo_aa098e159f5c3c082d8dbe514b1312afd}{topo\-\_\-set\-\_\-max} (max, max\-\_\-lib, max\-\_\-nbr)
+\item 
+subroutine \hyperlink{classtopo_a5d8d6ced35f199f8babf3314deb5bd5b}{topo\-\_\-allocate\-\_\-potential} (stat\-\_\-out)
+\item 
+subroutine \hyperlink{classtopo_a88a502c82bac0ebb3dbf06b2e7bd0e2b}{topo\-\_\-allocate\-\_\-atom} (stat\-\_\-out)
+\item 
+subroutine \hyperlink{classtopo_aa6153a7d9918ecb635b405949f7237ee}{topo\-\_\-deallocate} (keep\-\_\-ff)
+\item 
+subroutine \hyperlink{classtopo_a168e8dd7b1ec88e419b80fa92cadc2c0}{topo\-\_\-reallocate\-\_\-xtop} (atoms)
+\item 
+subroutine \hyperlink{classtopo_a1ab3b8fc655da30d712a142f00f37491}{topo\-\_\-reallocate} (oldatoms, atoms, waters)
+\item 
+logical function \hyperlink{classtopo_aac0681f14a49bb07e5cbb3a877b1e5dd}{topo\-\_\-load} (filename, require\-\_\-version)
+\item 
+integer function \hyperlink{classtopo_a5d064dafa1d8df6166a94664f390767f}{topo\-\_\-open} (filename)
+\item 
+logical function \hyperlink{classtopo_a7aad640a2ad55b89529425b1f386810a}{topo\-\_\-read} (u, require\-\_\-version, extrabonds)
+\item 
+subroutine \hyperlink{classtopo_a04787a084f5cd3714804c90837d423d3}{topo\-\_\-save} (name)
+\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+integer, parameter \hyperlink{classtopo_a81ba8fdc81bafeeebc27023f5e279b61}{nljtyp} = 3
+\item 
+integer, parameter \hyperlink{classtopo_a829add9eca19b5542187f422aca77837}{max\-\_\-nbr\-\_\-range} = 25
+\item 
+real \hyperlink{classtopo_a617c819365f4a269fda75bb3a4e3829e}{version}
+\item 
+character(len=80) \hyperlink{classtopo_aeed5c7dad044f283eead0024edd1c4d2}{title} = ''
+\item 
+character(len=80) \hyperlink{classtopo_a8ae816563184073254a1590f00d34844}{forcefield} = ''
+\item 
+character(len=8) \hyperlink{classtopo_a89837e9df3b93b954210d3f9b7f6ed4b}{creation\-\_\-date}
+\item 
+character(len=256) \hyperlink{classtopo_a90f0e1e8f5270c20cb96cdaa565c7d5b}{pdb\-\_\-file} = ''
+\item 
+character(len=256) \hyperlink{classtopo_a36d8911e30fa5afaf992961a17174479}{lib\-\_\-files} = ''
+\item 
+character(len=256) \hyperlink{classtopo_a49ba5e9d5475fd58013ee8e5931480b0}{prm\-\_\-file}
+\item 
+integer \hyperlink{classtopo_a9c36bc3f022fb8a4dbb82c24369a4dc9}{nat\-\_\-pro}
+\item 
+integer \hyperlink{classtopo_aa2c11d8a835cd358961ef16ed23e444b}{nat\-\_\-solute}
+\item 
+integer \hyperlink{classtopo_a3ab7b1b9142e0426e8b147a00c78f36c}{max\-\_\-atom}
+\item 
+real(8), dimension(\-:), allocatable \hyperlink{classtopo_a401594110af6e631225453a47e150299}{xtop}
+\item 
+integer(tiny), dimension(\-:), \\*
+allocatable \hyperlink{classtopo_ae4a49e34cb36ac8f97b97dc0ed0dc467}{iac}
+\item 
+logical, dimension(\-:), allocatable \hyperlink{classtopo_add92afa3ae9b74baac3b28ec0c65b5bd}{heavy}
+\item 
+real, dimension(\-:), allocatable \hyperlink{classtopo_a19aa89f2c73146419d066f95e7d789b4}{crg}
+\item 
+integer(ai), dimension(\-:), \\*
+allocatable \hyperlink{classtopo_aaa0378f603bebaa45a7aaa20adf7a881}{cgpatom}
+\item 
+integer, parameter \hyperlink{classtopo_a511570d6a5e9c6eef152d18f793f51ad}{solvent\-\_\-spc} =0
+\item 
+integer, parameter \hyperlink{classtopo_adfbe1f0059a125762d2f0be3ad7899f1}{solvent\-\_\-3atom} =1
+\item 
+integer, parameter \hyperlink{classtopo_ac2cd61b970ce97de005f36f91d23aa29}{solvent\-\_\-general} =2
+\item 
+integer \hyperlink{classtopo_a6e2eb29b8d19028c7ee9ba06b64359ad}{solvent\-\_\-type}
+\item 
+integer, dimension(\-:), allocatable \hyperlink{classtopo_a0c4a7c684dc6cb8009204fa4ff5a415b}{glb\-\_\-cofactor}
+\item 
+integer, public \hyperlink{classtopo_a8ea821d57105dc97b563aefc43d99d60}{ligand\-\_\-offset}
+\item 
+real(8), dimension(3) \hyperlink{classtopo_a05520e487814783f2383d15af85fa9b0}{xpcent}
+\item 
+real(8), dimension(3) \hyperlink{classtopo_a6d9dae4d1a043949c4aaed1b7e605fb1}{xwcent}
+\item 
+real(8) \hyperlink{classtopo_a5afc147998793fe81dc80f71d620b250}{rwat}
+\item 
+real(8) \hyperlink{classtopo_a4366d13c72ff459b53a9d5d4bfa3fbf1}{rexcl\-\_\-o}
+\item 
+real(8) \hyperlink{classtopo_a620b9479ac6c966db149f0c9e0724c33}{rexcl\-\_\-i}
+\item 
+integer \hyperlink{classtopo_ac511fe2f83b9f7f217045c167ea69a73}{nexats}
+\item 
+integer \hyperlink{classtopo_aab63f01b0844c9dd5b6c57b7257825d7}{nshellats}
+\item 
+integer \hyperlink{classtopo_ade6597c2219c875b950e07384990ac20}{nexwat}
+\item 
+logical, dimension(\-:), allocatable \hyperlink{classtopo_acb17ff02ccc726e439feaad37738f222}{shell}
+\item 
+logical, dimension(\-:), allocatable \hyperlink{classtopo_a9ef86d62501c5cd833dee346e02d324c}{excl}
+\item 
+real(8), dimension(3) \hyperlink{classtopo_a17297954a20e0e493e7c6415823fc312}{boxlength}
+\item 
+real(8), dimension(3) \hyperlink{classtopo_a352c64cb90d5b00eea0402dc6954e595}{boxcentre}
+\item 
+real(8), dimension(3) \hyperlink{classtopo_ad55ddb5451fe2a4663e4e0b8bd9d3962}{inv\-\_\-boxl}
+\item 
+logical \hyperlink{classtopo_aa8f6e5af5947f84992ab2b021b47bc7b}{use\-\_\-pbc} = .false.
+\item 
+integer \hyperlink{classtopo_a4f77c74b9498ed0ab1e72a2f82c1796f}{nbonds}
+\item 
+integer \hyperlink{classtopo_a827a5b6a9b9047edf57a7a0c4d1c3ed8}{nbonds\-\_\-solute}
+\item 
+integer \hyperlink{classtopo_a40ede124fdad99eb520cd35353772625}{max\-\_\-bonds}
+\item 
+type(\hyperlink{structtopo_1_1bond__type}{bond\-\_\-type}), dimension(\-:), \\*
+allocatable \hyperlink{classtopo_ae81427ee7513e74fcb1520cdc0523e56}{bnd}
+\item 
+integer \hyperlink{classtopo_a87c426cfe207ece52a6f31615499f98e}{nbndcod}
+\item 
+integer \hyperlink{classtopo_adba79e0b7b7a62d7222fd453ec63aeb6}{max\-\_\-bondlib}
+\item 
+type(\hyperlink{structtopo_1_1bondlib__type}{bondlib\-\_\-type}), dimension(\-:), \\*
+allocatable \hyperlink{classtopo_af8d6aa1609b783f42bbac18b0cf8ae54}{bondlib}
+\item 
+character(len=3), dimension(\-:), \\*
+allocatable \hyperlink{classtopo_a0bd8eb8a9acd81024eda5ce4abbec08e}{sybyl\-\_\-bond\-\_\-type}
+\item 
+integer \hyperlink{classtopo_acb9de4b76e3e1615bb6f05ca40c22c61}{nangles}
+\item 
+integer \hyperlink{classtopo_a9095694ab9db269f2ee2508062eee9bd}{nangles\-\_\-solute}
+\item 
+integer \hyperlink{classtopo_a132cc719eeaf3f1f29ce8417010fb4b6}{max\-\_\-angles}
+\item 
+type(\hyperlink{structtopo_1_1ang__type}{ang\-\_\-type}), dimension(\-:), \\*
+allocatable \hyperlink{classtopo_a56261b466e299c202f2e574284fbe9c4}{ang}
+\item 
+integer \hyperlink{classtopo_a436580317d68710fbbcccd1ee7440194}{nangcod}
+\item 
+integer \hyperlink{classtopo_af2e022280b5f0e4ca0ccad0bc6f08a64}{max\-\_\-anglib}
+\item 
+type(\hyperlink{structtopo_1_1anglib__type}{anglib\-\_\-type}), dimension(\-:), \\*
+allocatable \hyperlink{classtopo_a4eca44c180379aa76933b665a911feec}{anglib}
+\item 
+integer \hyperlink{classtopo_abe9f7f9ff31ba9e2bf07d57eba011599}{ntors}
+\item 
+integer \hyperlink{classtopo_aec92d2102078e497ee2a6d2fa66bce7c}{ntors\-\_\-solute}
+\item 
+integer \hyperlink{classtopo_a78b13d042014360bfeba5ccbc35d0bd0}{ntorcod}
+\item 
+integer \hyperlink{classtopo_ad15d0e0210d29b89c0da05c40a32f66e}{max\-\_\-tors}
+\item 
+integer \hyperlink{classtopo_adb758dbc842950b17c7940a435fd501e}{max\-\_\-torlib}
+\item 
+integer \hyperlink{classtopo_a316b9321482ea8b4d578dce01da31d9e}{nimps}
+\item 
+integer \hyperlink{classtopo_a92c8927aae134648de67450ea59d3471}{nimps\-\_\-solute}
+\item 
+integer \hyperlink{classtopo_a482e71c286dc7f192d4b77e7b7371bfc}{nimpcod}
+\item 
+integer \hyperlink{classtopo_a1b4325f0531a3b008f1ce6b7e30aa825}{max\-\_\-imps}
+\item 
+integer \hyperlink{classtopo_a13e46089a183300ca9545d432d1b069a}{max\-\_\-implib}
+\item 
+integer \hyperlink{classtopo_a3e704a6de4b91501a168a1bfa7971824}{imp\-\_\-type}
+\item 
+type(\hyperlink{structtopo_1_1tor__type}{tor\-\_\-type}), dimension(\-:), \\*
+allocatable, target \hyperlink{classtopo_ae6ee33b8bdbc8bdccb2419ed9fda07a6}{tor}
+\item 
+type(\hyperlink{structtopo_1_1tor__type}{tor\-\_\-type}), dimension(\-:), \\*
+allocatable, target \hyperlink{classtopo_ac57046f9ffb42c26a980df689e49fa21}{imp}
+\item 
+type(\hyperlink{structtopo_1_1torlib__type}{torlib\-\_\-type}), dimension(\-:), \\*
+allocatable, target \hyperlink{classtopo_ad251840e17aa9a480795470371c954f1}{torlib}
+\item 
+type(\hyperlink{structtopo_1_1implib__type}{implib\-\_\-type}), dimension(\-:), \\*
+allocatable, target \hyperlink{classtopo_a5137a466e7383aab3d7d0c1a25ba0a21}{implib}
+\item 
+integer \hyperlink{classtopo_a17bb91c0e550e12c6bfddf5de414489a}{ncgp}
+\item 
+integer \hyperlink{classtopo_a3a5a2e36d89c3dd5715b85c9d074aad7}{ncgp\-\_\-solute}
+\item 
+integer \hyperlink{classtopo_af211ad4f3cda0669a497f1e0f2ab3f5e}{max\-\_\-cgp}
+\item 
+type(\hyperlink{structtopo_1_1cgp__type}{cgp\-\_\-type}), dimension(\-:), \\*
+allocatable \hyperlink{classtopo_a14c15995f0c51e3f476a707dacdb8325}{cgp}
+\item 
+integer \hyperlink{classtopo_aa2c6ab1859a6c008f5b356dbaa530d07}{natyps}
+\item 
+integer \hyperlink{classtopo_ad992e655380f152361aa9d351c59a9f6}{max\-\_\-atyps}
+\item 
+integer \hyperlink{classtopo_a3e9ae63a574e391f4273239d99cde7dc}{nlj2}
+\item 
+integer \hyperlink{classtopo_afa9d4e5525b6c87435e9203dbedd00e9}{max\-\_\-lj2}
+\item 
+type(\hyperlink{structtopo_1_1iac__type}{iac\-\_\-type}), dimension(\-:), \\*
+allocatable \hyperlink{classtopo_ac0d4a792e1df748bab4c64c116767f36}{iaclib}
+\item 
+character(len=5), dimension(\-:), \\*
+allocatable \hyperlink{classtopo_a54b45b6eb47a65ecff972da7e73e7ffe}{sybyl\-\_\-atom\-\_\-type}
+\item 
+character(len=8), dimension(\-:), \\*
+allocatable \hyperlink{classtopo_a61a2ce9eb3fbc2b8c978de51e0c8c232}{tac}
+\item 
+type(\hyperlink{structtopo_1_1lj2__type}{lj2\-\_\-type}), dimension(\-:), \\*
+allocatable \hyperlink{classtopo_a5edb99fd66ebc120dc55c764018389a1}{lj2}
+\item 
+integer \hyperlink{classtopo_aecebb95712ccb5cb3945600dccbd9721}{ivdw\-\_\-rule}
+\item 
+integer, parameter \hyperlink{classtopo_a7c8bd17bbabb36ba8f438e50e503d6b7}{vdw\-\_\-geometric} =1
+\item 
+integer, parameter \hyperlink{classtopo_a62176dc452e3f5a13dff7365a45edfb6}{vdw\-\_\-arithmetic} =2
+\item 
+real(8) \hyperlink{classtopo_aceb0d764eb03b4b14e013f791b20210c}{el14\-\_\-scale}
+\item 
+integer \hyperlink{classtopo_a2d534e5252ccf0786f939d8cacdb8d1f}{iuse\-\_\-switch\-\_\-atom}
+\item 
+real(8) \hyperlink{classtopo_a5d5c22c48d2fd1140ed5943ce44f0192}{coulomb\-\_\-constant}
+\item 
+integer \hyperlink{classtopo_a3ecd180b85daedebf2f6fa7b4e8046e4}{ff\-\_\-type}
+\item 
+integer, parameter \hyperlink{classtopo_a225be5b395f0b592cf0689d27febd07b}{ff\-\_\-gromos} =1
+\item 
+integer, parameter \hyperlink{classtopo_a8e1182655496f5acb43690d5141e48cd}{ff\-\_\-amber} =2
+\item 
+integer, parameter \hyperlink{classtopo_a0f190a378d94253fd8ba43557193bbc7}{ff\-\_\-charmm} =3
+\item 
+integer \hyperlink{classtopo_a6debae2aa4d0f73038d45c4d4baecd06}{n14nbrs}
+\item 
+integer \hyperlink{classtopo_adffc0d2559b13aa47e04b6480b856654}{nexnbrs}
+\item 
+integer \hyperlink{classtopo_abc0c05f5412f2af5c5ca0816d3d58ae4}{max\-\_\-exbnrs}
+\item 
+integer \hyperlink{classtopo_a7a7341812bbcb4ee7fb15e2bcbe7c7ab}{n14long}
+\item 
+integer \hyperlink{classtopo_a7ae07d7e5923afe96b6827e0697fcd3f}{max\-\_\-14long}
+\item 
+integer \hyperlink{classtopo_a1f5e9cb69084b2315adb19fd0530be6a}{nexlong}
+\item 
+integer \hyperlink{classtopo_ae9731d005feffe66fba90dbd3d247ec9}{max\-\_\-exlong}
+\item 
+logical, dimension(\-:,\-:), \\*
+allocatable \hyperlink{classtopo_a696c4dfe06f913854120360cf5e906d0}{list14}
+\item 
+logical, dimension(\-:,\-:), \\*
+allocatable \hyperlink{classtopo_a830745f1b19366ecd19740718c30a2a0}{listex}
+\item 
+integer(ai), dimension(\-:,\-:), \\*
+allocatable \hyperlink{classtopo_a195827534980f9002caf554cc449bdfd}{list14long}
+\item 
+integer(ai), dimension(\-:,\-:), \\*
+pointer \hyperlink{classtopo_ab6d13bd20fd204e5d5dac827e8d2f0d8}{listexlong}
+\item 
+integer \hyperlink{classtopo_a7084f73e1214464c07b24e59beb247d2}{nres}
+\item 
+integer \hyperlink{classtopo_a2871deb545ab811525581a49954a4b09}{nres\-\_\-solute}
+\item 
+integer \hyperlink{classtopo_abc8a8c2036ea05a86bfc6e383196e167}{max\-\_\-res}
+\item 
+type(\hyperlink{structtopo_1_1residue__type}{residue\-\_\-type}), dimension(\-:), \\*
+allocatable \hyperlink{classtopo_a0867b2ae350f5df1e287c48074a88be7}{res}
+\item 
+integer \hyperlink{classtopo_a7ea01882bbe30eae14b394d73abaa51e}{nmol}
+\item 
+integer \hyperlink{classtopo_ab8596238bb7a672ce61644d634f46202}{max\-\_\-mol}
+\item 
+integer, dimension(\-:), allocatable \hyperlink{classtopo_a96b6bc2cb9d036ac0e8d9592233b6111}{istart\-\_\-mol}
+\end{DoxyCompactItemize}
+\subsubsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine, private \hyperlink{classtopo_a45b47b1bdc178f97b93778d46d7445bb}{topo\-\_\-check\-\_\-alloc} (message)
+\end{DoxyCompactItemize}
+\subsubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+real, parameter, private \hyperlink{classtopo_a4f6210fac33536607cb33d0af2b86205}{module\-\_\-version} = 5.\-03
+\item 
+character($\ast$), parameter, private \hyperlink{classtopo_a6149f4013048cd71979f0c1733b5a93c}{module\-\_\-date} = '2003-\/11-\/12'
+\item 
+integer, private \hyperlink{classtopo_ac6b73d379302df522b9bfb09f9ce7e54}{alloc\-\_\-status}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+
+
+Definition at line 6 of file topo.\-f90.
+
+
+
+\subsubsection{Member Function/\-Subroutine Documentation}
+\hypertarget{classtopo_a88a502c82bac0ebb3dbf06b2e7bd0e2b}{\index{topo@{topo}!topo\-\_\-allocate\-\_\-atom@{topo\-\_\-allocate\-\_\-atom}}
+\index{topo\-\_\-allocate\-\_\-atom@{topo\-\_\-allocate\-\_\-atom}!topo@{topo}}
+\paragraph[{topo\-\_\-allocate\-\_\-atom}]{\setlength{\rightskip}{0pt plus 5cm}subroutine topo\-::topo\-\_\-allocate\-\_\-atom (
+\begin{DoxyParamCaption}
+\item[{integer, intent(out), optional}]{stat\-\_\-out}
+\end{DoxyParamCaption}
+)}}\label{classtopo_a88a502c82bac0ebb3dbf06b2e7bd0e2b}
+
+
+Definition at line 262 of file topo.\-f90.
+
+
+
+Referenced by md\-::init\-\_\-nodes(), and topo\-\_\-read().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classtopo_a5d8d6ced35f199f8babf3314deb5bd5b}{\index{topo@{topo}!topo\-\_\-allocate\-\_\-potential@{topo\-\_\-allocate\-\_\-potential}}
+\index{topo\-\_\-allocate\-\_\-potential@{topo\-\_\-allocate\-\_\-potential}!topo@{topo}}
+\paragraph[{topo\-\_\-allocate\-\_\-potential}]{\setlength{\rightskip}{0pt plus 5cm}subroutine topo\-::topo\-\_\-allocate\-\_\-potential (
+\begin{DoxyParamCaption}
+\item[{integer, intent(out), optional}]{stat\-\_\-out}
+\end{DoxyParamCaption}
+)}}\label{classtopo_a5d8d6ced35f199f8babf3314deb5bd5b}
+
+
+Definition at line 227 of file topo.\-f90.
+
+
+
+Referenced by md\-::init\-\_\-nodes().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtopo_a5d8d6ced35f199f8babf3314deb5bd5b_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtopo_a45b47b1bdc178f97b93778d46d7445bb}{\index{topo@{topo}!topo\-\_\-check\-\_\-alloc@{topo\-\_\-check\-\_\-alloc}}
+\index{topo\-\_\-check\-\_\-alloc@{topo\-\_\-check\-\_\-alloc}!topo@{topo}}
+\paragraph[{topo\-\_\-check\-\_\-alloc}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, private topo\-::topo\-\_\-check\-\_\-alloc (
+\begin{DoxyParamCaption}
+\item[{character($\ast$)}]{message}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classtopo_a45b47b1bdc178f97b93778d46d7445bb}
+
+
+Definition at line 422 of file topo.\-f90.
+
+
+
+Referenced by topo\-\_\-read(), topo\-\_\-reallocate(), topo\-\_\-reallocate\-\_\-xtop(), and topo\-\_\-save().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classtopo_aa6153a7d9918ecb635b405949f7237ee}{\index{topo@{topo}!topo\-\_\-deallocate@{topo\-\_\-deallocate}}
+\index{topo\-\_\-deallocate@{topo\-\_\-deallocate}!topo@{topo}}
+\paragraph[{topo\-\_\-deallocate}]{\setlength{\rightskip}{0pt plus 5cm}subroutine topo\-::topo\-\_\-deallocate (
+\begin{DoxyParamCaption}
+\item[{logical, intent(in), optional}]{keep\-\_\-ff}
+\end{DoxyParamCaption}
+)}}\label{classtopo_aa6153a7d9918ecb635b405949f7237ee}
+
+
+Definition at line 291 of file topo.\-f90.
+
+
+
+Referenced by finalize\-\_\-topology(), md\-::md\-\_\-shutdown(), prep\-::prep\-\_\-shutdown(), prep\-::readpdb(), and topo\-\_\-read().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classtopo_aac0681f14a49bb07e5cbb3a877b1e5dd}{\index{topo@{topo}!topo\-\_\-load@{topo\-\_\-load}}
+\index{topo\-\_\-load@{topo\-\_\-load}!topo@{topo}}
+\paragraph[{topo\-\_\-load}]{\setlength{\rightskip}{0pt plus 5cm}logical function topo\-::topo\-\_\-load (
+\begin{DoxyParamCaption}
+\item[{character($\ast$)}]{filename, }
+\item[{real, intent(in)}]{require\-\_\-version}
+\end{DoxyParamCaption}
+)}}\label{classtopo_aac0681f14a49bb07e5cbb3a877b1e5dd}
+
+
+Definition at line 436 of file topo.\-f90.
+
+
+
+References topo\-\_\-open(), and topo\-\_\-read().
+
+
+
+Referenced by get\-\_\-topology(), and md\-::topology().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=349pt]{classtopo_aac0681f14a49bb07e5cbb3a877b1e5dd_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtopo_a5d064dafa1d8df6166a94664f390767f}{\index{topo@{topo}!topo\-\_\-open@{topo\-\_\-open}}
+\index{topo\-\_\-open@{topo\-\_\-open}!topo@{topo}}
+\paragraph[{topo\-\_\-open}]{\setlength{\rightskip}{0pt plus 5cm}integer function topo\-::topo\-\_\-open (
+\begin{DoxyParamCaption}
+\item[{character($\ast$)}]{filename}
+\end{DoxyParamCaption}
+)}}\label{classtopo_a5d064dafa1d8df6166a94664f390767f}
+
+
+Definition at line 463 of file topo.\-f90.
+
+
+
+References misc\-::freefile().
+
+
+
+Referenced by topo\-\_\-load().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtopo_a5d064dafa1d8df6166a94664f390767f_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtopo_a7aad640a2ad55b89529425b1f386810a}{\index{topo@{topo}!topo\-\_\-read@{topo\-\_\-read}}
+\index{topo\-\_\-read@{topo\-\_\-read}!topo@{topo}}
+\paragraph[{topo\-\_\-read}]{\setlength{\rightskip}{0pt plus 5cm}logical function topo\-::topo\-\_\-read (
+\begin{DoxyParamCaption}
+\item[{integer}]{u, }
+\item[{real, intent(in)}]{require\-\_\-version, }
+\item[{integer, intent(in), optional}]{extrabonds}
+\end{DoxyParamCaption}
+)}}\label{classtopo_a7aad640a2ad55b89529425b1f386810a}
+
+
+Definition at line 487 of file topo.\-f90.
+
+
+
+References misc\-::centered\-\_\-heading(), topo\-\_\-allocate\-\_\-atom(), topo\-\_\-check\-\_\-alloc(), topo\-\_\-deallocate(), and misc\-::upcase().
+
+
+
+Referenced by prep\-::readtop(), and topo\-\_\-load().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=332pt]{classtopo_a7aad640a2ad55b89529425b1f386810a_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classtopo_a1ab3b8fc655da30d712a142f00f37491}{\index{topo@{topo}!topo\-\_\-reallocate@{topo\-\_\-reallocate}}
+\index{topo\-\_\-reallocate@{topo\-\_\-reallocate}!topo@{topo}}
+\paragraph[{topo\-\_\-reallocate}]{\setlength{\rightskip}{0pt plus 5cm}subroutine topo\-::topo\-\_\-reallocate (
+\begin{DoxyParamCaption}
+\item[{integer}]{oldatoms, }
+\item[{integer}]{atoms, }
+\item[{integer}]{waters}
+\end{DoxyParamCaption}
+)}}\label{classtopo_a1ab3b8fc655da30d712a142f00f37491}
+
+
+Definition at line 357 of file topo.\-f90.
+
+
+
+References topo\-\_\-check\-\_\-alloc().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=345pt]{classtopo_a1ab3b8fc655da30d712a142f00f37491_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtopo_a168e8dd7b1ec88e419b80fa92cadc2c0}{\index{topo@{topo}!topo\-\_\-reallocate\-\_\-xtop@{topo\-\_\-reallocate\-\_\-xtop}}
+\index{topo\-\_\-reallocate\-\_\-xtop@{topo\-\_\-reallocate\-\_\-xtop}!topo@{topo}}
+\paragraph[{topo\-\_\-reallocate\-\_\-xtop}]{\setlength{\rightskip}{0pt plus 5cm}subroutine topo\-::topo\-\_\-reallocate\-\_\-xtop (
+\begin{DoxyParamCaption}
+\item[{integer}]{atoms}
+\end{DoxyParamCaption}
+)}}\label{classtopo_a168e8dd7b1ec88e419b80fa92cadc2c0}
+
+
+Definition at line 335 of file topo.\-f90.
+
+
+
+References topo\-\_\-check\-\_\-alloc().
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtopo_a168e8dd7b1ec88e419b80fa92cadc2c0_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classtopo_a04787a084f5cd3714804c90837d423d3}{\index{topo@{topo}!topo\-\_\-save@{topo\-\_\-save}}
+\index{topo\-\_\-save@{topo\-\_\-save}!topo@{topo}}
+\paragraph[{topo\-\_\-save}]{\setlength{\rightskip}{0pt plus 5cm}subroutine topo\-::topo\-\_\-save (
+\begin{DoxyParamCaption}
+\item[{character($\ast$)}]{name}
+\end{DoxyParamCaption}
+)}}\label{classtopo_a04787a084f5cd3714804c90837d423d3}
+
+
+Definition at line 1036 of file topo.\-f90.
+
+
+
+References misc\-::centered\-\_\-heading(), misc\-::freefile(), and topo\-\_\-check\-\_\-alloc().
+
+
+
+Referenced by prep\-::writetop().
+
+
+
+Here is the call graph for this function\-:
+
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classtopo_aa098e159f5c3c082d8dbe514b1312afd}{\index{topo@{topo}!topo\-\_\-set\-\_\-max@{topo\-\_\-set\-\_\-max}}
+\index{topo\-\_\-set\-\_\-max@{topo\-\_\-set\-\_\-max}!topo@{topo}}
+\paragraph[{topo\-\_\-set\-\_\-max}]{\setlength{\rightskip}{0pt plus 5cm}subroutine topo\-::topo\-\_\-set\-\_\-max (
+\begin{DoxyParamCaption}
+\item[{integer}]{max, }
+\item[{integer}]{max\-\_\-lib, }
+\item[{integer}]{max\-\_\-nbr}
+\end{DoxyParamCaption}
+)}}\label{classtopo_aa098e159f5c3c082d8dbe514b1312afd}
+
+
+Definition at line 194 of file topo.\-f90.
+
+
+
+Referenced by prep\-::make\-\_\-solute\-\_\-bonds(), prep\-::maketop(), and qprep().
+
+
+
+Here is the caller graph for this function\-:
+
+
+\hypertarget{classtopo_a02f3feddf37e4a6fc41c1d2321db3e02}{\index{topo@{topo}!topo\-\_\-startup@{topo\-\_\-startup}}
+\index{topo\-\_\-startup@{topo\-\_\-startup}!topo@{topo}}
+\paragraph[{topo\-\_\-startup}]{\setlength{\rightskip}{0pt plus 5cm}subroutine topo\-::topo\-\_\-startup (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classtopo_a02f3feddf37e4a6fc41c1d2321db3e02}
+
+
+Definition at line 189 of file topo.\-f90.
+
+
+
+Referenced by atom\-\_\-mask\-::mask\-\_\-startup(), and prep\-::prep\-\_\-startup().
+
+
+
+Here is the caller graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtopo_a02f3feddf37e4a6fc41c1d2321db3e02_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Data Documentation}
+\hypertarget{classtopo_ac6b73d379302df522b9bfb09f9ce7e54}{\index{topo@{topo}!alloc\-\_\-status@{alloc\-\_\-status}}
+\index{alloc\-\_\-status@{alloc\-\_\-status}!topo@{topo}}
+\paragraph[{alloc\-\_\-status}]{\setlength{\rightskip}{0pt plus 5cm}integer, private topo\-::alloc\-\_\-status\hspace{0.3cm}{\ttfamily [private]}}}\label{classtopo_ac6b73d379302df522b9bfb09f9ce7e54}
+
+
+Definition at line 75 of file topo.\-f90.
+
+\hypertarget{classtopo_a56261b466e299c202f2e574284fbe9c4}{\index{topo@{topo}!ang@{ang}}
+\index{ang@{ang}!topo@{topo}}
+\paragraph[{ang}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf ang\-\_\-type}), dimension(\-:), allocatable topo\-::ang}}\label{classtopo_a56261b466e299c202f2e574284fbe9c4}
+
+
+Definition at line 129 of file topo.\-f90.
+
+\hypertarget{classtopo_a4eca44c180379aa76933b665a911feec}{\index{topo@{topo}!anglib@{anglib}}
+\index{anglib@{anglib}!topo@{topo}}
+\paragraph[{anglib}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf anglib\-\_\-type}), dimension(\-:), allocatable topo\-::anglib}}\label{classtopo_a4eca44c180379aa76933b665a911feec}
+
+
+Definition at line 132 of file topo.\-f90.
+
+\hypertarget{classtopo_ae81427ee7513e74fcb1520cdc0523e56}{\index{topo@{topo}!bnd@{bnd}}
+\index{bnd@{bnd}!topo@{topo}}
+\paragraph[{bnd}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf bond\-\_\-type}), dimension(\-:), allocatable topo\-::bnd}}\label{classtopo_ae81427ee7513e74fcb1520cdc0523e56}
+
+
+Definition at line 121 of file topo.\-f90.
+
+\hypertarget{classtopo_af8d6aa1609b783f42bbac18b0cf8ae54}{\index{topo@{topo}!bondlib@{bondlib}}
+\index{bondlib@{bondlib}!topo@{topo}}
+\paragraph[{bondlib}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf bondlib\-\_\-type}), dimension(\-:), allocatable topo\-::bondlib}}\label{classtopo_af8d6aa1609b783f42bbac18b0cf8ae54}
+
+
+Definition at line 124 of file topo.\-f90.
+
+\hypertarget{classtopo_a352c64cb90d5b00eea0402dc6954e595}{\index{topo@{topo}!boxcentre@{boxcentre}}
+\index{boxcentre@{boxcentre}!topo@{topo}}
+\paragraph[{boxcentre}]{\setlength{\rightskip}{0pt plus 5cm}real(8), dimension(3) topo\-::boxcentre}}\label{classtopo_a352c64cb90d5b00eea0402dc6954e595}
+
+
+Definition at line 113 of file topo.\-f90.
+
+\hypertarget{classtopo_a17297954a20e0e493e7c6415823fc312}{\index{topo@{topo}!boxlength@{boxlength}}
+\index{boxlength@{boxlength}!topo@{topo}}
+\paragraph[{boxlength}]{\setlength{\rightskip}{0pt plus 5cm}real(8), dimension(3) topo\-::boxlength}}\label{classtopo_a17297954a20e0e493e7c6415823fc312}
+
+
+Definition at line 112 of file topo.\-f90.
+
+\hypertarget{classtopo_a14c15995f0c51e3f476a707dacdb8325}{\index{topo@{topo}!cgp@{cgp}}
+\index{cgp@{cgp}!topo@{topo}}
+\paragraph[{cgp}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf cgp\-\_\-type}), dimension(\-:), allocatable topo\-::cgp}}\label{classtopo_a14c15995f0c51e3f476a707dacdb8325}
+
+
+Definition at line 146 of file topo.\-f90.
+
+\hypertarget{classtopo_aaa0378f603bebaa45a7aaa20adf7a881}{\index{topo@{topo}!cgpatom@{cgpatom}}
+\index{cgpatom@{cgpatom}!topo@{topo}}
+\paragraph[{cgpatom}]{\setlength{\rightskip}{0pt plus 5cm}integer(ai), dimension(\-:), allocatable topo\-::cgpatom}}\label{classtopo_aaa0378f603bebaa45a7aaa20adf7a881}
+
+
+Definition at line 95 of file topo.\-f90.
+
+\hypertarget{classtopo_a5d5c22c48d2fd1140ed5943ce44f0192}{\index{topo@{topo}!coulomb\-\_\-constant@{coulomb\-\_\-constant}}
+\index{coulomb\-\_\-constant@{coulomb\-\_\-constant}!topo@{topo}}
+\paragraph[{coulomb\-\_\-constant}]{\setlength{\rightskip}{0pt plus 5cm}real(8) topo\-::coulomb\-\_\-constant}}\label{classtopo_a5d5c22c48d2fd1140ed5943ce44f0192}
+
+
+Definition at line 161 of file topo.\-f90.
+
+\hypertarget{classtopo_a89837e9df3b93b954210d3f9b7f6ed4b}{\index{topo@{topo}!creation\-\_\-date@{creation\-\_\-date}}
+\index{creation\-\_\-date@{creation\-\_\-date}!topo@{topo}}
+\paragraph[{creation\-\_\-date}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8) topo\-::creation\-\_\-date}}\label{classtopo_a89837e9df3b93b954210d3f9b7f6ed4b}
+
+
+Definition at line 83 of file topo.\-f90.
+
+\hypertarget{classtopo_a19aa89f2c73146419d066f95e7d789b4}{\index{topo@{topo}!crg@{crg}}
+\index{crg@{crg}!topo@{topo}}
+\paragraph[{crg}]{\setlength{\rightskip}{0pt plus 5cm}real, dimension(\-:), allocatable topo\-::crg}}\label{classtopo_a19aa89f2c73146419d066f95e7d789b4}
+
+
+Definition at line 94 of file topo.\-f90.
+
+\hypertarget{classtopo_aceb0d764eb03b4b14e013f791b20210c}{\index{topo@{topo}!el14\-\_\-scale@{el14\-\_\-scale}}
+\index{el14\-\_\-scale@{el14\-\_\-scale}!topo@{topo}}
+\paragraph[{el14\-\_\-scale}]{\setlength{\rightskip}{0pt plus 5cm}real(8) topo\-::el14\-\_\-scale}}\label{classtopo_aceb0d764eb03b4b14e013f791b20210c}
+
+
+Definition at line 159 of file topo.\-f90.
+
+\hypertarget{classtopo_a9ef86d62501c5cd833dee346e02d324c}{\index{topo@{topo}!excl@{excl}}
+\index{excl@{excl}!topo@{topo}}
+\paragraph[{excl}]{\setlength{\rightskip}{0pt plus 5cm}logical, dimension(\-:), allocatable topo\-::excl}}\label{classtopo_a9ef86d62501c5cd833dee346e02d324c}
+
+
+Definition at line 109 of file topo.\-f90.
+
+\hypertarget{classtopo_a8e1182655496f5acb43690d5141e48cd}{\index{topo@{topo}!ff\-\_\-amber@{ff\-\_\-amber}}
+\index{ff\-\_\-amber@{ff\-\_\-amber}!topo@{topo}}
+\paragraph[{ff\-\_\-amber}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter topo\-::ff\-\_\-amber =2}}\label{classtopo_a8e1182655496f5acb43690d5141e48cd}
+
+
+Definition at line 165 of file topo.\-f90.
+
+\hypertarget{classtopo_a0f190a378d94253fd8ba43557193bbc7}{\index{topo@{topo}!ff\-\_\-charmm@{ff\-\_\-charmm}}
+\index{ff\-\_\-charmm@{ff\-\_\-charmm}!topo@{topo}}
+\paragraph[{ff\-\_\-charmm}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter topo\-::ff\-\_\-charmm =3}}\label{classtopo_a0f190a378d94253fd8ba43557193bbc7}
+
+
+Definition at line 165 of file topo.\-f90.
+
+\hypertarget{classtopo_a225be5b395f0b592cf0689d27febd07b}{\index{topo@{topo}!ff\-\_\-gromos@{ff\-\_\-gromos}}
+\index{ff\-\_\-gromos@{ff\-\_\-gromos}!topo@{topo}}
+\paragraph[{ff\-\_\-gromos}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter topo\-::ff\-\_\-gromos =1}}\label{classtopo_a225be5b395f0b592cf0689d27febd07b}
+
+
+Definition at line 165 of file topo.\-f90.
+
+\hypertarget{classtopo_a3ecd180b85daedebf2f6fa7b4e8046e4}{\index{topo@{topo}!ff\-\_\-type@{ff\-\_\-type}}
+\index{ff\-\_\-type@{ff\-\_\-type}!topo@{topo}}
+\paragraph[{ff\-\_\-type}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::ff\-\_\-type}}\label{classtopo_a3ecd180b85daedebf2f6fa7b4e8046e4}
+
+
+Definition at line 164 of file topo.\-f90.
+
+\hypertarget{classtopo_a8ae816563184073254a1590f00d34844}{\index{topo@{topo}!forcefield@{forcefield}}
+\index{forcefield@{forcefield}!topo@{topo}}
+\paragraph[{forcefield}]{\setlength{\rightskip}{0pt plus 5cm}character(len=80) topo\-::forcefield = ''}}\label{classtopo_a8ae816563184073254a1590f00d34844}
+
+
+Definition at line 82 of file topo.\-f90.
+
+\hypertarget{classtopo_a0c4a7c684dc6cb8009204fa4ff5a415b}{\index{topo@{topo}!glb\-\_\-cofactor@{glb\-\_\-cofactor}}
+\index{glb\-\_\-cofactor@{glb\-\_\-cofactor}!topo@{topo}}
+\paragraph[{glb\-\_\-cofactor}]{\setlength{\rightskip}{0pt plus 5cm}integer, dimension(\-:), allocatable topo\-::glb\-\_\-cofactor}}\label{classtopo_a0c4a7c684dc6cb8009204fa4ff5a415b}
+
+
+Definition at line 98 of file topo.\-f90.
+
+\hypertarget{classtopo_add92afa3ae9b74baac3b28ec0c65b5bd}{\index{topo@{topo}!heavy@{heavy}}
+\index{heavy@{heavy}!topo@{topo}}
+\paragraph[{heavy}]{\setlength{\rightskip}{0pt plus 5cm}logical, dimension(\-:), allocatable topo\-::heavy}}\label{classtopo_add92afa3ae9b74baac3b28ec0c65b5bd}
+
+
+Definition at line 93 of file topo.\-f90.
+
+\hypertarget{classtopo_ae4a49e34cb36ac8f97b97dc0ed0dc467}{\index{topo@{topo}!iac@{iac}}
+\index{iac@{iac}!topo@{topo}}
+\paragraph[{iac}]{\setlength{\rightskip}{0pt plus 5cm}integer(tiny), dimension(\-:), allocatable topo\-::iac}}\label{classtopo_ae4a49e34cb36ac8f97b97dc0ed0dc467}
+
+
+Definition at line 92 of file topo.\-f90.
+
+\hypertarget{classtopo_ac0d4a792e1df748bab4c64c116767f36}{\index{topo@{topo}!iaclib@{iaclib}}
+\index{iaclib@{iaclib}!topo@{topo}}
+\paragraph[{iaclib}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf iac\-\_\-type}), dimension(\-:), allocatable topo\-::iaclib}}\label{classtopo_ac0d4a792e1df748bab4c64c116767f36}
+
+
+Definition at line 151 of file topo.\-f90.
+
+\hypertarget{classtopo_ac57046f9ffb42c26a980df689e49fa21}{\index{topo@{topo}!imp@{imp}}
+\index{imp@{imp}!topo@{topo}}
+\paragraph[{imp}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf tor\-\_\-type}), dimension(\-:), allocatable, target topo\-::imp}}\label{classtopo_ac57046f9ffb42c26a980df689e49fa21}
+
+
+Definition at line 140 of file topo.\-f90.
+
+\hypertarget{classtopo_a3e704a6de4b91501a168a1bfa7971824}{\index{topo@{topo}!imp\-\_\-type@{imp\-\_\-type}}
+\index{imp\-\_\-type@{imp\-\_\-type}!topo@{topo}}
+\paragraph[{imp\-\_\-type}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::imp\-\_\-type}}\label{classtopo_a3e704a6de4b91501a168a1bfa7971824}
+
+
+Definition at line 138 of file topo.\-f90.
+
+\hypertarget{classtopo_a5137a466e7383aab3d7d0c1a25ba0a21}{\index{topo@{topo}!implib@{implib}}
+\index{implib@{implib}!topo@{topo}}
+\paragraph[{implib}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf implib\-\_\-type}), dimension(\-:), allocatable, target topo\-::implib}}\label{classtopo_a5137a466e7383aab3d7d0c1a25ba0a21}
+
+
+Definition at line 142 of file topo.\-f90.
+
+\hypertarget{classtopo_ad55ddb5451fe2a4663e4e0b8bd9d3962}{\index{topo@{topo}!inv\-\_\-boxl@{inv\-\_\-boxl}}
+\index{inv\-\_\-boxl@{inv\-\_\-boxl}!topo@{topo}}
+\paragraph[{inv\-\_\-boxl}]{\setlength{\rightskip}{0pt plus 5cm}real(8), dimension(3) topo\-::inv\-\_\-boxl}}\label{classtopo_ad55ddb5451fe2a4663e4e0b8bd9d3962}
+
+
+Definition at line 114 of file topo.\-f90.
+
+\hypertarget{classtopo_a96b6bc2cb9d036ac0e8d9592233b6111}{\index{topo@{topo}!istart\-\_\-mol@{istart\-\_\-mol}}
+\index{istart\-\_\-mol@{istart\-\_\-mol}!topo@{topo}}
+\paragraph[{istart\-\_\-mol}]{\setlength{\rightskip}{0pt plus 5cm}integer, dimension(\-:), allocatable topo\-::istart\-\_\-mol}}\label{classtopo_a96b6bc2cb9d036ac0e8d9592233b6111}
+
+
+Definition at line 183 of file topo.\-f90.
+
+\hypertarget{classtopo_a2d534e5252ccf0786f939d8cacdb8d1f}{\index{topo@{topo}!iuse\-\_\-switch\-\_\-atom@{iuse\-\_\-switch\-\_\-atom}}
+\index{iuse\-\_\-switch\-\_\-atom@{iuse\-\_\-switch\-\_\-atom}!topo@{topo}}
+\paragraph[{iuse\-\_\-switch\-\_\-atom}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::iuse\-\_\-switch\-\_\-atom}}\label{classtopo_a2d534e5252ccf0786f939d8cacdb8d1f}
+
+
+Definition at line 160 of file topo.\-f90.
+
+\hypertarget{classtopo_aecebb95712ccb5cb3945600dccbd9721}{\index{topo@{topo}!ivdw\-\_\-rule@{ivdw\-\_\-rule}}
+\index{ivdw\-\_\-rule@{ivdw\-\_\-rule}!topo@{topo}}
+\paragraph[{ivdw\-\_\-rule}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::ivdw\-\_\-rule}}\label{classtopo_aecebb95712ccb5cb3945600dccbd9721}
+
+
+Definition at line 157 of file topo.\-f90.
+
+\hypertarget{classtopo_a36d8911e30fa5afaf992961a17174479}{\index{topo@{topo}!lib\-\_\-files@{lib\-\_\-files}}
+\index{lib\-\_\-files@{lib\-\_\-files}!topo@{topo}}
+\paragraph[{lib\-\_\-files}]{\setlength{\rightskip}{0pt plus 5cm}character(len=256) topo\-::lib\-\_\-files = ''}}\label{classtopo_a36d8911e30fa5afaf992961a17174479}
+
+
+Definition at line 85 of file topo.\-f90.
+
+\hypertarget{classtopo_a8ea821d57105dc97b563aefc43d99d60}{\index{topo@{topo}!ligand\-\_\-offset@{ligand\-\_\-offset}}
+\index{ligand\-\_\-offset@{ligand\-\_\-offset}!topo@{topo}}
+\paragraph[{ligand\-\_\-offset}]{\setlength{\rightskip}{0pt plus 5cm}integer, public topo\-::ligand\-\_\-offset}}\label{classtopo_a8ea821d57105dc97b563aefc43d99d60}
+
+
+Definition at line 100 of file topo.\-f90.
+
+\hypertarget{classtopo_a696c4dfe06f913854120360cf5e906d0}{\index{topo@{topo}!list14@{list14}}
+\index{list14@{list14}!topo@{topo}}
+\paragraph[{list14}]{\setlength{\rightskip}{0pt plus 5cm}logical, dimension(\-:,\-:), allocatable topo\-::list14}}\label{classtopo_a696c4dfe06f913854120360cf5e906d0}
+
+
+Definition at line 172 of file topo.\-f90.
+
+\hypertarget{classtopo_a195827534980f9002caf554cc449bdfd}{\index{topo@{topo}!list14long@{list14long}}
+\index{list14long@{list14long}!topo@{topo}}
+\paragraph[{list14long}]{\setlength{\rightskip}{0pt plus 5cm}integer(ai), dimension(\-:,\-:), allocatable topo\-::list14long}}\label{classtopo_a195827534980f9002caf554cc449bdfd}
+
+
+Definition at line 174 of file topo.\-f90.
+
+\hypertarget{classtopo_a830745f1b19366ecd19740718c30a2a0}{\index{topo@{topo}!listex@{listex}}
+\index{listex@{listex}!topo@{topo}}
+\paragraph[{listex}]{\setlength{\rightskip}{0pt plus 5cm}logical, dimension(\-:,\-:), allocatable topo\-::listex}}\label{classtopo_a830745f1b19366ecd19740718c30a2a0}
+
+
+Definition at line 173 of file topo.\-f90.
+
+\hypertarget{classtopo_ab6d13bd20fd204e5d5dac827e8d2f0d8}{\index{topo@{topo}!listexlong@{listexlong}}
+\index{listexlong@{listexlong}!topo@{topo}}
+\paragraph[{listexlong}]{\setlength{\rightskip}{0pt plus 5cm}integer(ai), dimension(\-:,\-:), pointer topo\-::listexlong}}\label{classtopo_ab6d13bd20fd204e5d5dac827e8d2f0d8}
+
+
+Definition at line 176 of file topo.\-f90.
+
+\hypertarget{classtopo_a5edb99fd66ebc120dc55c764018389a1}{\index{topo@{topo}!lj2@{lj2}}
+\index{lj2@{lj2}!topo@{topo}}
+\paragraph[{lj2}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf lj2\-\_\-type}), dimension(\-:), allocatable topo\-::lj2}}\label{classtopo_a5edb99fd66ebc120dc55c764018389a1}
+
+
+Definition at line 154 of file topo.\-f90.
+
+\hypertarget{classtopo_a7ae07d7e5923afe96b6827e0697fcd3f}{\index{topo@{topo}!max\-\_\-14long@{max\-\_\-14long}}
+\index{max\-\_\-14long@{max\-\_\-14long}!topo@{topo}}
+\paragraph[{max\-\_\-14long}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::max\-\_\-14long}}\label{classtopo_a7ae07d7e5923afe96b6827e0697fcd3f}
+
+
+Definition at line 170 of file topo.\-f90.
+
+\hypertarget{classtopo_a132cc719eeaf3f1f29ce8417010fb4b6}{\index{topo@{topo}!max\-\_\-angles@{max\-\_\-angles}}
+\index{max\-\_\-angles@{max\-\_\-angles}!topo@{topo}}
+\paragraph[{max\-\_\-angles}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::max\-\_\-angles}}\label{classtopo_a132cc719eeaf3f1f29ce8417010fb4b6}
+
+
+Definition at line 128 of file topo.\-f90.
+
+\hypertarget{classtopo_af2e022280b5f0e4ca0ccad0bc6f08a64}{\index{topo@{topo}!max\-\_\-anglib@{max\-\_\-anglib}}
+\index{max\-\_\-anglib@{max\-\_\-anglib}!topo@{topo}}
+\paragraph[{max\-\_\-anglib}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::max\-\_\-anglib}}\label{classtopo_af2e022280b5f0e4ca0ccad0bc6f08a64}
+
+
+Definition at line 131 of file topo.\-f90.
+
+\hypertarget{classtopo_a3ab7b1b9142e0426e8b147a00c78f36c}{\index{topo@{topo}!max\-\_\-atom@{max\-\_\-atom}}
+\index{max\-\_\-atom@{max\-\_\-atom}!topo@{topo}}
+\paragraph[{max\-\_\-atom}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::max\-\_\-atom}}\label{classtopo_a3ab7b1b9142e0426e8b147a00c78f36c}
+
+
+Definition at line 90 of file topo.\-f90.
+
+\hypertarget{classtopo_ad992e655380f152361aa9d351c59a9f6}{\index{topo@{topo}!max\-\_\-atyps@{max\-\_\-atyps}}
+\index{max\-\_\-atyps@{max\-\_\-atyps}!topo@{topo}}
+\paragraph[{max\-\_\-atyps}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::max\-\_\-atyps}}\label{classtopo_ad992e655380f152361aa9d351c59a9f6}
+
+
+Definition at line 149 of file topo.\-f90.
+
+\hypertarget{classtopo_adba79e0b7b7a62d7222fd453ec63aeb6}{\index{topo@{topo}!max\-\_\-bondlib@{max\-\_\-bondlib}}
+\index{max\-\_\-bondlib@{max\-\_\-bondlib}!topo@{topo}}
+\paragraph[{max\-\_\-bondlib}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::max\-\_\-bondlib}}\label{classtopo_adba79e0b7b7a62d7222fd453ec63aeb6}
+
+
+Definition at line 123 of file topo.\-f90.
+
+\hypertarget{classtopo_a40ede124fdad99eb520cd35353772625}{\index{topo@{topo}!max\-\_\-bonds@{max\-\_\-bonds}}
+\index{max\-\_\-bonds@{max\-\_\-bonds}!topo@{topo}}
+\paragraph[{max\-\_\-bonds}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::max\-\_\-bonds}}\label{classtopo_a40ede124fdad99eb520cd35353772625}
+
+
+Definition at line 120 of file topo.\-f90.
+
+\hypertarget{classtopo_af211ad4f3cda0669a497f1e0f2ab3f5e}{\index{topo@{topo}!max\-\_\-cgp@{max\-\_\-cgp}}
+\index{max\-\_\-cgp@{max\-\_\-cgp}!topo@{topo}}
+\paragraph[{max\-\_\-cgp}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::max\-\_\-cgp}}\label{classtopo_af211ad4f3cda0669a497f1e0f2ab3f5e}
+
+
+Definition at line 145 of file topo.\-f90.
+
+\hypertarget{classtopo_abc0c05f5412f2af5c5ca0816d3d58ae4}{\index{topo@{topo}!max\-\_\-exbnrs@{max\-\_\-exbnrs}}
+\index{max\-\_\-exbnrs@{max\-\_\-exbnrs}!topo@{topo}}
+\paragraph[{max\-\_\-exbnrs}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::max\-\_\-exbnrs}}\label{classtopo_abc0c05f5412f2af5c5ca0816d3d58ae4}
+
+
+Definition at line 169 of file topo.\-f90.
+
+\hypertarget{classtopo_ae9731d005feffe66fba90dbd3d247ec9}{\index{topo@{topo}!max\-\_\-exlong@{max\-\_\-exlong}}
+\index{max\-\_\-exlong@{max\-\_\-exlong}!topo@{topo}}
+\paragraph[{max\-\_\-exlong}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::max\-\_\-exlong}}\label{classtopo_ae9731d005feffe66fba90dbd3d247ec9}
+
+
+Definition at line 171 of file topo.\-f90.
+
+\hypertarget{classtopo_a13e46089a183300ca9545d432d1b069a}{\index{topo@{topo}!max\-\_\-implib@{max\-\_\-implib}}
+\index{max\-\_\-implib@{max\-\_\-implib}!topo@{topo}}
+\paragraph[{max\-\_\-implib}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::max\-\_\-implib}}\label{classtopo_a13e46089a183300ca9545d432d1b069a}
+
+
+Definition at line 138 of file topo.\-f90.
+
+\hypertarget{classtopo_a1b4325f0531a3b008f1ce6b7e30aa825}{\index{topo@{topo}!max\-\_\-imps@{max\-\_\-imps}}
+\index{max\-\_\-imps@{max\-\_\-imps}!topo@{topo}}
+\paragraph[{max\-\_\-imps}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::max\-\_\-imps}}\label{classtopo_a1b4325f0531a3b008f1ce6b7e30aa825}
+
+
+Definition at line 138 of file topo.\-f90.
+
+\hypertarget{classtopo_afa9d4e5525b6c87435e9203dbedd00e9}{\index{topo@{topo}!max\-\_\-lj2@{max\-\_\-lj2}}
+\index{max\-\_\-lj2@{max\-\_\-lj2}!topo@{topo}}
+\paragraph[{max\-\_\-lj2}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::max\-\_\-lj2}}\label{classtopo_afa9d4e5525b6c87435e9203dbedd00e9}
+
+
+Definition at line 150 of file topo.\-f90.
+
+\hypertarget{classtopo_ab8596238bb7a672ce61644d634f46202}{\index{topo@{topo}!max\-\_\-mol@{max\-\_\-mol}}
+\index{max\-\_\-mol@{max\-\_\-mol}!topo@{topo}}
+\paragraph[{max\-\_\-mol}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::max\-\_\-mol}}\label{classtopo_ab8596238bb7a672ce61644d634f46202}
+
+
+Definition at line 182 of file topo.\-f90.
+
+\hypertarget{classtopo_a829add9eca19b5542187f422aca77837}{\index{topo@{topo}!max\-\_\-nbr\-\_\-range@{max\-\_\-nbr\-\_\-range}}
+\index{max\-\_\-nbr\-\_\-range@{max\-\_\-nbr\-\_\-range}!topo@{topo}}
+\paragraph[{max\-\_\-nbr\-\_\-range}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter topo\-::max\-\_\-nbr\-\_\-range = 25}}\label{classtopo_a829add9eca19b5542187f422aca77837}
+
+
+Definition at line 17 of file topo.\-f90.
+
+\hypertarget{classtopo_abc8a8c2036ea05a86bfc6e383196e167}{\index{topo@{topo}!max\-\_\-res@{max\-\_\-res}}
+\index{max\-\_\-res@{max\-\_\-res}!topo@{topo}}
+\paragraph[{max\-\_\-res}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::max\-\_\-res}}\label{classtopo_abc8a8c2036ea05a86bfc6e383196e167}
+
+
+Definition at line 179 of file topo.\-f90.
+
+\hypertarget{classtopo_adb758dbc842950b17c7940a435fd501e}{\index{topo@{topo}!max\-\_\-torlib@{max\-\_\-torlib}}
+\index{max\-\_\-torlib@{max\-\_\-torlib}!topo@{topo}}
+\paragraph[{max\-\_\-torlib}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::max\-\_\-torlib}}\label{classtopo_adb758dbc842950b17c7940a435fd501e}
+
+
+Definition at line 136 of file topo.\-f90.
+
+\hypertarget{classtopo_ad15d0e0210d29b89c0da05c40a32f66e}{\index{topo@{topo}!max\-\_\-tors@{max\-\_\-tors}}
+\index{max\-\_\-tors@{max\-\_\-tors}!topo@{topo}}
+\paragraph[{max\-\_\-tors}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::max\-\_\-tors}}\label{classtopo_ad15d0e0210d29b89c0da05c40a32f66e}
+
+
+Definition at line 136 of file topo.\-f90.
+
+\hypertarget{classtopo_a6149f4013048cd71979f0c1733b5a93c}{\index{topo@{topo}!module\-\_\-date@{module\-\_\-date}}
+\index{module\-\_\-date@{module\-\_\-date}!topo@{topo}}
+\paragraph[{module\-\_\-date}]{\setlength{\rightskip}{0pt plus 5cm}character($\ast$), parameter, private topo\-::module\-\_\-date = '2003-\/11-\/12'\hspace{0.3cm}{\ttfamily [private]}}}\label{classtopo_a6149f4013048cd71979f0c1733b5a93c}
+
+
+Definition at line 14 of file topo.\-f90.
+
+\hypertarget{classtopo_a4f6210fac33536607cb33d0af2b86205}{\index{topo@{topo}!module\-\_\-version@{module\-\_\-version}}
+\index{module\-\_\-version@{module\-\_\-version}!topo@{topo}}
+\paragraph[{module\-\_\-version}]{\setlength{\rightskip}{0pt plus 5cm}real, parameter, private topo\-::module\-\_\-version = 5.\-03\hspace{0.3cm}{\ttfamily [private]}}}\label{classtopo_a4f6210fac33536607cb33d0af2b86205}
+
+
+Definition at line 13 of file topo.\-f90.
+
+\hypertarget{classtopo_a7a7341812bbcb4ee7fb15e2bcbe7c7ab}{\index{topo@{topo}!n14long@{n14long}}
+\index{n14long@{n14long}!topo@{topo}}
+\paragraph[{n14long}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::n14long}}\label{classtopo_a7a7341812bbcb4ee7fb15e2bcbe7c7ab}
+
+
+Definition at line 170 of file topo.\-f90.
+
+\hypertarget{classtopo_a6debae2aa4d0f73038d45c4d4baecd06}{\index{topo@{topo}!n14nbrs@{n14nbrs}}
+\index{n14nbrs@{n14nbrs}!topo@{topo}}
+\paragraph[{n14nbrs}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::n14nbrs}}\label{classtopo_a6debae2aa4d0f73038d45c4d4baecd06}
+
+
+Definition at line 168 of file topo.\-f90.
+
+\hypertarget{classtopo_a436580317d68710fbbcccd1ee7440194}{\index{topo@{topo}!nangcod@{nangcod}}
+\index{nangcod@{nangcod}!topo@{topo}}
+\paragraph[{nangcod}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::nangcod}}\label{classtopo_a436580317d68710fbbcccd1ee7440194}
+
+
+Definition at line 131 of file topo.\-f90.
+
+\hypertarget{classtopo_acb9de4b76e3e1615bb6f05ca40c22c61}{\index{topo@{topo}!nangles@{nangles}}
+\index{nangles@{nangles}!topo@{topo}}
+\paragraph[{nangles}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::nangles}}\label{classtopo_acb9de4b76e3e1615bb6f05ca40c22c61}
+
+
+Definition at line 128 of file topo.\-f90.
+
+\hypertarget{classtopo_a9095694ab9db269f2ee2508062eee9bd}{\index{topo@{topo}!nangles\-\_\-solute@{nangles\-\_\-solute}}
+\index{nangles\-\_\-solute@{nangles\-\_\-solute}!topo@{topo}}
+\paragraph[{nangles\-\_\-solute}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::nangles\-\_\-solute}}\label{classtopo_a9095694ab9db269f2ee2508062eee9bd}
+
+
+Definition at line 128 of file topo.\-f90.
+
+\hypertarget{classtopo_a9c36bc3f022fb8a4dbb82c24369a4dc9}{\index{topo@{topo}!nat\-\_\-pro@{nat\-\_\-pro}}
+\index{nat\-\_\-pro@{nat\-\_\-pro}!topo@{topo}}
+\paragraph[{nat\-\_\-pro}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::nat\-\_\-pro}}\label{classtopo_a9c36bc3f022fb8a4dbb82c24369a4dc9}
+
+
+Definition at line 90 of file topo.\-f90.
+
+\hypertarget{classtopo_aa2c11d8a835cd358961ef16ed23e444b}{\index{topo@{topo}!nat\-\_\-solute@{nat\-\_\-solute}}
+\index{nat\-\_\-solute@{nat\-\_\-solute}!topo@{topo}}
+\paragraph[{nat\-\_\-solute}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::nat\-\_\-solute}}\label{classtopo_aa2c11d8a835cd358961ef16ed23e444b}
+
+
+Definition at line 90 of file topo.\-f90.
+
+\hypertarget{classtopo_aa2c6ab1859a6c008f5b356dbaa530d07}{\index{topo@{topo}!natyps@{natyps}}
+\index{natyps@{natyps}!topo@{topo}}
+\paragraph[{natyps}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::natyps}}\label{classtopo_aa2c6ab1859a6c008f5b356dbaa530d07}
+
+
+Definition at line 149 of file topo.\-f90.
+
+\hypertarget{classtopo_a87c426cfe207ece52a6f31615499f98e}{\index{topo@{topo}!nbndcod@{nbndcod}}
+\index{nbndcod@{nbndcod}!topo@{topo}}
+\paragraph[{nbndcod}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::nbndcod}}\label{classtopo_a87c426cfe207ece52a6f31615499f98e}
+
+
+Definition at line 123 of file topo.\-f90.
+
+\hypertarget{classtopo_a4f77c74b9498ed0ab1e72a2f82c1796f}{\index{topo@{topo}!nbonds@{nbonds}}
+\index{nbonds@{nbonds}!topo@{topo}}
+\paragraph[{nbonds}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::nbonds}}\label{classtopo_a4f77c74b9498ed0ab1e72a2f82c1796f}
+
+
+Definition at line 120 of file topo.\-f90.
+
+\hypertarget{classtopo_a827a5b6a9b9047edf57a7a0c4d1c3ed8}{\index{topo@{topo}!nbonds\-\_\-solute@{nbonds\-\_\-solute}}
+\index{nbonds\-\_\-solute@{nbonds\-\_\-solute}!topo@{topo}}
+\paragraph[{nbonds\-\_\-solute}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::nbonds\-\_\-solute}}\label{classtopo_a827a5b6a9b9047edf57a7a0c4d1c3ed8}
+
+
+Definition at line 120 of file topo.\-f90.
+
+\hypertarget{classtopo_a17bb91c0e550e12c6bfddf5de414489a}{\index{topo@{topo}!ncgp@{ncgp}}
+\index{ncgp@{ncgp}!topo@{topo}}
+\paragraph[{ncgp}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::ncgp}}\label{classtopo_a17bb91c0e550e12c6bfddf5de414489a}
+
+
+Definition at line 145 of file topo.\-f90.
+
+\hypertarget{classtopo_a3a5a2e36d89c3dd5715b85c9d074aad7}{\index{topo@{topo}!ncgp\-\_\-solute@{ncgp\-\_\-solute}}
+\index{ncgp\-\_\-solute@{ncgp\-\_\-solute}!topo@{topo}}
+\paragraph[{ncgp\-\_\-solute}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::ncgp\-\_\-solute}}\label{classtopo_a3a5a2e36d89c3dd5715b85c9d074aad7}
+
+
+Definition at line 145 of file topo.\-f90.
+
+\hypertarget{classtopo_ac511fe2f83b9f7f217045c167ea69a73}{\index{topo@{topo}!nexats@{nexats}}
+\index{nexats@{nexats}!topo@{topo}}
+\paragraph[{nexats}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::nexats}}\label{classtopo_ac511fe2f83b9f7f217045c167ea69a73}
+
+
+Definition at line 107 of file topo.\-f90.
+
+\hypertarget{classtopo_a1f5e9cb69084b2315adb19fd0530be6a}{\index{topo@{topo}!nexlong@{nexlong}}
+\index{nexlong@{nexlong}!topo@{topo}}
+\paragraph[{nexlong}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::nexlong}}\label{classtopo_a1f5e9cb69084b2315adb19fd0530be6a}
+
+
+Definition at line 171 of file topo.\-f90.
+
+\hypertarget{classtopo_adffc0d2559b13aa47e04b6480b856654}{\index{topo@{topo}!nexnbrs@{nexnbrs}}
+\index{nexnbrs@{nexnbrs}!topo@{topo}}
+\paragraph[{nexnbrs}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::nexnbrs}}\label{classtopo_adffc0d2559b13aa47e04b6480b856654}
+
+
+Definition at line 169 of file topo.\-f90.
+
+\hypertarget{classtopo_ade6597c2219c875b950e07384990ac20}{\index{topo@{topo}!nexwat@{nexwat}}
+\index{nexwat@{nexwat}!topo@{topo}}
+\paragraph[{nexwat}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::nexwat}}\label{classtopo_ade6597c2219c875b950e07384990ac20}
+
+
+Definition at line 107 of file topo.\-f90.
+
+\hypertarget{classtopo_a482e71c286dc7f192d4b77e7b7371bfc}{\index{topo@{topo}!nimpcod@{nimpcod}}
+\index{nimpcod@{nimpcod}!topo@{topo}}
+\paragraph[{nimpcod}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::nimpcod}}\label{classtopo_a482e71c286dc7f192d4b77e7b7371bfc}
+
+
+Definition at line 137 of file topo.\-f90.
+
+\hypertarget{classtopo_a316b9321482ea8b4d578dce01da31d9e}{\index{topo@{topo}!nimps@{nimps}}
+\index{nimps@{nimps}!topo@{topo}}
+\paragraph[{nimps}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::nimps}}\label{classtopo_a316b9321482ea8b4d578dce01da31d9e}
+
+
+Definition at line 137 of file topo.\-f90.
+
+\hypertarget{classtopo_a92c8927aae134648de67450ea59d3471}{\index{topo@{topo}!nimps\-\_\-solute@{nimps\-\_\-solute}}
+\index{nimps\-\_\-solute@{nimps\-\_\-solute}!topo@{topo}}
+\paragraph[{nimps\-\_\-solute}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::nimps\-\_\-solute}}\label{classtopo_a92c8927aae134648de67450ea59d3471}
+
+
+Definition at line 137 of file topo.\-f90.
+
+\hypertarget{classtopo_a3e9ae63a574e391f4273239d99cde7dc}{\index{topo@{topo}!nlj2@{nlj2}}
+\index{nlj2@{nlj2}!topo@{topo}}
+\paragraph[{nlj2}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::nlj2}}\label{classtopo_a3e9ae63a574e391f4273239d99cde7dc}
+
+
+Definition at line 150 of file topo.\-f90.
+
+\hypertarget{classtopo_a81ba8fdc81bafeeebc27023f5e279b61}{\index{topo@{topo}!nljtyp@{nljtyp}}
+\index{nljtyp@{nljtyp}!topo@{topo}}
+\paragraph[{nljtyp}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter topo\-::nljtyp = 3}}\label{classtopo_a81ba8fdc81bafeeebc27023f5e279b61}
+
+
+Definition at line 16 of file topo.\-f90.
+
+\hypertarget{classtopo_a7ea01882bbe30eae14b394d73abaa51e}{\index{topo@{topo}!nmol@{nmol}}
+\index{nmol@{nmol}!topo@{topo}}
+\paragraph[{nmol}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::nmol}}\label{classtopo_a7ea01882bbe30eae14b394d73abaa51e}
+
+
+Definition at line 182 of file topo.\-f90.
+
+\hypertarget{classtopo_a7084f73e1214464c07b24e59beb247d2}{\index{topo@{topo}!nres@{nres}}
+\index{nres@{nres}!topo@{topo}}
+\paragraph[{nres}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::nres}}\label{classtopo_a7084f73e1214464c07b24e59beb247d2}
+
+
+Definition at line 179 of file topo.\-f90.
+
+\hypertarget{classtopo_a2871deb545ab811525581a49954a4b09}{\index{topo@{topo}!nres\-\_\-solute@{nres\-\_\-solute}}
+\index{nres\-\_\-solute@{nres\-\_\-solute}!topo@{topo}}
+\paragraph[{nres\-\_\-solute}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::nres\-\_\-solute}}\label{classtopo_a2871deb545ab811525581a49954a4b09}
+
+
+Definition at line 179 of file topo.\-f90.
+
+\hypertarget{classtopo_aab63f01b0844c9dd5b6c57b7257825d7}{\index{topo@{topo}!nshellats@{nshellats}}
+\index{nshellats@{nshellats}!topo@{topo}}
+\paragraph[{nshellats}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::nshellats}}\label{classtopo_aab63f01b0844c9dd5b6c57b7257825d7}
+
+
+Definition at line 107 of file topo.\-f90.
+
+\hypertarget{classtopo_a78b13d042014360bfeba5ccbc35d0bd0}{\index{topo@{topo}!ntorcod@{ntorcod}}
+\index{ntorcod@{ntorcod}!topo@{topo}}
+\paragraph[{ntorcod}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::ntorcod}}\label{classtopo_a78b13d042014360bfeba5ccbc35d0bd0}
+
+
+Definition at line 135 of file topo.\-f90.
+
+\hypertarget{classtopo_abe9f7f9ff31ba9e2bf07d57eba011599}{\index{topo@{topo}!ntors@{ntors}}
+\index{ntors@{ntors}!topo@{topo}}
+\paragraph[{ntors}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::ntors}}\label{classtopo_abe9f7f9ff31ba9e2bf07d57eba011599}
+
+
+Definition at line 135 of file topo.\-f90.
+
+\hypertarget{classtopo_aec92d2102078e497ee2a6d2fa66bce7c}{\index{topo@{topo}!ntors\-\_\-solute@{ntors\-\_\-solute}}
+\index{ntors\-\_\-solute@{ntors\-\_\-solute}!topo@{topo}}
+\paragraph[{ntors\-\_\-solute}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::ntors\-\_\-solute}}\label{classtopo_aec92d2102078e497ee2a6d2fa66bce7c}
+
+
+Definition at line 135 of file topo.\-f90.
+
+\hypertarget{classtopo_a90f0e1e8f5270c20cb96cdaa565c7d5b}{\index{topo@{topo}!pdb\-\_\-file@{pdb\-\_\-file}}
+\index{pdb\-\_\-file@{pdb\-\_\-file}!topo@{topo}}
+\paragraph[{pdb\-\_\-file}]{\setlength{\rightskip}{0pt plus 5cm}character(len=256) topo\-::pdb\-\_\-file = ''}}\label{classtopo_a90f0e1e8f5270c20cb96cdaa565c7d5b}
+
+
+Definition at line 84 of file topo.\-f90.
+
+\hypertarget{classtopo_a49ba5e9d5475fd58013ee8e5931480b0}{\index{topo@{topo}!prm\-\_\-file@{prm\-\_\-file}}
+\index{prm\-\_\-file@{prm\-\_\-file}!topo@{topo}}
+\paragraph[{prm\-\_\-file}]{\setlength{\rightskip}{0pt plus 5cm}character(len=256) topo\-::prm\-\_\-file}}\label{classtopo_a49ba5e9d5475fd58013ee8e5931480b0}
+
+
+Definition at line 86 of file topo.\-f90.
+
+\hypertarget{classtopo_a0867b2ae350f5df1e287c48074a88be7}{\index{topo@{topo}!res@{res}}
+\index{res@{res}!topo@{topo}}
+\paragraph[{res}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf residue\-\_\-type}), dimension(\-:), allocatable topo\-::res}}\label{classtopo_a0867b2ae350f5df1e287c48074a88be7}
+
+
+Definition at line 180 of file topo.\-f90.
+
+\hypertarget{classtopo_a620b9479ac6c966db149f0c9e0724c33}{\index{topo@{topo}!rexcl\-\_\-i@{rexcl\-\_\-i}}
+\index{rexcl\-\_\-i@{rexcl\-\_\-i}!topo@{topo}}
+\paragraph[{rexcl\-\_\-i}]{\setlength{\rightskip}{0pt plus 5cm}real(8) topo\-::rexcl\-\_\-i}}\label{classtopo_a620b9479ac6c966db149f0c9e0724c33}
+
+
+Definition at line 106 of file topo.\-f90.
+
+\hypertarget{classtopo_a4366d13c72ff459b53a9d5d4bfa3fbf1}{\index{topo@{topo}!rexcl\-\_\-o@{rexcl\-\_\-o}}
+\index{rexcl\-\_\-o@{rexcl\-\_\-o}!topo@{topo}}
+\paragraph[{rexcl\-\_\-o}]{\setlength{\rightskip}{0pt plus 5cm}real(8) topo\-::rexcl\-\_\-o}}\label{classtopo_a4366d13c72ff459b53a9d5d4bfa3fbf1}
+
+
+Definition at line 106 of file topo.\-f90.
+
+\hypertarget{classtopo_a5afc147998793fe81dc80f71d620b250}{\index{topo@{topo}!rwat@{rwat}}
+\index{rwat@{rwat}!topo@{topo}}
+\paragraph[{rwat}]{\setlength{\rightskip}{0pt plus 5cm}real(8) topo\-::rwat}}\label{classtopo_a5afc147998793fe81dc80f71d620b250}
+
+
+Definition at line 105 of file topo.\-f90.
+
+\hypertarget{classtopo_acb17ff02ccc726e439feaad37738f222}{\index{topo@{topo}!shell@{shell}}
+\index{shell@{shell}!topo@{topo}}
+\paragraph[{shell}]{\setlength{\rightskip}{0pt plus 5cm}logical, dimension(\-:), allocatable topo\-::shell}}\label{classtopo_acb17ff02ccc726e439feaad37738f222}
+
+
+Definition at line 108 of file topo.\-f90.
+
+\hypertarget{classtopo_adfbe1f0059a125762d2f0be3ad7899f1}{\index{topo@{topo}!solvent\-\_\-3atom@{solvent\-\_\-3atom}}
+\index{solvent\-\_\-3atom@{solvent\-\_\-3atom}!topo@{topo}}
+\paragraph[{solvent\-\_\-3atom}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter topo\-::solvent\-\_\-3atom =1}}\label{classtopo_adfbe1f0059a125762d2f0be3ad7899f1}
+
+
+Definition at line 96 of file topo.\-f90.
+
+\hypertarget{classtopo_ac2cd61b970ce97de005f36f91d23aa29}{\index{topo@{topo}!solvent\-\_\-general@{solvent\-\_\-general}}
+\index{solvent\-\_\-general@{solvent\-\_\-general}!topo@{topo}}
+\paragraph[{solvent\-\_\-general}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter topo\-::solvent\-\_\-general =2}}\label{classtopo_ac2cd61b970ce97de005f36f91d23aa29}
+
+
+Definition at line 96 of file topo.\-f90.
+
+\hypertarget{classtopo_a511570d6a5e9c6eef152d18f793f51ad}{\index{topo@{topo}!solvent\-\_\-spc@{solvent\-\_\-spc}}
+\index{solvent\-\_\-spc@{solvent\-\_\-spc}!topo@{topo}}
+\paragraph[{solvent\-\_\-spc}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter topo\-::solvent\-\_\-spc =0}}\label{classtopo_a511570d6a5e9c6eef152d18f793f51ad}
+
+
+Definition at line 96 of file topo.\-f90.
+
+\hypertarget{classtopo_a6e2eb29b8d19028c7ee9ba06b64359ad}{\index{topo@{topo}!solvent\-\_\-type@{solvent\-\_\-type}}
+\index{solvent\-\_\-type@{solvent\-\_\-type}!topo@{topo}}
+\paragraph[{solvent\-\_\-type}]{\setlength{\rightskip}{0pt plus 5cm}integer topo\-::solvent\-\_\-type}}\label{classtopo_a6e2eb29b8d19028c7ee9ba06b64359ad}
+
+
+Definition at line 97 of file topo.\-f90.
+
+\hypertarget{classtopo_a54b45b6eb47a65ecff972da7e73e7ffe}{\index{topo@{topo}!sybyl\-\_\-atom\-\_\-type@{sybyl\-\_\-atom\-\_\-type}}
+\index{sybyl\-\_\-atom\-\_\-type@{sybyl\-\_\-atom\-\_\-type}!topo@{topo}}
+\paragraph[{sybyl\-\_\-atom\-\_\-type}]{\setlength{\rightskip}{0pt plus 5cm}character(len=5), dimension(\-:), allocatable topo\-::sybyl\-\_\-atom\-\_\-type}}\label{classtopo_a54b45b6eb47a65ecff972da7e73e7ffe}
+
+
+Definition at line 152 of file topo.\-f90.
+
+\hypertarget{classtopo_a0bd8eb8a9acd81024eda5ce4abbec08e}{\index{topo@{topo}!sybyl\-\_\-bond\-\_\-type@{sybyl\-\_\-bond\-\_\-type}}
+\index{sybyl\-\_\-bond\-\_\-type@{sybyl\-\_\-bond\-\_\-type}!topo@{topo}}
+\paragraph[{sybyl\-\_\-bond\-\_\-type}]{\setlength{\rightskip}{0pt plus 5cm}character(len=3), dimension(\-:), allocatable topo\-::sybyl\-\_\-bond\-\_\-type}}\label{classtopo_a0bd8eb8a9acd81024eda5ce4abbec08e}
+
+
+Definition at line 125 of file topo.\-f90.
+
+\hypertarget{classtopo_a61a2ce9eb3fbc2b8c978de51e0c8c232}{\index{topo@{topo}!tac@{tac}}
+\index{tac@{tac}!topo@{topo}}
+\paragraph[{tac}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8), dimension(\-:), allocatable topo\-::tac}}\label{classtopo_a61a2ce9eb3fbc2b8c978de51e0c8c232}
+
+
+Definition at line 153 of file topo.\-f90.
+
+\hypertarget{classtopo_aeed5c7dad044f283eead0024edd1c4d2}{\index{topo@{topo}!title@{title}}
+\index{title@{title}!topo@{topo}}
+\paragraph[{title}]{\setlength{\rightskip}{0pt plus 5cm}character(len=80) topo\-::title = ''}}\label{classtopo_aeed5c7dad044f283eead0024edd1c4d2}
+
+
+Definition at line 81 of file topo.\-f90.
+
+\hypertarget{classtopo_ae6ee33b8bdbc8bdccb2419ed9fda07a6}{\index{topo@{topo}!tor@{tor}}
+\index{tor@{tor}!topo@{topo}}
+\paragraph[{tor}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf tor\-\_\-type}), dimension(\-:), allocatable, target topo\-::tor}}\label{classtopo_ae6ee33b8bdbc8bdccb2419ed9fda07a6}
+
+
+Definition at line 139 of file topo.\-f90.
+
+\hypertarget{classtopo_ad251840e17aa9a480795470371c954f1}{\index{topo@{topo}!torlib@{torlib}}
+\index{torlib@{torlib}!topo@{topo}}
+\paragraph[{torlib}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf torlib\-\_\-type}), dimension(\-:), allocatable, target topo\-::torlib}}\label{classtopo_ad251840e17aa9a480795470371c954f1}
+
+
+Definition at line 141 of file topo.\-f90.
+
+\hypertarget{classtopo_aa8f6e5af5947f84992ab2b021b47bc7b}{\index{topo@{topo}!use\-\_\-pbc@{use\-\_\-pbc}}
+\index{use\-\_\-pbc@{use\-\_\-pbc}!topo@{topo}}
+\paragraph[{use\-\_\-pbc}]{\setlength{\rightskip}{0pt plus 5cm}logical topo\-::use\-\_\-pbc = .false.}}\label{classtopo_aa8f6e5af5947f84992ab2b021b47bc7b}
+
+
+Definition at line 117 of file topo.\-f90.
+
+\hypertarget{classtopo_a62176dc452e3f5a13dff7365a45edfb6}{\index{topo@{topo}!vdw\-\_\-arithmetic@{vdw\-\_\-arithmetic}}
+\index{vdw\-\_\-arithmetic@{vdw\-\_\-arithmetic}!topo@{topo}}
+\paragraph[{vdw\-\_\-arithmetic}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter topo\-::vdw\-\_\-arithmetic =2}}\label{classtopo_a62176dc452e3f5a13dff7365a45edfb6}
+
+
+Definition at line 158 of file topo.\-f90.
+
+\hypertarget{classtopo_a7c8bd17bbabb36ba8f438e50e503d6b7}{\index{topo@{topo}!vdw\-\_\-geometric@{vdw\-\_\-geometric}}
+\index{vdw\-\_\-geometric@{vdw\-\_\-geometric}!topo@{topo}}
+\paragraph[{vdw\-\_\-geometric}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter topo\-::vdw\-\_\-geometric =1}}\label{classtopo_a7c8bd17bbabb36ba8f438e50e503d6b7}
+
+
+Definition at line 158 of file topo.\-f90.
+
+\hypertarget{classtopo_a617c819365f4a269fda75bb3a4e3829e}{\index{topo@{topo}!version@{version}}
+\index{version@{version}!topo@{topo}}
+\paragraph[{version}]{\setlength{\rightskip}{0pt plus 5cm}real topo\-::version}}\label{classtopo_a617c819365f4a269fda75bb3a4e3829e}
+
+
+Definition at line 80 of file topo.\-f90.
+
+\hypertarget{classtopo_a05520e487814783f2383d15af85fa9b0}{\index{topo@{topo}!xpcent@{xpcent}}
+\index{xpcent@{xpcent}!topo@{topo}}
+\paragraph[{xpcent}]{\setlength{\rightskip}{0pt plus 5cm}real(8), dimension(3) topo\-::xpcent}}\label{classtopo_a05520e487814783f2383d15af85fa9b0}
+
+
+Definition at line 104 of file topo.\-f90.
+
+\hypertarget{classtopo_a401594110af6e631225453a47e150299}{\index{topo@{topo}!xtop@{xtop}}
+\index{xtop@{xtop}!topo@{topo}}
+\paragraph[{xtop}]{\setlength{\rightskip}{0pt plus 5cm}real(8), dimension(\-:), allocatable topo\-::xtop}}\label{classtopo_a401594110af6e631225453a47e150299}
+
+
+Definition at line 91 of file topo.\-f90.
+
+\hypertarget{classtopo_a6d9dae4d1a043949c4aaed1b7e605fb1}{\index{topo@{topo}!xwcent@{xwcent}}
+\index{xwcent@{xwcent}!topo@{topo}}
+\paragraph[{xwcent}]{\setlength{\rightskip}{0pt plus 5cm}real(8), dimension(3) topo\-::xwcent}}\label{classtopo_a6d9dae4d1a043949c4aaed1b7e605fb1}
+
+
+Definition at line 104 of file topo.\-f90.
+
+
+
+The documentation for this module was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{topo_8f90}{topo.\-f90}\end{DoxyCompactItemize}

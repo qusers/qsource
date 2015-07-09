@@ -1,0 +1,9 @@
+<map id="calc_xscore::ligand_calculate_vdw" name="calc_xscore::ligand_calculate_vdw">
+<area shape="rect" id="node2" href="$classcalc__xscore.html#aa21b212c6de7c3b229d8d91ee336630a" title="calc_xscore::ligand\l_calculate_binding_score" alt="" coords="189,27,361,69"/>
+<area shape="rect" id="node3" href="$classcalc__xscore.html#a1f2c852d7a1ed801d7b14ce6205a384e" title="calc_xscore::xscore_calc" alt="" coords="409,5,580,32"/>
+<area shape="rect" id="node7" href="$classcalc__xscore.html#a1dd20b02356cb3c99283799d1030d1ba" title="calc_xscore::xscore\l_precalc" alt="" coords="425,57,564,98"/>
+<area shape="rect" id="node4" href="$qcalc_8f90.html#a5befd1d444d41d7d1e4bf8b297c17ee2" title="calc_all" alt="" coords="645,5,712,32"/>
+<area shape="rect" id="node5" href="$qcalc_8f90.html#a93dcacb957411ed0d0471fe8a31c60d6" title="process_frame" alt="" coords="777,5,888,32"/>
+<area shape="rect" id="node6" href="$qcalc_8f90.html#a7d2d447954fb385bdca4f228de92b1eb" title="process_data" alt="" coords="936,5,1039,32"/>
+<area shape="rect" id="node8" href="$qcalc_8f90.html#a6de35d783d8e2c1ffead6a9dbf61ebb6" title="do_pre_calcs" alt="" coords="628,64,729,91"/>
+</map>

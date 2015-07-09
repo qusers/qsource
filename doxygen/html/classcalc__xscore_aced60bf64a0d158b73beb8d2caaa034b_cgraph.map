@@ -1,0 +1,7 @@
+<map id="calc_xscore::molecule_count_internal_hbond" name="calc_xscore::molecule_count_internal_hbond">
+<area shape="rect" id="node2" href="$classcalc__xscore.html#a72197541b9f932425601e90275cd9c47" title="calc_xscore::molecule\l_adjacent_ring_check" alt="" coords="217,5,370,47"/>
+<area shape="rect" id="node3" href="$classcalc__xscore.html#a9d64d1541dd1138c926af1cd7156b621" title="calc_xscore::molecule\l_connection_1_4_check" alt="" coords="424,64,589,105"/>
+<area shape="rect" id="node6" href="$classcalc__xscore.html#a5f6d4cba2fbc1d782a2c945931d18145" title="calc_xscore::molecule\l_connection_1_5_check" alt="" coords="211,123,376,164"/>
+<area shape="rect" id="node4" href="$classcalc__xscore.html#a4c7edb774bb0f3f995158261cf1f1c3f" title="calc_xscore::molecule\l_connection_1_2_check" alt="" coords="851,119,1016,160"/>
+<area shape="rect" id="node5" href="$classcalc__xscore.html#a9d9f27b4fed731d2a432dd7fb2e80b61" title="calc_xscore::molecule\l_connection_1_3_check" alt="" coords="637,119,803,160"/>
+</map>

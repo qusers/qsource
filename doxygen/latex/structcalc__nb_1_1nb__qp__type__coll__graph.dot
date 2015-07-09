@@ -1,0 +1,6 @@
+digraph "calc_nb::nb_qp_type"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node1 [label="{calc_nb::nb_qp_type\n|+ p_first\l+ p_last\l+ q_first\l+ q_last\l|}",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+}

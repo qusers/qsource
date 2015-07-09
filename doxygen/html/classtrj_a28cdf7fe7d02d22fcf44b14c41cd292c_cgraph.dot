@@ -1,0 +1,29 @@
+digraph "trj::trj_open"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1 [label="trj::trj_open",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+  Node1 -> Node2 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="misc::freefile",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmisc.html#aaa874447823dfa2d2c7fcf6eb80ebd70"];
+  Node1 -> Node3 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="atom_mask::mask_add",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classatom__mask.html#ad0a7fae4495fbbde287b61adf5b41d62"];
+  Node3 -> Node4 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="atom_mask::get_sybylcode",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classatom__mask.html#a517aeb28af6ea93d97770ace5268b5ee"];
+  Node4 -> Node5 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="misc::upcase",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmisc.html#a3d25ef800766f590365955680ff3ba2c"];
+  Node3 -> Node6 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node6 [label="atom_mask::get_word",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classatom__mask.html#adfd3923e784e3ccdebf575c61257f0ea"];
+  Node3 -> Node5 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 -> Node7 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node7 [label="atom_mask::update",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classatom__mask.html#a30b962d0b0f89f142ad386569bab3d42"];
+  Node7 -> Node5 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 -> Node8 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node8 [label="atom_mask::update_pretop",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classatom__mask.html#ab6d589c395ac5883f6492a3bb59d61e7"];
+  Node1 -> Node9 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node9 [label="atom_mask::mask_initialize",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classatom__mask.html#a37135eea76c381c4aacee5cc9fbce046"];
+  Node9 -> Node10 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node10 [label="atom_mask::mask_clear",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classatom__mask.html#aa33256b4eb2abd74f319e47e7f9c67b8"];
+  Node9 -> Node11 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node11 [label="atom_mask::set_solute",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classatom__mask.html#a4d3aff857c97591b916a1ee064cb7cef"];
+}
