@@ -16,18 +16,18 @@
 !  Martin Nervall & Martin Almlof                                              !
 !  molecular dynamics                                                          !
 !------------------------------------------------------------------------------!
-module MD
+module md
 
   ! load modules
   ! use PROFILING
-  use SIZES
-  use TRJ
-  use MPIGLOB
-  use QATOM
+  use sizes
+  use trj
+  use mpiglob
+  use qatom
 
 #if defined (_DF_VERSION_)
-  use DFPORT
-  use DFLIB
+  use dfport
+  use dflib
 #endif
 
   implicit none
@@ -12961,7 +12961,7 @@ subroutine p_restrain
        end if
 
     else 
-       ! restrain each atom to its topology co-ordinate
+       ! restrain each atom to its topology coordinate
        do i = rstseq(ir)%i, rstseq(ir)%j
           if ( heavy(i) .or. rstseq(ir)%ih .eq. 1 ) then
              i3 = i*3-3
@@ -13121,8 +13121,6 @@ end subroutine p_restrain
 
 subroutine pot_energy
   ! local variables
-
-
  integer                                 :: istate, i, nat3
  integer                                 :: is, j
 #if defined (PROFILING)
@@ -13156,7 +13154,7 @@ subroutine pot_energy
  E%ww%vdw = 0.0
  E%qx%el    = 0.0
  E%qx%vdw   = 0.0
- !E%restraint%total = 0.0        ! will be assigned its final value later
+ !E%restraint%total = 0.0 ! will be assigned its final value later
  E%restraint%fix = 0.0
  E%restraint%shell = 0.0
  E%restraint%protein = 0.0
@@ -13170,7 +13168,7 @@ subroutine pot_energy
     EQ(istate)%q%torsion = 0.0
     EQ(istate)%q%improper = 0.0
     !EQ(istate)%qx%el = 0.0 ! assigned its final value later
-    !EQ(istate)%qx%vdw = 0.0        ! assigned its final value later
+    !EQ(istate)%qx%vdw = 0.0 ! assigned its final value later
     EQ(istate)%qq%el = 0.0
     EQ(istate)%qq%vdw = 0.0
     EQ(istate)%qp%el = 0.0
@@ -15922,8 +15920,4 @@ end function get_atom_from_resnum_atnum
 
 !----------------------------------------------------------------------------------------
 
-end module MD
-
-
-
-
+end module md

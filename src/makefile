@@ -29,13 +29,15 @@ ifeq ($(COMP),ifort)
 	DEBUGMPI=       -debug -traceback -g  -I${VT_ROOT}/include -L${VT_LIB_DIR} ${VT_ADD_LIBS} ${FC_OPT}
 
 ################################################################################
-# OSX Mavericks using gfortran
+# OSX Yosemite using gfortran 5.1
 ################################################################################
 else ifeq ($(COMP),osx)
 	FC= gfortran
 	FC_OPT=         -O3
 	FFLAGS=         -ffree-line-length-none -fcray-pointer -fall-intrinsics \
 	                -std=legacy -Wall -Wtabs -fstack-protector ${FC_OPT} -DG95=1
+#	FFLAGS=         -Wall -Wextra -Wimplicit-interface -fPIC -Werror -fmax-errors=1 \
+#	                -msse4.2 -ffast-math -funroll-loops
 	FPP_FLG=        -cpp
 
 	MPIFC=          mpif90
@@ -304,5 +306,8 @@ what:
 	@echo "osx              Gnu Compiler Collection (GCC) in mac"
 	@echo "gcc              GCC in linux"
 	@echo "pgi              Portland Group compiler"
+	@echo
+	@echo "Example: make all COMP=ifort"
+	@echo
 ################################################################################
 

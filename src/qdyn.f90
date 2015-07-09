@@ -17,8 +17,8 @@
 !------------------------------------------------------------------------------!
 
 program qdyn
-  use MD                                                                
-  use MPIGLOB ! use MPI global data
+  use md
+  use mpiglob
 
 #if defined (_DF_VERSION_)
   use dfport ! portability lib for signals. Used in windows.
@@ -30,9 +30,9 @@ program qdyn
   character(10)             :: QDYN_VERSION = '5.7'
   character(12)             :: QDYN_DATE = '2015-02-22'
 #if defined (USE_MPI)
-  character(10)           :: QDYN_SUFFIX = '_parallel'
+  character(10)             :: QDYN_SUFFIX = '_parallel'
 #else
-  character(10)           :: QDYN_SUFFIX = ''
+  character(10)             :: QDYN_SUFFIX = ''
 #endif
 
 
@@ -187,15 +187,17 @@ contains
   end function signal
 #endif
 
-
 end program qdyn
+
+
+
 
 
 !-------------------------------------------------------------------------------
 ! signal handlers
 !-------------------------------------------------------------------------------
 INTEGER(4) FUNCTION sigint_handler(sig_num)
-  use MD
+  use md
   implicit none
   INTEGER(4) :: sig_num
 
@@ -204,7 +206,7 @@ INTEGER(4) FUNCTION sigint_handler(sig_num)
 END FUNCTION sigint_handler
 
 INTEGER(4) FUNCTION sigkill_handler(sig_num)
-  use MD
+  use md
   implicit none
   INTEGER(4) :: sig_num
 
@@ -213,10 +215,11 @@ INTEGER(4) FUNCTION sigkill_handler(sig_num)
 END FUNCTION sigkill_handler
 
 INTEGER(4) FUNCTION sigabrt_handler(sig_num)
-  use MD
+  use md
   implicit none
   INTEGER(4) :: sig_num
 
   call die('kill signal')
   sigabrt_handler = 1
 END FUNCTION sigabrt_handler
+
