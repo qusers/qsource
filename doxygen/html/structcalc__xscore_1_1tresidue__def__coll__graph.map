@@ -1,4 +1,0 @@
-<map id="calc_xscore::tresidue_def" name="calc_xscore::tresidue_def">
-<area shape="rect" id="node2" href="$structcalc__xscore_1_1tbondstruct.html" title="{calc_xscore::tbondstruct\n|+ atom1\l+ atom2\l+ ttype\l|}" alt="" coords="5,64,171,171"/>
-<area shape="rect" id="node3" href="$structcalc__xscore_1_1tatomstruct.html" title="{calc_xscore::tatomstruct\n|+ name\l+ ttype\l+ xtype\l+ r\l+ eps\l+ q\l+ hb\l+ logp\l+ solv\l+ ring\l+ pmftype\l|}" alt="" coords="195,5,360,229"/>
-</map>

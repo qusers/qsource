@@ -1,6 +1,0 @@
-digraph "atom_mask"
-{
-  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
-  node [fontname="Helvetica",fontsize="10",shape=record];
-  Node1 [label="{atom_mask\n|- module_version\l- modeule_date\l- solute\l|+ mask_startup()\l+ mask_shutdown()\l+ mask_initialize()\l+ mask_finalize()\l+ mask_clear()\l+ mask_all()\l+ mask_count()\l+ mask_add()\l+ get_sybylcode()\l+ mask_get()\l+ mask_put()\l- set_solute()\l- get_word()\l- update()\l- update_pretop()\l- finalize_storage()\l}",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
-}

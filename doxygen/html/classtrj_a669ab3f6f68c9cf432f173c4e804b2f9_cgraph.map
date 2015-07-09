@@ -1,8 +1,0 @@
-<map id="trj::trj_commit_mask" name="trj::trj_commit_mask">
-<area shape="rect" id="node2" href="$classatom__mask.html#ad0a7fae4495fbbde287b61adf5b41d62" title="atom_mask::mask_add" alt="" coords="195,107,355,133"/>
-<area shape="rect" id="node3" href="$classatom__mask.html#a517aeb28af6ea93d97770ace5268b5ee" title="atom_mask::get_sybylcode" alt="" coords="403,5,587,32"/>
-<area shape="rect" id="node4" href="$classmisc.html#a3d25ef800766f590365955680ff3ba2c" title="misc::upcase" alt="" coords="635,56,735,83"/>
-<area shape="rect" id="node5" href="$classatom__mask.html#adfd3923e784e3ccdebf575c61257f0ea" title="atom_mask::get_word" alt="" coords="418,107,571,133"/>
-<area shape="rect" id="node6" href="$classatom__mask.html#a30b962d0b0f89f142ad386569bab3d42" title="atom_mask::update" alt="" coords="425,157,564,184"/>
-<area shape="rect" id="node7" href="$classatom__mask.html#ab6d589c395ac5883f6492a3bb59d61e7" title="atom_mask::update_pretop" alt="" coords="403,208,587,235"/>
-</map>

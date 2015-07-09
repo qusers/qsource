@@ -1,8 +1,0 @@
-digraph "calc_entropy"
-{
-  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
-  node [fontname="Helvetica",fontsize="10",shape=record];
-  Node1 [label="{calc_entropy\n|+ pi_val\l+ hs\l+ r\l+ ref_vol\l+ e\l+ u\l+ kb\l+ cm\l+ entropy_frame\l+ start\l- masks\l- nmasks\l|+ entropy_add()\l+ construct_trajectory()\l+ entropy_initialize()\l+ entropy_finalize()\l+ entropy_heading()\l+ entropy_calc()\l+ covariancematrix()\l+ schlittersformula()\l+ multiplymatrices()\l+ choleskyfactorization()\land 9 more...\l}",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
-  Node2 -> Node1 [color="grey25",fontsize="10",style="solid",label=" -coords" ,arrowhead="odiamond"];
-  Node2 [label="{calc_entropy::entropy\l_coord_type\n|+ x\l+ xref\l+ xr\l+ xrcm\l+ interval\l+ calc_type\l+ calc_select\l+ temperature\l+ tot_no_frames\l|}",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structcalc__entropy_1_1entropy__coord__type.html"];
-}

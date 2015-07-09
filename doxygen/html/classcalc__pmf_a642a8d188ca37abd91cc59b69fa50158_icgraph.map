@@ -1,7 +1,0 @@
-<map id="calc_pmf::pmfmolecule_two_bonds_connection_check" name="calc_pmf::pmfmolecule_two_bonds_connection_check">
-<area shape="rect" id="node2" href="$classcalc__pmf.html#a9dca279d37fdfd1f5f387211c3c6c697" title="calc_pmf::pmfdetect\l_connections" alt="" coords="270,5,411,47"/>
-<area shape="rect" id="node6" href="$classcalc__pmf.html#a6a8fb6accff9a1c234e056e69cdb12e8" title="calc_pmf::pmfmolecule\l_look_for_a_ring" alt="" coords="261,71,420,112"/>
-<area shape="rect" id="node3" href="$classcalc__pmf.html#ac556c87ce39732c2e96def3d32dd211f" title="calc_pmf::pmfvalue\l_molecule" alt="" coords="468,5,605,47"/>
-<area shape="rect" id="node4" href="$classcalc__pmf.html#a15f551fc2681bc20e67c32c26f0e6213" title="calc_pmf::pmf_precalc" alt="" coords="653,13,809,39"/>
-<area shape="rect" id="node5" href="$qcalc_8f90.html#a6de35d783d8e2c1ffead6a9dbf61ebb6" title="do_pre_calcs" alt="" coords="857,13,959,39"/>
-</map>

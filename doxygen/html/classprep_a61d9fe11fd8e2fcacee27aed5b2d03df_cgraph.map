@@ -1,8 +1,0 @@
-<map id="prep::checkimps" name="prep::checkimps">
-<area shape="rect" id="node2" href="$classparse.html#a9941ab0c7c89dad4ed63753dda092274" title="parse::get_real_arg" alt="" coords="172,56,309,83"/>
-<area shape="rect" id="node7" href="$classprep.html#ae5d14f28b42c21cbeac0a6d01b437b0a" title="prep::impr_ene" alt="" coords="185,107,297,133"/>
-<area shape="rect" id="node3" href="$classparse.html#a362c49175b5f2d7f582dde6cb7b871af" title="parse::getline" alt="" coords="373,5,475,32"/>
-<area shape="rect" id="node5" href="$classparse.html#ab0b0c4663024ac8a04d78628109e5215" title="parse::parse_reset" alt="" coords="357,56,491,83"/>
-<area shape="rect" id="node6" href="$qfep_8f90.html#a897ce0488192cf7f2a3ca4d41e5d73e3" title="prompt" alt="" coords="392,107,456,133"/>
-<area shape="rect" id="node4" href="$classparse.html#a431f0c36309d6174287bde5e4d0e78e8" title="parse::split" alt="" coords="539,5,625,32"/>
-</map>

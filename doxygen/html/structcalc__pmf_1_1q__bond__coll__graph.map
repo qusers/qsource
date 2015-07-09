@@ -1,4 +1,0 @@
-<map id="calc_pmf::q_bond" name="calc_pmf::q_bond">
-<area shape="rect" id="node3" href="$structcalc__pmf_1_1bond__pointer.html" title="{calc_pmf::bond_pointer\n||}" alt="" coords="5,292,165,369"/>
-<area shape="rect" id="node2" href="$structcalc__pmf_1_1q__atom.html" title="{calc_pmf::q_atom\n|+ top_nr\l+ n\l+ contact\l+ at_type\l+ hybrid\l+ been_there\l+ cyclic\l+ active\l|}" alt="" coords="106,432,233,612"/>
-</map>

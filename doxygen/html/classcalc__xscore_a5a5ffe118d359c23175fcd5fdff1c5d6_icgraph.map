@@ -1,8 +1,0 @@
-<map id="calc_xscore::protein_value_atom" name="calc_xscore::protein_value_atom">
-<area shape="rect" id="node2" href="$classcalc__xscore.html#a1f2c852d7a1ed801d7b14ce6205a384e" title="calc_xscore::xscore_calc" alt="" coords="193,5,364,32"/>
-<area shape="rect" id="node6" href="$classcalc__xscore.html#a1dd20b02356cb3c99283799d1030d1ba" title="calc_xscore::xscore\l_precalc" alt="" coords="209,57,348,98"/>
-<area shape="rect" id="node3" href="$qcalc_8f90.html#a5befd1d444d41d7d1e4bf8b297c17ee2" title="calc_all" alt="" coords="429,5,496,32"/>
-<area shape="rect" id="node4" href="$qcalc_8f90.html#a93dcacb957411ed0d0471fe8a31c60d6" title="process_frame" alt="" coords="561,5,672,32"/>
-<area shape="rect" id="node5" href="$qcalc_8f90.html#a7d2d447954fb385bdca4f228de92b1eb" title="process_data" alt="" coords="720,5,823,32"/>
-<area shape="rect" id="node7" href="$qcalc_8f90.html#a6de35d783d8e2c1ffead6a9dbf61ebb6" title="do_pre_calcs" alt="" coords="412,64,513,91"/>
-</map>

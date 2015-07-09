@@ -1,7 +1,0 @@
-<map id="prep::make_shell2" name="prep::make_shell2">
-<area shape="rect" id="node2" href="$classparse.html#a9941ab0c7c89dad4ed63753dda092274" title="parse::get_real_arg" alt="" coords="184,56,321,83"/>
-<area shape="rect" id="node3" href="$classparse.html#a362c49175b5f2d7f582dde6cb7b871af" title="parse::getline" alt="" coords="385,5,487,32"/>
-<area shape="rect" id="node5" href="$classparse.html#ab0b0c4663024ac8a04d78628109e5215" title="parse::parse_reset" alt="" coords="369,56,503,83"/>
-<area shape="rect" id="node6" href="$qfep_8f90.html#a897ce0488192cf7f2a3ca4d41e5d73e3" title="prompt" alt="" coords="404,107,468,133"/>
-<area shape="rect" id="node4" href="$classparse.html#a431f0c36309d6174287bde5e4d0e78e8" title="parse::split" alt="" coords="551,5,637,32"/>
-</map>

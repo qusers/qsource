@@ -1,6 +1,0 @@
-<map id="md::torsion" name="md::torsion">
-<area shape="rect" id="node2" href="$classmd.html#a562a2ee1724ec384edbd711aa9ef9c4a" title="md::pot_energy_bonds" alt="" coords="141,5,300,32"/>
-<area shape="rect" id="node3" href="$classmd.html#a1d2fcb4bf9fce9c03ef3cc9584c719b2" title="md::pot_energy" alt="" coords="348,5,463,32"/>
-<area shape="rect" id="node4" href="$classmd.html#a171682c3783373090d6525d6b435211e" title="md::md_run" alt="" coords="511,5,604,32"/>
-<area shape="rect" id="node5" href="$qdyn_8f90.html#a93aa3f5a63d37164f411c008fce7e62c" title="qdyn" alt="" coords="652,5,703,32"/>
-</map>

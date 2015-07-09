@@ -1,5 +1,0 @@
-<map id="calc_xscore::protein_add_ring" name="calc_xscore::protein_add_ring">
-<area shape="rect" id="node2" href="$classcalc__rdf.html#a203d29eb42a922de8786e02bef09868a" title="calc_rdf::r" alt="" coords="438,5,518,32"/>
-<area shape="rect" id="node3" href="$classcalc__xscore.html#a24c5a0f8b002da1a0a5efe5c79034484" title="calc_xscore::ring_clear" alt="" coords="399,68,557,95"/>
-<area shape="rect" id="node4" href="$classcalc__xscore.html#ac51bc4c8c1999f720168c6300e83a4d6" title="calc_xscore::ring_copy" alt="" coords="193,31,351,57"/>
-</map>

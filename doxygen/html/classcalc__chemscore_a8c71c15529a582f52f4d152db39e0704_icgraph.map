@@ -1,6 +1,0 @@
-<map id="calc_chemscore::lip_atom" name="calc_chemscore::lip_atom">
-<area shape="rect" id="node2" href="$classcalc__chemscore.html#afa2b8e0f000132f3f983c3781cc16115" title="calc_chemscore::count\l_qlipo" alt="" coords="229,5,388,47"/>
-<area shape="rect" id="node3" href="$classcalc__chemscore.html#a1a0ba4ea42a592ed4c0017e204372e0b" title="calc_chemscore::set\l_ligand" alt="" coords="436,5,580,47"/>
-<area shape="rect" id="node4" href="$classcalc__chemscore.html#a1dbdeb7c4eb3b9068a041f3b08224417" title="calc_chemscore::score\l_precalc" alt="" coords="628,5,787,47"/>
-<area shape="rect" id="node5" href="$qcalc_8f90.html#a6de35d783d8e2c1ffead6a9dbf61ebb6" title="do_pre_calcs" alt="" coords="835,13,936,39"/>
-</map>

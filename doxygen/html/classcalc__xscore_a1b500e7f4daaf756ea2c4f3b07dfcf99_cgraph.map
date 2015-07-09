@@ -1,6 +1,0 @@
-<map id="calc_xscore::molecule_count_hydrophobic_carbon" name="calc_xscore::molecule_count_hydrophobic_carbon">
-<area shape="rect" id="node2" href="$classcalc__xscore.html#a6446e80b2b2c7ee7b6e718a7a112fe70" title="calc_xscore::molecule\l_hydrophobic_neighbor_check" alt="" coords="244,21,448,62"/>
-<area shape="rect" id="node3" href="$classcalc__xscore.html#a4c7edb774bb0f3f995158261cf1f1c3f" title="calc_xscore::molecule\l_connection_1_2_check" alt="" coords="923,25,1088,66"/>
-<area shape="rect" id="node4" href="$classcalc__xscore.html#a9d9f27b4fed731d2a432dd7fb2e80b61" title="calc_xscore::molecule\l_connection_1_3_check" alt="" coords="709,25,875,66"/>
-<area shape="rect" id="node5" href="$classcalc__xscore.html#a9d64d1541dd1138c926af1cd7156b621" title="calc_xscore::molecule\l_connection_1_4_check" alt="" coords="496,80,661,121"/>
-</map>

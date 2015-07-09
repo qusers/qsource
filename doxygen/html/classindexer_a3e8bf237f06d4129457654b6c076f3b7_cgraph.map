@@ -1,7 +1,0 @@
-<map id="indexer::index_alias" name="indexer::index_alias">
-<area shape="rect" id="node2" href="$classindexer.html#a3881b2e3e31c5a3e188e90ad8bc96405" title="indexer::index_add" alt="" coords="193,5,328,32"/>
-<area shape="rect" id="node6" href="$classindexer.html#a3b93040983a622421fa918a6af566c93" title="indexer::index_get" alt="" coords="195,56,326,83"/>
-<area shape="rect" id="node3" href="$classindexer.html#ab6c32d13a4bcca7f5411d6d097cf5cd8" title="indexer::grow" alt="" coords="376,5,479,32"/>
-<area shape="rect" id="node4" href="$classindexer.html#a4c6bb664b3ca6a455aedaed8b6e501fd" title="indexer::index_resize" alt="" coords="527,5,675,32"/>
-<area shape="rect" id="node5" href="$classindexer.html#ac760937d1c86952d78fe2f8ee82c0264" title="indexer::index_clear" alt="" coords="723,5,864,32"/>
-</map>

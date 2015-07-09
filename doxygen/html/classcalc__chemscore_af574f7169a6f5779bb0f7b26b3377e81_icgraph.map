@@ -1,9 +1,0 @@
-<map id="calc_chemscore::calc_rot" name="calc_chemscore::calc_rot">
-<area shape="rect" id="node2" href="$classcalc__chemscore.html#ac685deaa80ea9769e36c6b9ac8c8462d" title="calc_chemscore::calc\l_scores" alt="" coords="225,35,375,76"/>
-<area shape="rect" id="node3" href="$classcalc__chemscore.html#a1dbdeb7c4eb3b9068a041f3b08224417" title="calc_chemscore::score\l_precalc" alt="" coords="438,5,597,47"/>
-<area shape="rect" id="node5" href="$classcalc__chemscore.html#a678c1ccc18920a66c00a8fe528997561" title="calc_chemscore::score_calc" alt="" coords="423,71,612,98"/>
-<area shape="rect" id="node4" href="$qcalc_8f90.html#a6de35d783d8e2c1ffead6a9dbf61ebb6" title="do_pre_calcs" alt="" coords="660,13,761,39"/>
-<area shape="rect" id="node6" href="$qcalc_8f90.html#a5befd1d444d41d7d1e4bf8b297c17ee2" title="calc_all" alt="" coords="677,71,744,98"/>
-<area shape="rect" id="node7" href="$qcalc_8f90.html#a93dcacb957411ed0d0471fe8a31c60d6" title="process_frame" alt="" coords="809,71,920,98"/>
-<area shape="rect" id="node8" href="$qcalc_8f90.html#a7d2d447954fb385bdca4f228de92b1eb" title="process_data" alt="" coords="968,71,1071,98"/>
-</map>

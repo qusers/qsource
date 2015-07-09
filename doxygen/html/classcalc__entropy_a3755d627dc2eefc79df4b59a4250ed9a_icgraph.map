@@ -1,7 +1,0 @@
-<map id="calc_entropy::covariancematrix" name="calc_entropy::covariancematrix">
-<area shape="rect" id="node2" href="$classcalc__entropy.html#aa0d5bd96bcbb6587c5e1e624674e5e4e" title="calc_entropy::entropy_calc" alt="" coords="433,5,613,32"/>
-<area shape="rect" id="node6" href="$classcalc__entropy.html#afae4ac42e827ba29f7e2dc444a868123" title="calc_entropy::pca" alt="" coords="259,31,385,57"/>
-<area shape="rect" id="node3" href="$qcalc_8f90.html#a5befd1d444d41d7d1e4bf8b297c17ee2" title="calc_all" alt="" coords="661,5,728,32"/>
-<area shape="rect" id="node4" href="$qcalc_8f90.html#a93dcacb957411ed0d0471fe8a31c60d6" title="process_frame" alt="" coords="776,5,887,32"/>
-<area shape="rect" id="node5" href="$qcalc_8f90.html#a7d2d447954fb385bdca4f228de92b1eb" title="process_data" alt="" coords="935,5,1037,32"/>
-</map>

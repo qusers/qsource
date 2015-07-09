@@ -1,4 +1,0 @@
-<map id="calc_chemscore::q_bond" name="calc_chemscore::q_bond">
-<area shape="rect" id="node3" href="$structcalc__chemscore_1_1bond__pointer.html" title="{calc_chemscore::bond\l_pointer\n||}" alt="" coords="5,277,161,369"/>
-<area shape="rect" id="node2" href="$structcalc__chemscore_1_1q__atom.html" title="{calc_chemscore::q_atom\n|+ top_nr\l+ n\l+ contact\l+ at_type\l+ hybrid\l+ been_there\l+ cyclic\l+ active\l|}" alt="" coords="81,432,251,612"/>
-</map>
