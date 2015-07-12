@@ -13,6 +13,7 @@
 \singlespacing
 \usepackage[left=2.54cm,bottom=2.00cm,top=2.00cm,right=2.54cm]{geometry}
 \usepackage[compact]{titlesec}
+\usepackage[colorinlistoftodos]{todonotes}
 %\allsectionsfont{\color{bl}\scshape\selectfont}
 \allsectionsfont{\color{bl}}
 %\usepackage{chapterbib}
@@ -33,15 +34,15 @@
 \definecolor{gray}{rgb}{0.5,0.5,0.5}
 \definecolor{mauve}{rgb}{0.58,0,0.82}
 
-\lstset{frame=tb, 
-language=bash, 
+\lstset{frame=tb,
+language=bash,
 aboveskip=3mm,
-belowskip=3mm, 
-showstringspaces=false, 
+belowskip=3mm,
+showstringspaces=false,
 columns=flexible,
-basicstyle={\small\ttfamily}, 
+basicstyle={\small\ttfamily},
 numbers=none,
-numberstyle=\tiny\color{gray}, 
+numberstyle=\tiny\color{gray},
 keywordstyle=\color{blue},
 commentstyle=\color{dkgreen},
 stringstyle=\color{mauve},
@@ -64,32 +65,40 @@ tabsize=3}
 \renewcommand*\familydefault{\sfdefault}
 %\renewcommand*{\encodingdefault}{T1}
 % For more options go to: http://www.tug.dk/FontCatalogue/
-\usepackage[colorinlistoftodos]{todonotes}
+
 
 
 %===============================================================================
 % Definitions
 %===============================================================================
 % Define a new command that prints the title only
-\makeatletter                                           % Begin definition
-\def\printtitle{                                        % Define command: \printtitle
-{\color{bl} \centering \huge \sc \textbf{\@title}\par}} % Typesetting
-\makeatother                                            % End definition
+% Begin definition
+\makeatletter
+\def\printtitle{
+{\color{bl} \centering \Huge \textbf{\@title}\par}} % Typesetting
+\makeatother
+% End definition
 
-\title{Q DEVELOPERS MANUAL} %\\
-%    \large \vspace*{-10pt}A Developers Manual for Q.\vspace*{10pt}}
+\title{Q\\
+    \LARGE Version 5.7 \\
+    \LARGE \vspace*{-10pt}Developers Manual\vspace*{10pt}}
+
 
 % Define a new command that prints the author(s) only
-\makeatletter                            % Begin definition
+% Begin definition
+\makeatletter
 \def\printauthor{                        % Define command: \printauthor
 {\centering \small \@author}}            % Typesetting
-\makeatother                             % End definition
+\makeatother
+% End definition
 
 \author{
-    Mauricio Esguerra \\
-    mauricio.esguerra@gmail.com \\
-    \vspace{20pt}
-    }
+  \vspace{10pt}
+  Mauricio Esguerra \\
+  \vspace{4pt}
+  mauricio.esguerra@gmail.com \\
+  \vspace{20pt}
+  }
 
 % Custom headers and footers
 \usepackage{fancyhdr}
@@ -99,8 +108,7 @@ tabsize=3}
 \lhead{}
 \chead{}
 \rhead{}
-% Footer (you may change this to your own needs)
-\lfoot{\footnotesize \texttt{mesguerra.org} - Q Development}
+\lfoot{\footnotesize Q Development - \texttt{qdyn.org}}
 \cfoot{}
 \rfoot{\footnotesize page \thepage\ }%of \pageref{LastPage}}    % "Page 1 of 2"
 \renewcommand{\headrulewidth}{0.0pt}
@@ -124,42 +132,50 @@ tabsize=3}
 \tableofcontents
 %\bibliographystyle{plainurl}
 \bibliographystyle{nar}
+\vspace{20pt}
 \section{Introduction}
-This is the developers manual for \textbf{Q}. the free enegies from molecular dynamics
-program.
-Q is entirely writen in Fortran. It's initial development was in Fortran 90, but
-the incorporation of object oriented paradigms into modern Fortran have seen
-the code evolve to take advantage of the evolution of the language.
+This is  the developers manual  for \textbf{Q}, the free  enegies from
+molecular dynamics program.  Q is  entirely written in modern Fortran.
+Its initial  development was in  Fortran 90, but the  incorporation of
+object  oriented paradigms  into  modern Fortran  have  seen the  code
+evolve to take advantage of  the evolution of the language.  Currently
+the program incorporporates elements of  the Fortran 2008 standard and
+it is developing the use  of the OpenMP 4.0 standard\footnote{which is
+now  fully implemented  into  gnu  Fortran version  5.1}  for in-node
+parallelization.
 
-A very convenient trick fro cleaning up the code is:
 
-emacs --batch md.f90 -f mark-whole-buffer -f f90-indent-subprogram -f save-buffer
-
+\subsection{Makefile}
 \label{makefile}
-\subsection{makefile}
 
-\label{clusterarchitectures}
+
 \subsection{Cluster Architectures}
+\label{clusterarchitectures}
 
-\label{debugging}
+
 \subsection{Debugging}
+\label{debugging}
 
+
+\subsection{Profiling}
 \label{profiling}
-\subsection{profiling}
 
-\label{bestpractices}
 \subsection{Best Practices}
+\label{bestpractices}
 
 \url{http://www.fortran90.org/src/best-practices.html}
 
-\label{changelog}
+
 \section{ChangeLog}
+\label{changelog}
 
-\label{schedule}
+
 \section{Release Schedule}
+\label{schedule}
 
-\label{qprep}
+
 \section{qprep}
+\label{qprep}
 \textbf{qprep} is the utility which allows the translation of pdb files into
 a format which the dynamics engine can understand. The main file generated
 by \textbf{qprep} is refered to as the topology.
@@ -169,50 +185,45 @@ by \textbf{qprep} is refered to as the topology.
 \fvset{frame=single, fontfamily=courier, fontsize=\small}
 %\fvset{frame=single, fontfamily=courier}
 \begin{Verbatim}
-bash-3.1\$ qprep generate.inp >& generate.out &
+qprep generate.inp >& generate.out &
 \end{Verbatim}
 
 
-\begin{Verbatim}
-bash-3.1\$ pwd
-/home/username
-bash-3.1\$ cd Desktop
-bash-3.1\$ ls
-Trash
-\end{Verbatim}
+\section{qdum}
+\label{qdum}
 
 
 \section{qdyn}
+\label{qdyn}
 \textbf{qdyn} is compiled using the following explicit rules:
+\begin{Verbatim}
 -ffree-line-length-none
 -fcray-pointer
--fall-intrinsics 
--std=legacy 
--Wall 
--Wtabs 
--fstack-protector 
--O3 
--DG95=1 -c 
+-fall-intrinsics
+-std=legacy
+-Wall
+-Wtabs
+-fstack-protector
+-O3
+-DG95=1 -c
+\end{Verbatim}
 
-Development flags recommended from fortran90.org:
+Development flags recommended from fortran90.org:\\
 -Wall -Wextra -Wimplicit-interface -fPIC -fmax-errors=1 -g -fcheck=all -fbacktrace
 
-Production flags recommended from fortran90.org:
+Production flags recommended from fortran90.org:\\
 -Wall -Wextra -Wimplicit-interface -fPIC -Werror -fmax-errors=1 -O3 -march=native -ffast-math -funroll-loops
 
-
-sizes: Does this.
+sizes: Specifies data storage for all Q programs.\\
 Modules used= NONE
 
-
-nrgy: Does this.
-Modules used= sizes
-Subroutines: 
-  nrgy\_startup = empty
-  put\_ene = 
+nrgy: Input/Output for energy data and energy file.\\
+Modules used= sizes\\
+Subroutines:\\
+  nrgy\_startup = empty\\
+  put\_ene =
 
 Functions:
-
 
 mpiglob: Declares global variables for MPI parallelization of qdyn
 Modules used = nrgy
@@ -221,8 +232,8 @@ Subroutines:
 Functions:
 
 
-misc:
-Modules used = sizes
+misc:\\
+Modules used = sizes\\
 Subroutines:
 
 Functions:
@@ -230,7 +241,7 @@ Functions:
 
 prmfile: Data files parser.
 Modules used = misc
-Subroutines: 
+Subroutines:
   prmfile\_startup = EMPTY ? WTF
 
 
@@ -243,7 +254,7 @@ Modules used = NONE
 
 topo:
 Modules used = sizes, misc
-Subroutines: 
+Subroutines:
   topo\_startup = EMPTY ? WTF
 
 
@@ -267,41 +278,42 @@ Modules used = atom\_mask, misc
 -DG95=1 -cpp -c
 
 md: This is the main molecular dynamics \textit{module}.
-Modules used = 
+Modules used =
 
 
 qdyn: This file contains the main \textbf{qdyn} \textit{program} code.
-Modules used = 
+Modules used =
 
 
-
-
-\subsection{subsection 1}
-
-Make sure to have the location of the binaries on your path.\\
-
-\noindent
-Make sure to modify rungms to have the path to the gamess binary and
-also the location of scratch.\\
-
-\noindent
-Make a  symbolic link to the  mac executable which comes  with a funky
-name.
 
 \section{qfep}
+\label{qfep}
 
 
 \section{qcalc}
+\label{qcalc}
+
+
+\section{Tricks}
+\label{tricks}
+
+A very convenient trick for cleaning up the code is:
+
+emacs --batch md.f90 -f mark-whole-buffer -f f90-indent-subprogram -f save-buffer
+
 
 \section{Links}
+\label{links}
 The following  is a  collection of reference  links useful  for fotran
 programers.
 
-The description of the GNU Compiler Collection (gcc) version 5.1.0
+
+\noindent - The description of the GNU Compiler Collection (gcc) version 5.1.0\\
 \url{https://gcc.gnu.org/onlinedocs/gcc-5.1.0/gfortran.pdf}
 
 
 \subsection{Doxygen}
+\label{doxygen}
 To  automatically document  fortran  code the  only current  available
 option is doxygen.
 To  use doxygen  a  configuration  file is  necessary.  This has  been
@@ -323,7 +335,6 @@ Generates html code which we make available at:
 doxygen.qdyn.org
 
 A mainfile document is included in the file maintext.txt
-
 
 
 \subsection{Fortran codes available online}

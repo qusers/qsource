@@ -130,9 +130,9 @@ module md
   integer                   :: nwpolr_shell, n_max_insh
 
   type SHELL_TYPE
-     real                    :: rout, dr, cstb
-     real                    :: avtheta, avn_insh, theta_corr
-     integer                 :: n_insh
+     real                   :: rout, dr, cstb
+     real                   :: avtheta, avn_insh, theta_corr
+     integer                :: n_insh
   end type SHELL_TYPE
 
 
@@ -178,39 +178,48 @@ module md
 
   ! --- Restraints
   integer                   :: implicit_rstr_from_file
-  integer                   :: nrstr_seq, nrstr_pos, nrstr_dist, nrstr_wall
+  integer                   :: nrstr_seq, nrstr_pos, nrstr_dist, nrstr_angl, nrstr_wall
 
   type RSTRSEQ_TYPE
-     integer(AI)             :: i,j
-     real(8)                 :: fk
-     integer(TINY)           :: ih
-     integer                 :: to_centre !flag for restraining to geom. or mass centre
+     integer(AI)            :: i,j
+     real(8)                :: fk
+     integer(TINY)          :: ih
+     integer                :: to_centre !flag for restraining to geom. or mass centre
   end type RSTRSEQ_TYPE
 
   type RSTRPOS_TYPE
-     integer(AI)             :: i
-     integer(TINY)           :: ipsi
-     real(8)                 :: fk(3)
-     real(8)                 :: x(3)
+     integer(AI)            :: i
+     integer(TINY)          :: ipsi
+     real(8)                :: fk(3)
+     real(8)                :: x(3)
   end type RSTRPOS_TYPE
 
   type RSTRDIS_TYPE
-     integer(AI)             :: i,j
-     integer(TINY)           :: ipsi
-     real(8)                 :: fk
-     real(8)                 :: d1, d2
-     character(len=20)       :: itext,jtext
+     integer(AI)            :: i,j
+     integer(TINY)          :: ipsi
+     real(8)                :: fk
+     real(8)                :: d1, d2
+     character(len=20)      :: itext,jtext
   end type RSTRDIS_TYPE
 
+type RSTRANG_TYPE 
+        integer(AI)    :: i,j,k
+        integer(TINY)  :: ipsi
+        real(8)        :: fk
+        real(8)        :: ang
+!       character(len=20)       ::  itext,jtext,ktext
+end type RSTRANG_TYPE
+
   type RSTRWAL_TYPE
-     integer(AI)             :: i,j
-     real(8)                 :: d, fk, aMorse, dMorse
-     integer(TINY)           :: ih
+     integer(AI)            :: i,j
+     real(8)                :: d, fk, aMorse, dMorse
+     integer(TINY)          :: ih
   end type RSTRWAL_TYPE
 
   type(RSTRSEQ_TYPE), allocatable:: rstseq(:)
   type(RSTRPOS_TYPE), allocatable:: rstpos(:)
   type(RSTRDIS_TYPE), allocatable:: rstdis(:)
+  type(RSTRANG_TYPE), allocatable:: rstang(:)
   type(RSTRWAL_TYPE), allocatable:: rstwal(:)
 
 
@@ -586,6 +595,7 @@ contains
     deallocate(rstseq, stat=alloc_status)
     deallocate(rstpos, stat=alloc_status)
     deallocate(rstdis, stat=alloc_status)
+    deallocate(rstang, stat=alloc_status)
     deallocate(rstwal, stat=alloc_status)
 
 #if defined (USE_MPI)
@@ -2540,17 +2550,17 @@ contains
     real(8)                                         :: stepsize
     real(8)                                         :: lamda_tmp(max_states)
     integer                                         :: fu, fstat
-    real(8)                                         ::      rjunk
-    integer                                         ::      ijunk
+    real(8)                                         :: rjunk
+    integer                                         :: ijunk
 
     ! local parameters
     integer                                         :: num_args
-    character(200)                          :: infilename
-    logical                                         ::      yes
-    logical                                         ::      need_restart
-    character(len=80)                       ::      instring
-    logical                                         ::      inlog
-    integer                                         ::      mask_rows
+    character(200)                                  :: infilename
+    logical                                         :: yes
+    logical                                         :: need_restart
+    character(len=80)                               :: instring
+    logical                                         :: inlog
+    integer                                         :: mask_rows
 
     ! this subroutine will init:
     !  nsteps, stepsize, dt
@@ -2571,6 +2581,7 @@ contains
     !  nrstr_seq, [rstseq] (allocating memory for rstseq)
     !  nrstr_pos, [rstpos] (allocating memory for rstpos)
     !  nrstr_dist, [rstdis] (allocating memory for rstdis)
+    !  nrstr_ang, [rstang] (allocating memory for rstang)
     !  nrstr_wall, [rstwal] (allocating memory for rstwal)
 
     ! read name of input file from the command line
@@ -2886,7 +2897,7 @@ contains
              write(*,'(a)') '>>> ERROR: charge_correction on requires polarization on (section solvent)'
              initialize = .false.
           end if
-          if(.not. prm_get_real8_by_key('polarisation_force', fkwpol)) then
+          if(.not. prm_get_real8_by_key('polarization_force', fkwpol)) then
              write(*,'(a)') 'Solvent polarization force constant set to default'
              fkwpol = -1 ! this will be set in water_sphere, once target radius is known
           end if
@@ -3197,18 +3208,53 @@ contains
 132    format (i6,1x,i6,3f8.2,i8)
     end if
 
+! --- nrstr_angl, [rstang]
+nrstr_angl = prm_count('angle_restraints')
+135     format (/,'No. of angle restraints =',i10)
+if ( nrstr_angl .gt. 0 ) then
+        write (*,135) nrstr_angl
+        ! allocate memory for rstang
+        allocate(rstang(nrstr_angl), stat=alloc_status)
+        call check_alloc('restraint list')
+        write (*,140)
+140             format ('atom_i atom_j atom_k   angle   fc        state')
+        do i=1,nrstr_angl
+                yes=prm_get_line(text)
+                ! read rstang(i)
+                !if(scan(text, ':') > 0) then !got res:atnr
+                  !Store in i&j as res:atnr and assign atom nr after topology is
+                  !read (prep_coord)
+                !  read(text,*, iostat=fstat) rstang(i)%itext,rstang(i)%jtext,rstang(i)%ktext,&
+                !     rstang(i)%ang, rstang(i)%fk, rstang(i)%ipsi
+                !else !Plain numbers
+                  read(text,*, iostat=fstat) rstang(i)%i,rstang(i)%j,rstang(i)%k,&
+                        rstang(i)%ang, rstang(i)%fk, rstang(i)%ipsi
+                 ! rstang(i)%itext = 'nil'
+                 ! rstang(i)%jtext = 'nil'
+                 ! rstang(i)%ktext = 'nil'
+                !end if
+                if(fstat /= 0) then
+                  write(*,'(a)') '>>> ERROR: Invalid angle restraint data.'
+                  initialize = .false.
+                  exit
+                end if
+                write (*,142) rstang(i)%i,rstang(i)%j,rstang(i)%k,rstang(i)%ang,rstang(i)%fk, &
+                        rstang(i)%ipsi
+        end do
+142             format (i6,1x,i6,1x,i6,2f8.2,i8)
+end if
 
     if (.not. box )then
        ! --- nrstr_wall, [rstwal]
        nrstr_wall = prm_count('wall_restraints')
-135    format (/,'No. of wall sequence restraints=',i10)
+145    format (/,'No. of wall sequence restraints=',i10)
        if ( nrstr_wall .gt. 0) then
-          write (*,135) nrstr_wall
+          write (*,145) nrstr_wall
           ! allocate memory for rstwal
           allocate(rstwal(nrstr_wall), stat=alloc_status)
           call check_alloc('restraint list')
-          write (*,140)
-140       format ('atom_i atom_j   dist.      fc  aMorse  dMorse  H-flag')
+          write (*,150)
+150       format ('atom_i atom_j   dist.      fc  aMorse  dMorse  H-flag')
           do i=1,nrstr_wall
              ! read rstwal(:)
              yes = prm_get_line(text)
@@ -3219,9 +3265,9 @@ contains
                 initialize = .false.
                 exit
              end if
-             write (*,142) rstwal(i)     
+             write (*,152) rstwal(i)     
           end do
-142       format (i6,1x,i6,4f8.2,i8)
+152       format (i6,1x,i6,4f8.2,i8)
        end if
     end if
 
@@ -3234,18 +3280,18 @@ contains
 
   logical function old_initialize(fu)
     !arguments
-    integer                                         ::      fu
+    integer                                         :: fu
     ! local variables
-    integer                                         ::      iuse_indip, shake_flag
+    integer                                         :: iuse_indip, shake_flag
     character                                       :: text*80, watmodel*80
     integer                                         :: i,j,length
     integer                                         :: irestart
     real(8)                                         :: stepsize
     real(8)                                         :: lamda_tmp(max_states)
     integer                                         :: fstat
-    integer                                         ::      NBMethod
-    integer                                         ::      iwpol_restr
-    real(8)                                         ::      rjunk
+    integer                                         :: NBMethod
+    integer                                         :: iwpol_restr
+    real(8)                                         :: rjunk
 
     !this is called by initialize to read old-style input file which is 
     !alreadu open as unit fu
@@ -3271,6 +3317,7 @@ contains
     !  nrstr_seq, [rstseq] (allocating memory for rstseq)
     !  nrstr_pos, [rstpos] (allocating memory for rstpos)
     !  nrstr_dist, [rstdis] (allocating memory for rstdis)
+    !  nrstr_ang, [rstang] (allocating memory for rstang)
     !  nrstr_wall, [rstwal] (allocating memory for rstwal)
 
 
@@ -3559,27 +3606,45 @@ contains
     end do
 132 format (i6,1x,i6,2f8.2,i8)
 
+! --- nrstr_ang, [rstang]
+read (fu,*) nrstr_angl
+write (*,135) nrstr_angl
+135 format ('No. angle rstrs =',i10)
+if ( nrstr_angl .gt. 0 ) then
+! allocate memory for rstang
+allocate(rstang(nrstr_angl), stat=alloc_status)
+call check_alloc('restraint list')
+write (*,140)
+end if
+140 format ('atom_i atom_j atom_k   angle      fc  istate')
+do i=1,nrstr_angl
+! read rstang(i)
+read (fu,*) rstang(i)%i,rstang(i)%j,rstang(i)%k,rstang(i)%ang, &
+  rstang(i)%fk,rstang(i)%ipsi
+write (*,142) rstang(i)%i,rstang(i)%j,rstang(i)%k,rstang(i)%ang, &
+  rstang(i)%fk,rstang(i)%ipsi
+end do
+142 format (i6,1x,i6,1x,i6,2f8.2,i8)
+
     ! --- nrstr_wall, [rstwal]
     read (fu,*) nrstr_wall
-    write (*,135) nrstr_wall
-135 format ('No. wall seq. rstrs=',i10)
+    write (*,145) nrstr_wall
+145 format ('No. wall seq. rstrs=',i10)
     if ( nrstr_wall .gt. 0) then
-
-
        ! allocate memory for rstwal
        allocate(rstwal(nrstr_wall), stat=alloc_status)
        call check_alloc('restraint list')
-       write (*,140)
+       write (*,150)
     end if
-140 format ('atom_i atom_j   dist.      fc  H-flag')
+150 format ('atom_i atom_j   dist.      fc  H-flag')
     do i=1,nrstr_wall
        ! read rstwal(:)
        read (fu,*) rstwal(i)%i,rstwal(i)%j,rstwal(i)%d,rstwal(i)%fk, &
             rstwal(i)%ih
-       write (*,142) rstwal(i)%i,rstwal(i)%j,rstwal(i)%d,rstwal(i)%fk, &
+       write (*,152) rstwal(i)%i,rstwal(i)%j,rstwal(i)%d,rstwal(i)%fk, &
             rstwal(i)%ih     
     end do
-142 format (i6,1x,i6,2f8.2,i8)
+152 format (i6,1x,i6,2f8.2,i8)
 
     read (fu,'(a80)') text
     write (*,157) 
@@ -12884,14 +12949,14 @@ end subroutine offdiag
 !-----------------------------------------------------------------------
 subroutine p_restrain
   ! *** Local variables
- integer                                         ::      ir,i,j,k,i3,j3,istate, n_ctr
- real(8)                                         ::      fk,r2,erst,Edum,x2,y2,z2,wgt,b,db,dv, totmass
- real(8)                                         ::      dr(3), ctr(3)
- real(8)                                         ::      fexp
+ integer :: ir,i,j,k,i3,j3,k3,istate,n_ctr
+ real(8) :: fk,r2,erst,Edum,x2,y2,z2,wgt,b,db,dv,totmass,theta,rij,r2ij,rjk,r2jk,scp,f1
+ real(8) :: dr(3), dr2(3), ctr(3), di(3), dk(3)
+ real(8) :: fexp
 
  ! global variables used:
  !  E, nstates, EQ, nrstr_seq, rstseq, heavy, x, xtop, d, nrstr_pos, rstpos, nrstr_dist, 
- !  rstdis, nrstr_wall, rstwal, xwcent
+ !  rstdis, nrst_ang, rstang, nrstr_wall, rstwal, xwcent
 
  ! sequence restraints (independent of Q-state)
  do ir = 1, nrstr_seq
@@ -13081,6 +13146,108 @@ subroutine p_restrain
     end if
  end do
 
+! atom-atom-atom angle restraints (Q-state dependent)
+do ir = 1, nrstr_angl
+
+istate = rstang(ir)%ipsi
+i      = rstang(ir)%i
+j      = rstang(ir)%j
+k      = rstang(ir)%k
+i3     = i*3-3
+j3     = j*3-3
+k3     = k*3-3
+
+! distance from atom i to atom j
+dr(1)  = x(i3+1) - x(j3+1)
+dr(2)  = x(i3+2) - x(j3+2)
+dr(3)  = x(i3+3) - x(j3+3)
+
+! distance from atom k to atom j
+dr2(1) = x(k3+1) - x(j3+1)
+dr2(2) = x(k3+2) - x(j3+2)
+dr2(3) = x(k3+3) - x(j3+3)
+
+! if PBC then adjust lengths according to periodicity - MA
+if( use_PBC ) then
+        dr(1) = dr(1) - boxlength(1)*nint( dr(1)*inv_boxl(1) )
+        dr(2) = dr(2) - boxlength(2)*nint( dr(2)*inv_boxl(2) )
+        dr(3) = dr(3) - boxlength(3)*nint( dr(3)*inv_boxl(3) )
+
+        dr2(1) = dr2(1) - boxlength(1)*nint( dr2(1)*inv_boxl(1) )
+        dr2(2) = dr2(2) - boxlength(2)*nint( dr2(2)*inv_boxl(2) )
+        dr2(3) = dr2(3) - boxlength(3)*nint( dr2(3)*inv_boxl(3) )
+
+end if
+
+if ( istate .ne. 0 ) then
+wgt = EQ(istate)%lambda
+else
+wgt = 1.0
+end if
+
+! square distances from the triangle formed by the atoms i, j and k
+r2ij = dr(1)**2 + dr(2)**2 + dr(3)**2
+r2jk = dr2(1)**2 + dr2(2)**2 + dr2(3)**2
+
+rij  = sqrt ( r2ij )
+rjk  = sqrt ( r2jk )
+
+! calculate the scalar product (scp) and the angle theta from it
+scp = ( dr(1)*dr2(1) + dr(2)*dr2(2) + dr(3)*dr2(3) )
+scp = scp / ( rij*rjk )
+
+! criteria inserted on the real angle force calculations to ensure no weird scp.
+if ( scp .gt.  1.0 ) scp =  1.0
+if ( scp .lt. -1.0 ) scp = -1.0
+
+theta = acos(scp)
+db    = theta - (rstang(ir)%ang)*deg2rad
+
+! dv is the force to be added in module
+Edum   = 0.5*rstang(ir)%fk*db**2
+dv     = wgt*rstang(ir)%fk*db
+
+! calculate sin(theta) to use in forces
+f1 = sin ( theta )
+if ( abs(f1) .lt. 1.e-12 ) then
+        ! avoid division by zero
+        f1 = -1.e12
+else
+        f1 =  -1.0 / f1
+end if
+
+        ! calculate di and dk
+di(1) = f1 * ( dr2(1) / ( rij * rjk ) - scp * dr(1) / r2ij )
+di(2) = f1 * ( dr2(2) / ( rij * rjk ) - scp * dr(2) / r2ij )
+di(3) = f1 * ( dr2(3) / ( rij * rjk ) - scp * dr(3) / r2ij )
+dk(1) = f1 * ( dr(1) / ( rij * rjk ) - scp * dr2(1) / r2jk )
+dk(2) = f1 * ( dr(2) / ( rij * rjk ) - scp * dr2(2) / r2jk )
+dk(3) = f1 * ( dr(3) / ( rij * rjk ) - scp * dr2(3) / r2jk )
+
+        ! update d
+d(i3+1) = d(i3+1) + dv*di(1)
+d(i3+2) = d(i3+2) + dv*di(2)
+d(i3+3) = d(i3+3) + dv*di(3)
+d(k3+1) = d(k3+1) + dv*dk(1)
+d(k3+2) = d(k3+2) + dv*dk(2)
+d(k3+3) = d(k3+3) + dv*dk(3)
+d(j3+1) = d(j3+1) - dv*( di(1) + dk(1) )
+d(j3+2) = d(j3+2) - dv*( di(2) + dk(2) )
+d(j3+3) = d(j3+3) - dv*( di(3) + dk(3) )
+
+
+  if ( istate .eq. 0 ) then
+    do k = 1, nstates
+    EQ(k)%restraint = EQ(k)%restraint + Edum
+    end do
+  if ( nstates .eq. 0 ) E%restraint%protein = E%restraint%protein + Edum
+    else
+    EQ(istate)%restraint = EQ(istate)%restraint + Edum
+  end if
+end do
+
+
+
  if( .not. use_PBC ) then
     ! extra half-harmonic wall restraints
     do ir = 1, nrstr_wall
@@ -13112,7 +13279,6 @@ subroutine p_restrain
           end if
        end do
     end do
-
  end if
 
 end subroutine p_restrain

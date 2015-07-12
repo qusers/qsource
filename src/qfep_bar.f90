@@ -4,32 +4,32 @@
 ! Qfep free energy analysis program for FEP, EVB & umbrella sampling
 
 program qfep
-  use NRGY	
+  use NRGY      
   use PARSE
 
   implicit none
-  character*(*), parameter			::	MODULE_VERSION = '5.7'
-  character*(*), parameter			::	MODULE_DATE = '2015-04-01'
+  character*(*), parameter                      ::      MODULE_VERSION = '5.7'
+  character*(*), parameter                      ::      MODULE_DATE = '2015-04-01'
 
   integer,parameter ::mxpts=20000,mxbin=100,mxstates=4
-  character*80      ::filnam, line
+  character(80)      ::filnam, line
   integer           ::i,j,ifile,ipt,istate,ibin,nfiles,nstates,ERR, &
        nskip,nbins,nmin,idum,noffd,nnoffd,offel,ngroups,iexclg,igrp,mpts,iexclgn,astate,bstate
 
-  type(OFFDIAG_SAVE), dimension(mxstates)	:: offd
+  type(OFFDIAG_SAVE), dimension(mxstates)       :: offd
 
   real(8) ::rt,gapmin,gapmax,sum,dv,gaprange, &
        xint,dvg,veff1,veff2,dGa,dGb,dGg,alpha_B,scale_Hij, &
-       veff,min,dlam,sumf,sumb,konst,fel,nfnr,nrnf	  		
+       veff,min,dlam,sumf,sumb,konst,fel,nfnr,nrnf                      
   real(8),dimension(mxbin)              ::sumg,sumg2,avdvg,avc11,avc12,avc13,avc21,avc22,avc23,avc31,avc32,avc33,avr
 
   real(8),dimension(mxbin,14)            ::binsum
   real(8),dimension(150,mxpts,3,3)            ::eigv
   integer,dimension(mxbin)              ::nbinpts,ptsum
 
-  type(Q_ENERGIES), dimension(mxstates)	:: EQ 	
-  type(Q_ENERGIES), dimension(mxstates)	:: avEQ
-  real(8),dimension(mxstates)				:: dvv,dGv,alfa,coeff,Vel,Vvdw
+  type(Q_ENERGIES), dimension(mxstates) :: EQ   
+  type(Q_ENERGIES), dimension(mxstates) :: avEQ
+  real(8),dimension(mxstates)                           :: dvv,dGv,alfa,coeff,Vel,Vvdw
 
   real(8),dimension(3)                  ::u,y
   real(8),allocatable              ::dgf(:),dgr(:),dgfsum(:),dgrsum(:),dG(:),dgti(:),dgtisum(:), &
@@ -37,17 +37,17 @@ program qfep
   real(8),dimension(mxstates,mxstates)  ::A,mu,eta,rxy0
   real(8),allocatable                   ::Hij(:,:),d(:),e(:)
   type FEP_DATA_TYPE
-     integer					::	npts
-     real(8)					::	lambda(mxstates)
-     real(8), pointer		::	v(:,:), r(:,:) !indices are state, point
-     real(8), pointer		::	vg(:), gap(:), c1(:), c2(:) !index is point
+     integer                                    ::      npts
+     real(8)                                    ::      lambda(mxstates)
+     real(8), pointer           ::      v(:,:), r(:,:) !indices are state, point
+     real(8), pointer           ::      vg(:), gap(:), c1(:), c2(:) !index is point
   end type FEP_DATA_TYPE
-  type(FEP_DATA_TYPE), allocatable	::	FEP(:) !index is file
-  type(FEP_DATA_TYPE)				::	FEPtmp !temporary storage for one file
+  type(FEP_DATA_TYPE), allocatable      ::      FEP(:) !index is file
+  type(FEP_DATA_TYPE)                           ::      FEPtmp !temporary storage for one file
 
   real(8),dimension(mxstates,mxbin)     ::avdvv,sumv,sumv2 
 
-  integer								::	f
+  integer                                                         ::      f
 
   !header
   write(*,100) MODULE_VERSION,  MODULE_DATE
@@ -73,7 +73,7 @@ program qfep
   allocate(Hij(nstates,nstates),d(nstates),e(nstates),STAT=ERR)
   if(ERR /= 0) then
      write(*,*) 'ERROR: Out of memory when allocation Hij array.'
-     stop 'Qfep4 terminated abnormally: Out of memory.'
+     stop 'Qfep5 terminated abnormally: Out of memory.'
   end if
 
   ! Continue to read input
@@ -125,7 +125,7 @@ program qfep
 
   call prompt ('--> linear combination of states defining reaction coord: ')
   read (*,*) (coeff(i),i=1,nstates)
-  write(*,13) coeff(1:nstates)		
+  write(*,13) coeff(1:nstates)          
 13 format('# Linear combination co-efficients=',8f6.2)
 
   call prompt ('--> # of monitored groups and which to be excluded: ')
@@ -143,7 +143,7 @@ program qfep
        dglusum(0:nfiles+1),dgbarsum(0:nfiles+1), &
        STAT=ERR)
   if(ERR /= 0) then
-     stop 'Qfep4 terminated abnormally: Out of memory when allocating arrays.'
+     stop 'Qfep5 terminated abnormally: Out of memory when allocating arrays.'
   end if
 
   !---------------------------------
@@ -173,7 +173,7 @@ program qfep
      call prompt(line)
      read(*,*) filnam
      if(openit(f,filnam,'old','unformatted','read') /= 0) then
-        stop 'Qfep4 terminated abnormally: Failed to open energy file.'
+        stop 'Qfep5 terminated abnormally: Failed to open energy file.'
      end if
 
      !read 1st record to get lambdas
@@ -189,13 +189,13 @@ program qfep
            !the problem is in energies
            write(*,'(a,i1)') 'while reading energies of state ',idum
            write(*,'(a,i1,a)') 'Maybe there are only ',idum-1, ' states?'
-           stop 'Qfep3 terminated abnormally: Failed to read energies.'
+           stop 'Qfep5 terminated abnormally: Failed to read energies.'
         else
            !idum < 0 indicates problems with offdiags
            write(*,'(a)') 'while reading off-diagonal elements.'
            write(*,'(a,i1,a)') 'Maybe there are less than ',nnoffd, &
                 ' off-diagonal elements?'
-           stop 'Qfep3 terminated abnormally: Failed to read off-diagonals.'
+           stop 'Qfep5 terminated abnormally: Failed to read off-diagonals.'
         end if
      end if
 
@@ -256,10 +256,10 @@ program qfep
                  else
                     if (A(i,j)==0.0) then
                        Hij(i,j) = A(j,i)*exp(-mu(j,i)*(offd(1)%rkl-rxy0(j,i)))* &
-                            exp(-eta(j,i)*(offd(1)%rkl-rxy0(j,i))**2)					 					
+                            exp(-eta(j,i)*(offd(1)%rkl-rxy0(j,i))**2)
                     else 
                        Hij(i,j) = A(i,j)*exp(-mu(i,j)*(offd(1)%rkl-rxy0(i,j)))* &
-                            exp(-eta(i,j)*(offd(1)%rkl-rxy0(i,j))**2)									 
+                            exp(-eta(i,j)*(offd(1)%rkl-rxy0(i,j))**2)
                     end if
                  end if
               end do
@@ -281,47 +281,47 @@ program qfep
            call tred2(Hij,nstates,nstates,d,e)
            call tqli(d,e,nstates,nstates,Hij)
            FEPtmp%vg(ipt)=MINVAL(d)
-           eigv(ifile,ipt,1,1)=Hij(1,1)	! 1 < 2 < 3
-           eigv(ifile,ipt,1,2)=Hij(1,2)	
-           eigv(ifile,ipt,1,3)=Hij(1,3)	
-           eigv(ifile,ipt,2,1)=Hij(2,1)	
-           eigv(ifile,ipt,2,2)=Hij(2,2)	
-           eigv(ifile,ipt,2,3)=Hij(2,3)	
-           eigv(ifile,ipt,3,1)=Hij(3,1)	
-           eigv(ifile,ipt,3,2)=Hij(3,2)	
-           eigv(ifile,ipt,3,3)=Hij(3,3)	
+           eigv(ifile,ipt,1,1)=Hij(1,1) ! 1 < 2 < 3
+           eigv(ifile,ipt,1,2)=Hij(1,2) 
+           eigv(ifile,ipt,1,3)=Hij(1,3) 
+           eigv(ifile,ipt,2,1)=Hij(2,1) 
+           eigv(ifile,ipt,2,2)=Hij(2,2) 
+           eigv(ifile,ipt,2,3)=Hij(2,3) 
+           eigv(ifile,ipt,3,1)=Hij(3,1) 
+           eigv(ifile,ipt,3,2)=Hij(3,2) 
+           eigv(ifile,ipt,3,3)=Hij(3,3) 
            if (d(1).lt.d(2)) then         ! 1 < 2
               if (d(3).lt.d(1)) then      ! 3 < 1 < 2
-                 eigv(ifile,ipt,1,1)=Hij(3,1)	
-                 eigv(ifile,ipt,1,2)=Hij(3,2)	
-                 eigv(ifile,ipt,1,3)=Hij(3,3)	
-                 eigv(ifile,ipt,2,1)=Hij(1,1)	
-                 eigv(ifile,ipt,2,2)=Hij(1,2)	
-                 eigv(ifile,ipt,2,3)=Hij(1,3)	
-                 eigv(ifile,ipt,3,1)=Hij(2,1)	
-                 eigv(ifile,ipt,3,2)=Hij(2,2)	
-                 eigv(ifile,ipt,3,3)=Hij(2,3)	
+                 eigv(ifile,ipt,1,1)=Hij(3,1)   
+                 eigv(ifile,ipt,1,2)=Hij(3,2)   
+                 eigv(ifile,ipt,1,3)=Hij(3,3)   
+                 eigv(ifile,ipt,2,1)=Hij(1,1)   
+                 eigv(ifile,ipt,2,2)=Hij(1,2)   
+                 eigv(ifile,ipt,2,3)=Hij(1,3)   
+                 eigv(ifile,ipt,3,1)=Hij(2,1)   
+                 eigv(ifile,ipt,3,2)=Hij(2,2)   
+                 eigv(ifile,ipt,3,3)=Hij(2,3)   
               end if
            else                         ! 2 < 1
               if (d(2).lt.d(3)) then    ! 2 < 3
-                 eigv(ifile,ipt,1,1)=Hij(2,1)	
-                 eigv(ifile,ipt,1,2)=Hij(2,2)	
-                 eigv(ifile,ipt,1,3)=Hij(2,3)	
+                 eigv(ifile,ipt,1,1)=Hij(2,1)   
+                 eigv(ifile,ipt,1,2)=Hij(2,2)   
+                 eigv(ifile,ipt,1,3)=Hij(2,3)   
                  if (d(1).lt.d(3) ) then ! 2 < 1 < 3
-                    eigv(ifile,ipt,2,1)=Hij(1,1)	
-                    eigv(ifile,ipt,2,2)=Hij(1,2)	
-                    eigv(ifile,ipt,2,3)=Hij(1,3)	
+                    eigv(ifile,ipt,2,1)=Hij(1,1)        
+                    eigv(ifile,ipt,2,2)=Hij(1,2)        
+                    eigv(ifile,ipt,2,3)=Hij(1,3)        
                  end if
               else                       ! 3 < 2 < 1 
-                 eigv(ifile,ipt,1,1)=Hij(3,1)	
-                 eigv(ifile,ipt,1,2)=Hij(3,2)	
-                 eigv(ifile,ipt,1,3)=Hij(3,3)	
-                 eigv(ifile,ipt,2,1)=Hij(2,1)	
-                 eigv(ifile,ipt,2,2)=Hij(2,2)	
-                 eigv(ifile,ipt,2,3)=Hij(2,3)	
-                 eigv(ifile,ipt,3,1)=Hij(1,1)	
-                 eigv(ifile,ipt,3,2)=Hij(1,2)	
-                 eigv(ifile,ipt,3,3)=Hij(1,3)	
+                 eigv(ifile,ipt,1,1)=Hij(3,1)   
+                 eigv(ifile,ipt,1,2)=Hij(3,2)   
+                 eigv(ifile,ipt,1,3)=Hij(3,3)   
+                 eigv(ifile,ipt,2,1)=Hij(2,1)   
+                 eigv(ifile,ipt,2,2)=Hij(2,2)   
+                 eigv(ifile,ipt,2,3)=Hij(2,3)   
+                 eigv(ifile,ipt,3,1)=Hij(1,1)   
+                 eigv(ifile,ipt,3,2)=Hij(1,2)   
+                 eigv(ifile,ipt,3,3)=Hij(1,3)   
               end if
            end if
         end if
@@ -347,7 +347,7 @@ program qfep
           FEP(ifile)%c2(FEP(ifile)%npts), &
           STAT=ERR)
      if(ERR /= 0) then
-        stop 'Qfep3 terminated abnormally: Out of memory when allocating arrays.'
+        stop 'Qfep5 terminated abnormally: Out of memory when allocating arrays.'
      end if
      FEP(ifile)%v(:,:) = FEPtmp%v(1:nstates, 1:FEP(ifile)%npts)
      FEP(ifile)%vg(:) = FEPtmp%vg(1:FEP(ifile)%npts)
@@ -357,18 +357,19 @@ program qfep
      if(nnoffd > 0) then 
         allocate(FEP(ifile)%r(nstates, FEP(ifile)%npts), STAT=ERR)
         if(ERR /= 0) then
-           stop 'Qfep3 terminated abnormally: Out of memory when allocating arrays.'
+           stop 'Qfep5 terminated abnormally: Out of memory when allocating arrays.'
         end if
         FEP(ifile)%r(:,:) = FEPtmp%r(1:nstates, 1:FEP(ifile)%npts)
      end if
 
 
      ! Average energies for each file are calculated
+
      if(ipt <= nskip) then !skipped all points in the file
         write(*,900) trim(filnam)
 900     format('>>>>> ERROR: number of data sets in ',a,&
              ' is less than number of points to skip!')
-        stop 'Qfep3 terminated abnormally: Too few data points in file.'
+        stop 'Qfep5 terminated abnormally: Too few data points in file.'
      else
         avEQ(:) = avEQ(:) * (1./(FEP(ifile)%npts-nskip)) !use new * operator
      end if
@@ -531,7 +532,7 @@ program qfep
               sum=sum+1/((1+(nrnf*exp((-dv+konst)/rt))))
            end do
            sumb=sum/real(FEP(ifile+1)%npts-nskip)
-           dgbar(ifile)=-rt*dlog((sumf/sumb)*exp(-konst/rt)*nfnr)			
+           dgbar(ifile)=-rt*dlog((sumf/sumb)*exp(-konst/rt)*nfnr)                       
            sum=0.
            fel=ABS(konst-dgbar(ifile))
            konst=dgbar(ifile)
@@ -593,6 +594,7 @@ program qfep
      !-----------------------------------
      ! Reaction free energy is calculated
      !-----------------------------------
+
      write (*,*)
      write (*,*)
      write(*,24)
@@ -641,7 +643,7 @@ program qfep
            avc32(ibin)=avc32(ibin)+eigv(ifile,ipt,3,2)**2
            avc33(ibin)=avc33(ibin)+eigv(ifile,ipt,3,3)**2
            !Only gives first r_xy distance
-           if(nnoffd > 0)	avr(ibin)=avr(ibin)+FEP(ifile)%r(1,ipt)		 
+           if(nnoffd > 0)       avr(ibin)=avr(ibin)+FEP(ifile)%r(1,ipt)          
            nbinpts(ibin)=nbinpts(ibin)+1
         end do          !ipt
         do ibin=1,nbins
@@ -655,7 +657,7 @@ program qfep
               avc31(ibin)=avc31(ibin)/real(nbinpts(ibin))
               avc32(ibin)=avc32(ibin)/real(nbinpts(ibin))
               avc33(ibin)=avc33(ibin)/real(nbinpts(ibin))
-              avr(ibin)=avr(ibin)/real(nbinpts(ibin))				
+              avr(ibin)=avr(ibin)/real(nbinpts(ibin))                           
               avdvv(:,ibin)=avdvv(:,ibin)/nbinpts(ibin)
               avdvg(ibin)=avdvg(ibin)/nbinpts(ibin)
 
@@ -723,7 +725,7 @@ program qfep
 28   format('# bin  energy gap  <dGg> <dGg norm> pts  <c1**2> <c2**2> <c3**2> <r_xy>     dGa     dGb     dGc')
 
      do ibin=1,nbins
-	if (ptsum(ibin).ge.nmin) then
+        if (ptsum(ibin).ge.nmin) then
            binsum(ibin,1)=binsum(ibin,1)/real(ptsum(ibin)) ! Bin-averaged reaction free energy
            binsum(ibin,2)=binsum(ibin,2)/real(ptsum(ibin)) ! Bin-averaged c1**2
            binsum(ibin,3)=binsum(ibin,3)/real(ptsum(ibin)) ! Bin-averaged c2**2
@@ -738,15 +740,15 @@ program qfep
            binsum(ibin,12)=binsum(ibin,12)/real(ptsum(ibin)) ! 
            binsum(ibin,13)=binsum(ibin,13)/real(ptsum(ibin)) ! 
            binsum(ibin,14)=binsum(ibin,14)/real(ptsum(ibin)) ! 
-	end if
+        end if
      end do
      min=MINVAL(binsum(:,1))
      do ibin=1,nbins
         if (ptsum(ibin).ge.nmin) then
 29         format(i4,1x,3f9.2,2x,i5,3f8.3,4f8.2,6f8.3)
            write(*,29) ibin,gapmin+real(ibin)*xint-xint/2.,binsum(ibin,1),  &
- 		binsum(ibin,1)-min,int(ptsum(ibin)),binsum(ibin,2),binsum(ibin,3),binsum(ibin,4),binsum(ibin,5), &
-		binsum(ibin,6),binsum(ibin,7),binsum(ibin,8),binsum(ibin,9),binsum(ibin,10),binsum(ibin,11),binsum(ibin,12), &
+                binsum(ibin,1)-min,int(ptsum(ibin)),binsum(ibin,2),binsum(ibin,3),binsum(ibin,4),binsum(ibin,5), &
+                binsum(ibin,6),binsum(ibin,7),binsum(ibin,8),binsum(ibin,9),binsum(ibin,10),binsum(ibin,11),binsum(ibin,12), &
                 binsum(ibin,13),binsum(ibin,14)
         end if
      end do !ibin
@@ -768,13 +770,12 @@ contains
   !------------------------------
 
   subroutine prompt (outtxt)
-    character*(*) outtxt
+    character(*) outtxt
 #if defined (__osf__)
     !prompt to STDERR using unit 5=STDIN on OSF/1=DEC UNIX
-    integer, parameter			::	f=10
+    integer, parameter                  ::      f=10
     !write (f,'($,a)') outtxt
-#else
-#if defined (_WIN32)
+#elseif defined (_WIN32)
     !open the ERR file on Win32
     integer, save :: f
     if(f==0) then
@@ -784,9 +785,8 @@ contains
     !write (f1,'($,a)') outtxt
 #else
     !otherwise prompt to STDOUT
-    integer, parameter			::	f=6
+    integer, parameter                  ::      f=6
     !write (f2,'($,a)') outtxt
-#endif
 #endif
     write (f,'($,a)') outtxt
   end subroutine prompt
@@ -795,7 +795,7 @@ contains
 
   SUBROUTINE TRED2(A,N,NP,D,E)
     !------------------------------------------------------------
-    ! This subroutine reduces a symmetric matrix to a tridiagonal
+    ! This subroutine reduces a symmetric matrix to tridiagonal
     ! form. The tridiagonal matrix can further be diagonalized by
     ! the subroutine tqli.
     ! These subroutines were copied by Karin Kolmodin 20 Nov. 1997

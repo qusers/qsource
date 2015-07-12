@@ -2,13 +2,13 @@
 ! By Jens Carlsson, phd 
 ! Absolute entropies according to Quasiharmonic analysis, Schlitter's formula and RMS fluctuations
 
-module CALC_ENTROPY
+module calc_entropy
     
-        use CALC_BASE
-        use MASKMANIP
-    use TRJ
-        use CALC_FIT
-        use CALC_GEOM
+use calc_base
+use maskmanip
+use trj
+use calc_fit
+use calc_geom
 implicit none
 
 ! Constants
@@ -822,4 +822,4 @@ end subroutine UpdateCovariancematrix
     
 
 
-end module CALC_ENTROPY
+end module calc_entropy

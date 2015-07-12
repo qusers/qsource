@@ -1,18 +1,18 @@
-! (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
-! calc_chemscore.f90
-!Kajsa Ljungberg 1998-06-11
-!Implementation of a scoring function by Eldridge et al.
-!JCAMD 11 (1997) 425-445.
-!Integration into QCalc5 by Peter Hanspers
+!  (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
+!  calc_chemscore.f90
+!  Kajsa Ljungberg 1998-06-11
+!  Implementation of a scoring function by Eldridge et al.
+!  JCAMD 11 (1997) 425-445.
+!  Integration into QCalc5 by Peter Hanspers
 
 module calc_chemscore
 
-use CALC_BASE
-use MASKMANIP
-use TRJ
-use PRMFILE
-use INDEXER
-use QATOM
+use calc_base
+use maskmanip
+use trj
+use prmfile
+use indexer
+use qatom
 implicit none
 
 real                    :: score
@@ -22,27 +22,28 @@ integer                 :: i
 character(len=4)        :: trj_type
 character*80            :: top_file, fep_file
 
-type SCORE_PRECALC_TYPE
-        character(len=80)       :: chFilename           ! name of re file if one is given
-        integer                                         :: iType                                ! 1 = top calculation, 2 = restart calculation
-end type SCORE_PRECALC_TYPE
+type score_precalc_type
+  character(len=80)       :: chFilename           ! name of re file if one is given
+  integer                                         :: iType                                ! 1 = top calculation, 2 = restart calculation
+end type score_precalc_type
 
-type SCORE_TYPE                                                                                 ! structure tp keep track of scoring data
-        character(len=80)               :: chFilename   ! either name of restart file, 'top' or empty if trajectory frame
-        integer                                                 :: frame                        ! empty if chReFilename is present
-        real(8)                                                 :: score
-        real(8)                                                 :: h_bonds
-        real(8)                                                 :: metal
-        real(8)                                                 :: lipophil
-        real(8)                                                 :: rot_bond
-end type SCORE_TYPE
+type score_type                                                                                 ! structure tp keep track of scoring data
+  character(len=80)               :: chFilename   ! either name of restart file, 'top' or empty if trajectory frame
+  integer                                                 :: frame                        ! empty if chReFilename is present
+  real(8)                                                 :: score
+  real(8)                                                 :: h_bonds
+  real(8)                                                 :: metal
+  real(8)                                                 :: lipophil
+  real(8)                                                 :: rot_bond
+end type score_type
 
 !constants
-        integer, parameter                                              ::      MAX_MASKS = 10
+  integer, parameter                                              ::      MAX_MASKS = 10
+
 !module variables
         type(SCORE_PRECALC_TYPE),pointer,private        :: aPrecalc(:)  ! array of pre-calculations
-        integer, private                                                        :: iPrecalc             ! current number of pre-calcs added
-        integer, private                                                        :: maxPrecalc   ! number of pre-calc elements allocated
+        integer, private                                      :: iPrecalc             ! current number of pre-calcs added
+        integer, private                                      :: maxPrecalc   ! number of pre-calc elements allocated
 
         type(SCORE_TYPE),pointer,private                ::      aScore(:)                               ! framewise scoring info
         integer                                                                 ::      nScores, maxScores              ! number of elements in aScore, number of allocated elements of aScore
@@ -60,7 +61,7 @@ end type SCORE_TYPE
                 integer(AI)                                     ::      O, H1, H2               !topology numbers
                 real                                            ::      score                   !H-bond score with receptor
         end type wat
-        
+
         type donor
                 integer(AI)                                     ::      heavy,hydr              !topology numbers for atoms in H-bond donor
         end type donor
@@ -69,23 +70,23 @@ end type SCORE_TYPE
                 integer                                         ::      n_lip                   !number of lipophilic atoms
                 integer                                         ::      n_nonlip                !number of heavy, non-lipophilic atoms
         end type lipos
-        
+
         type bond_pointer                                                                       !pointer to the datatype q_bond
                 type(q_bond),pointer            ::      qb                              !needed for array of q_bonds in type q_atom
         end type bond_pointer
-        
-        type q_atom                     
-                integer                                         ::      top_nr                                                                  ! atom number in topology               
-                integer                                         ::      n                                                                                               !number of bonds                                                                
+
+        type q_atom
+                integer                                         ::      top_nr                                                                  ! atom number in topology
+                integer                                         ::      n                                                                                               !number of bonds
                 type(bond_pointer),dimension(1:6)               ::      bd              !pointers to the bonds
-                logical                                         ::      contact                         !if     closer than r to any receptor atom 
-                integer                                         ::      at_type                         !if lipophilic 2, if other heavy 1, if hydrogen 0 
+                logical                                         ::      contact                         !if     closer than r to any receptor atom
+                integer                                         ::      at_type                         !if lipophilic 2, if other heavy 1, if hydrogen 0
                 integer                                         ::      hybrid                          !if included sp3 then 3, if included sp2 then 2, others 0
                 logical                                         ::      been_there              !flag used in recursive routines, to avoid eternal loops
                 logical,pointer         ::      cyclic(:)                       !array of logicals, one for each ring, true if part of that ring
                 logical                                         ::      active                          !same as been_there
-        end type q_atom                                                                         
-        
+        end type q_atom
+
         type q_bond
                 type(q_atom),pointer            ::      a,b                                     !pointers to two bonded atoms
                 logical                                         ::      rotatable                       !if not part of ring and sp3-sp3 or sp3-sp2 bond
@@ -93,31 +94,31 @@ end type SCORE_TYPE
                 logical                                         ::      been_there
                 integer                                         ::      a_nonlip,b_nonlip       !number of non-lipophilic heavy atoms on a-side and b-side of bond
                 integer                                         ::      a_lip,b_lip                     !number of lipophilic heavy atoms on a-side and b-side of bond
-                logical,pointer                         ::      cyclic(:)                       
+                logical,pointer                         ::      cyclic(:)
                 logical                                         ::      active
         end type q_bond
-        
+
         integer(AI), allocatable        ::      lph_r(:)        !topology number for all lipophilic atoms in the receptor
         integer(AI), allocatable        ::      lph_l(:)        !                               ''                                                   the ligand
         type(donor), allocatable        ::      hbd_r(:)        !H-bond donor in receptor
         type(donor), allocatable        ::      hbd_l(:)        !  ''            ligand
-        integer(AI), allocatable        ::      hba_r(:)        !H-bond acceptor atoms in receptor 
+        integer(AI), allocatable        ::      hba_r(:)        !H-bond acceptor atoms in receptor
         integer(AI), allocatable        ::      hba_l(:)        !      ''                 ligand
         integer(AI), allocatable        ::      met_r(:)        !metal atoms in the receptor
         type(wat), allocatable          ::      waters(:)       !water molecules
-        
+
         integer, allocatable            ::      pol_con(:)      !connections for potentially polar atoms
-                                                                                                
-        
+
+
         type(q_atom),private,allocatable,target ::      q_atoms(:)              ! atoms in ligand
         type(q_bond),private,allocatable,target ::      q_bonds(:)              ! bonds in ligand
-        
+
         !numbers of each of the atom types
         integer                                         ::      nlph_r, nlph_l, nhbd_r, nhbd_l
         integer                                         ::      nhba_r, nhba_l, nmet_r, nwaters,nqbonds
         integer                                         ::      nhbd_prot, nhba_prot
         integer                                         ::      nrings          !number of rings in the ligand
-        
+
         !lists of the atom type categories
         integer, parameter                              ::      LIPO=1, METAL=2, SULPHUR=3, ACCEPTOR=4
         integer, parameter                              ::      SP3=5, SP2=6, SP3_N=7, PL_N=8
@@ -138,26 +139,26 @@ end type SCORE_TYPE
                 'carbon_lipo    ', &
                 'carbonyl_carbon', &
                 'carbonyl_oxygen']
-        
+
         type ATOM_DATA_TYPE
                 real                                            ::      radius
                 logical                                         ::      prop(NPROPS)
         end type ATOM_DATA_TYPE
         type(ATOM_DATA_TYPE), allocatable ::atom_data(:)
-        
+
         !No record is kept of polar(non H-bonding) atoms
-        
-        integer, allocatable            ::      iqatom(:)       !one element per atom, 0 if not Q-atom, 
+
+        integer, allocatable            ::      iqatom(:)       !one element per atom, 0 if not Q-atom,
                                                                                                 !else number in iqseq (ligand)
-        real,allocatable                        ::      vdwr(:)         !van der Waals radius of each atom      
+        real,allocatable                        ::      vdwr(:)         !van der Waals radius of each atom
 
         character*80                            ::      atom_data_file
-        character*80                            ::  coord_file  
-        
+        character*80                            ::  coord_file
+
         real                                            ::      hbond_term,metal_term,lipo_term,rot_term        !result from score
-        real, parameter                         ::      dGconst=-5.48, dGhbond=-3.34, dGmetal=-6.03 
+        real, parameter                         ::      dGconst=-5.48, dGhbond=-3.34, dGmetal=-6.03
         real, parameter                         ::      dGlipo=-0.117, dGrot=2.56
-        
+
         integer, private                        ::      bDoTopcalc              ! boolean flag
         integer, private                        ::      iRestartCalc=-1 ! flag to indicate if doing calcs on restart file or not
 
@@ -166,7 +167,7 @@ end type SCORE_TYPE
         integer, private                        :: warn                                         ! flag to indicate if any warnings were displayed
 
 contains
-        
+
 subroutine score_initialize
         nScores = 0
         maxScores = 16
@@ -184,16 +185,16 @@ end subroutine chemscore_finalize
 subroutine log_frame(iFrame)                                    ! logs scoring results for frame
         ! args
         integer, intent(in)             :: iFrame                       ! current frame
-        
+
         ! locals
         type(SCORE_TYPE),pointer:: new_aScore(:)        ! tmp pointer
-        
+
         nScores = nScores +1
         if(nScores>maxScores) then
                 maxScores = maxScores + 16              ! allocate 16 elements a time
                 allocate(new_aScore(maxScores)) ! allocate new mem
                 new_aScore(1:nScores-1) = aScore(1:nScores-1)   ! copy old
-                
+
                 deallocate(aScore)                              ! return old mem to OS
                 aScore => new_aScore                            ! update pointer
         end if
@@ -206,7 +207,7 @@ subroutine log_frame(iFrame)                                    ! logs scoring r
         aScore(nScores)%lipophil        = lipo_term
         aScore(nScores)%rot_bond        = rot_term
 end subroutine log_frame
-        
+
 subroutine score_heading(i)
         integer         ::      i
 
@@ -229,7 +230,7 @@ subroutine calc_hbonds            !in subroutine calc_scores
                         hbond_term = hbond_term+score1*score2
                 end do
         end do
-        
+
         do i = 1,nhba_l                                                                                                                                                 !ligand acceptors scored against
                 do j = 1,nhbd_r                                                                                                                                         !receptor donors
                         score1 = g1_hb(hba_l(i),hbd_r(j)%hydr)
@@ -241,7 +242,7 @@ subroutine calc_hbonds            !in subroutine calc_scores
 end subroutine calc_hbonds
 
 subroutine calc_lipo                            !in subroutine calc_scores
-        integer                                 ::i,j   
+        integer                                 ::i,j
         real                                    ::fij
 
         lipo_term = 0
@@ -252,7 +253,7 @@ subroutine calc_lipo                            !in subroutine calc_scores
                         lipo_term = lipo_term+fij
                 end do
         end do
-        
+
 end subroutine calc_lipo
 
 subroutine calc_metals                          !in subroutine calc_scores
@@ -261,7 +262,7 @@ subroutine calc_metals                          !in subroutine calc_scores
 
         metal_term = 0
         do i = 1,nmet_r                                                                                         !metal atoms in receptor
-                do j = 1,nhba_l                                                                                 !H-bond acceptors in ligand             
+                do j = 1,nhba_l                                                                                 !H-bond acceptors in ligand
                         score = fr_met(met_r(i),hba_l(j))
                         metal_term = metal_term+score
                 end do
@@ -272,7 +273,7 @@ end subroutine calc_metals
 subroutine calc_rot                                     !in subroutine calc_scores
         integer                 :: i,nfrozen
         real                            :: pa,pb,hrot,sum
-        
+
         nfrozen = 0
         sum = 0
 
@@ -285,8 +286,8 @@ subroutine calc_rot                                     !in subroutine calc_scor
                                 write(*,*) 'qbond ', i, ', atoms ', q_bonds(i)%a%top_nr, q_bonds(i)%b%top_nr, ', contrib = ', ((pa + pb)/2)
                 end if
         end do
-        if(nfrozen == 0) then 
-                hrot = 0                                        
+        if(nfrozen == 0) then
+                hrot = 0
         else
                 hrot = 1 + (1-1.0/nfrozen)*sum
         end if
@@ -297,9 +298,9 @@ end subroutine calc_rot
 subroutine calc_scores
         call set_waters                         ! does calcs on waters
         call calc_hbonds                        ! calc contribution from hbond interaction between ligand and receptor
-        
+
         call calc_metals                        ! calc contrib from metals in rec interacting with h-bond acceptors in ligand
-        
+
         call calc_lipo                          ! calc lipophilic contrib
 
         call q_contacts                         ! set contact parameter =.true. for qatoms in contact with receptor
@@ -307,7 +308,7 @@ subroutine calc_scores
         call calc_rot                                   ! calcs contrib from frozen rotatable bonds
 end subroutine calc_scores
 
-subroutine count_qlipo          
+subroutine count_qlipo
         !count (non)lipophilic heavy atoms on each side of every bond
         integer                                 ::      i
         type(lipos)                             ::      lipo
@@ -317,7 +318,7 @@ subroutine count_qlipo
         q_bonds(:)%a_nonlip = 0
         q_bonds(:)%b_nonlip = 0
 
-        do i = 1,nqbonds 
+        do i = 1,nqbonds
                 if (q_bonds(i)%rotatable) then                  !go through all rotatable bonds
                         q_bonds(:)%been_there = .false.
                         q_atoms(:)%been_there = .false.         !reset
@@ -337,7 +338,7 @@ end subroutine count_qlipo
 recursive function lip_atom(atom) result(ans)
 !arguments
         type(q_atom),pointer                    ::      atom
-                
+
 !local
         type(lipos)                                             ::  lipo
         type(lipos)                                             ::      temp
@@ -349,24 +350,24 @@ recursive function lip_atom(atom) result(ans)
         lipo%n_nonlip = 0
         atom%been_there = .true.                                        !flag to avoid cycling in rings
         do i = 1,atom%n                                                         !go through every bond to this atom
-                bond => atom%bd(i)%qb                                                   
+                bond => atom%bd(i)%qb
                 if ( .not. bond%been_there ) then               !if the bond has not already been passed
                         temp%n_lip = 0
                         temp%n_nonlip = 0
                         bond%been_there = .true.
                                                                                                 !count heavy atoms on the opposite side
                         if (.not. bond%a%been_there ) then      !i.e. the side with an atom which has not been passed
-                                temp = lip_atom(bond%a)                 
+                                temp = lip_atom(bond%a)
                         end if
-                        if (.not. bond%b%been_there ) then 
+                        if (.not. bond%b%been_there ) then
                                 temp = lip_atom(bond%b)
-                        end if  
-        
+                        end if
+
                         lipo%n_lip = lipo%n_lip+temp%n_lip  !add result from each bond
                         lipo%n_nonlip = lipo%n_nonlip+temp%n_nonlip
                 end if
         end do
-        
+
         if (atom%at_type == 2) then                                     !add atom itself to sum
                 lipo%n_lip = lipo%n_lip + 1
         end if
@@ -376,7 +377,7 @@ recursive function lip_atom(atom) result(ans)
 
         ans = lipo                                                                      !return result to atom which made the call
 end function lip_atom
-                
+
 
 subroutine frozen
         ! check each rotatable bond to see if it is frozen
@@ -386,13 +387,13 @@ subroutine frozen
 
         q_bonds(:)%acontact = .false.   !reset
         q_bonds(:)%bcontact = .false.
-                                
+
         do i = 1,nqbonds                                                                                ! go through all bonds
                 bond => q_bonds(i)                                                              ! pointer to bond i
                 if (bond%rotatable) then                                        ! only have to check rotatable bonds
                         q_bonds(:)%been_there = .false. ! reset
                         q_atoms(:)%been_there = .false.
-                        
+
                         bond%been_there = .true.
                         bond%acontact = find_contact(bond%a)    !if any contacts on a-side of rotatable bond
                         bond%bcontact = find_contact(bond%b)    !if any contacts on b-side
@@ -400,7 +401,7 @@ subroutine frozen
         end do
 end subroutine frozen
 
-recursive function find_contact(atom) result(ans)       
+recursive function find_contact(atom) result(ans)
 !argument
         type(q_atom),pointer    :: atom
 !local
@@ -415,8 +416,8 @@ recursive function find_contact(atom) result(ans)
         if (atom%contact) then                          !if this atom is in contact there is no need to keep looking
                 cont = .true.
         else                                                            !else go through all the bonds to this atom which have not been passed yet
-                do i = 1,atom%n 
-                        bond => atom%bd(i)%qb   
+                do i = 1,atom%n
+                        bond => atom%bd(i)%qb
                         if ( .not. bond%been_there ) then
                                 bond%been_there = .true.
 
@@ -471,10 +472,10 @@ subroutine get_atom_data
                         atom_data(i)%radius = radius
                 end if
         end do
-        
+
         do i = 1,nat_solute                     !!! Go through all atoms and give them a vdW radius.
-                vdwr(i) = atom_data(iac(i))%radius      !!! I represents atom number. 
-                if (vdwr(i) == 0.0) novdw(iac(i)) = .true.              
+                vdwr(i) = atom_data(iac(i))%radius      !!! I represents atom number.
+                if (vdwr(i) == 0.0) novdw(iac(i)) = .true.
         end do
 
         do i = 1, natyps
@@ -500,11 +501,11 @@ subroutine get_atom_data
                         end if
                 end do
         end do
-        
+
 end subroutine get_atom_data
 
 subroutine make_tac_index
-        ! creates index of atom types   
+        ! creates index of atom types
         integer         ::      i
 
         call index_create(natyps)               ! natyps is read from file
@@ -515,16 +516,16 @@ subroutine make_tac_index
         end do
 end subroutine make_tac_index
 
-subroutine q_contacts           
+subroutine q_contacts
         !check which q-atoms are in contact with receptor, in subroutine calc_scores
         integer                         ::      i,j,tnr
         real                                    ::      distance
-        
+
         q_atoms(:)%contact = .false.
 
         do i = 1,nqat                                                                                                                                                                                   ! loop over heavy q-atoms
                 tnr = q_atoms(i)%top_nr
-                if (heavy(tnr)) then                                                                                                                                            ! if heavy 
+                if (heavy(tnr)) then                                                                                                                                            ! if heavy
                         do j = 1,nat_solute                                                                                                                                             ! all protein atoms, not the waters
                                 if ((iqatom(j) == 0) .and. (heavy(j)) ) then                            ! if heavy receptor atom (not q-atom)
                                         distance = dist(tnr,j)                                                                                                          ! measure distance
@@ -538,13 +539,13 @@ subroutine q_contacts
         end do
 end subroutine q_contacts
 
-subroutine q_types                      
+subroutine q_types
         ! assign q-atom types and hybrids, used in entropy
         ! calculation, in subroutine set_ligand
         integer                                         ::      i,nr, a_type
 
 
-        !set atom type 0:hydrogen, 2:heavy lipophilic, 1:non-lipophilic heavy   
+        !set atom type 0:hydrogen, 2:heavy lipophilic, 1:non-lipophilic heavy
         do i = 1,nqat
                 nr = iqseq(i)                                                                           ! topology number
                 q_atoms(i)%top_nr = nr                                  ! used in other subroutines
@@ -573,25 +574,25 @@ subroutine q_types
                         q_atoms(i)%hybrid = 3
                 elseif(atom_data(a_type)%prop(SP3_N)) then !sp3 nitrogens
                         if (pol_con(nr) == 21 .or. pol_con(nr) == 31) then      !if bonded to two H and one other, or three H and one other
-                                q_atoms(i)%hybrid = 0                                                   !then terminal NH2 or NH3 and should not be included    
+                                q_atoms(i)%hybrid = 0                                                   !then terminal NH2 or NH3 and should not be included
                         else
-                                q_atoms(i)%hybrid = 3   
-                        end if 
+                                q_atoms(i)%hybrid = 3
+                        end if
                 elseif(atom_data(a_type)%prop(SP2)) then !sp2
                         q_atoms(i)%hybrid = 2
                 elseif(atom_data(a_type)%prop(PL_N)) then !planar nitrogens
                         if (pol_con(nr) == 21 ) then    !if bonded to two H and one other then terminal NH2 and not included
                                 q_atoms(i)%hybrid = 0
                         else
-                                q_atoms(i)%hybrid = 2   
-                        end if 
+                                q_atoms(i)%hybrid = 2
+                        end if
                 else
                         q_atoms(i)%hybrid = 0
                 end if
         end do
 
 end subroutine q_types
-              
+
 subroutine report_ligand
         integer                                 ::i,top,cont
 
@@ -609,7 +610,7 @@ subroutine report_ligand
 !               110     format((1x,i8), t9,(1x,i8), t18,(1x,a8), t27,(1x,i8), t36,(1x,i8), t45,(1x,i8), t54,(1x,i8))
 !               110 format(2(1x,i8),1x,a8,4(1x,i8))
 !               110 format(7i8)
-        
+
                 write(*, 110) i, top, tac(iac(top)), q_atoms(i)%hybrid, q_atoms(i)%at_type, q_atoms(i)%n, cont
 !               write(*, 110) i, top, iac(top), q_atoms(i)%hybrid, q_atoms(i)%at_type, q_atoms(i)%n, cont
         end do
@@ -618,7 +619,7 @@ subroutine report_ligand
         120 format(1a11)
         130 format(1i7)
         140 format(2i7)
-        do i = 1,nlph_l 
+        do i = 1,nlph_l
                 write(*,130) lph_l(i)
         end do
         write(*,120) 'Hb acc'
@@ -629,7 +630,7 @@ subroutine report_ligand
         do i = 1,nhbd_l
                 write(*,140) hbd_l(i)%heavy, hbd_l(i)%hydr
         end do
-end subroutine report_ligand    
+end subroutine report_ligand
 
 subroutine report_protein
 
@@ -643,7 +644,7 @@ subroutine report_protein
         write(*,110) 'metal ions', nmet_r
         write(*,110) 'water molecules', nwaters
         write(*,*)
-end subroutine report_protein           
+end subroutine report_protein
 
 subroutine report_rings
         integer                                 ::i,j
@@ -665,8 +666,8 @@ subroutine reset_waters !in subroutine set_waters
                 nhbd_r = nhbd_prot
                 nhba_r = nhba_prot
 end subroutine reset_waters
-                
-                        
+
+
 
 
 subroutine score_waters
@@ -677,20 +678,20 @@ subroutine score_waters
 
         do i = 1,nwaters
                 sum_score = 0.0
-                
+
                 do j = 1,nhba_r                                                         !water hydrogens as donors, scored against receptor acceptors
                         score1 = g1_hb(waters(i)%H1,hba_r(j))                           !distance term
                         score2 = g2_hb(waters(i)%O,waters(i)%H1,hba_r(j))       !angle term
                         sum_score = sum_score+score1*score2
 
                         score1 = g1_hb(waters(i)%H2,hba_r(j))
-                        score2 = g2_hb(waters(i)%O,waters(i)%H2,hba_r(j))       
+                        score2 = g2_hb(waters(i)%O,waters(i)%H2,hba_r(j))
                         sum_score = sum_score+score1*score2
                 end do
 
                 do j = 1,nhbd_r         !water oxygen as acceptor, scored against receptor donors
                         score1 = g1_hb(waters(i)%O,hbd_r(j)%hydr)
-                        score2 = g2_hb(waters(i)%O,hbd_r(j)%hydr,hbd_r(j)%heavy)        
+                        score2 = g2_hb(waters(i)%O,hbd_r(j)%hydr,hbd_r(j)%heavy)
                         sum_score = sum_score+score1*score2
                 end do
                 waters(i)%score = sum_score
@@ -705,7 +706,7 @@ subroutine set_ligand
 end subroutine set_ligand
 
 subroutine set_rings            !in set_ligand
-        
+
         integer                                 ::      ir
         type(q_atom),pointer    ::      start_atom
         integer                                 ::      i,j
@@ -713,10 +714,10 @@ subroutine set_rings            !in set_ligand
         nrings = nqbonds-nqat+1                                         !number of rings in ligand
 
         if (nrings > 0) then                                                    !if at least one ring
-                do i = 1,nqbonds 
+                do i = 1,nqbonds
                         allocate (q_bonds(i)%cyclic(nrings))
                         do j = 1,nrings
-                                q_bonds(i)%cyclic(j) = .false.          !reset  
+                                q_bonds(i)%cyclic(j) = .false.          !reset
                         end do
                 end do
                 do i = 1,nqat
@@ -725,24 +726,24 @@ subroutine set_rings            !in set_ligand
                                 q_atoms(i)%cyclic(j) = .false.
                         end do
                 end do
-                
+
                 q_bonds(:)%been_there = .false.         !reset
                 q_atoms(:)%been_there = .false.
 
                 start_atom => q_atoms(1)                        !does not matter which q-atom search starts from
-                ir = 0                                                          
-                
+                ir = 0
+
                 start_atom%been_there = .true.
                 do i = 1,start_atom%n                           !go through all bonds of the start atom
                         if (.not. start_atom%bd(i)%qb%been_there ) then
                                 call search_ring(start_atom%bd(i)%qb,ir)
                         end if
                 end do
-                
+
         end if
 end subroutine set_rings
 
-recursive subroutine search_ring(bond,ir)       
+recursive subroutine search_ring(bond,ir)
 !arguments
         type(q_bond),pointer                    ::      bond
         integer                                                 ::      ir
@@ -751,27 +752,27 @@ recursive subroutine search_ring(bond,ir)
         integer                                                 ::      i
 
         bond%been_there = .true.
-        if ( bond%a%been_there .and. bond%b%been_there ) then   !if both atoms of a bond have been passed, but not the bond 
+        if ( bond%a%been_there .and. bond%b%been_there ) then   !if both atoms of a bond have been passed, but not the bond
                 call mark_ring(bond,ir)                                                         !then a ring has been found. call mark_ring to find all the atoms of this ring
         end if
-        
+
         atom => bond%a                                                                                  !pekartilldelning
-        if (.not. atom%been_there ) then                                                !if atom a has not been passed                  
+        if (.not. atom%been_there ) then                                                !if atom a has not been passed
                 atom%been_there = .true.
-                do i = 1,atom%n                                                                         !look for rings in all directions which have not been passed 
+                do i = 1,atom%n                                                                         !look for rings in all directions which have not been passed
                         if (.not. atom%bd(i)%qb%been_there ) then
                                 call search_ring(atom%bd(i)%qb,ir)
                         end if
-                end do  
-        else 
-                atom => bond%b                          
-                if (.not. atom%been_there ) then                                                !if it is atom b which has not been passed      
+                end do
+        else
+                atom => bond%b
+                if (.not. atom%been_there ) then                                                !if it is atom b which has not been passed
                         atom%been_there = .true.
                         do i = 1,atom%n
                                 if (.not. atom%bd(i)%qb%been_there ) then
                                         call search_ring(atom%bd(i)%qb,ir)
                                 end if
-                        end do  
+                        end do
                 end if
         end if
 end subroutine search_ring
@@ -785,18 +786,18 @@ subroutine mark_ring(bond,ir)   !identify atoms involved in rings
 
                 ir = ir+1                                                                       !one more ring has been found
                 q_bonds(:)%active = .false.                                     !reset
-                q_atoms(:)%active = .false.     
+                q_atoms(:)%active = .false.
                 bond%cyclic(ir) = .true.                                        !this bond is part of the ring
-                bond%active = .true.                    
+                bond%active = .true.
                 bond%a%cyclic(ir) = .true.                                      !atom on a-side also part of the ring
-                found = trace_ring(bond%b,ir)                           !try to close ring starting at atom on b-side 
+                found = trace_ring(bond%b,ir)                           !try to close ring starting at atom on b-side
 end subroutine mark_ring
 
 recursive function trace_ring(atom,ir) result(ans)
 !arguments
         type(q_atom),pointer                    ::      atom
         integer                                                 ::      ir
-!local  
+!local
         integer                                                 ::      i
         logical                                                 ::      found
         type(q_bond),pointer                    ::      bond
@@ -804,7 +805,7 @@ recursive function trace_ring(atom,ir) result(ans)
 
         found = .false.
         atom%active = .true.                                                    !this atom has been passed trying to close the ring
-        do i = 1,atom%n 
+        do i = 1,atom%n
                 bond => atom%bd(i)%qb                                           !go through all bonds which could be part of the ring recently found (been_there)
                 if (bond%been_there .and. (.not. bond%active)) then     !but have not been passed trying to close the ring (not active)
                         bond%active = .true.
@@ -830,9 +831,9 @@ recursive function trace_ring(atom,ir) result(ans)
                         end if
                 end if
         end do
-        
+
         ans = found                                                                                                     !if possible to close ring using this atom
-end function trace_ring 
+end function trace_ring
 
 subroutine set_rotatable
         !check which q-bonds are rotatable
@@ -845,13 +846,13 @@ subroutine set_rotatable
                 if  ( ( (q_bonds(i)%a%hybrid == 3) .and. (q_bonds(i)%b%hybrid > 0) ) &
                         .or. ( (q_bonds(i)%b%hybrid == 3) .and. (q_bonds(i)%a%hybrid > 0) ) ) then
                         q_bonds(i)%rotatable = .true.
-                        
+
                         do j = 1,nrings                 !check if bond is member of any ring
                                 if (q_bonds(i)%cyclic(j)) then          !then not rotatable
                                         q_bonds(i)%rotatable = .false.
                                         exit
                                 end if
-                        end do  
+                        end do
 
                 end if
         end do
@@ -869,16 +870,16 @@ end subroutine set_waters
 subroutine sort_atoms           !must be done after sort_bonds ,in subroutine start
 
         integer                                 ::i, a_type
-        
+
         allocate(hba_l(nqat),lph_l(nqat),lph_r(nat_solute),hba_r(nat_solute),met_r(64))
         nlph_l = 0
         nlph_r = 0
         nmet_r = 0
         nhba_l = 0
         nhba_r = 0
-        
-        
-        do i = 1,nat_solute                             !go through all atoms, put in right category    
+
+
+        do i = 1,nat_solute                             !go through all atoms, put in right category
                 a_type = iac(i)
                 if(atom_data(a_type)%prop(LIPO)) then
                 !atoms which may be lipophilic: all carbons, Cl, Br, I which are not ions
@@ -907,8 +908,8 @@ subroutine sort_atoms           !must be done after sort_bonds ,in subroutine st
                                 nmet_r = nmet_r+1                       !only metals in receptor
                                 met_r(nmet_r) = i
                 elseif(atom_data(a_type)%prop(ACCEPTOR)) then
-                        ! all N, all O, all halogen ions, sulphurs with only one 
-                        ! connection can be Hbond acceptors             
+                        ! all N, all O, all halogen ions, sulphurs with only one
+                        ! connection can be Hbond acceptors
                         if (pol_con(i) .le. 2) then     !If N has >2 connections then it is polar, all other atoms have value 0
                                 if (iqatom(i) /= 0) then
                                         nhba_l = nhba_l+1
@@ -916,7 +917,7 @@ subroutine sort_atoms           !must be done after sort_bonds ,in subroutine st
                                 else
                                         nhba_r = nhba_r+1
                                         hba_r(nhba_r) = i
-                                end if                  
+                                end if
                         end if
                 end if
         end do
@@ -925,7 +926,7 @@ subroutine sort_atoms           !must be done after sort_bonds ,in subroutine st
 
 end subroutine sort_atoms
 
-subroutine sort_bonds           !identify pairs of atoms involved in q-bonds and/or hydrogen bonding !in start 
+subroutine sort_bonds           !identify pairs of atoms involved in q-bonds and/or hydrogen bonding !in start
         integer                                         ::      atom1,atom2,hydrogen_atom
         integer                                         ::      heavy_at,a_type,type1,type2
         integer                                         ::      i,j,k
@@ -945,11 +946,11 @@ subroutine sort_bonds           !identify pairs of atoms involved in q-bonds and
         pol_con(:) = 0
 
         do i = 1,nbonds_solute          ! loop over all bonds between solute atoms
-                polar = .false. 
-                atom1 = bnd(i)%i                
+                polar = .false.
+                atom1 = bnd(i)%i
                 atom2 = bnd(i)%j
-                
-                if(atom_data(iac(atom1))%prop(HYDROGEN)) then           !all polar H    
+
+                if(atom_data(iac(atom1))%prop(HYDROGEN)) then           !all polar H
                         polar = .true.                          !if one of the atoms is a polar hydrogen, then the bond is polar
                         hydrogen_atom = atom1
                         heavy_at = atom2
@@ -961,25 +962,25 @@ subroutine sort_bonds           !identify pairs of atoms involved in q-bonds and
 
                 if (polar) then
                         a_type = iac(heavy_at)                                  !check if the bond matches any of the h-bond categories
-                        if(atom_data(a_type)%prop(OXYGEN)) then !all oxygens (not water)        
+                        if(atom_data(a_type)%prop(OXYGEN)) then !all oxygens (not water)
                                 if (iqatom(heavy_at) /= 0) then         !if q-atom
                                         nhbd_l = nhbd_l+1
-                                        hbd_l(nhbd_l)%heavy = heavy_at  
+                                        hbd_l(nhbd_l)%heavy = heavy_at
                                         hbd_l(nhbd_l)%hydr = hydrogen_atom
                                 else                                                            !else receptor
                                         nhbd_r = nhbd_r+1
-                                        hbd_r(nhbd_r)%heavy = heavy_at          
+                                        hbd_r(nhbd_r)%heavy = heavy_at
                                         hbd_r(nhbd_r)%hydr = hydrogen_atom
                                 end if
                         elseif(atom_data(a_type)%prop(SP3_N) .or. &
-                                atom_data(a_type)%prop(PL_N)) then              !all nitrogens                  
+                                atom_data(a_type)%prop(PL_N)) then              !all nitrogens
                                 if (iqatom(heavy_at) /= 0) then
                                         nhbd_l = nhbd_l+1
-                                        hbd_l(nhbd_l)%heavy = heavy_at          
+                                        hbd_l(nhbd_l)%heavy = heavy_at
                                         hbd_l(nhbd_l)%hydr = hydrogen_atom
                                 else
                                         nhbd_r = nhbd_r+1
-                                        hbd_r(nhbd_r)%heavy = heavy_at          
+                                        hbd_r(nhbd_r)%heavy = heavy_at
                                         hbd_r(nhbd_r)%hydr = hydrogen_atom
                                 end if
                                 pol_con(heavy_at) = pol_con(heavy_at)+10                !N bonded to H should not be included in hbond acceptors
@@ -991,18 +992,18 @@ subroutine sort_bonds           !identify pairs of atoms involved in q-bonds and
                                 atom_data(type1)%prop(PL_N)) then !all nitrogens
                                 pol_con(atom1) = pol_con(atom1)+1               !count all connections to N
                         elseif(atom_data(type1)%prop(CARBON_LIPO)) then
-                                !all carbons (except CH3 and carbons which might be in 
+                                !all carbons (except CH3 and carbons which might be in
                                 !carbonyls or nitriles)
                                 if(atom_data(type2)%prop(PL_N) .or. &
                                         atom_data(type2)%prop(ACCEPTOR)) then
-                                        !       case (30:37,40,41,43,44,49,51,52,61)    
-                                        ! all polar and H-bonding atoms (but not H, not C, not F) 
+                                        !       case (30:37,40,41,43,44,49,51,52,61)
+                                        ! all polar and H-bonding atoms (but not H, not C, not F)
                                         !i.e. all N, all O, all halogen ions, P, F, S with only one connection
                                         !count polar connections to C
-                                        pol_con(atom1) = pol_con(atom1)+1       
+                                        pol_con(atom1) = pol_con(atom1)+1
                                 end if
-                        elseif(atom_data(type1)%prop(SULPHUR)) then     !sulphur                                                
-                                !count polar connections to S with more than one connection 
+                        elseif(atom_data(type1)%prop(SULPHUR)) then     !sulphur
+                                !count polar connections to S with more than one connection
                                 if(atom_data(type2)%prop(PL_N) .or. &
                                         atom_data(type2)%prop(ACCEPTOR)) then
                                         !and not always bonded to a polar atom (49, sulphate, is always polar and no need to count)
@@ -1010,16 +1011,16 @@ subroutine sort_bonds           !identify pairs of atoms involved in q-bonds and
                                                 pol_con(atom1) = pol_con(atom1)+1
                                 end if
                         elseif(atom_data(type1)%prop(CARBONYL_CARBON)) then
-                                !case (21) 
-                                !sp2 carbons which might be carbonyl, 
+                                !case (21)
+                                !sp2 carbons which might be carbonyl,
                                 !(carbons which could be part of nitriles should be included)
                                 if(atom_data(type2)%prop(CARBONYL_OXYGEN)) then
-                                        !case (40,43)   
+                                        !case (40,43)
                                         !carbonyl O, (nitrile N should come here)
                                         pol_con(atom1) = pol_con(atom1)+2 !carbonyl always polar
                                 elseif(atom_data(type2)%prop(PL_N) .or. &
                                         atom_data(type2)%prop(ACCEPTOR)) then
-                                        !case (30:37,41,44,49,51,52,61) 
+                                        !case (30:37,41,44,49,51,52,61)
                                         !all other polar atoms, see list above
                                                 pol_con(atom1) = pol_con(atom1)+1 !else only count polar connections
                                 end if
@@ -1027,7 +1028,7 @@ subroutine sort_bonds           !identify pairs of atoms involved in q-bonds and
 
                         !same for atom 2
                         if(atom_data(type2)%prop(SP3_N) .or. &
-                                atom_data(type2)%prop(PL_N)) then       
+                                atom_data(type2)%prop(PL_N)) then
                                 !case (30:37)
                                 pol_con(atom2) = pol_con(atom2)+1
                         elseif(atom_data(type2)%prop(CARBON_LIPO)) then
@@ -1036,7 +1037,7 @@ subroutine sort_bonds           !identify pairs of atoms involved in q-bonds and
                                 if(atom_data(type1)%prop(PL_N) .or. &
                                         atom_data(type1)%prop(ACCEPTOR)) then
                                                 !all polar atoms
-                                                !case (30:37,40,41,43,44,49,51,52,61)   
+                                                !case (30:37,40,41,43,44,49,51,52,61)
                                                 pol_con(atom2) = pol_con(atom2)+1
                                 end if
                         elseif(atom_data(type2)%prop(SULPHUR)) then
@@ -1060,36 +1061,36 @@ subroutine sort_bonds           !identify pairs of atoms involved in q-bonds and
                         end if
                 end if
 
-                !store all bonds between q-atoms, pointers relating arrays q_atoms and q_bonds 
+                !store all bonds between q-atoms, pointers relating arrays q_atoms and q_bonds
 
                 if ((iqatom(atom1) /= 0) .and. (iqatom(atom2) /= 0)) then
                         j = iqatom(atom1)
-                        k = iqatom(atom2)  
+                        k = iqatom(atom2)
 
                         nqbonds = nqbonds+1
-                        q_bonds(nqbonds)%a => q_atoms(j)                
+                        q_bonds(nqbonds)%a => q_atoms(j)
                         q_bonds(nqbonds)%b => q_atoms(k)        !pointer to atom in q_atoms
 
                         q_atoms(j)%n = q_atoms(j)%n +1          !number of bonds to atom j
                         q_atoms(j)%bd(q_atoms(j)%n)%qb => q_bonds(nqbonds)      !pointer to bond in q_bonds
-                                
+
                         q_atoms(k)%n = q_atoms(k)%n +1
                         q_atoms(k)%bd(q_atoms(k)%n)%qb => q_bonds(nqbonds)
                 end if
-                        
+
         end do
 
         !go through bond list once more, count bonds to polar sulphurs
 
         do i = 1,nbonds_solute
-                atom1 = bnd(i)%i                
+                atom1 = bnd(i)%i
                 atom2 = bnd(i)%j
                 type1 = iac(atom1)
                 type2 = iac(atom2)
 
                 if(atom_data(type1)%prop(SULPHUR) .and. &
-                        pol_con(atom1) >= 1)  then 
-                        !if ((type1 == 50) .and. (pol_con(atom1) .ge. 1))  then  
+                        pol_con(atom1) >= 1)  then
+                        !if ((type1 == 50) .and. (pol_con(atom1) .ge. 1))  then
                 !       if atom1 is a polar sulphur
                         !select case (type2)
                         if(atom_data(type2)%prop(CARBON_LIPO) .or. &
@@ -1098,10 +1099,10 @@ subroutine sort_bonds           !identify pairs of atoms involved in q-bonds and
                                 pol_con(atom2) = pol_con(atom2)+1                       !then atom2 has one more connection to a polar atom
                         end if
                 end if
-                        
+
                 if(atom_data(type2)%prop(SULPHUR) .and. &
                         pol_con(atom2) >= 1) then
-                        !if ((type2 == 50) .and. (pol_con(atom2) .ge. 1))  then 
+                        !if ((type2 == 50) .and. (pol_con(atom2) .ge. 1))  then
                         !if atom2 is a polar sulphur
                         !select case (type1)
                         if(atom_data(type1)%prop(CARBON_LIPO) .or.  &
@@ -1113,7 +1114,7 @@ subroutine sort_bonds           !identify pairs of atoms involved in q-bonds and
         end do
 
         nhbd_prot = nhbd_r              !used later to keep track of waters in receptor list
-        
+
 end subroutine sort_bonds
 
 subroutine sort_waters  !görs ev bara en gång           !in set_waters
@@ -1124,20 +1125,20 @@ subroutine sort_waters  !görs ev bara en gång           !in set_waters
                         nhbd_r = nhbd_r+1
                         hbd_r(nhbd_r)%heavy = waters(i)%O
                         hbd_r(nhbd_r)%hydr = waters(i)%H1
-                        
+
                         nhbd_r = nhbd_r+1
                         hbd_r(nhbd_r)%heavy = waters(i)%O
                         hbd_r(nhbd_r)%hydr = waters(i)%H2
 
                         nhba_r = nhba_r+1
-                        hba_r(nhba_r) = waters(i)%O     
+                        hba_r(nhba_r) = waters(i)%O
                 end if
         end do
 
 end subroutine sort_waters
 
 
-subroutine start                
+subroutine start
 !       character*80                            ::      top_file, fep_file
         integer(4)                                      ::      u,nat3
         integer                                         ::      i
@@ -1146,14 +1147,14 @@ subroutine start
 
         ! --- topology file is now read by qcalc
         !write(*,'(a)', advance='no') 'Topology file: '
-        !read (*,'(a)') top_file                        
+        !read (*,'(a)') top_file
         !top_file = 'hapc.top'
 
         ! --- fep file is read by score_add
         !write(*,'(/,a)', advance='no') 'Q-atom (FEP) file: '
         !read (*,'(a)') fep_file
         !fep_file = 'lie.fep'
-        
+
         ! --- prm file is read by score_add
         !write(*,'(/,a)', advance='no') 'Parameter file: '
         !read (*,'(a)') atom_data_file
@@ -1163,8 +1164,8 @@ subroutine start
         !if(.not. topo_load(top_file, 4.00)) then
         !       write(*,'(a)') '>>>>> ERROR: Failed to load topology.'
         !       stop
-        !end if  
-        
+        !end if
+
         nwaters = (nat_pro-nat_solute)/3
         call make_tac_index                     ! creates text atom code index
         call get_atom_data                      !!! Takes vdw_radii from vdw_file and puts into vector vdwr.
@@ -1172,7 +1173,7 @@ subroutine start
         if(.not. qatom_load_atoms(fep_file)) then
                 stop 'Failed to read Q-atom list from FEP file.'
         end if
-        
+
         allocate(iqatom(nat_solute))! Allocate mem for every solute atom
         iqatom(:) = 0
         do i=1,nqat
@@ -1182,13 +1183,13 @@ subroutine start
         call sort_bonds
         call sort_atoms
         call store_waters
-                
+
 end subroutine start
 
 
 
 subroutine store_waters !order of atoms in coordinate list must be O,H,H                !in subroutine start
-        
+
         integer                 ::i,j
         j = 0
         allocate(waters(1:nwaters))
@@ -1224,14 +1225,14 @@ end function angle
 
 real function dist (a,b)
         !!! Gives the distance between two atoms.
-        
+
         integer                         ::      a,b                     !topology numbers
         real,dimension(3)       ::      delta
-        
+
         if(bUseXIN) then
                 delta = xin(3*a-2:3*a)-xin(3*b-2:3*b)
         else
-                delta = xtop(3*a-2:3*a)-xtop(3*b-2:3*b)                 
+                delta = xtop(3*a-2:3*a)-xtop(3*b-2:3*b)
         end if
         dist = sqrt(dot_product(delta,delta))
 
@@ -1240,8 +1241,8 @@ end function dist
 real function distsq (a,b)
         !!! Gives the squared distance between two atoms.
 
-        
-        integer                         ::      a,b                     
+
+        integer                         ::      a,b
         real,dimension(3)       ::      delta
 
         if(bUseXIN) then
@@ -1255,9 +1256,9 @@ end function distsq
 
 real function fr_lip(a,b)
         !!! Gives f(rlL) i.e. contribution from one lipophilic - lipophilic pair
-        
+
         integer                                 ::      a,b     !topology numbers of the pair
-        
+
         real                                    ::      dr      !distance between the two atoms
         real                                    ::  R1
 
@@ -1265,13 +1266,13 @@ real function fr_lip(a,b)
         R1 = vdwr(a)+vdwr(b)+0.5
 
         if(dr < (R1+3)) then                            !if the atoms interact at all
-                if(dr <= R1) then                       
+                if(dr <= R1) then
                         fr_lip = 1                                      !if they are closer than R1 the interaction is given full weight
                 else
                         fr_lip = 1-(dr-R1)/3            !else the interaction is given reduced weight
                 end if
         else
-                fr_lip = 0                              
+                fr_lip = 0
         end if
 end function fr_lip
 
@@ -1281,7 +1282,7 @@ real function fr_met(a,b)
         ! (or H-bond acceptor/donor) - metal pair
         integer                         ::      a,b     ! topology numbers
         real                                    ::      dr      ! distance between the two atoms
-        
+
         dr = dist(a,b)
         if(dr < 2.6) then
                 if(dr <= 2.2) then
@@ -1294,10 +1295,10 @@ real function fr_met(a,b)
         end if
 end function fr_met
 
-real function g1_hb(a,b)        
+real function g1_hb(a,b)
         ! Gives g1(dev_dr) i.e. contribution depending on the distance between
         ! the H of an H-bond donor and an H-bond acceptor
-        
+
         integer                 ::      a,b                                     !       top. nr
         real                            ::      dr, dev_dr      ! distance between the two atoms, deviation from the
                                                                                                                         ! ideal value 1.85 Å
@@ -1315,11 +1316,11 @@ real function g1_hb(a,b)
         end if
 end function g1_hb
 
-real function g2_hb(a,b,c)      
-        !!! Gives g2(dev_ang) i.e. contribution depending on the H-bond angle at the hydrogen atom      
+real function g2_hb(a,b,c)
+        !!! Gives g2(dev_ang) i.e. contribution depending on the H-bond angle at the hydrogen atom
         integer                                 ::      a,b,c                   !top.nr, the hydrogen must be atom b
         real                                    ::      ang, dev_ang    !H-bond angle, deviation from ideal value of 180 degrees
-        
+
         ang = angle(a,b,c)
         dev_ang = abs(180-ang)
 
@@ -1337,7 +1338,7 @@ end function g2_hb
 subroutine score_precalc
         ! 1. Prepares ligand and other stuff for calculations
         ! 2. Does calculations on topology or restart file before frame by frame calculations start
-        
+
         integer                                                 :: i
         character(len=200)      :: chBuf
 
@@ -1367,7 +1368,7 @@ integer function score_add(desc)
         !arguments
         character(*)                            :: desc
         integer                                                 :: ats, iRe
-        ! locals        
+        ! locals
         character(len=400)      :: chInFile             ! long buffers to meet long paths
         character(len=400)      :: chBuf
 
@@ -1389,7 +1390,7 @@ integer function score_add(desc)
                 score_add = 0
                 return
         end if
-        
+
         chBuf = ''
         do while((trim(chBuf).ne.'yes').and.(trim(chBuf).ne.'no'))
                 call getlin(chBuf,'Score initial topology? (yes/no)')
@@ -1401,7 +1402,7 @@ integer function score_add(desc)
         else
                 bDoTopCalc = 0
         end if
-                
+
         call getlin(fep_file,'Q-atom (FEP) file: ')
         write(chBuf,'(a,a,a)') 'Parameter file (blank to use ', trim(prm_file), '): '
         call getlin(atom_data_file, trim(chBuf))
@@ -1434,15 +1435,15 @@ subroutine score_mean
         m_metal = m_metal / nScores
         m_lipo  = m_lipo  / nScores
         m_rot   = m_rot   / nScores
-        
+
         ! output mean values
         write(*,100) 'processed frames: ', nScores,  'score', 'h-bonds', 'metal', 'lipophilic', 'rot_bond'
 100     format(       t1,a,                t21,i4,    t29,a5,  t38,a7,    t51,a5,   t58,a10,     t71,a8)
 
         write(*,110) 'mean value', m_score,   m_hbond,    m_metal,   m_lipo,    m_rot
 110     format(       t1,a,        t25,f9.2,  t36, f9.2,  t47,f9.2,  t59,f9.2,  t70,f9.2)
-        write(*,111) '------------------------------------------------------------------------------'                                                                     
-111     format(t1,a)    
+        write(*,111) '------------------------------------------------------------------------------'
+111     format(t1,a)
         m_score = 0
         m_hbond = 0
         m_metal = 0

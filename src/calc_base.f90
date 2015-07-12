@@ -1,8 +1,19 @@
+!------------------------------------------------------------------------------!
+!  Q v.5.7 makefile                                                            !
+!  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
+!  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
+!  Kajsa Ljunjberg, John Marelius, Martin Nervall                              !
+!  Maintainers: Beat Amrein, Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, !
+!  Irek Szeler                                                                 !
+!  latest update: july 9, 2015                                                 !
+!------------------------------------------------------------------------------!
+
+!------------------------------------------------------------------------------!
 !       (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
 !       calc_base.f90
 !       by John Marelius
 !       shared data for trajectory calculation modules
-
+!------------------------------------------------------------------------------!
 module calc_base
 use topo
 implicit none

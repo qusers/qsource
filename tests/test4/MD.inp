@@ -1,0 +1,20 @@
+[MD]
+steps               1
+stepsize            0.1
+temperature         1
+initial_temperature 1
+shake_solvent       off
+shake_solute        off
+shake_hydrogens     off
+lrf                 off
+[intervals]
+energy 10
+trajectory 10
+[files]
+topology chloro.top
+final test.rst
+trajectory test.dcd
+energy test.energy
+fep test.fep
+[lambdas]
+1.0 0.0

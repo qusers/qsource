@@ -1,0 +1,76 @@
+Q topology file
+TITLE      chloro.top
+DATE       20150629
+VERSION     5.06
+LIB_FILES  /home/mjmills/Dropbox/Practical_Paradynamics/initial-testing/make-lib/test.lib
+FORCEFIELD Chloromethane
+FF_TYPE    3
+PRM_FILE   /home/mjmills/Dropbox/Practical_Paradynamics/initial-testing/make-prm/test.prm
+END        of header
+       6       6 = Total no. of atoms, no. of solute atoms. Coordinates: (2*3 per line)
+    0.000     0.000     0.000      1.806     0.000     0.000
+   -2.843     0.000     0.000     -0.360    -0.771     0.686
+   -0.360    -0.209    -1.010     -0.360     0.979     0.325
+       6 = No. of integer atom codes. iac's: 
+   1    3    3    2    2    2
+       4       4 = No. of bonds, no. of solute bonds. i - j - icode: (5 per line)
+    1     2   1     1     4   2     1     5   2     1     6   2
+       2 = No. of bond codes. Parameters: 
+    1   79.000     1.8200   
+    2  100.400     1.1000   
+       6       6 = No. of angles, no. of solute angles. i - j - k - icode: (3 per line)
+    2     1     4   1     2     1     5   1     2     1     6   1
+    4     1     5   1     4     1     6   1     5     1     6   1
+       1 = No. of angle codes. Parameters:
+    1   50.000   109.500     0.000     0.00000
+       0       0 = No. of torsions, solute torsions. i - j - k - l - icode: (2 per line)
+       0 = No. of torsion codes. Parameters:
+       0       0 = No. of impropers, solute impr. i - j - k - l - icode: (2 per line)
+       0       1 = No. of improper codes, type (1=harmonic,2=periodic). Parameters:
+       6 = No. of atomic charges
+-0.4380 -0.1680 -0.9940  0.2000  0.2000  0.2000
+       1       1       0 = No. of charge groups, no of solvent cgps, switch atoms flag. nat_cgp, iswitch / atom list: 
+    6     1
+    1     2     3     4     5     6
+       3 = No. of atom types
+       2 = vdW combination rule (1 = Geom. / 2 = Arit.)
+ 1.00000 332.0000 = Electrostatic 1-4 scaling factor and  Coulomb constant
+Masses: 
+ 12.011   1.000  35.500
+R* normal:
+ 0.0000  0.0000  0.0000
+epsilon normal:
+ 0.0000000  0.0000000  0.0000000
+R* polar:
+  0.0000   0.0000   0.0000
+epsilon polar:
+ 0.0000000  0.0000000  0.0000000
+R* 1-4:
+  0.0000   0.0000   0.0000
+epsilon 1-4:
+ 0.0000000  0.0000000  0.0000000
+       0 = No. of type-2 vdW interactions. pairs: 
+       0 = No. of 1-4 neighbours. nborlist (range=max_nbr_range): 
+00000000000000000000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000000000
+       0 = No. of long 1-4 nbrs (>max_nbr_range). pairlist: 
+      10 = No. of exclusions. exclusion list (range=max_nbr_range): 
+10111000000000000000000000111000000000000000000000000000000000000000000000011000
+0000000000000000000010000000000000000000000000000000000000000000000000
+       0 = No. of long exclusions (>max_nbr_range). pairlist: 
+       1 = No. of residues. start atoms: 
+    1
+Sequence: 
+CLM 
+       1 = No. of separate molecules. start atoms:
+    1
+       3 = No. of atom types:
+C        H        Cl      
+       3 = No. of SYBYL atom types:
+1     1     1    
+       2 = solvent type (0=SPC,1=3-atom,2=general)
+   5.000   0.000 = Exclusion, solvent radii
+   0.000   0.000   0.000 = Solute centre
+   0.000   0.000   0.000 = Solvent centre
+       0       0 = No. of excluded atoms (incl. water), no. of excluded waters
+FFFFFF

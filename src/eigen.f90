@@ -24,7 +24,15 @@ SUBROUTINE EIGEN (A,R,N,MV)
 !                                                                      C
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 !                                                                       
-        implicit double precision (A-H, O-Z)
+        !implicit double precision (A-H, O-Z)
+        double precision :: A,B,C,D,E,F,G,H,O,P,Q,R,S,T,U,V,W,X,Y,Z
+        double precision :: anorm, anrmx, thr, sinx, sinx2, cosx, cosx2, sincs
+
+
+        !implicit integer (I-N)
+        integer         :: I,J,K,L,M,N, range, mv, iq, ij, ia, ind, mq, lq, lm, ll, mm, ilq, imq, im, il, ilr, imr, jq
+
+
     DIMENSION A(1),R(1) 
 
 !                                                                       
@@ -150,4 +158,5 @@ SUBROUTINE EIGEN (A,R,N,MV)
   185 CONTINUE 
 !                                                                       
       RETURN 
-      END                                           
+      END
+

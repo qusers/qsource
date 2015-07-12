@@ -1,0 +1,5 @@
+rl CLM.lib
+readtop chloro.top
+readx  test.rst
+writepdb test.pdb y
+quit
