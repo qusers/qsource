@@ -1,8 +1,19 @@
-! (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
-! topo.f90
-! by John Marelius & Johan Åqvist
-! molecular topology data and I/O
+!------------------------------------------------------------------------------!
+!  Q v.5.7 makefile                                                            !
+!  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
+!  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
+!  Kajsa Ljunjberg, John Marelius, Martin Nervall                              !
+!  Maintainers: Beat Amrein, Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, !
+!  Irek Szeler                                                                 !
+!  latest update: july 13, 2015                                                !
+!------------------------------------------------------------------------------!
 
+!------------------------------------------------------------------------------!
+!  (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
+!  topo.f90
+!  by John Marelius & Johan Aqvist
+!  molecular topology data and I/O
+!------------------------------------------------------------------------------!
 module topo
   use sizes
   use misc
@@ -10,8 +21,8 @@ module topo
   implicit none
 
   ! constants
-  real, private, parameter                :: MODULE_VERSION = 5.03
-  character(*), private, parameter        :: MODULE_DATE = '2003-11-12'
+  real, private, parameter                :: MODULE_VERSION = 5.7
+  character(*), private, parameter        :: MODULE_DATE = '2015-02-22'
 
   integer, parameter                      :: nljtyp = 3      !TINY
   integer, parameter                      :: max_nbr_range   = 25
@@ -1070,7 +1081,7 @@ contains
     write(*, 20) nat_pro-nat_solute
 
     ! --- NAT_PRO / COORDINATES
-    write(*, 10, advance='no') 'co-ordinates'
+    write(*, 10, advance='no') 'coordinates'
     write(u, '(2i8,a)') nat_pro, nat_solute, &
          ' = Total no. of atoms, no. of solute atoms. Coordinates: (2*3 per line)'
     if(nat_pro > 0) write(u, '(2(3(f9.3,1x),1x))') ( xtop(si), si = 1,3*nat_pro )

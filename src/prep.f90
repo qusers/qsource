@@ -1,8 +1,19 @@
-!       (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
-!       prep.f90
-!       by Johan Åqvist & John Marelius
-!       topology preparation, solvation, validation and PDB I/O
+!------------------------------------------------------------------------------!
+!  Q v.5.7 makefile                                                            !
+!  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
+!  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
+!  Kajsa Ljunjberg, John Marelius, Martin Nervall                              !
+!  Maintainers: Beat Amrein, Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, !
+!  Irek Szeler                                                                 !
+!  latest update: july 13, 2015                                                !
+!------------------------------------------------------------------------------!
 
+!------------------------------------------------------------------------------!
+!  (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
+!  prep.f90
+!  by Johan Aqvist & John Marelius
+!  topology preparation, solvation, validation and PDB I/O
+!------------------------------------------------------------------------------!
 MODULE PREP
 
         use TRJ
@@ -15,8 +26,8 @@ MODULE PREP
         IMPLICIT none
 
 !constants
-        character(*), private, parameter        ::      MODULE_VERSION = '5.04'
-        character(*), private, parameter        ::      MODULE_DATE = '2005-04-14'
+        character(*), private, parameter        ::      MODULE_VERSION = '5.7'
+        character(*), private, parameter        ::      MODULE_DATE = '2015-02-22'
 
         !library
         !max number of library entries
@@ -147,7 +158,7 @@ MODULE PREP
         integer                                         ::      nimp_prm
         logical                                         ::      imp_explicit !explicit or automatic defs
 
-! --- Co-ordinate information
+! --- Coordinate information
         integer                                         ::      natom, nat_wat, nwat
         character(len=100)                      ::      coord_source = ''
         character(len=80)                       ::      auto_name = ''
@@ -721,7 +732,7 @@ jloop:                  do jat=1, lib(jrc)%nat-1
                                         d2=(xtop(3*i-2)-xtop(3*j-2))**2+ &
                                                 (xtop(3*i-1)-xtop(3*j-1))**2+(xtop(3*i)-xtop(3*j))**2
                                         if(d2 < max_xlink**2) then
-                                                !found atom pair within limit Å, loop over all bonds
+                                                !found atom pair within limit ï¿½, loop over all bonds
                                                 do b=1, nbonds
                                                         if(bnd(b)%i == i .and. bnd(b)%j == j) cycle jloop
                                                         if(bnd(b)%i == j .and. bnd(b)%j == i) cycle jloop
@@ -1720,7 +1731,7 @@ integer function genH(j, residue)
         real(8)                                         ::      dx(3), dx_line, rms_dV
         real(8),parameter                       ::      convergence_criterum = 0.1
         real(8),parameter                       ::      dV_scale = 0.025
-        real(8),parameter                       ::      max_dx = 1. !max_dx is max distance of line search step in first CG iteration (Å)
+        real(8),parameter                       ::      max_dx = 1. !max_dx is max distance of line search step in first CG iteration (ï¿½)
         real(8)                                         ::      local_min = 30
         real(8)                                         ::      tors_fk = 10.
         integer, parameter                      ::      max_cg_iterations = 100, max_line_iterations = 35
@@ -1805,7 +1816,7 @@ integer function genH(j, residue)
                                 rnk(:) = -cross_product(rjkt, rktlt)
                                 bk = sqrt(dot_product(rnk, rnk))
                         end if
-                        !generate initial co-ordinates for H
+                        !generate initial coordinates for H
                         !random vector
                         do axis = 1,3
                                 xH(axis) = randm() - .5
@@ -4136,7 +4147,7 @@ subroutine readx
         u = freefile()
         if(openit(u, filnam, 'old', 'unformatted', 'read') /= 0) return
 
-        !read number of co-ordinates (=3*natom)
+        !read number of coordinates (=3*natom)
         READ(u) nat3
         rewind(u)
         natom = nat3 / 3
@@ -4304,7 +4315,7 @@ subroutine set_cgp
 
                         if( (r2 < rexcl_o**2) .or. &
                                 (ires > nres_solute .and. r2 < (rexcl_o + 2.)**2)) then
-                                !is it inside? For solvent include up to 2Å outside rexcl_o too
+                                !is it inside? For solvent include up to 2ï¿½ outside rexcl_o too
                                 ncgp = ncgp + 1
                                 if(ires <= nres_solute) then
                                         ncgp_solute = ncgp_solute + 1
@@ -4570,7 +4581,7 @@ end function set_boundary_condition
 
 logical function set_simulation_sphere()
                 
-        !get centre co-ordinates
+        !get centre coordinates
         !as residue:atom or x y z
         
         !locals
@@ -4788,7 +4799,7 @@ subroutine solvate_box_grid
         max_wat = lib(irc_solvent)%density * boxlength(1) * boxlength(2) * boxlength(3) 
 
         allocate(xw(3,lib(irc_solvent)%nat,max_wat), keep(max_wat), stat=alloc_status)
-        call check_alloc('water sphere co-ordinate array')
+        call check_alloc('water sphere coordinate array')
 
 
         xmin = boxcentre(1) - boxlength(1)/2 + solvent_grid/2
@@ -5174,7 +5185,7 @@ subroutine solvate_sphere_grid
         radius2 = rwat**2
 
         allocate(xw(3,lib(irc_solvent)%nat,max_wat), keep(max_wat), stat=alloc_status)
-        call check_alloc('water sphere co-ordinate array')
+        call check_alloc('water sphere coordinate array')
 
         xmin = xwcent(1) - int(rwat/solvent_grid)*solvent_grid
         xmax = xwcent(1) + int(rwat/solvent_grid)*solvent_grid
@@ -6093,7 +6104,7 @@ subroutine writemol2
 
 5       format('#       Mol2 file written by Qprep version 5',/,&
                    '#       Title of topology: ',a,/,&
-                   '#       Co-ordinate source: ',a)
+                   '#       Coordinate source: ',a)
 ! atom records
 10      format(i6,1x,a4,4x,3f10.3,2x,a,t55,i6,2x,a4,2x,f6.3) !atom record
 !              #    nam    xyz     atyp  res# rnam    q

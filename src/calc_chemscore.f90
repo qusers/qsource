@@ -1,10 +1,21 @@
+!------------------------------------------------------------------------------!
+!  Q v.5.7 makefile                                                            !
+!  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
+!  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
+!  Kajsa Ljunjberg, John Marelius, Martin Nervall                              !
+!  Maintainers: Beat Amrein, Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, !
+!  Irek Szeler                                                                 !
+!  latest update: july 13, 2015                                                !
+!------------------------------------------------------------------------------!
+
+!------------------------------------------------------------------------------!
 !  (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
 !  calc_chemscore.f90
 !  Kajsa Ljungberg 1998-06-11
 !  Implementation of a scoring function by Eldridge et al.
 !  JCAMD 11 (1997) 425-445.
 !  Integration into QCalc5 by Peter Hanspers
-
+!------------------------------------------------------------------------------!
 module calc_chemscore
 
 use calc_base
@@ -1117,7 +1128,7 @@ subroutine sort_bonds           !identify pairs of atoms involved in q-bonds and
 
 end subroutine sort_bonds
 
-subroutine sort_waters  !görs ev bara en gång           !in set_waters
+subroutine sort_waters  !gï¿½rs ev bara en gï¿½ng           !in set_waters
         integer                                 ::i
 
         do i = 1,nwaters                                                !all waters
@@ -1301,7 +1312,7 @@ real function g1_hb(a,b)
 
         integer                 ::      a,b                                     !       top. nr
         real                            ::      dr, dev_dr      ! distance between the two atoms, deviation from the
-                                                                                                                        ! ideal value 1.85 Å
+                                                                                                                        ! ideal value 1.85 ï¿½
         dr = dist(a,b)
         dev_dr = abs(1.85-dr)
 

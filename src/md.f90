@@ -5,8 +5,7 @@
 !  Kajsa Ljunjberg, John Marelius, Martin Nervall                              !
 !  Maintainers: Beat Amrein, Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, !
 !  Irek Szeler                                                                 !
-!  latest update: february 21, 2015                                            !
-!  make [option] [comp=compiler]                                               !
+!  latest update: july 13, 2015                                                !
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
@@ -3032,7 +3031,7 @@ contains
 65     format ('Initial coord. file= ',a)
 
        if(.not. prm_get_string_by_key('final', xfin_file)) then
-          write(*,'(a)') '>>> ERROR: final co-ordinate file not specified (section files, keyword final)'
+          write(*,'(a)') '>>> ERROR: final coordinate file not specified (section files, keyword final)'
           initialize = .false.
        end if
        write (*,80) trim(xfin_file)

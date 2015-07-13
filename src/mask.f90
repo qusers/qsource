@@ -1,16 +1,27 @@
-!       (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
-!       mask.f90
-!       by John Marelius
-!       atom selection mask
+!------------------------------------------------------------------------------!
+!  Q v.5.7 makefile                                                            !
+!  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
+!  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
+!  Kajsa Ljunjberg, John Marelius, Martin Nervall                              !
+!  Maintainers: Beat Amrein, Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, !
+!  Irek Szeler                                                                 !
+!  latest update: july 13, 2015                                                !
+!------------------------------------------------------------------------------!
 
+!------------------------------------------------------------------------------!
+!  (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
+!  mask.f90
+!  by John Marelius
+!  atom selection mask
+!------------------------------------------------------------------------------!
 module atom_mask
   use topo
 
   implicit none
 
   ! version data
-  character(*), private, parameter::      MODULE_VERSION = '5.01'
-  character(*), private, parameter::      MODEULE_DATE = '2003-06-02'
+  character(*), private, parameter::      MODULE_VERSION = '5.7'
+  character(*), private, parameter::      MODULE_DATE = '2015-02-22'
 
   !private procedures
   private update,update_pretop, set_solute, get_word, finalize_storage

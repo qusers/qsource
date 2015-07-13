@@ -1,8 +1,19 @@
-!       (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
-!       qcalc.f90
-!       by John Marelius
-!       Qcalc trajectory analysis main program
+!------------------------------------------------------------------------------!
+!  Q v.5.7 makefile                                                            !
+!  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
+!  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
+!  Kajsa Ljunjberg, John Marelius, Martin Nervall                              !
+!  Maintainers: Beat Amrein, Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, !
+!  Irek Szeler                                                                 !
+!  latest update: july 13, 2015                                                !
+!------------------------------------------------------------------------------!
 
+!------------------------------------------------------------------------------!
+!  (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
+!  qcalc.f90
+!  by John Marelius
+!  Qcalc trajectory analysis main program
+!------------------------------------------------------------------------------!
 program QCALC
         use TRJ
         use CALC_BASE
@@ -23,8 +34,8 @@ program QCALC
         implicit none
 
         ! version data
-        character(*), parameter ::      PROGRAM_VERSION = '5.01'
-        character(*), parameter ::      PROGRAM_DATE = '2003-06-03'
+        character(*), parameter ::      PROGRAM_VERSION = '5.7'
+        character(*), parameter ::      PROGRAM_DATE = '2015-02-22'
 
         !constants
         integer, parameter                      ::      MAX_CALCS = 99

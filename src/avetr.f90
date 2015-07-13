@@ -5,13 +5,13 @@
 !  Kajsa Ljunjberg, John Marelius, Martin Nervall                              !
 !  Maintainers: Beat Amrein, Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, !
 !  Irek Szeler                                                                 !
-!  latest update: july 9, 2015                                                 !
+!  latest update: july 13, 2015                                                !
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
 !  (C) 2004 Uppsala Molekylmekaniska HB, Uppsala, Sweden
 !  avetr.f90
-!  average co-ordinates from Qdyn trajectory files and write pdb-structure
+!  average coordinates from Qdyn trajectory files and write pdb-structure
 !  Added to Qprep March 2004 by Martin Nervall
 !  Tested to reproduce average structures from vmd
 !------------------------------------------------------------------------------!
@@ -19,10 +19,10 @@ module avetr
   use prep
   implicit none
 
-        integer, parameter             :: ave_pdb = 11
-        integer(4), private            :: ncoords, N_sets = 0
-        real(4), allocatable, private  :: x_in(:), x_sum(:), x2_sum(:)
-        real(8), private               :: rmsd
+  integer, parameter             :: ave_pdb = 11
+  integer(4), private            :: ncoords, N_sets = 0
+  real(4), allocatable, private  :: x_in(:), x_sum(:), x2_sum(:)
+  real(8), private               :: rmsd
 contains
 
 !TODO: *choose which frames, add more trajectories, divide x_sum every 100 steps
@@ -71,18 +71,18 @@ end subroutine avetr_calc
 !  Sum the coordinates and the squared coordinates
 !------------------------------------------------------------------------------!  
 subroutine add_coordinates
-        x_sum = x_sum + x_in
-        x2_sum = x2_sum + x_in**2
-        N_sets = N_sets +1
+  x_sum = x_sum + x_in
+  x2_sum = x2_sum + x_in**2
+  N_sets = N_sets +1
 end subroutine add_coordinates
 
 !------------------------------------------------------------------------------!  
 !  Make average and rmsd
 !------------------------------------------------------------------------------!  
 subroutine average
-        x_sum = x_sum / N_sets
-        x2_sum = x2_sum / N_sets
-        rmsd = sqrt(sum(x2_sum - x_sum**2)/ncoords)
+  x_sum = x_sum / N_sets
+  x2_sum = x2_sum / N_sets
+  rmsd = sqrt(sum(x2_sum - x_sum**2)/ncoords)
 end subroutine average
 
 !------------------------------------------------------------------------------!  

@@ -1,8 +1,19 @@
-!       (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
-!       misc.f90
-!       by John Marelius & Johan Åqvist
-!       miscellaneous utility functions
+!------------------------------------------------------------------------------!
+!  Q v.5.7 makefile                                                            !
+!  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
+!  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
+!  Kajsa Ljunjberg, John Marelius, Martin Nervall                              !
+!  Maintainers: Beat Amrein, Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, !
+!  Irek Szeler                                                                 !
+!  latest update: july 13, 2015                                                !
+!------------------------------------------------------------------------------!
 
+!------------------------------------------------------------------------------!
+!  (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
+!  misc.f90
+!  by John Marelius & Johan Aqvist
+!  miscellaneous utility functions
+!------------------------------------------------------------------------------!
 module misc
 
   use sizes
@@ -10,8 +21,8 @@ module misc
   implicit none
 
   ! version data
-  character(*), private, parameter::      MODULE_VERSION = '5.01'
-  character(*), private, parameter::      MODEULE_DATE = '2003-06-02'
+  character(*), private, parameter::      MODULE_VERSION = '5.7'
+  character(*), private, parameter::      MODEULE_DATE = '2015-02-22'
 
 contains
 
@@ -91,7 +102,7 @@ contains
     end do
   end subroutine upcase
 
-  subroutine locase(string)
+subroutine locase(string)
     !arguments
     character(*), intent(inout)::   string
 
@@ -101,9 +112,9 @@ contains
        c = ior(ichar(string(i:i)), 32)
        string(i:i) = char(c)
     end do
-  end subroutine locase
+end subroutine locase
 
-  character(len=3) function onoff(l)
+character(len=3) function onoff(l)
     !arguments
     logical                                         ::      l
     if(l) then 
@@ -111,34 +122,29 @@ contains
     else
        onoff='off'
     endif
-  end function onoff
+end function onoff
 
-  integer function string_part(string, separator, start)
+integer function string_part(string, separator, start)
     !arguments
     character(*)                            ::      string, separator
     integer                                         ::      start
     !locals
     integer                                         ::      totlen
-
     totlen = len_trim(string)
-
     string_part = index(string(start:totlen), separator)
     if(string_part == 0) then 
        string_part = totlen
     else
        string_part = string_part - 2 + start
     end if
+end function string_part
 
-  end function string_part
+real(8) function rtime()
+  integer :: timevals(8)
+  call date_and_time(values=timevals)
+  rtime = timevals(3)*24*3600+timevals(5)*3600+timevals(6)*60+timevals(7)+0.001*timevals(8)
+end function rtime
 
-  real(8) function rtime()
-    integer :: timevals(8)
-    call date_and_time(values=timevals)
-    rtime = timevals(3)*24*3600+timevals(5)*3600+timevals(6)*60+timevals(7)+0.001*timevals(8)
-  end function rtime
-
-  !-----------------------------------------------------------------------
-  !-----------------------------------------------------------------------
 
 end module misc
 

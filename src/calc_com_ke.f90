@@ -1,8 +1,20 @@
-!       (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
-!       calc_kineticenergy.f90
-!       by Martin Almlöf
-!       calculates the kinetic energy of the center of mass of whatever atom mask is specified
+!------------------------------------------------------------------------------!
+!  Q v.5.7 makefile                                                            !
+!  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
+!  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
+!  Kajsa Ljunjberg, John Marelius, Martin Nervall                              !
+!  Maintainers: Beat Amrein, Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, !
+!  Irek Szeler                                                                 !
+!  latest update: july 13, 2015                                                !
+!------------------------------------------------------------------------------!
 
+!------------------------------------------------------------------------------!
+!  (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
+!  calc_kineticenergy.f90
+!  by Martin Almlof
+!  calculates the kinetic energy of the center of mass of whatever atom 
+!  mask is specified
+!------------------------------------------------------------------------------!
 module calc_com_ke
         use calc_base
         use maskmanip
@@ -12,7 +24,7 @@ module calc_com_ke
 !constants
         integer, parameter                      ::      MAX_MASKS = 10
 !module variables
-        integer, parameter, private :: conversion_factor = 2390.0574   ! gram/mol*Å^2/fs^2  -->  kcal/mol
+        integer, parameter, private :: conversion_factor = 2390.0574   ! gram/mol**^2/fs^2  -->  kcal/mol
         integer, private                        :: frames(MAX_MASKS), apa
         real(8), allocatable            :: kineticenergy(:)
         type(MASK_TYPE), private, target        ::      masks(MAX_MASKS)

@@ -1,8 +1,19 @@
-! (C) 2000 Molekylmekanikerna HB, Uppsala, Sweden
-! qfep.f90
-! by Johan Aqvist, Karin Kolmodin, John Marelius, Johan Sund
-! Qfep free energy analysis program for FEP, EVB & umbrella sampling
+!------------------------------------------------------------------------------!
+!  Q v.5.7 makefile                                                            !
+!  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
+!  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
+!  Kajsa Ljunjberg, John Marelius, Martin Nervall                              !
+!  Maintainers: Beat Amrein, Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, !
+!  Irek Szeler                                                                 !
+!  latest update: july 13, 2015                                                !
+!------------------------------------------------------------------------------!
 
+!------------------------------------------------------------------------------!
+!  (C) 2000 Molekylmekanikerna HB, Uppsala, Sweden
+!  qfep.f90
+!  by Johan Aqvist, Karin Kolmodin, John Marelius, Johan Sund
+!  Qfep free energy analysis program for FEP, EVB & umbrella sampling
+!------------------------------------------------------------------------------!
 program qfep
   use NRGY      
   use PARSE

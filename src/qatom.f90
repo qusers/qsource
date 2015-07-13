@@ -1,8 +1,19 @@
-!       (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
-!       qatom.f90
-!       by John Marelius, Johan Åqvist & Martin Almlöf
-!       Q-atom force field data and FEP file reading
+!------------------------------------------------------------------------------!
+!  Q v.5.7 makefile                                                            !
+!  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
+!  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
+!  Kajsa Ljunjberg, John Marelius, Martin Nervall                              !
+!  Maintainers: Beat Amrein, Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, !
+!  Irek Szeler                                                                 !
+!  latest update: july 13, 2015                                                !
+!------------------------------------------------------------------------------!
 
+!------------------------------------------------------------------------------!
+!  (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
+!  qatom.f90
+!  by John Marelius, Johan Aqvist & Martin Almlof
+!  Q-atom force field data and FEP file reading
+!------------------------------------------------------------------------------!
 module qatom
   use sizes
   use nrgy
@@ -16,8 +27,8 @@ module qatom
 
   !constants
   character(*), private, parameter        :: MODULE_NAME = 'Q-atom'
-  character(*), private, parameter        :: MODULE_VERSION = '5.01'
-  character(*), private, parameter        :: MODULE_DATE = '2003-06-02'
+  character(*), private, parameter        :: MODULE_VERSION = '5.7'
+  character(*), private, parameter        :: MODULE_DATE = ''2015-02-22''
 
   !       Constants
   real(8), private                                        :: pi, deg2rad  !set in sub startup
@@ -1681,7 +1692,7 @@ contains
              k=k+1
              read(line,*) temp_atom(k)   !read line med fritt format
           end do
-          allocate(monitor_atom_group(i)%atom(k))   !k är antal element i array nr i
+          allocate(monitor_atom_group(i)%atom(k))   !k ï¿½r antal element i array nr i
           monitor_atom_group(i)%atom(:)=temp_atom(1:k) + offset! kopiera temp_atom arrayens element med index 1-k till 
           monitor_atom_group(i)%n=k
           write (*,660,advance='no') i
@@ -1700,7 +1711,7 @@ contains
        write (*,630) monitor_group_pairs
        write (*,'(a)') 'group_i group_j'
        do i=1,monitor_group_pairs
-          if (.not. prm_get_int_int(monitor_group_pair(i)%i, monitor_group_pair(i)%j)) goto 1000   !läser in i arrayen monitor_group_pair
+          if (.not. prm_get_int_int(monitor_group_pair(i)%i, monitor_group_pair(i)%j)) goto 1000   !lï¿½ser in i arrayen monitor_group_pair
           write (*,640)  monitor_group_pair(i)%i, monitor_group_pair(i)%j                 
        end do
     end if

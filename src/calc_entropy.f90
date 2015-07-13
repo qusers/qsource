@@ -1,29 +1,41 @@
-! calc_entropy.f90
-! By Jens Carlsson, phd 
-! Absolute entropies according to Quasiharmonic analysis, Schlitter's formula and RMS fluctuations
+!------------------------------------------------------------------------------!
+!  Q v.5.7 makefile                                                            !
+!  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
+!  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
+!  Kajsa Ljunjberg, John Marelius, Martin Nervall                              !
+!  Maintainers: Beat Amrein, Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, !
+!  Irek Szeler                                                                 !
+!  latest update: july 13, 2015                                                !
+!------------------------------------------------------------------------------!
 
+!------------------------------------------------------------------------------!
+!  calc_entropy.f90
+!  By Jens Carlsson, phd 
+!  Absolute entropies according to Quasiharmonic analysis, Schlitter's formula 
+!  and RMS fluctuations
+!------------------------------------------------------------------------------!
 module calc_entropy
-    
-use calc_base
-use maskmanip
-use trj
-use calc_fit
-use calc_geom
-implicit none
+  use calc_base
+  use maskmanip
+  use trj
+  use calc_fit
+  use calc_geom
+  implicit none
 
 ! Constants
 
-real(8)                                                                         :: pi_val, hs, R, ref_vol, e, u, kb, cm   ! pi, plancs constant, R, reference_volume
+! pi, Planck's constant, R, reference_volume
+real(8)                    :: pi_val, hs, R, ref_vol, e, u, kb, cm   
 
 !module variables
 
 
         type(MASK_TYPE), private, target                :: masks(MAX_MASKS)
-        integer, private                                                :: Nmasks = 0
+        integer, private                                :: Nmasks = 0
 
     type COVARIANCE_MATRIX                                                  ! Numbers stored for covariance matrix calculation
             real(8)                                                             :: Exy, Ex, Ey                                  ! C[X,Y] = E[XY] - E[X] -E[Y]
-        end type COVARIANCE_MATRIX
+    end type COVARIANCE_MATRIX
 
 
         type ENTROPY_COORD_TYPE
@@ -415,7 +427,7 @@ subroutine MultiplyMatrices(t)
  ! e=2.718281828       ! Euler number
  ! u=1.6605402      ! Atomic mass constant *10**(-27) from u to Kg
    
-  c=(e**2)*kb*(t%Temperature)*u*0.01/(hs**2)        ! 0.01 is Å to m, u is u to kg (hs*hs) to hs**2
+  c=(e**2)*kb*(t%Temperature)*u*0.01/(hs**2)        ! 0.01 is ï¿½ to m, u is u to kg (hs*hs) to hs**2
   
   do i=1,t%no_atoms*3
      do j=1,i                     !t%no_atoms*3    
@@ -689,7 +701,7 @@ real(8) :: det, hswkT, w, cm, scaling ! , hs, kb, u, ,pi
    det = 0.0
    do i= 1,no_freq       
      k = i*(i+1)/2                                          ! Transformation to VIZ format
-     w = sqrt(kb*t%Temperature/(u*t%VIZ(k)))    ! Removed -1.0 since i don't have to shift  ! 10**(12) = sqrt(10**(-23, kb)/(10**(-27, u)*10**(-20, Å**2 to m**2))
+     w = sqrt(kb*t%Temperature/(u*t%VIZ(k)))    ! Removed -1.0 since i don't have to shift  ! 10**(12) = sqrt(10**(-23, kb)/(10**(-27, u)*10**(-20, ï¿½**2 to m**2))
      hswkT = 10*hs*w/(kb*t%Temperature)                     ! 10**(1) = 10**(-34, h)*10**(12, w)/10**(-23, kb)
      
     write(*,'(i10,a,3f8.3)', advance='no') i,'. ',10*cm*w   ! 10**(1) = 10**(12,w)*10**(-11,cm)
@@ -818,8 +830,5 @@ integer :: i,j,k
      enddo
 
 end subroutine UpdateCovariancematrix
-
-    
-
 
 end module calc_entropy

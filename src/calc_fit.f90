@@ -1,35 +1,46 @@
-!       (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
-!       calc_fit.f90
-!       by John Marelius
-!       parts (C) 1979 W. F. van Gunsteren
-!       pair-wise superposition of coordidinate sets
+!------------------------------------------------------------------------------!
+!  Q v.5.7 makefile                                                            !
+!  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
+!  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
+!  Kajsa Ljunjberg, John Marelius, Martin Nervall                              !
+!  Maintainers: Beat Amrein, Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, !
+!  Irek Szeler                                                                 !
+!  latest update: july 13, 2015                                                !
+!------------------------------------------------------------------------------!
 
-module CALC_FIT
-        use CALC_BASE
-        use MASKMANIP
-        implicit none
+!------------------------------------------------------------------------------!
+!  (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
+!  calc_fit.f90
+!  by John Marelius
+!  parts (C) 1979 W. F. van Gunsteren
+!  pair-wise superposition of coordidinate sets
+!------------------------------------------------------------------------------!
+module calc_fit
+  use calc_base
+  use maskmanip
+  implicit none
 
 !constants
-        integer, parameter                      ::      MAX_MASKS = 10
+  integer, parameter                      :: MAX_MASKS = 10
 !module variables
-        type(MASK_TYPE), private, target        ::      masks(MAX_MASKS)
-        integer, private                        ::      Nmasks = 0
+  type(MASK_TYPE), private, target        :: masks(MAX_MASKS)
+  integer, private                        :: Nmasks = 0
 
-        type FIT_COORD_TYPE
-                real(8), pointer                ::      xr(:)
-                real(8)                                 ::      xrcm(3)
-        end type FIT_COORD_TYPE
-        type(FIT_COORD_TYPE), private   ::      coords(MAX_MASKS)
+  type FIT_COORD_TYPE
+    real(8), pointer                :: xr(:)
+    real(8)                         :: xrcm(3)
+  end type FIT_COORD_TYPE
+  
+  type(FIT_COORD_TYPE), private     :: coords(MAX_MASKS)
 
 contains
-        
-subroutine fit_initialize
-end subroutine fit_initialize
+
+  subroutine fit_initialize
+  end subroutine fit_initialize
 
 subroutine fit_finalize(i)
-        integer                                         ::      i
-
-        call mask_finalize(masks(i))
+  integer                           :: i
+  call mask_finalize(masks(i))
 end subroutine fit_finalize
 
 integer function fit_add(desc)
@@ -149,26 +160,26 @@ integer function LSQSTR (NR,W,XP,X,E,U)
 
 
 !CCCCC W.F. VAN GUNSTEREN, CAMBRIDGE, JULY 1979 CCCCCCCCCCCCCCCCCCCCCCCC
-!                                                                                                                                          C
-!         SUBROUTINE LSQSTR (NR,W,XP,X,E,IROT)                                                     C
-!                                                                                                                                          C
+!                                                                      C
+!         SUBROUTINE LSQSTR (NR,W,XP,X,E,IROT)                         C
+!                                                                      C
 !OMMENT   LSQSTR ROTATES THE ATOMS WITH COORDINATES X ABOUT THE ORIGIN C
 !         SUCH THAT THE FUNCTION E = 0.5 * SUM OVER ALL NR ATOMS OF        C
 !         W*(X-XP)**2 HAS A MINIMUM. HERE W DENOTES THE WEIGHT FACTORS AND C
 !         XP ARE THE REFERENCE COORDINATES. FOR A DESCRIPTION OF THE       C
-!         METHOD SEE A.D. MCLACHLAN, J. MOL. BIOL. 128 (1979) 49.                  C
+!         METHOD SEE A.D. MCLACHLAN, J. MOL. BIOL. 128 (1979) 49.          C
 !         IF THE SUBROUTINE FAILS, IT IS RETURNED WITH A MESSAGE AND       C
-!         IROT=0.                                                                                                                  C
-!                                                                                                                                          C
-!         NR = NUMBER OF ATOMS                                                                                     C
-!         W(1..NR) = ATOMIC WEIGHT FACTORS                                                                 C
-!         XP(1..3*NR) = REFERENCE ATOM COORDINATES                                                 C
+!         IROT=0.                                                          C
+!                                                                          C
+!         NR = NUMBER OF ATOMS                                             C
+!         W(1..NR) = ATOMIC WEIGHT FACTORS                                 C
+!         XP(1..3*NR) = REFERENCE ATOM COORDINATES                         C
 !         X(1..3*NR) = ATOM COORDINATES; DELIVERED WITH THE ROTATED ONES   C
 !         If present,
 !         E is DELIVERED WITH THE MINIMUM VALUE OF THE FUNCTION E          C
-!                                                                                                                                          C
-!         LSQSTR USES SUBR. EIGEN.                                                                                 C
-!                                                                                                                                          C
+!                                                                          C
+!         LSQSTR USES SUBR. EIGEN.                                         C
+!                                                                          C
 !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 !
 !       converted to F90 function by John Marelius, July 2000
@@ -266,4 +277,4 @@ integer function LSQSTR (NR,W,XP,X,E,U)
 END function LSQSTR
 
 
-end module CALC_FIT
+end module calc_fit

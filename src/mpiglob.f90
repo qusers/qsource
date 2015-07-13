@@ -1,7 +1,19 @@
-! (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
-! mpiglob.f90
-! by John Marelius & Anders Kaplan
-! global variables for MPI parallell Qdyn
+!------------------------------------------------------------------------------!
+!  Q v.5.7 makefile                                                            !
+!  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
+!  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
+!  Kajsa Ljunjberg, John Marelius, Martin Nervall                              !
+!  Maintainers: Beat Amrein, Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, !
+!  Irek Szeler                                                                 !
+!  latest update: july 13, 2015                                                !
+!------------------------------------------------------------------------------!
+
+!------------------------------------------------------------------------------!
+!  (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
+!  mpiglob.f90
+!  by John Marelius & Anders Kaplan
+!  global variables for MPI parallell Qdyn
+!------------------------------------------------------------------------------!
 module  mpiglob
 
   use nrgy

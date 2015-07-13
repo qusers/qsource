@@ -1,8 +1,19 @@
-! (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
-! calc_xscore.f90
-! by Peter Hanspers & Martin Nervall
-! Qcalc trajectory analysis main program
+!------------------------------------------------------------------------------!
+!  Q v.5.7 makefile                                                            !
+!  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
+!  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
+!  Kajsa Ljunjberg, John Marelius, Martin Nervall                              !
+!  Maintainers: Beat Amrein, Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, !
+!  Irek Szeler                                                                 !
+!  latest update: july 13, 2015                                                !
+!------------------------------------------------------------------------------!
 
+!------------------------------------------------------------------------------!
+!  (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
+!  calc_xscore.f90
+!  by Peter Hanspers & Martin Nervall
+!  Qcalc trajectory analysis main program
+!------------------------------------------------------------------------------!
 module CALC_XSCORE
 ! v.2003.11, Structure-Based Drug Design Toolkits, developed by Dr. Renxiao Wang
 ! F90 implementation and QCalc5 integration by Peter Hanspers
@@ -5604,7 +5615,7 @@ real function Ligand_Calculate_VDW(ligand,protein)
                 ! revert the sign
                 asum=asum*(-1.00) 
 
-                ! if ligand atom has unfavorable contribution then neglect it           =============== FRÅGA NERVALL OM DETTA ===============
+                ! if ligand atom has unfavorable contribution then neglect it           =============== FRï¿½GA NERVALL OM DETTA ===============
                 if(asum<0.00) then
                         goto 1
                 else 

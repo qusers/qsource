@@ -1,12 +1,23 @@
-!       (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
-!       calc_kineticenergy.f90
-!       by Martin Almlöf
-!       calculates the center of mass coordinates of whatever atom mask is specified
+!------------------------------------------------------------------------------!
+!  Q v.5.7 makefile                                                            !
+!  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
+!  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
+!  Kajsa Ljunjberg, John Marelius, Martin Nervall                              !
+!  Maintainers: Beat Amrein, Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, !
+!  Irek Szeler                                                                 !
+!  latest update: july 13, 2015                                                !
+!------------------------------------------------------------------------------!
 
-module CALC_COM
-        use CALC_BASE
-        use MASKMANIP
-        implicit none
+!------------------------------------------------------------------------------!
+!  (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
+!  calc_kineticenergy.f90
+!  by Martin Almlof
+!  calculates the center of mass coordinates of whatever atom mask is specified
+!------------------------------------------------------------------------------!
+module calc_com
+  use calc_base
+  use MASKMANIP
+  implicit none
 
 !constants
         integer, parameter                      ::      MAX_MASKS = 10

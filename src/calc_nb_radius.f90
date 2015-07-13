@@ -1,11 +1,21 @@
-!       (C) 2003 Uppsala Molekylmekaniska HB, Uppsala, Sweden
-!       calc_nb.f90
-!       by Martin Almlöf & Martin Nervall
-!       
-!       nonbonded potential calculation &
-!   calculation of nb interactions between 'q-atoms' and
-!   protein residues
+!------------------------------------------------------------------------------!
+!  Q v.5.7 makefile                                                            !
+!  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
+!  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
+!  Kajsa Ljunjberg, John Marelius, Martin Nervall                              !
+!  Maintainers: Beat Amrein, Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, !
+!  Irek Szeler                                                                 !
+!  latest update: july 13, 2015                                                !
+!------------------------------------------------------------------------------!
 
+!------------------------------------------------------------------------------!
+!  (C) 2003 Uppsala Molekylmekaniska HB, Uppsala, Sweden
+!  calc_nb.f90
+!  by Martin Almlof & Martin Nervall
+!  nonbonded potential calculation &
+!  calculation of nb interactions between 'q-atoms' and
+!  protein residues
+!------------------------------------------------------------------------------!
 module CALC_NB
         use CALC_BASE
         use MASKMANIP
@@ -14,11 +24,11 @@ module CALC_NB
         implicit none
 
 !constants
-        integer, parameter                                      ::      MAX_LISTS = 20
-        integer, parameter                                      ::  MAX_NB_QP = 1
+        integer, parameter                                      :: MAX_LISTS = 20
+        integer, parameter                                      :: MAX_NB_QP = 1
 !module variables
-        type(MASK_TYPE), private, target        ::      masks(2)
-        integer, private                                        ::      Nlists = 0
+        type(MASK_TYPE), private, target        :: masks(2)
+        integer, private                                        :: Nlists = 0
         integer, private                    ::  N_nb_qp = 0
         type NB_LIST_TYPE
                 integer                                                 ::  number_of_NB

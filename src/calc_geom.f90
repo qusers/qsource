@@ -1,21 +1,32 @@
-!       (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
-!       calc_geom.f90
-!       by John Marelius
-!       geometry analysis functions
+!------------------------------------------------------------------------------!
+!  Q v.5.7 makefile                                                            !
+!  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
+!  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
+!  Kajsa Ljunjberg, John Marelius, Martin Nervall                              !
+!  Maintainers: Beat Amrein, Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, !
+!  Irek Szeler                                                                 !
+!  latest update: july 13, 2015                                                !
+!------------------------------------------------------------------------------!
 
-module CALC_GEOM
-        use CALC_BASE
-        implicit none
+!------------------------------------------------------------------------------!
+!  (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
+!  calc_geom.f90
+!  by John Marelius
+!  geometry analysis functions
+!------------------------------------------------------------------------------!
+module calc_geom
+  use calc_base
+  implicit none
 
 !constants
         integer, parameter                      ::      MAX_MEASUREMENTS = 99
 
 !module variables
-        real(8)                                         ::      pi
+        real(8)                                 ::      pi
         integer, private                        ::      Nmeas = 0
         type GEOM_TYPE
-                integer                                 ::      i, j, k, l, cod
-                integer                                 ::      kind
+                integer                         ::      i, j, k, l, cod
+                integer                         ::      kind
         end type GEOM_TYPE
         type(GEOM_TYPE), private        ::      geom(MAX_MEASUREMENTS)
 contains
@@ -293,7 +304,7 @@ end subroutine torsion_calc
 subroutine dist_heading(i)
         integer                                         ::      i
         
-        write(*,'(a)', advance='no') 'dist(Å)'
+        write(*,'(a)', advance='no') 'dist(ï¿½)'
 
         if(geom(i)%cod > 0) then
                 write(*,'(a8)', advance='no') 'V_bond'
@@ -304,7 +315,7 @@ end subroutine dist_heading
 subroutine angle_heading(i)
         integer                                         ::      i
         
-        write(*,'(a)', advance='no') 'angle(°)'
+        write(*,'(a)', advance='no') 'angle(ï¿½)'
 
         if(geom(i)%cod > 0) then
                 write(*,'(a8)', advance='no') 'V_angle'
@@ -315,7 +326,7 @@ end subroutine angle_heading
 subroutine torsion_heading(i)
         integer                                         ::      i
         
-        write(*,'(a)', advance='no') 'tors(°)'
+        write(*,'(a)', advance='no') 'tors(ï¿½)'
 
         if(geom(i)%cod > 0) then
                 write(*,'(a8)', advance='no') 'V_tors'
@@ -323,4 +334,4 @@ subroutine torsion_heading(i)
 end subroutine torsion_heading
 
 
-end module CALC_GEOM
+end module calc_geom

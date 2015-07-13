@@ -1,9 +1,18 @@
-!  (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
-!
-!  calc_pmfscore.f90
-!
-! Implementation by Peter Hanspers
+!------------------------------------------------------------------------------!
+!  Q v.5.7 makefile                                                            !
+!  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
+!  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
+!  Kajsa Ljunjberg, John Marelius, Martin Nervall                              !
+!  Maintainers: Beat Amrein, Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, !
+!  Irek Szeler                                                                 !
+!  latest update: july 13, 2015                                                !
+!------------------------------------------------------------------------------!
 
+!------------------------------------------------------------------------------!
+!  (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
+!  calc_pmfscore.f90
+! Implementation by Peter Hanspers
+!------------------------------------------------------------------------------!
 module CALC_PMF
         use CALC_BASE
         use MASKMANIP
@@ -18,13 +27,13 @@ module CALC_PMF
 
         type tPMFEdge
                 integer                                                 :: valid
-                integer,pointer                 :: p(:)                                                                                                                                                                 ! connectivity path, 0..n-1
+                integer,pointer                 :: p(:)                   ! connectivity path, 0..n-1
         end type
 
         type tPMFVertex
                 integer                                                 :: valid
-                integer                                                 :: id                                                                                                                                                                           ! ids are 0..n-1
-                integer                                                 :: num_conn                                                                                                                                                     ! number of connections
+                integer                                                 :: id   ! ids are 0..n-1
+                integer                                                 :: num_conn       ! number of connections
         end type
 
         type bond_pointer                                                                       !pointer to the datatype q_bond

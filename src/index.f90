@@ -1,15 +1,26 @@
-!       (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
-!       index.f90
-!       by John Marelius
-!       string-to-integer index lookup table and functions
+!------------------------------------------------------------------------------!
+!  Q v.5.7 makefile                                                            !
+!  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
+!  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
+!  Kajsa Ljunjberg, John Marelius, Martin Nervall                              !
+!  Maintainers: Beat Amrein, Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, !
+!  Irek Szeler                                                                 !
+!  latest update: july 13, 2015                                                !
+!------------------------------------------------------------------------------!
 
+!------------------------------------------------------------------------------!
+!  (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
+!  index.f90
+!  by John Marelius
+!  string-to-integer index lookup table and functions
+!------------------------------------------------------------------------------!
 module indexer
 
   implicit none
 
   !constants
-  character(*), private, parameter        ::      MODULE_VERSION = '5.01'
-  character(*), private, parameter        ::      MODULE_DATE = '2003-06-02'
+  character(*), private, parameter        ::      MODULE_VERSION = '5.7'
+  character(*), private, parameter        ::      MODULE_DATE = '2015-02-22'
 
   integer, private ::                             count = 0, top = 0
   integer, parameter ::   KEYLENGTH = 8

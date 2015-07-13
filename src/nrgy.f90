@@ -1,15 +1,26 @@
-!       (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
-!       nrgy.f90
-!       by John Marelius
-!       energy data and energy file I/O
+!------------------------------------------------------------------------------!
+!  Q v.5.7 makefile                                                            !
+!  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
+!  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
+!  Kajsa Ljunjberg, John Marelius, Martin Nervall                              !
+!  Maintainers: Beat Amrein, Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, !
+!  Irek Szeler                                                                 !
+!  latest update: july 13, 2015                                                !
+!------------------------------------------------------------------------------!
 
+!------------------------------------------------------------------------------!
+!  (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
+!  nrgy.f90
+!  by John Marelius
+!  energy data and energy file I/O
+!------------------------------------------------------------------------------!
 module nrgy
   use sizes
 
   implicit none
 
-  character(*), parameter ::      NRGY_VERSION = '5.01'
-  character(*), parameter ::      NRGY_DATE = '2003-06-02'
+  character(*), parameter ::      NRGY_VERSION = '5.7'
+  character(*), parameter ::      NRGY_DATE = '2015-02-22'
 
   type BONDED_ENERGIES
      sequence
