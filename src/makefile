@@ -132,9 +132,9 @@ qcalc5 qdyn5 qdum5 qdyn5p qfep5 qiso: nrgy.o
 
 qcalc5 qdyn5 qdum5 qdyn5p qiso: qatom.o
 
-qcalc5 qprep5 qfep5 qiso: parse.o
+qcalc5 qprep5 qfep5 : parse.o
 
-qcalc5 qprep5 qiso: maskmanip.o
+qcalc5 qprep5 : maskmanip.o
 
 qdyn5 qdum5: qdyn.o
 
@@ -154,7 +154,7 @@ qcalc5: calc_base.o calc_chemscore.o calc_fit.o calc_geom.o calc_pmfscore.o \
 qdyn5 : md.o
 	${FC} ${FFLAGS} ${FLIBS} $+ -o $@
 
-qiso : qiso.o
+qiso : md.o
 	${FC} ${FFLAGS} ${FLIBS} $+ -o $@
 
 qdum5 : md_dum.o
@@ -263,7 +263,7 @@ qcalc.o: qcalc.f90 calc_chemscore.o calc_pmfscore.o calc_xscore.o trj.o calc_bas
 qdyn.o: qdyn.f90 md.o mpiglob.o 
 	${FC} ${FFLAGS} ${FPP_FLG} -c qdyn.f90
 
-qiso.o: qiso.f90 md.o mpiglob.o nrgy.o parse.o
+qiso.o: qiso.f90 md.o mpiglob.o 
 	${FC} ${FFLAGS} ${FPP_FLG} -c qiso.f90
 
 qdyn_dum.o: qdyn.f90 md.o mpiglob.o

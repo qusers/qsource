@@ -10,17 +10,23 @@ program Qiso
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   use MD
-  use MPIGLOB ! use MPI global data
-  use NRGY
-  use PARSE
-
 
   implicit none
 	character(*), parameter			::	MODULE_VERSION = '0.10'
 	character(*), parameter			::	MODULE_DATE    = '2015-07-01'
-	integer					::	nfiles
+	integer					::	h,nfiles,ifile,nskip
+	real(8)					::	Temp_static
+	character(80)				::	line
 
-	!defined in MPIGLOB
+	type INPUT_TYPE
+		character(80)			::	filnam
+		real(8),allocatable		::	lambda(:)
+	end type INPUT_TYPE
+
+	type(INPUT_TYPE),allocatable		::	traj(:)
+
+
+	!defined in MPIGLOB via md.90
 	nodeid = 0
 	numnodes = 1
 
@@ -33,24 +39,45 @@ program Qiso
 	!------------------------------------------------------------------------------------------------
 
 	call prompt ('--> Number of trajectory files: ')
-	read (*,*) nfiles
+	read (*,*) nfiles	!TODO Read command need control mechanism
 	write (*,1) nfiles
 1	format('# Number of files                 =',i6)
+
 	call prompt ('--> No. of states ')
 	!where the nstates is defined ???
-	read (*,*) nstates
+	read (*,*) nstates	!TODO Read command need control mechanism
 	write (*,2) nstates
 2	format('# Number of states                 =',i6)
 
+	call prompt ('--> Give T & number of trajectories to skip: ')
+	read (*,*) Temp_static,nskip	!TODO Read command need control mechanism
+	write (*,3) Temp_static,nskip
+3	format('# T         =',f7.3,/, '# Number of trajectories to skip   =',i6)
 
-  
+	call prompt ('--> Topology file name ')
+	!The fep_file is defined in md.f90
+	read (*,*) top_file	!TODO Read command need control mechanism
+	write (*,4) top_file
+4	format('# Topology file         =',a40)
 
+	call prompt ('--> Fep file name ')
+	!The fep_file is defined in md.f90
+	read (*,*) fep_file	!TODO Read command need control mechanism
+	write (*,5) fep_file
+5	format('# Fep file         =',a20)
 
+!Now itirate over the trajectory files names and put them in a array.
+	allocate(traj(nfiles))		!TODO Check allocation status
 
-
-
-
-
+	do ifile=1,nfiles
+		allocate(traj(ifile)%lambda(nstates))	!TODO Check allocation status
+		write(line,6) ifile
+6		format('--> Name of file number',i4,'       & The lambda values for each state')
+		call prompt(line)
+		read(*,*) traj(ifile)%filnam,traj(ifile)%lambda(1:nstates)	!TODO do sanity chech for lambda (sum=1) and read
+		write (*,7) traj(ifile)%filnam,(traj(ifile)%lambda(h), h=1,nstates)
+7		format ('Trajectory file   ',a10,'with lambda ', 7(f8.2))
+	end do
 
 
 
