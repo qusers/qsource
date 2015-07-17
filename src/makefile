@@ -104,6 +104,8 @@ default: what
 ################################################################################
 all:	qfep5 qprep5 qdyn5 qdum5 qcalc5 move1 move2
 
+qiso:	qiso
+
 debug:
 	@make FFLAGS="${DEBUG}" \
 	qfep5 qprep5 qdyn5 qdum5 qcalc5 move1 move2
@@ -122,19 +124,21 @@ clean:
 nuke:
 	-rm -rf *.o  *.mod *.M *.kmo *.il *.oo qfep5 qdyn5p qdyn5 qprep5 qcalc5 qdum5 ../bin ../obj
 
-qcalc5 qdyn5 qdum5 qdyn5p qprep5 qfep5: misc.o mpiglob.o
+qcalc5 qdyn5 qdum5 qdyn5p qprep5 qfep5 qiso: misc.o mpiglob.o
 
-qcalc5 qdyn5 qdum5 qdyn5p qprep5: mask.o prmfile.o sizes.o topo.o trj.o index.o
+qcalc5 qdyn5 qdum5 qdyn5p qprep5 qiso: mask.o prmfile.o sizes.o topo.o trj.o index.o
 
-qcalc5 qdyn5 qdum5 qdyn5p qfep5: nrgy.o
+qcalc5 qdyn5 qdum5 qdyn5p qfep5 qiso: nrgy.o
 
-qcalc5 qdyn5 qdum5 qdyn5p: qatom.o
+qcalc5 qdyn5 qdum5 qdyn5p qiso: qatom.o
 
-qcalc5 qprep5 qfep5: parse.o
+qcalc5 qprep5 qfep5 qiso: parse.o
 
-qcalc5 qprep5: maskmanip.o
+qcalc5 qprep5 qiso: maskmanip.o
 
 qdyn5 qdum5: qdyn.o
+
+qiso: qiso.o
 
 qprep5: q_prep.o prefs.o prep.o avetr.o nrgy.o
 	${FC} ${FFLAGS} ${FLIBS} $+ -o $@
@@ -148,6 +152,9 @@ qcalc5: calc_base.o calc_chemscore.o calc_fit.o calc_geom.o calc_pmfscore.o \
 	${FC} ${FFLAGS} ${FLIBS} $+ -o $@
 
 qdyn5 : md.o
+	${FC} ${FFLAGS} ${FLIBS} $+ -o $@
+
+qiso : qiso.o
 	${FC} ${FFLAGS} ${FLIBS} $+ -o $@
 
 qdum5 : md_dum.o
@@ -253,8 +260,11 @@ qatom.o: qatom.f90 misc.o nrgy.o prmfile.o sizes.o index.o topo.o
 qcalc.o: qcalc.f90 calc_chemscore.o calc_pmfscore.o calc_xscore.o trj.o calc_base.o calc_rms.o calc_fit.o calc_geom.o
 	${FC} ${FFLAGS} ${FPP_FLG} -c qcalc.f90
 
-qdyn.o: qdyn.f90 md.o mpiglob.o
+qdyn.o: qdyn.f90 md.o mpiglob.o 
 	${FC} ${FFLAGS} ${FPP_FLG} -c qdyn.f90
+
+qiso.o: qiso.f90 md.o mpiglob.o nrgy.o parse.o
+	${FC} ${FFLAGS} ${FPP_FLG} -c qiso.f90
 
 qdyn_dum.o: qdyn.f90 md.o mpiglob.o
 	${FC} ${FFLAGS} ${FPP_FLG} -DDUM -c qdyn.f90 -o qdyn_dum.o
