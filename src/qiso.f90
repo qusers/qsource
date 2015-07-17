@@ -1,4 +1,13 @@
 program Qiso
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!# Qiso caclulate the H/D KIE baesd on the Path Integral method.
+!# the Qfep strategy will be adopted for input section
+!# the Qcalc starategy will be used for reading the trajectory files
+!# The Qdyne strategy will be used for reading topology and fep files
+!  and calculating potenial energy (classic)
+!# the free energy calculation has to be done internally since we need
+!  the bin averge of centroids.
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   use MD
   use MPIGLOB ! use MPI global data
@@ -11,15 +20,18 @@ program Qiso
 	character(*), parameter			::	MODULE_DATE    = '2015-07-01'
 	integer					::	nfiles
 
-
-
 	!defined in MPIGLOB
 	nodeid = 0
 	numnodes = 1
 
-	!------------------------------------------
+	!------------------------------------------------------------------------------------------------
 	! INPUT OF PARAMETERS
-	!------------------------------------------
+	! we need # of files, # of states, topology file name, fep file name, trajectory file names, 
+	! # of frames to be skiped, tempreture 
+	! and the information regarding the free energy calculation which could be done later 
+	!the limitation of this approach is the information has to be given in a specific order
+	!------------------------------------------------------------------------------------------------
+
 	call prompt ('--> Number of trajectory files: ')
 	read (*,*) nfiles
 	write (*,1) nfiles
