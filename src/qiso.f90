@@ -31,7 +31,7 @@ program Qiso
 2	format('# Number of states                 =',i6)
 
 
-
+  
 
 
 
