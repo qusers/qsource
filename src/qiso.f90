@@ -66,7 +66,7 @@ program Qiso
 	write (*,5) fep_file
 5	format('# Fep file         =',a20)
 
-!Now itirate over the trajectory files names and put them in a array.
+!itirate over the trajectory files names and put them in a array.
 	allocate(traj(nfiles))		!TODO Check allocation status
 
 	do ifile=1,nfiles
@@ -76,11 +76,11 @@ program Qiso
 		call prompt(line)
 		read(*,*) traj(ifile)%filnam,traj(ifile)%lambda(1:nstates)	!TODO do sanity chech for lambda (sum=1) and read
 		write (*,7) traj(ifile)%filnam,(traj(ifile)%lambda(h), h=1,nstates)
-7		format ('Trajectory file   ',a10,'with lambda ', 7(f8.2))
-	end do
+7		format ('Trajectory file   ',a20,'with lambda ', 7(f8.2))
+	end do	!TODO check end of file to stop the memory error
 
-
-
+!Read the topology file and assigne
+	call topology
 
 
 
