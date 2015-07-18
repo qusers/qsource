@@ -1,8 +1,5 @@
-3
-2
+1
 298 2
-topology
-fep 
-traj-1  1    0
-traj-2  0.5 0.5
-traj-3  0    1
+md.tm
+f_100_000.dcd  1    0
+

@@ -17,6 +17,7 @@ program Qiso
 	integer					::	h,nfiles,ifile,nskip
 	real(8)					::	Temp_static
 	character(80)				::	line
+	character(200)				::	infilename
 
 	type INPUT_TYPE
 		character(80)			::	filnam
@@ -43,50 +44,60 @@ program Qiso
 	write (*,1) nfiles
 1	format('# Number of files                 =',i6)
 
-	call prompt ('--> No. of states ')
-	!where the nstates is defined ???
-	read (*,*) nstates	!TODO Read command need control mechanism
-	write (*,2) nstates
-2	format('# Number of states                 =',i6)
+!	call prompt ('--> No. of states ')
+!	!where the nstates is defined ???
+!	read (*,*) nstates	!TODO Read command need control mechanism
+!	write (*,2) nstates
+!2	format('# Number of states                 =',i6)
 
 	call prompt ('--> Give T & number of trajectories to skip: ')
 	read (*,*) Temp_static,nskip	!TODO Read command need control mechanism
 	write (*,3) Temp_static,nskip
 3	format('# T         =',f7.3,/, '# Number of trajectories to skip   =',i6)
 
-	call prompt ('--> Topology file name ')
-	!The fep_file is defined in md.f90
-	read (*,*) top_file	!TODO Read command need control mechanism
-	write (*,4) top_file
-4	format('# Topology file         =',a40)
+!	call prompt ('--> Topology file name ')
+!	!The fep_file is defined in md.f90
+!	read (*,*) top_file	!TODO Read command need control mechanism
+!	write (*,4) top_file
+!4	format('# Topology file         =',a40)
 
-	call prompt ('--> Fep file name ')
+!	call prompt ('--> Fep file name ')
+!	!The fep_file is defined in md.f90
+!	read (*,*) fep_file	!TODO Read command need control mechanism
+!	write (*,5) fep_file
+!5	format('# Fep file         =',a20)
+
+	call prompt ('--> Sample MD input ') !to read the restraints and other parameters used
 	!The fep_file is defined in md.f90
-	read (*,*) fep_file	!TODO Read command need control mechanism
-	write (*,5) fep_file
-5	format('# Fep file         =',a20)
+	read (*,*) infilename	!TODO Read command need control mechanism
+	write (*,6) infilename
+6	format('# Sample MD input         =',a20)
 
 !itirate over the trajectory files names and put them in a array.
 	allocate(traj(nfiles))		!TODO Check allocation status
 
 	do ifile=1,nfiles
 		allocate(traj(ifile)%lambda(nstates))	!TODO Check allocation status
-		write(line,6) ifile
-6		format('--> Name of file number',i4,'       & The lambda values for each state')
+		write(line,7) ifile
+7		format('--> Name of file number',i4,'       & The lambda values for each state')
 		call prompt(line)
 		read(*,*) traj(ifile)%filnam,traj(ifile)%lambda(1:nstates)	!TODO do sanity chech for lambda (sum=1) and read
-		write (*,7) traj(ifile)%filnam,(traj(ifile)%lambda(h), h=1,nstates)
-7		format ('Trajectory file   ',a20,'with lambda ', 7(f8.2))
+		write (*,8) traj(ifile)%filnam,(traj(ifile)%lambda(h), h=1,nstates)
+8		format ('Trajectory file   ',a20,'with lambda ', 7(f8.2))
 	end do	!TODO check end of file to stop the memory error
 
-!Read the topology file and assigne
+! Read input data
+	if(.not. initialize_2()) call die('Invalid data in input file')
+! Read the topology file and assigne
 	call topology
+! Read coords, solvates etc. This produces extra arrays for force, displacement etc that is not used.
+	call prep_coord
+! Read fep/evb strategy
+	if ( nstates > 0 ) call get_fep
+! prepare for simulation (calc. inv. mass, total charge,...)
+	call prep_sim
 
-
-
-
-
-
+print* , x(:)
 
 
 
@@ -96,7 +107,7 @@ program Qiso
 
 
 Contains
-
+!----------------------------------------------------------------------------------------------------------------------
 subroutine prompt (outtxt)
 	character(*) outtxt
 #if defined (__osf__)
@@ -118,8 +129,769 @@ subroutine prompt (outtxt)
 #endif
 write (f,'(a,$)') outtxt
 end subroutine prompt
+!----------------------------------------------------------------------------------------------------------------------
+logical function initialize_2()
+	! local variables
+	character					::	text*80
+	integer						::	i,j,length
+	real(8)						::	stepsize
+	real(8)						::	lamda_tmp(max_states)
+	integer						::	fu, fstat
+	real(8)						::	rjunk
+	integer						::	ijunk
+
+! local parameters
+	integer						::	num_args
+!	character(200)					::	infilename
+	logical						::	yes
+	logical						::	need_restart
+	character(len=80)				::	instring
+	logical						::	inlog
+	integer						::	mask_rows
+
+! this subroutine will init:
+!  nsteps, stepsize, dt
+!  Temp0, tau_T, iseed, Tmaxw
+!  use_LRF, NBcycle, Rcpp, Rcww, Rcpw, Rcq
+!  shake_solute, shake_solvent, shake_hydrogens
+! fk_pshell
+!  fk_wsphere=-1, wpol_restr, wpol_born
+!  fkwpol=-1, Dwmz=-1 (values  ized to -1 will
+!    be set in water_sphere, once target radius is known)
+!  top_file
+!  restart, [restart_file]
+!  xfin_file
+!  itrj_cycle, iene_cycle, iout_cycle, itemp_cycle, [trj_file], [ene_file]
+!  fep_file
+!  nstates, EQ (allocating memory for EQ)
+!  implicit_rstr_from_file, [exrstr_file]
+!  nrstr_seq, [rstseq] (allocating memory for rstseq)
+!  nrstr_pos, [rstpos] (allocating memory for rstpos)
+!  nrstr_dist, [rstdis] (allocating memory for rstdis)
+!  nrstr_wall, [rstwal] (allocating memory for rstwal)
+
+! external definition of iargc disabled for gfortran
+!integer(4) iargc
+!external iargc
+
+! read name of input file from the command line
+!num_args = command_argument_count()
+!if (num_args .lt. 1) call die('no input file specified on the command line')
+!#if defined(CRAY)
+!call pxfgetarg(num_args, infilename, 200, i)
+!#elif defined(MPICH)
+!call getarg(1, infilename)
+!#else
+!call getarg(num_args, infilename)
+!#endif
+text = 'Reading input from '//infilename
+call centered_heading(trim(text), '-')
+
+initialize_2 = .true. 
+
+if(.not. prm_open_section('PBC', infilename)) then
+        box = .false.
+        write(*,'(a)') 'Boundary: sphere'
+else
+        box = .true.
+        write(*,'(a)') 'Boundary: periodic box'
+        if( .not. prm_get_logical_by_key('rigid_box_centre', rigid_box_centre, .false. ) ) then
+                write(*,'(a)') '>>> Error: rigid_box_centre must be on or off'
+                initialize_2 = .false.
+        end if
+        write(*,'(a,a3)') 'Rigid box centre ', onoff(rigid_box_centre)
+        if( .not. prm_get_logical_by_key('constant_pressure', constant_pressure, .false.) ) then
+                write(*,'(a)') '>>> Error: constant_pressure must be on or off'
+                initialize_2 = .false.
+        end if
+
+        if( constant_pressure ) then
+                write(*,'(a)') 'NPT-ensemble'
+                volume_try = 0
+                volume_acc = 0
+                if( .not. prm_get_real8_by_key('max_volume_displ', max_vol_displ) ) then
+                        initialize_2 = .false.
+                        write(*,'(a)') '>>> ERROR: maximum volume displacement not specified (section PBC)'
+                else
+                        write(*,5) max_vol_displ
+                end if
+5	format ('Maximum volume displacemet = ', f10.3)
+
+                if( .not. prm_get_integer_by_key('pressure_seed', pressure_seed)) then
+                        pressure_seed = 3781
+                end if
+
+				write(*, '(a, i4 )' ) 'Pressure seed: ', pressure_seed
+
+                if( .not. prm_get_real8_by_key('pressure', pressure) ) then
+                        pressure = 1.0
+                end if
+                write(*,9) pressure
+9	format ('Pressure = ',f10.3,'  bar')
+                !convert pressure to strange internal unit
+                pressure = pressure * 1.43836e-5
+                yes = prm_get_logical_by_key('atom_based_scaling', atom_based_scaling, .false.)
+                if (atom_based_scaling) then
+                        write (*,'(a)') 'Coordinate scaling on volume changes:  Atom based'
+                else
+                        write (*,'(a)') 'Coordinate scaling on volume changes:  Molecule based'
+                end if
+
+        else
+                write(*,'(a)') 'NVT-ensemble'
+                if( prm_get_line_by_key('control_box', instring) ) then
+                        read(instring, *) new_boxl(:)
+                        control_box = .true.
+                        write(*,'(a, 3f10.3)')'Boxsize will be changed to: ', new_boxl
+                else
+                        control_box = .false.
+                end if
 
 
+        end if !section constant_pressure
+
+	yes = prm_get_logical_by_key('put_solvent_back_in_box', put_solvent_back_in_box)
+
+	yes = prm_get_logical_by_key('put_solute_back_in_box', put_solute_back_in_box)
+
+
+	if(put_solute_back_in_box .and. put_solvent_back_in_box) then
+           write(*,'(a)') 'Solute and solvent molecules will be put back in box.'
+	else
+		if (put_solute_back_in_box) then
+           	write(*,'(a)') 'Only solute molecules will be put back in box.'
+		else
+			if (put_solvent_back_in_box) then
+				write(*,'(a)') 'Only solvent molecules will be put back in box.'
+			else
+				write(*,'(a)') 'No molecules will be put back in box.'				
+			end if
+		end if
+	end if
+
+
+
+end if !section PBC
+
+
+if(.not. prm_open_section('md')) then
+        call prm_close
+        ! open input file
+        fu = freefile()
+        open(unit=fu, file=infilename, action='read', form='formatted', status='old', iostat=fstat)
+        if (fstat .ne. 0) call die('error opening input file '//infilename)
+                initialize_2 = old_initialize(fu)
+                close(fu)
+        return
+end if
+
+need_restart = .false. !flag for restart file required
+if(.not. prm_get_integer_by_key('steps', nsteps)) then
+        write(*,*) '>>> ERROR: steps not specified (section MD)'
+        initialize_2 = .false.
+end if
+if(.not. prm_get_real8_by_key('stepsize', stepsize)) then
+        write(*,*) '>>> ERROR: stepsize not specified (section MD)'
+        initialize_2 = .false.
+end if
+write (*,10) nsteps, stepsize
+10	format ('Number of MD steps =',i10,'  Stepsize (fs)    =',f10.3)
+
+! convert to internal time units once and for all.
+dt=0.020462*stepsize
+
+! --- Temperature etc.
+if(.not. prm_get_real8_by_key('temperature', Temp0)) then
+        write(*,*) '>>> ERROR: temperature not specified (section MD)'
+        initialize_2 = .false.
+end if
+if(.not. prm_get_real8_by_key('bath_coupling', tau_T)) then
+        write(*,*) 'Temperature bath relaxation time tau_T set to default'
+        tau_T = tau_T_default
+end if
+write (*,15) Temp0,tau_T
+tau_T=0.020462*tau_T
+if(Temp0 <= 0) then
+        write(*,'(a)') &
+                '>>> Error: No dynamics at zero temperature!'
+        initialize_2 = .false.
+end if
+if(tau_T < dt) then
+        write(*,'(a)') '>>> Error: tau_t must be >= stepsize.'
+        initialize_2 = .false.
+end if
+
+yes = prm_get_logical_by_key('separate_scaling', separate_scaling, .true.)
+if(separate_scaling) then
+	   write(*,'(a)') 'Solute and solvent atoms coupled separately to heat bath.'
+else 
+	   write(*,'(a)') 'Solute and solvent atoms coupled together to heat bath.'
+end if
+
+15	format ('Target temperature =',f10.2,'  T-relax time     =',f10.2)
+
+yes = prm_get_integer_by_key('random_seed', iseed, 1) 
+if(.not. prm_get_real8_by_key('initial_temperature', Tmaxw)) then
+        iseed = 100 !set iseed = 0 if no initial temp
+        need_restart = .false. !never check for restart
+end if
+
+if (iseed > 0) write (*,16) Tmaxw, iseed
+16	format ('Initial velocities will be generated from Maxwell distribution:',&
+                /,'Maxwell temperature=',f10.2,' Random number seed=',i10)
+
+! --- shake, LRF
+if(.not. prm_get_logical_by_key('shake_solvent', shake_solvent, .true.)) then
+        write(*,'(a)') '>>> Error: shake_solvent must be on or off.'
+        initialize_2 = .false.
+end if
+write(*,17) 'all solvent bonds', onoff(shake_solvent)
+17	format('Shake constaints on ',a,t42,': ',a3)
+
+if(.not. prm_get_logical_by_key('shake_solute', shake_solute, .false.)) then
+        write(*,'(a)') '>>> Error: shake_solute must be on or off.'
+        initialize_2 = .false.
+end if 
+write(*,17) 'all solute bonds', onoff(shake_solute)
+
+if(.not. prm_get_logical_by_key('shake_hydrogens', shake_hydrogens, .false.)) then
+        write(*,'(a)') '>>> Error: shake_hydrogens must be on or off.'
+        initialize_2 = .false.
+end if 
+write(*,17) 'all bonds to hydrogen', onoff(shake_hydrogens)
+
+
+       yes = prm_get_logical_by_key('lrf', use_LRF, .true.)
+       if(use_LRF) then
+               write(*,20) 'LRF Taylor expansion outside cut-off'
+       else 
+               write(*,20) 'standard cut-off'
+       end if
+
+20	format ('Nonbonded method   = ',a)
+
+yes = prm_get_logical_by_key('force_rms', force_rms, .false.)
+if(force_rms) then
+        write(*,22) 
+end if
+22	format ('R.M.S. force will be calculated.')
+
+
+! --- Rcpp, Rcww, Rcpw, Rcq, RcLRF
+if(.not. prm_open_section('cut-offs')) then
+        write(*,'(a)') 'No cut-offs section, default cut-offs used'
+        rcpp = rcpp_default
+        rcww = rcww_default
+        rcpw = rcpw_default
+        rcq = rcq_default
+        rcLRF = rcLRF_default
+else
+        if(.not. prm_get_real8_by_key('solute_solute', rcpp, rcpp_default)) then
+                write(*,'(a)') 'solute-solute cut-off set to default'
+        end if
+        if(.not. prm_get_real8_by_key('solvent_solvent', rcww, rcww_default)) then
+                write(*,'(a)') 'solvent-solvent cut-off set to default'
+        end if
+        if(.not. prm_get_real8_by_key('solute_solvent', rcpw, rcpw_default)) then
+                write(*,'(a)') 'solute-solvent cut-off set to default'
+        end if
+        if(.not. prm_get_real8_by_key('q_atom', rcq, rcq_default)) then
+                write(*,'(a)') 'q-atom cut-off set to default'
+        end if
+        if(use_LRF) then
+                if(.not. prm_get_real8_by_key('lrf', rcLRF, rcLRF_default)) then
+                        write(*,'(a)') 'LRF cut-off set to default'
+                end if
+                if(RcLRF < rcpp .or. RcLRF < rcpw .or. RcLRF < rcww) then
+                        write(*,'(a)') &
+                                '>>> ERROR; LRF cut-off must not be smaller than solute or solvent cut-offs!'
+                        initialize_2 = .false.
+                end if
+        end if
+end if
+
+write (*,25) Rcpp,Rcww,Rcpw,Rcq
+if(use_LRF) write(*,26) RcLRF
+25	format ('Cut-off radii for non-bonded interactions:',/, &
+                'Solute-solute:    ',f6.2,/,&
+                'Solvent-solvent:  ',f6.2,/,&
+                'Solute-solvent:   ',f6.2,/,&
+                'Q-atom-non-Q-atom:',f6.2)
+26	format ('LRF:              ',f6.2)
+
+30	format ('>>> WARNING: Ingnoring obsolete keyword ',a,'.')
+! --- simulation sphere
+
+if( .not. box ) then
+        if(.not. prm_open_section('sphere')) then
+			fk_pshell = fk_pshell_default
+			print*,'Radius of inner restrained shell set to 85% of exclusion shell radius.'
+			rexcl_i = shell_default
+			write(*,50) rexcl_i
+        else
+                if(prm_get_line_by_key('centre', instring)) then
+                        write(*,30) 'centre'
+                end if
+                ! --- rexcl_o, rexcl_i, fk_pshell
+                if(prm_get_real8_by_key('radius', rjunk)) then
+                        write(*,30) 'radius'
+                end if
+                if(prm_get_real8_by_key('shell_radius', rexcl_i)) then  !inner radius of restrained shell
+                    write(*,50) rexcl_i
+                    if(rexcl_i < 0.) then
+                      call die('inner radius of restrained shell must be >= 0')
+                    end if
+                else
+                    print*,'Radius of inner restrained shell set to 85% of exclusion shell radius.'
+					rexcl_i = shell_default
+                    write(*,50) rexcl_i
+                end if
+50 format('Radius of inner restrained shell       =    ',f8.3) 
+                if(.not. prm_get_real8_by_key('shell_force', fk_pshell)) then
+                        write(*,'(a)') 'Shell force constant set to default'
+                        fk_pshell = fk_pshell_default
+                end if
+                if(fk_pshell > 0) then
+                        write(*,47) fk_pshell
+                end if
+47		format('Shell restraint force constant         =',f8.2)
+                if(.not. prm_get_real8_by_key('excluded_force', fk_fix   )) then
+                        write(*,'(a)') 'Excluded atoms force constant set to default'
+                        fk_fix = fk_fix_default
+                end if
+                if(fk_fix > 0) then
+                        write(*,48) fk_fix
+                else
+                        fk_fix = fk_fix_default
+                        write(*,'(a)')'Shell restraint force constant can not be less-equal zero, set to default'
+                        write(*,48) fk_fix
+                end if
+48              format('Excluded atom restraint force constant         =',f8.2)
+
+                yes = prm_get_logical_by_key('excluded_freeze', freeze, .false.)
+                if(freeze) then
+                        write(*,'(a)') &
+                                'Excluded atoms will not move.'
+                end if
+
+                yes = prm_get_logical_by_key('exclude_bonded', exclude_bonded, .false.)
+                if(exclude_bonded) then
+                        write(*,'(a)') &
+                                'Bonded interactions outside the sphere will be eliminated'
+                end if
+       end if
+
+        ! --- solvent 
+        inlog = prm_open_section('solvent')
+        if(.not. inlog) inlog = prm_open_section('water') !try also the old name
+        if(.not. inlog) then       !defaults
+                fk_wsphere = -1
+                Dwmz = -1
+                awmz = -1
+                wpol_restr = wpol_restr_default
+                wpol_born = wpol_restr_default
+                fkwpol = -1 
+        else
+                if(prm_get_real8_by_key('radius', rwat_in)) then
+                        write(*,'(a,f8.2)') 'Target solvent radius =',rwat_in
+                end if
+                if(prm_get_line_by_key('centre', instring)) then
+                        write(*,30) 'centre'
+                end if
+                if(prm_get_real8_by_key('pack', rjunk)) then
+                        write(*,30) 'pack'
+                end if
+
+
+          if(.not. prm_get_real8_by_key('radial_force', fk_wsphere)) then
+                write(*,'(a)') 'Solvent radial restraint force constant set to default'
+                fk_wsphere = -1 ! this will be set in water_sphere, once target radius is known
+          end if
+          yes=prm_get_logical_by_key('polarisation', wpol_restr, wpol_restr_default)
+          !default is on when pol. restr is on, otherwise off
+          yes=prm_get_logical_by_key('charge_correction', wpol_born, wpol_restr)
+          if(wpol_born .and. .not. wpol_restr) then
+                write(*,'(a)') '>>> ERROR: charge_correction on requires polarisation on (section solvent)'
+                initialize_2 = .false.
+          end if
+          if(.not. prm_get_real8_by_key('polarisation_force', fkwpol)) then
+                write(*,'(a)') 'Solvent polarisation force constant set to default'
+                fkwpol = -1 ! this will be set in water_sphere, once target radius is known
+          end if
+          yes = prm_get_real8_by_key('morse_depth', Dwmz, -1._8)			
+          yes = prm_get_real8_by_key('morse_width', awmz, -1._8)			
+          if(prm_get_string_by_key('model', instring)) then
+                write(*,30) 'model'
+          end if
+        end if !if (.not. inlog)
+end if !if( .not. box )
+
+
+if(.not. prm_open_section('intervals')) then
+        write(*,'(a)') 'non-bond list update interval set to default.'
+        NBcycle = NB_cycle_default
+        write(*,'(a)') 'energy summary interval set to default.'
+        iout_cycle = iout_cycle_default
+        itemp_cycle = iout_cycle_default
+        iene_cycle = 0 !no energy
+        itrj_cycle = 0 !no trajectory
+
+        ivolume_cycle = ivolume_cycle_default
+
+
+else
+        if(.not. prm_get_integer_by_key('non_bond', NBcycle)) then
+                write(*,'(a)') 'non-bond list update interval set to default.'
+                NBcycle = NB_cycle_default
+        end if
+        if(.not. prm_get_integer_by_key('output', iout_cycle)) then
+                write(*,'(a)') 'energy summary interval set to default.'
+                iout_cycle = iout_cycle_default
+        end if
+        if(.not. prm_get_integer_by_key('temperature', itemp_cycle)) then
+                write(*,'(a)') 'temperature print-out interval set to default.'
+                itemp_cycle = iout_cycle_default
+        end if
+        yes = prm_get_integer_by_key('energy', iene_cycle, 0)
+        yes = prm_get_integer_by_key('trajectory', itrj_cycle, 0)
+
+        if( constant_pressure ) then
+                if( .not. prm_get_integer_by_key('volume_change', ivolume_cycle) ) then
+                        write(*,'(a)') 'volume change intervall set to default'
+                        ivolume_cycle = ivolume_cycle_default
+                end if
+        end if
+end if
+
+write(*,84) NBcycle
+84	format('Non-bonded pair list update interval   =',i8)
+86	format('Energy summary print-out interval      =',i8)
+87	format('Temperature print-out interval         =',i8)
+88	format('Trajectory write interval              =',i8)
+89	format('Energy file write interval             =',i8)
+83  format('Volume change interval                 =',i8)
+
+if(iout_cycle > 0) then
+        write (*,86) iout_cycle
+else
+        write(*,'(a)') 'No energy summaries written.'
+        iout_cycle = -999999999 ! make sure mod(istep, iout_cycle) never = 0
+end if
+if(itemp_cycle > 0) then
+        write (*,87) itemp_cycle
+else
+        write(*,'(a)') 'No temperatures written.'
+        itemp_cycle = -999999999 ! make sure mod(istep, itemp_cycle) never = 0
+end if
+if(itrj_cycle > 0) then
+        write (*,88) itrj_cycle
+else
+        itrj_cycle = -999999999 !no energy
+        write(*,'(a)') 'No trajectory written.'
+end if
+if(iene_cycle > 0) then
+        write (*,89) iene_cycle
+else
+        iene_cycle = -999999999 !no energy
+        write(*,'(a)') 'No energy file written.'
+end if
+if( constant_pressure ) then
+        write(*,83) ivolume_cycle
+end if
+
+!read trajectory atom mask
+mask_rows = prm_count('trajectory_atoms')
+if(itrj_cycle > 0) then
+        if(mask_rows == 0) then
+                write(*,'(a)') 'All atoms will be included in the trajectory.'
+                yes = trj_store_mask('all')
+        else
+                do i=1,mask_rows
+                        yes = prm_get_line(text)
+                        yes = trj_store_mask(text)
+                end do
+        end if
+elseif(mask_rows == 0) then
+        write(*,'(a)') 'Ignoring section trajectory_atoms.'
+end if
+
+if(.not. prm_open_section('files')) then
+        write(*,'(a)') '>>> ERROR: files section not found.'
+        initialize_2 = .false.
+else
+        if(.not. prm_get_string_by_key('topology', top_file)) then
+                write(*,'(a)') '>>> ERROR: topology not specified (section files)'
+                initialize_2 = .false.
+        end if
+        write (*,60) trim(top_file)
+60		format ('Topology file      = ',a)
+
+        if(.not. prm_get_string_by_key('restart', restart_file)) then
+                restart = .false.
+                if(need_restart) then
+                        write(*,'(a)') '>>> ERROR: Restart file required when initial temp. not given.'
+                        initialize_2 = .false.
+                end if
+        else
+                restart = .false.   !never check for restart
+        end if
+
+        if(restart) then
+                write (*,65) trim(restart_file)
+        else
+                write (*,'(a)') 'Initial coordinates taken from topology.'
+                if(iseed == 0) then
+                        write(*,'(a)') &
+                                '>>> ERROR: Need a random number seed to generate initial velocities, aborting.'
+                        initialize_2 = .false.
+                end if
+        end if
+65		format ('Initial coord. file= ',a)
+
+        if(.not. prm_get_string_by_key('final', xfin_file)) then
+                write(*,'(a)') '>>> ERROR: final co-ordinate file not specified (section files, keyword final)'
+                initialize_2 = .false.
+        end if
+        write (*,80) trim(xfin_file)
+80		format ('Final coord. file  = ',a)
+
+        if(.not. prm_get_string_by_key('trajectory', trj_file)) then
+                if(itrj_cycle > 0) then
+                        write(*,'(a)') '>>> ERROR: Trajectory file name required to write trajectory!'
+                        initialize_2 = .false.
+                end if
+        else
+                if(itrj_cycle < 0) then
+                        write(*,*) '>>> Error: Trajectory file given but no output interval'
+                        initialize_2 = .false.
+                end if
+                if(itrj_cycle > 0) write (*,90) trim(trj_file)
+        end if
+90		format ('Trajectory file    = ',a)
+
+        if(.not. prm_get_string_by_key('energy', ene_file)) then
+                if(iene_cycle > 0) then
+                        write(*,'(a)') '>>> ERROR: Energy file name required to write energies!'
+                        initialize_2 = .false.
+                end if
+        else
+
+                if(iene_cycle < 0) then
+
+                        write(*,'(a)') '>>> ERROR: Energy file given but no energy interval'
+
+                        initialize_2 = .false.
+
+                end if
+                if(iene_cycle > 0) write (*,94) trim(ene_file)
+        end if
+94		format ('Energy output file = ',a)
+
+        if(.not. prm_get_string_by_key('fep', fep_file)) then
+                write(*,'(a)') 'No FEP file.'
+                !initialize_2 = .false. !This condition IS OK.
+                fep_file = ''
+        else
+                write (*,95) trim(fep_file)
+95			format ('FEP input file     = ',a,/)
+        end if
+        if(.not. prm_get_string_by_key('restraint', exrstr_file)) then
+                implicit_rstr_from_file = 0
+        else
+                implicit_rstr_from_file = 1
+                write (*,104) trim(exrstr_file)
+104			format ('External rstr file = ',a,/)
+        end if
+        if(prm_get_string_by_key('water', instring)) then
+                write(*,30) 'water'
+        end if
+end if			
+
+! --- states, EQ
+nstates = 0
+if(prm_open_section('lambdas')) then
+        do while(prm_get_field(instring))
+                nstates = nstates + 1
+                read(instring, *, iostat=fstat) lamda_tmp(nstates)
+                if(fstat /= 0) then
+                        write(*,'(a)') '>>> ERROR: Invalid lambda value.'
+                        initialize_2 = .false.
+                        exit
+                end if
+        end do
+end if
+if(nstates == 0 .and. fep_file /= '') then
+        if(fep_file /= '') then
+                write(*,'(a)') 'Defaulting to single FEP state.'
+                nstates = 1
+                lamda_tmp(1) = 1.
+        end if
+end if
+if(nstates > 0 ) then
+        if(fep_file == '') then
+                write(*,'(a)') '>>> ERROR: FEP file required to use lambdas!'
+                initialize_2 = .false.
+        else
+                ! allocate memory for EQ
+                allocate(EQ(nstates), stat=alloc_status)
+                call check_alloc('Q-atom energy array')
+
+                ! init EQ%lambda
+                EQ(1:nstates)%lambda = lamda_tmp(1:nstates)
+                write (*,98) (EQ(i)%lambda,i=1,nstates)
+98			format ('lambda-values      = ',10f8.5)
+        end if
+end if
+
+!	--- restraints:
+write (*,'(/,a)') 'Listing of restraining data:'
+
+! --- nrstr_seq, [rstseq]
+nrstr_seq = prm_count('sequence_restraints')
+109 format (/,'No. of sequence restraints =',i10)
+if ( nrstr_seq .gt. 0 ) then
+        ! allocate memory for rstseq
+        write (*,109) nrstr_seq
+        allocate(rstseq(nrstr_seq), stat=alloc_status)
+        call check_alloc('restraint list')
+        write (*,110)
+110		format ('  atom_i  atom_j      fc  H-flag to_centre')
+        do i=1,nrstr_seq
+                ! read rstseq(i)
+                yes = prm_get_line(text)
+                rstseq(i)%to_centre = 0 
+                read(text,*, end=111, err=111) rstseq(i)
+111			write(*,112) rstseq(i)
+112			format (2i8,f8.2,i8,i10)
+  end do
+end if
+
+! --- nrstr_pos, [rstpos]
+nrstr_pos = prm_count('atom_restraints')
+115 format (/,'No. of position restratints =',i10)
+if ( nrstr_pos .gt. 0 ) then
+        write (*,115) nrstr_pos
+        ! allocate memory for rstpos
+        allocate(rstpos(nrstr_pos), stat=alloc_status)
+        call check_alloc('restraint list')
+        write (*,120)
+120		format ('atom_i      x0      y0      z0     fcx     fcy     fcz   state')
+        do i=1,nrstr_pos ! read rstpos(i)
+                yes = prm_get_line(text)
+                read(text,*, iostat=fstat) rstpos(i)%i,(rstpos(i)%x(j),j=1,3), &
+                        (rstpos(i)%fk(j),j=1,3), rstpos(i)%ipsi
+                if(fstat /= 0) then
+                        write(*,'(a)') '>>> ERROR: Invalid atom restraint data.'
+                        initialize_2 = .false.
+                        exit
+                end if
+                write (*,122) rstpos(i)%i,(rstpos(i)%x(j),j=1,3), &
+                        (rstpos(i)%fk(j),j=1,3), rstpos(i)%ipsi
+        end do
+122		format (i6,6f8.2,i8)
+end if
+
+! --- nrstr_dist, [rstdis]
+nrstr_dist = prm_count('distance_restraints')
+125	format (/,'No. of distance restraints =',i10)
+if ( nrstr_dist .gt. 0 ) then
+        write (*,125) nrstr_dist
+        ! allocate memory for rstdis
+        allocate(rstdis(nrstr_dist), stat=alloc_status)
+        call check_alloc('restraint list')
+        write (*,130)
+130		format ('atom_i atom_j   dist1   dist2   fc        state') 
+        do i=1,nrstr_dist
+                yes=prm_get_line(text)
+                ! read rstdis(i)
+                if(scan(text, ':') > 0) then !got res:atnr
+                  !Store in i&j as res:atnr and assign atom nr after topology is read (prep_coord)
+                  read(text,*, iostat=fstat) rstdis(i)%itext,rstdis(i)%jtext,rstdis(i)%d1,& 
+                     rstdis(i)%d2, rstdis(i)%fk, rstdis(i)%ipsi
+                else !Plain numbers
+                  read(text,*, iostat=fstat) rstdis(i)%i,rstdis(i)%j,rstdis(i)%d1,&
+                        rstdis(i)%d2, rstdis(i)%fk, rstdis(i)%ipsi
+                  rstdis(i)%itext = 'nil'
+                  rstdis(i)%jtext = 'nil'
+                end if
+                if(fstat /= 0) then
+                  write(*,'(a)') '>>> ERROR: Invalid distance restraint data.'
+                  initialize_2 = .false.
+                  exit
+                end if
+                write (*,132) rstdis(i)%i,rstdis(i)%j,rstdis(i)%d1,rstdis(i)%d2,rstdis(i)%fk, &
+                        rstdis(i)%ipsi
+        end do
+132		format (i6,1x,i6,3f8.2,i8)
+end if
+
+! --- nrstr_angl, [rstang]
+nrstr_angl = prm_count('angle_restraints')
+135     format (/,'No. of angle restraints =',i10)
+if ( nrstr_angl .gt. 0 ) then
+        write (*,135) nrstr_angl
+        ! allocate memory for rstang
+        allocate(rstang(nrstr_angl), stat=alloc_status)
+        call check_alloc('restraint list')
+        write (*,140)
+140             format ('atom_i atom_j atom_k   angle   fc        state')
+        do i=1,nrstr_angl
+                yes=prm_get_line(text)
+                ! read rstang(i)
+                !if(scan(text, ':') > 0) then !got res:atnr
+                  !Store in i&j as res:atnr and assign atom nr after topology is
+                  !read (prep_coord)
+                !  read(text,*, iostat=fstat) rstang(i)%itext,rstang(i)%jtext,rstang(i)%ktext,&
+                !     rstang(i)%ang, rstang(i)%fk, rstang(i)%ipsi
+                !else !Plain numbers
+                  read(text,*, iostat=fstat) rstang(i)%i,rstang(i)%j,rstang(i)%k,&
+                        rstang(i)%ang, rstang(i)%fk, rstang(i)%ipsi
+                 ! rstang(i)%itext = 'nil'
+                 ! rstang(i)%jtext = 'nil'
+                 ! rstang(i)%ktext = 'nil'
+                !end if
+                if(fstat /= 0) then
+                  write(*,'(a)') '>>> ERROR: Invalid angle restraint data.'
+                  initialize_2 = .false.
+                  exit
+                end if
+                write (*,142) rstang(i)%i,rstang(i)%j,rstang(i)%k,rstang(i)%ang,rstang(i)%fk, &
+                        rstang(i)%ipsi
+        end do
+142             format (i6,1x,i6,1x,i6,2f8.2,i8)
+end if
+
+
+if (.not. box )then
+! --- nrstr_wall, [rstwal]
+nrstr_wall = prm_count('wall_restraints')
+145 format (/,'No. of wall sequence restraints=',i10)
+if ( nrstr_wall .gt. 0) then
+        write (*,145) nrstr_wall
+        ! allocate memory for rstwal
+        allocate(rstwal(nrstr_wall), stat=alloc_status)
+        call check_alloc('restraint list')
+        write (*,150)
+150  format ('atom_i atom_j   dist.      fc  aMorse  dMorse  H-flag')
+        do i=1,nrstr_wall
+                ! read rstwal(:)
+                yes = prm_get_line(text)
+                read(text,*, iostat=fstat) rstwal(i)%i,rstwal(i)%j,rstwal(i)%d,rstwal(i)%fk, &
+                        rstwal(i)%aMorse, rstwal(i)%dMorse, rstwal(i)%ih
+                if(fstat /= 0) then
+                        write(*,'(a)') '>>> ERROR: Invalid wall restraint data.'
+                        initialize_2 = .false.
+                        exit
+                end if
+                write (*,152) rstwal(i)     
+        end do
+152  format (i6,1x,i6,4f8.2,i8)
+end if
+end if
+
+call prm_close
+end function initialize_2
+!----------------------------------------------------------------------------------------------------------------------
 
 
 
