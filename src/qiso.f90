@@ -14,7 +14,7 @@ program Qiso
   implicit none
 	character(*), parameter			::	MODULE_VERSION = '0.10'
 	character(*), parameter			::	MODULE_DATE    = '2015-07-01'
-	integer					::	h,nfiles,ifile,nskip
+	integer					::	h,nfiles,ifile,nskip,framesn,iframe
 	real(8)					::	Temp_static
 	character(80)				::	line
 	character(200)				::	infilename
@@ -73,7 +73,7 @@ program Qiso
 	write (*,6) infilename
 6	format('# Sample MD input         =',a20)
 
-!itirate over the trajectory files names and put them in a array.
+	!itirate over the trajectory files names and put them in a array.
 	allocate(traj(nfiles))		!TODO Check allocation status
 
 	do ifile=1,nfiles
@@ -86,18 +86,57 @@ program Qiso
 8		format ('Trajectory file   ',a20,'with lambda ', 7(f8.2))
 	end do	!TODO check end of file to stop the memory error
 
-! Read input data
-	if(.not. initialize_2()) call die('Invalid data in input file')
-! Read the topology file and assigne
+
+	!------------------------------------------------------------------------------------------------
+	!Reading various input files and setting up the parameters
+	!------------------------------------------------------------------------------------------------
+
+	! Read input data
+	if(.not. initialize_2()) call die_iso('Invalid data in input file')
+	! Read the topology file and assigne
 	call topology
-! Read coords, solvates etc. This produces extra arrays for force, displacement etc that is not used.
+	! Read coords, solvates etc. This produces extra arrays for force, displacement etc that is not used.
 	call prep_coord
-! Read fep/evb strategy
+	! Read fep/evb strategy
 	if ( nstates > 0 ) call get_fep
-! prepare for simulation (calc. inv. mass, total charge,...)
+	! prepare for simulation (calc. inv. mass, total charge,...)
 	call prep_sim
 
-print* , x(:)
+
+
+
+	!------------------------------------------------------------------------------------------------
+	!Reading the trajectory files and Qatom potential calculation
+	!------------------------------------------------------------------------------------------------
+
+	do ifile=1,nfiles
+		!open each trajectory file
+		if(.not. trj_open(traj(ifile)%filnam)) call die_iso()
+		iframe = 0
+		!read each trajectory file and put it in the global position array
+		do while(trj_read(x))
+		iframe = iframe + 1
+		!position array is updated
+
+
+		end do
+		framesn = iframe
+		call trj_close
+
+	end do
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -129,6 +168,62 @@ subroutine prompt (outtxt)
 #endif
 write (f,'(a,$)') outtxt
 end subroutine prompt
+!----------------------------------------------------------------------------------------------------------------------
+subroutine die_iso(cause)
+!TODO deallocation of variable defined in this module
+
+	! args
+	character(*), optional				::	cause
+	! local vars
+	integer						::	i
+	! flush stuff
+	integer(4), parameter				::	stdout_unit = 6
+	! external flush disabled for gfortran
+	! external flush
+
+if (nodeid .eq. 0) then
+        write(*,*)
+        call centered_heading('ABNORMAL TERMINATION', '!')
+!	write final energies if run has started
+!	if (istep > 0) then
+!		if ( mod(istep,iout_cycle) .ne. 1 ) call write_out
+!	end if
+!	if(allocated(v)) then
+!		!save restart file for diagnosing coordinate problems
+!		write(*,*) 'restart file written at step', istep
+!		call write_xfin
+!	endif
+        write (*,'(79a)') ('!',i=1,79)
+        call close_output_files
+
+        ! apologise
+        write(*,'(a)') 'ABNORMAL TERMINATION of Qiso'
+        if (present(cause)) then
+                write(*,'(79a)') 'Terminating due to ', cause
+                endif
+        write (*,'(79a)') ('!',i=1,79)
+#if defined(CRAY)
+        !Cray can't flush stdout...
+#elif defined(NO_FLUSH)
+		!When you can't flush
+#else
+        ! flush stdout
+        call flush(stdout_unit)
+#endif
+end if	
+! clean up
+call md_deallocate
+
+
+#if defined (USE_MPI)
+! abort all processes with exit code 255
+call MPI_Abort(MPI_COMM_WORLD, 255, ierr)
+#else
+! stop with a message to stderr
+stop 'Qiso terminated abnormally'
+#endif
+
+end subroutine die_iso
 !----------------------------------------------------------------------------------------------------------------------
 logical function initialize_2()
 	! local variables
@@ -892,7 +987,6 @@ end if
 call prm_close
 end function initialize_2
 !----------------------------------------------------------------------------------------------------------------------
-
 
 
 
