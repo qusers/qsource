@@ -10,10 +10,17 @@ program Qiso
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   use MD
+  use MPIGLOB
 
   implicit none
 	character(*), parameter			::	MODULE_VERSION = '0.10'
-	character(*), parameter			::	MODULE_DATE    = '2015-07-01'
+	character(*), parameter			::	MODULE_DATE    = '2015-07-17'
+#if defined (USE_MPI)
+	character(10)					:: QDYN_SUFFIX = '_parallel'
+	integer						:: qdyn_ierr
+#else
+  character(10)					:: QDYN_SUFFIX = ''
+#endif
 	integer					::	h,nfiles,ifile,nskip,framesn,iframe
 	real(8)					::	Temp_static
 	character(80)				::	line
@@ -27,9 +34,19 @@ program Qiso
 	type(INPUT_TYPE),allocatable		::	traj(:)
 
 
-	!defined in MPIGLOB via md.90
+#if defined (USE_MPI)
+	! initialize MPI
+	call MPI_Init(qdyn_ierr)
+	if (qdyn_ierr .ne. MPI_SUCCESS) call die('failure at MPI init')
+	call MPI_Comm_rank(MPI_COMM_WORLD, nodeid, qdyn_ierr)
+	call MPI_Comm_size(MPI_COMM_WORLD, numnodes, qdyn_ierr)
+#else
 	nodeid = 0
 	numnodes = 1
+#endif
+
+	! Only initialise static data, The banner is not needed since it is interactive
+	call md_startup
 
 	!------------------------------------------------------------------------------------------------
 	! INPUT OF PARAMETERS
@@ -81,50 +98,58 @@ program Qiso
 		write(line,7) ifile
 7		format('--> Name of file number',i4,'       & The lambda values for each state')
 		call prompt(line)
-		read(*,*) traj(ifile)%filnam,traj(ifile)%lambda(1:nstates)	!TODO do sanity chech for lambda (sum=1) and read
+		read(*,*) traj(ifile)%filnam,traj(ifile)%lambda(1:nstates)	!TODO do sanity check for lambda (sum=1) and read
 		write (*,8) traj(ifile)%filnam,(traj(ifile)%lambda(h), h=1,nstates)
 8		format ('Trajectory file   ',a20,'with lambda ', 7(f8.2))
 	end do	!TODO check end of file to stop the memory error
 
 
+
 	!------------------------------------------------------------------------------------------------
 	!Reading various input files and setting up the parameters
 	!------------------------------------------------------------------------------------------------
+	if (nodeid .eq. 0) then
+		! Read input data
+		if(.not. initialize_2()) call die_iso('Invalid data in input file')
+		! Read the topology file and assigne
+		call topology
+		! Read coords, solvates etc. This produces extra arrays for force, displacement etc that is not used.
+		call prep_coord
+		! Read fep/evb strategy
+		if ( nstates > 0 ) call get_fep
+		! prepare for simulation (calc. inv. mass, total charge,...)
+		call prep_sim
+		! The list of Q-Q atom nb interactions. taking care of bonded and exclusions
+		call make_nbqqlist
 
-	! Read input data
-	if(.not. initialize_2()) call die_iso('Invalid data in input file')
-	! Read the topology file and assigne
-	call topology
-	! Read coords, solvates etc. This produces extra arrays for force, displacement etc that is not used.
-	call prep_coord
-	! Read fep/evb strategy
-	if ( nstates > 0 ) call get_fep
-	! prepare for simulation (calc. inv. mass, total charge,...)
-	call prep_sim
+	end if
 
+#if defined (USE_MPI)
+	! initialise slave nodes
+	if (numnodes .gt. 1) call init_nodes
+#endif
 
+	! count non-bonded pairs to get the maximum number, then distribute them among the nodes
+	call distribute_nonbonds_iso
 
 
 	!------------------------------------------------------------------------------------------------
 	!Reading the trajectory files and Qatom potential calculation
 	!------------------------------------------------------------------------------------------------
-
-	do ifile=1,nfiles
-		!open each trajectory file
-		if(.not. trj_open(traj(ifile)%filnam)) call die_iso()
-		iframe = 0
-		!read each trajectory file and put it in the global position array
-		do while(trj_read(x))
-		iframe = iframe + 1
-		!position array is updated
-
-
+	if (nodeid .eq. 0) then
+		do ifile=1,nfiles
+			!open each trajectory file
+			if(.not. trj_open(traj(ifile)%filnam)) call die_iso()
+			iframe = 0
+			!read each trajectory file and put it in the global position array
+			do while(trj_read(x))
+			iframe = iframe + 1
+			!position array is updated
+			end do
+			framesn = iframe
+			call trj_close
 		end do
-		framesn = iframe
-		call trj_close
-
-	end do
-
+	end if !end of node 0
 
 
 
@@ -146,6 +171,334 @@ program Qiso
 
 
 Contains
+!-----------------------------------------------------------------------
+
+subroutine distribute_nonbonds_iso
+!locals
+integer					:: npp, npw, nqp, nww, nqw
+type(NODE_ASSIGNMENT_TYPE),allocatable  :: node_assignment(:)
+real					:: avgload, old_avgload
+integer					:: i, last_cgp, last_pair
+integer					:: mpitype_pair_assignment, mpitype_node_assignment
+integer                                 :: average_pairs,inode,icgp,sum,less_than_sum
+integer                                 :: n_bonded, n_nonbonded, master_assign
+real                                    :: percent
+integer                                 :: master_sum
+!!!!Tmp vars för allokering
+integer,parameter			:: vars = 5
+integer     :: mpi_batch, i_loop
+integer     :: blockcnt(vars),type(vars)
+integer(8)  :: disp(vars)
+!!!
+
+
+! count the number of nonbonded interactions and distribute them among the nodes
+
+if (nodeid .eq. 0) then
+! nice header
+call centered_heading('Distribution of charge groups','-')
+
+!Allocate node_assignment
+!>>>this includes pp pw ww qw qp<<<
+allocate(node_assignment(0:numnodes-1),stat=alloc_status)
+call check_alloc('node_assignment')
+
+!Allocate arrays that hold no. pairs per chargegroup.
+!>>>this includes pp pw ww qw qp<<<
+call allocate_nbxx_per_cgp
+
+!Count stuff for balancing nodes and allocating nonbond arrays nbxx()
+nbpp_per_cgp = 0
+nbpw_per_cgp = 0
+nbqp_per_cgp = 0
+nbqw_per_cgp = 0
+nbww_per_cgp = 0
+
+call nbpp_count(npp, nbpp_per_cgp) !<<<   !Only for switching atoms!!!?
+call nbpw_count(npw, nbpw_per_cgp) !<<<
+call nbqp_count(nqp, nbqp_per_cgp)
+call nbqw_count(nqw, nbqw_per_cgp) 
+call nbww_count(nww, nbww_per_cgp) !<<<
+
+!For keeping track of actual # of nonbonded pairs
+totnbpp = npp   !<<<0
+totnbpw = npw   !<<<0
+totnbww = nww*9 !<<<0
+totnbqp = nqp
+totnbqw = nqw*3*nqat
+
+if (numnodes .eq. 1) then
+! only one node: no load balancing
+
+! make the master node handle everything
+calculation_assignment%pp%start = 1
+calculation_assignment%pp%end = ncgp_solute
+calculation_assignment%pw%start = 1
+calculation_assignment%pw%end = ncgp_solute
+calculation_assignment%qp%start = 1
+calculation_assignment%qp%end = ncgp_solute
+calculation_assignment%qw%start = 1
+calculation_assignment%qw%end = nwat
+calculation_assignment%ww%start = 1
+calculation_assignment%ww%end = nwat
+
+#if defined (USE_MPI)
+else ! i.e. slave nodes exists
+
+
+! A simple solution to avoid parallelising the bonded
+! Calculate n_bonded and n_nonbonded 
+! Approximate time of computing one bonded with one nonbonded
+! The number of qq-interactions are neglected
+n_bonded = nbonds + nangles + ntors + nimps
+n_nonbonded = totnbpp + totnbpw + totnbww + totnbqw + totnbqp !<<<
+
+! Compare to determine how many nonbonded master should get
+! A bonded is faster, so this favours an early completion for master
+master_assign =  n_nonbonded/numnodes - n_bonded * numnodes
+
+! calculate the assignments ********************
+!<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+!Calculate balanced assignment for p-p pairs
+icgp=0
+sum=0
+ !First assign master a small part
+node_assignment(0)%pp%start=icgp+1 !<<<0
+percent=REAL(totnbpp)/n_nonbonded
+less_than_sum = master_assign*percent  ! No. of pp-type to assign master
+do while((icgp .lt. ncgp_solute) .and. (sum .lt. less_than_sum))
+   icgp=icgp+1
+   sum=sum + nbpp_per_cgp(icgp)
+end do
+node_assignment(0)%pp%end=icgp !<<<0
+master_sum=sum
+ !Now assign slaves
+average_pairs=(totnbpp-sum)/(numnodes-1)
+do inode=1,numnodes-2
+  node_assignment(inode)%pp%start=icgp+1 !<<<0
+  less_than_sum=average_pairs*inode+master_sum
+  do while (sum .lt. less_than_sum) 
+     icgp=icgp+1
+     sum=sum + nbpp_per_cgp(icgp)
+  end do
+  node_assignment(inode)%pp%end=icgp !<<<0
+end do
+node_assignment(numnodes-1)%pp%start=icgp+1 !<<<0
+node_assignment(numnodes-1)%pp%end=ncgp_solute !<<<0
+
+!Calculate balanced assignment for p-w pairs
+icgp=0
+sum=0
+node_assignment(0)%pw%start=icgp+1 !<<<0
+percent=REAL(totnbpw)/n_nonbonded
+less_than_sum = master_assign*percent
+do while((icgp .lt. ncgp_solute) .and. (sum .lt. less_than_sum))
+   icgp=icgp+1
+   sum=sum + nbpw_per_cgp(icgp)
+end do
+node_assignment(0)%pw%end=icgp !<<<0
+master_sum=sum
+average_pairs=(totnbpw-sum)/(numnodes-1)
+do inode=1,numnodes-2
+  node_assignment(inode)%pw%start=icgp+1 !<<<0
+  less_than_sum=average_pairs*inode+master_sum
+  do while (sum .lt. less_than_sum)
+     icgp=icgp+1
+     sum=sum + nbpw_per_cgp(icgp)
+  end do
+  node_assignment(inode)%pw%end=icgp !<<<0
+end do
+node_assignment(numnodes-1)%pw%start=icgp+1 !<<<0
+node_assignment(numnodes-1)%pw%end=ncgp_solute !<<<0
+!<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+!Calculate balanced assignment for q-p pairs
+icgp=0
+sum=0
+node_assignment(0)%qp%start=icgp+1
+percent=REAL(totnbqp)/n_nonbonded
+less_than_sum = master_assign*percent
+do while((icgp .lt. ncgp_solute) .and. (sum .lt. less_than_sum))
+   icgp=icgp+1
+   sum=sum + nbqp_per_cgp(icgp)
+end do
+node_assignment(0)%qp%end=icgp
+master_sum=sum
+average_pairs=(totnbqp-sum)/(numnodes-1)
+do inode=1,numnodes-2
+  node_assignment(inode)%qp%start=icgp+1
+  less_than_sum=average_pairs*inode+master_sum
+  do while(sum .lt. less_than_sum)
+     icgp=icgp+1
+     sum=sum + nbqp_per_cgp(icgp)
+  end do
+  node_assignment(inode)%qp%end=icgp
+end do
+node_assignment(numnodes-1)%qp%start=icgp+1
+node_assignment(numnodes-1)%qp%end=ncgp_solute
+!<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+!Calculate balanced assignment for w-w pairs
+icgp=0
+sum=0
+node_assignment(0)%ww%start=icgp+1 !<<<0
+percent=REAL(totnbww)/n_nonbonded
+less_than_sum = master_assign*percent
+do while((icgp .lt. nwat) .and. (sum .lt. less_than_sum))
+   icgp=icgp+1
+   sum=sum + nbww_per_cgp(icgp)
+end do
+node_assignment(0)%ww%end=icgp !<<<0
+master_sum=sum
+average_pairs=(totnbww-sum)/(numnodes-1)
+do inode=1,numnodes-2
+  node_assignment(inode)%ww%start=icgp+1 !<<<0
+  less_than_sum=average_pairs*inode+master_sum
+  do while(sum .lt. less_than_sum)
+     icgp=icgp+1
+     sum=sum + nbww_per_cgp(icgp)
+  end do
+  node_assignment(inode)%ww%end=icgp !<<<0
+end do
+node_assignment(numnodes-1)%ww%start=icgp+1 !<<<0
+node_assignment(numnodes-1)%ww%end=nwat !<<<0
+!<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+!Calculate balanced assignment for q-w pairs
+icgp=0
+sum=0
+node_assignment(0)%qw%start=icgp+1
+percent=REAL(totnbqw)/n_nonbonded
+less_than_sum = master_assign*percent
+do while((icgp .lt. nwat) .and. (sum .lt. less_than_sum))
+   icgp=icgp+1
+   sum=sum + nbqw_per_cgp(icgp)
+end do
+node_assignment(0)%qw%end=icgp
+master_sum=sum
+average_pairs=(totnbqw-sum)/(numnodes-1)
+do inode=1,numnodes-2
+  node_assignment(inode)%qw%start=icgp+1
+  less_than_sum=average_pairs*inode+master_sum
+  do while(sum .lt. less_than_sum)
+     icgp=icgp+1
+     sum=sum + nbqw_per_cgp(icgp)
+  end do
+  node_assignment(inode)%qw%end=icgp
+end do
+node_assignment(numnodes-1)%qw%start=icgp+1
+node_assignment(numnodes-1)%qw%end=nwat
+
+#endif
+end if    !if (numnodes .eq. 1)
+
+! deallocate bookkeeping arrays
+!deallocate(nppcgp, npwcgp, nqpcgp, nwwmol)
+
+end if   !if (nodeid .eq. 0)
+
+! distribute assignments to the nodes
+#if defined (USE_MPI)
+if (numnodes .gt. 1) then
+    if (nodeid .ne. 0) then
+	! Dummy allocation to avoid runtime errors when using pointer checking
+	allocate(node_assignment(1),stat=alloc_status)
+    endif 
+! register data types
+call MPI_Type_contiguous(3, MPI_INTEGER, mpitype_pair_assignment, ierr)
+if (ierr .ne. 0) call die('failure while creating custom MPI data type')
+call MPI_Type_commit(mpitype_pair_assignment, ierr)
+if (ierr .ne. 0) call die('failure while creating custom MPI data type')
+
+call MPI_Type_contiguous(5, mpitype_pair_assignment, mpitype_node_assignment, ierr)
+if (ierr .ne. 0) call die('failure while creating custom MPI data type')
+call MPI_Type_commit(mpitype_node_assignment, ierr)
+if (ierr .ne. 0) call die('failure while creating custom MPI data type')
+
+! distribute
+call MPI_Scatter(node_assignment, 1, mpitype_node_assignment, &
+    calculation_assignment, 1, mpitype_node_assignment, 0, MPI_COMM_WORLD, ierr)
+if (ierr .ne. 0) call die('failure while sending node assignments')
+
+! free data type
+call MPI_Type_free(mpitype_node_assignment, ierr)
+call MPI_Type_free(mpitype_pair_assignment, ierr)
+    if (nodeid .ne. 0) then
+	deallocate(node_assignment)
+    endif 
+end if
+#endif
+
+if (nodeid .eq. 0) then
+ ! print a status report
+ write(*,98) 'solute-solute', 'solute-water', 'water-water', 'Q-solute', 'Q-water'
+ write(*,99) 'total', ncgp_solute,ncgp_solute,nwat,ncgp_solute,nwat
+if (numnodes .gt. 1) then
+ do i=0,numnodes-1
+    write(*,100) i, 'assigned cgps', &
+         node_assignment(i)%pp%end-node_assignment(i)%pp%start+1, &
+         node_assignment(i)%pw%end-node_assignment(i)%pw%start+1, &
+         node_assignment(i)%ww%end-node_assignment(i)%ww%start+1, &
+         node_assignment(i)%qp%end-node_assignment(i)%qp%start+1, &
+         node_assignment(i)%qw%end-node_assignment(i)%qw%start+1
+ end do
+end if
+end if
+
+#if defined (USE_MPI)
+blockcnt(:) = 1
+type(:) = MPI_INTEGER
+call MPI_Bcast(totnbpp, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+call MPI_Bcast(totnbpw, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+call MPI_Bcast(totnbqp, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+call MPI_Bcast(totnbqw, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+call MPI_Bcast(totnbww, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
+#endif
+
+! allocate
+calculation_assignment%pp%max = totnbpp/numnodes + 0.20*totnbpp
+allocate(nbpp(calculation_assignment%pp%max), stat=alloc_status)
+call check_alloc('solute-solute non-bond list')
+
+calculation_assignment%pw%max = (totnbpw+3)/numnodes + 0.20*totnbpw
+allocate(nbpw(calculation_assignment%pw%max), stat=alloc_status)
+call check_alloc('solute-solvent non-bond list')
+
+calculation_assignment%ww%max = (totnbww+nwat)/numnodes + 0.20*totnbww
+allocate(nbww(calculation_assignment%ww%max), stat=alloc_status)
+call check_alloc('solvent-solvent non-bond list')
+
+calculation_assignment%qp%max = totnbqp/numnodes + 0.20*totnbqp
+allocate(nbqp(calculation_assignment%qp%max), stat=alloc_status)
+call check_alloc('Qatom - solute non-bond list')
+
+calculation_assignment%qw%max = nwat
+allocate(nbqw(calculation_assignment%qw%max), stat=alloc_status)
+call check_alloc('Qatom - water non-bond list')
+
+
+
+  if (use_PBC) then
+	!allocate array to keep track of chargegroups
+	!approximate with one half of the number of atompairs
+	allocate(nbpp_cgp(calculation_assignment%pp%max / 2), stat=alloc_status)
+	call check_alloc('solute-solute non-bond charge group pair list')
+	allocate(nbpw_cgp(calculation_assignment%pw%max / 2), stat=alloc_status)
+	call check_alloc('solute-solvent non-bond charge group pair list')
+	allocate(nbqp_cgp(calculation_assignment%qp%max / 2), stat=alloc_status)
+	call check_alloc('qatom-solute non-bond charge group pair list')
+  end if	
+
+!Kanske deallokera nbxx_per_cgp TODO
+
+98 format('node value ',5a13)
+99 format(a10,1x,5(1x,i12))
+!99 format(a4,2x,a,t18,i13,3x,i13,3x,i13,3x,i13)
+100 format(i4,1x,a5,1x,5(1x,i12))
+!100 format(i4,2x,a,t18,i13,3x,i13,3x,i13,3x,i13)
+
+if (nodeid .eq. 0)  call centered_heading('End of distribution', '-')
+
+end subroutine distribute_nonbonds_iso
+
+!-----------------------------------------------------------------------
 !----------------------------------------------------------------------------------------------------------------------
 subroutine prompt (outtxt)
 	character(*) outtxt
