@@ -48,6 +48,9 @@ program Qiso
 	! Only initialise static data, The banner is not needed since it is interactive
 	call md_startup
 
+
+
+	if (nodeid .eq. 0) then
 	!------------------------------------------------------------------------------------------------
 	! INPUT OF PARAMETERS
 	! we need # of files, # of states, topology file name, fep file name, trajectory file names, 
@@ -108,7 +111,7 @@ program Qiso
 	!------------------------------------------------------------------------------------------------
 	!Reading various input files and setting up the parameters
 	!------------------------------------------------------------------------------------------------
-	if (nodeid .eq. 0) then
+
 		! Read input data
 		if(.not. initialize_2()) call die_iso('Invalid data in input file')
 		! Read the topology file and assigne
@@ -121,35 +124,50 @@ program Qiso
 		call prep_sim
 		! The list of Q-Q atom nb interactions. taking care of bonded and exclusions
 		call make_nbqqlist
-
-	end if
+	end if !end of master
 
 #if defined (USE_MPI)
-	! initialise slave nodes
+	! initialise slave nodes. broad casting the initial vars
 	if (numnodes .gt. 1) call init_nodes
+
+	! broad cast the input vars
+	if (numnodes .gt. 1) call !XXX!
 #endif
 
-	! count non-bonded pairs to get the maximum number, then distribute them among the nodes
+	! count non-bonded pairs to get the maximum number (master), then broad cast them among the nodes
 	call distribute_nonbonds_iso
 
 
 	!------------------------------------------------------------------------------------------------
-	!Reading the trajectory files and Qatom potential calculation
+	!Reading the trajectory files and the energy calculation. the step synchrinization is done in the 
+	!potential energy calculation
+	!in two ways could be done
+	!	#the coordinates be read by all instances.
+	!	#master read the traj files and bcast it. need a prior knowled of no. of frames
+	!in both cases the send/recieve must shake hand prior to moving to the nest frame.
 	!------------------------------------------------------------------------------------------------
-	if (nodeid .eq. 0) then
-		do ifile=1,nfiles
+
+	do ifile=1,nfiles
+
+
 			!open each trajectory file
 			if(.not. trj_open(traj(ifile)%filnam)) call die_iso()
 			iframe = 0
-			!read each trajectory file and put it in the global position array
+			!read each trajectory file and count the number of frames
 			do while(trj_read(x))
 			iframe = iframe + 1
 			!position array is updated
 			end do
-			framesn = iframe
-			call trj_close
+			framesn = iframe !need to be broad casted
+
+
+
+
+
+
+		call trj_close
 		end do
-	end if !end of node 0
+
 
 
 
@@ -498,7 +516,6 @@ if (nodeid .eq. 0)  call centered_heading('End of distribution', '-')
 
 end subroutine distribute_nonbonds_iso
 
-!-----------------------------------------------------------------------
 !----------------------------------------------------------------------------------------------------------------------
 subroutine prompt (outtxt)
 	character(*) outtxt
