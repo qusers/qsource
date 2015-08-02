@@ -13,3 +13,4 @@ obj/
 *.DS_Store
 *~
 slurm*
+qiso
