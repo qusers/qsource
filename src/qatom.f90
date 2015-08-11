@@ -28,36 +28,36 @@ module qatom
   !constants
   character(*), private, parameter        :: MODULE_NAME = 'Q-atom'
   character(*), private, parameter        :: MODULE_VERSION = '5.7'
-  character(*), private, parameter        :: MODULE_DATE = ''2015-02-22''
+  character(*), private, parameter        :: MODULE_DATE = '2015-02-22'
 
   !       Constants
-  real(8), private                                        :: pi, deg2rad  !set in sub startup
+  real(8), private                        :: pi, deg2rad  !set in sub startup
 
   !-----------------------------------------------------------------------
   !       fep/evb information
   !-----------------------------------------------------------------------
 
-  integer, parameter                      ::      max_states              = 10
-  integer, parameter                      ::      max_qat                 = 100
-  integer, parameter                      ::      max_link                = 10
+  integer, parameter                      :: max_states = 10
+  integer, parameter                      :: max_qat    = 100
+  integer, parameter                      :: max_link   = 10
 
-  integer                                         ::      nstates, nqat
+  integer                                 :: nstates, nqat
 
   !******PWadded this variable
   !Topology atom number of the switching atom of the Q-atoms
   !Needed if periodic boundaries are used
-  integer                                         ::  qswitch 
+  integer                                 :: qswitch
+  
+  integer                                 :: offset !offset number for topology atom numbers
+  logical                                 :: qvdw_flag
+  logical                                 :: qq_use_library_charges
+  integer(AI), allocatable                :: iqseq(:)
+  integer, allocatable                    :: qiac(:,:)
+  character(len=KEYLENGTH), allocatable   :: qtac(:)
+  integer                                 :: nqexpnb
+  integer(AI), allocatable                :: iqexpnb(:), jqexpnb(:)
 
-  integer         ::      offset !offset number for topology atom numbers
-  logical                                         ::      qvdw_flag
-  logical                                         ::      qq_use_library_charges
-  integer(AI), allocatable        ::      iqseq(:)
-  integer, allocatable                    ::      qiac(:,:)
-  character(len=KEYLENGTH), allocatable   ::qtac(:)
-  integer                                                                                                                         ::      nqexpnb
-  integer(AI), allocatable                                                        ::      iqexpnb(:), jqexpnb(:)
-
-  integer                                                                 ::      nqlib
+  integer                                 :: nqlib
   real(4), allocatable            ::      qcrg(:,:)
   real(8), allocatable            ::      qmass(:)
   real(8), allocatable            ::      qavdw(:,:), qbvdw(:,:)
@@ -90,12 +90,12 @@ module qatom
   type(QANGLE_TYPE), allocatable::        qang(:)
   type(ANGLIB_TYPE), allocatable::        qanglib(:)
 
-  integer                                                                                         ::      nqtor
-  integer(AI), allocatable                        ::      iqtor(:),jqtor(:),kqtor(:),lqtor(:)
-  integer(TINY), allocatable              ::      qtorcod(:,:)
-  real(8), allocatable                                    ::      qfktor(:),qrmult(:),qdeltor(:)
+  integer                                         :: nqtor
+  integer(AI), allocatable                        :: iqtor(:),jqtor(:),kqtor(:),lqtor(:)
+  integer(TINY), allocatable                      :: qtorcod(:,:)
+  real(8), allocatable                            :: qfktor(:),qrmult(:),qdeltor(:)
 
-  integer                                         ::      nqimp
+  integer                                         :: nqimp
   integer(AI), allocatable        ::      iqimp(:),jqimp(:),kqimp(:),lqimp(:)
   integer(TINY), allocatable      ::      qimpcod(:,:)
   real(8), allocatable            ::      qfkimp(:),qimp0(:)
@@ -130,18 +130,17 @@ module qatom
   type(monitor_group_pair_TYPE), allocatable::monitor_group_pair(:)
 
   type monitor_atom_group_TYPE
-     integer, pointer                      ::      atom(:) ! the atoms
-     integer                                                               ::      n               ! #atoms
+     integer, pointer                      :: atom(:) ! the atoms
+     integer                               :: n  ! #atoms
   end type monitor_atom_group_TYPE
 
   type (monitor_atom_group_TYPE), allocatable::monitor_atom_group(:)
 
-  !the maximal number of atoms in a group to be monitored
+  !the maximum number of atoms in a group to be monitored
   !this is limited by the line length used in the prmfile module!
 
-  integer, parameter                      ::      MAX_ATOMS_IN_SPECIAL_GROUP=30
-
-  integer                                         ::      monitor_group_pairs, monitor_groups
+  integer, parameter                      :: MAX_ATOMS_IN_SPECIAL_GROUP=30
+  integer                                 :: monitor_group_pairs, monitor_groups
 
   !type holding all scaling factors for electostatic interactions in qq-pairs
   type qq_el_scale_TYPE
@@ -149,26 +148,26 @@ module qatom
      real(8)          ::el_scale
   end type qq_el_scale_TYPE
 
-  type(qq_el_scale_TYPE),allocatable             :: qq_el_scale(:) 
+  type(qq_el_scale_TYPE),allocatable      :: qq_el_scale(:) 
 
   integer               ::nel_scale !number of defined scale factors
 
-  integer                                         ::      tmpindex,numsoftlines,i2
-  real(8), allocatable                            ::      sc_lookup(:,:,:), alpha_max(:,:)
-  real(8)                                         ::      sc_aq,sc_bq,sc_aj,sc_bj,alpha_max_tmp
-  logical                                         ::  softcore_use_max_potential
+  integer                                         :: tmpindex,numsoftlines,i2
+  real(8), allocatable                            :: sc_lookup(:,:,:), alpha_max(:,:)
+  real(8)                                         :: sc_aq,sc_bq,sc_aj,sc_bj,alpha_max_tmp
+  logical                                         :: softcore_use_max_potential
 
   !-----------------------------------------------------------------------
   !       fep/evb energies
   !-----------------------------------------------------------------------
   type(Q_ENERGIES), allocatable:: EQ(:)
-  real(8)                                         ::      Hij(max_states,max_states)
-  real(8)                                         ::      EMorseD(max_qat)
-  real(8)                                         ::      dMorse_i(3,max_qat)
-  real(8)                                         ::      dMorse_j(3,max_qat)
+  real(8)                                         :: Hij(max_states,max_states)
+  real(8)                                         :: EMorseD(max_qat)
+  real(8)                                         :: dMorse_i(3,max_qat)
+  real(8)                                         :: dMorse_j(3,max_qat)
 
   !miscellany
-  logical                                         ::      use_new_fep_format
+  logical                                         :: use_new_fep_format
 
 contains
 
