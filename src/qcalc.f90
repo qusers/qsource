@@ -12,91 +12,92 @@
 !  (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
 !  qcalc.f90
 !  by John Marelius
-!  Qcalc trajectory analysis main program
+!  qcalc trajectory analysis main program
 !------------------------------------------------------------------------------!
-program QCALC
-        use TRJ
-        use CALC_BASE
-        use CALC_RMS
-        use CALC_FIT
-        use CALC_GEOM
-        use CALC_ENTROPY
-        use CALC_NB                             
-        use CALC_CHEMSCORE
-        use CALC_XSCORE
-        use CALC_PMF
-        use CALC_RDF
-        use CALC_RMSF
-        use CALC_COM_KE
-        use CALC_COM
-        !add more calculation kind modules here...
+program qcalc
+  use version
+  use trj
+  use calc_BASE
+  use calc_RMS
+  use calc_FIT
+  use calc_GEOM
+  use calc_ENTROPY
+  use calc_NB                             
+  use calc_CHEMSCORE
+  use calc_XSCORE
+  use calc_PMF
+  use calc_RDF
+  use calc_RMSF
+  use calc_COM_KE
+  use calc_COM
+  !add more calculation kind modules here...
 
-        implicit none
+  implicit none
 
-        ! version data
-        character(*), parameter ::      PROGRAM_VERSION = '5.7'
-        character(*), parameter ::      PROGRAM_DATE = '2015-02-22'
+  ! version data
+  character(*), parameter ::      PROGRAM_VERSION = '5.7'
+  character(*), parameter ::      PROGRAM_DATE = '2015-02-22'
 
-        !constants
-        integer, parameter                      ::      MAX_CALCS = 99
-        integer, parameter                      ::      MAX_CALC_KINDS = 99
-        
-        !data types  
-        type CALC_TYPE
-                character(len=60)               ::      desc
-                integer                                 ::      i
-                integer                                 ::      typ
-        end type CALC_TYPE
+  !constants
+  integer, parameter                      ::      MAX_CALCS = 99
+  integer, parameter                      ::      MAX_CALC_KINDS = 99
+  
+  !data types  
+  type CALC_TYPE
+          character(len=60)               ::      desc
+          integer                                 ::      i
+          integer                                 ::      typ
+  end type CALC_TYPE
 
-        type CALC_KIND_TYPE
-                character(len=40)               ::      desc
-                character(len=14)               ::      key
-                logical                                 ::      output
-        end type CALC_KIND_TYPE                         
+  type CALC_KIND_TYPE
+          character(len=40)               ::      desc
+          character(len=14)               ::      key
+          logical                                 ::      output
+  end type CALC_KIND_TYPE                         
 
-        integer                                         ::      Nkinds = 0, Ncalcs = 0
-        type(CALC_KIND_TYPE)            ::      cdef(MAX_CALC_KINDS)
-        type(CALC_TYPE)                         ::      calcs(MAX_CALCS)
+  integer                                         ::      Nkinds = 0, Ncalcs = 0
+  type(CALC_KIND_TYPE)            ::      cdef(MAX_CALC_KINDS)
+  type(CALC_TYPE)                         ::      calcs(MAX_CALCS)
 
 
-        !register the calculation kinds
-        call add_kind(desc='RMS coord. deviation',              key='rmsd', output=.true.)
-        call add_kind(desc='Least squares fit',                         key='fit', output=.false.)
-        call add_kind(desc='Distance, bond energy',             key='dist', output=.true.)
-        call add_kind(desc='Angle, angle energy',                       key='angle', output=.true.)
-        call add_kind(desc='Torsion, torsion energy', key='torsion', output=.true.)
-        call add_kind(desc='Entropy [Schlitters formula]', key='entropy', output=.true.) 
-        call add_kind(desc='Nonbonded monitor',                         key='nonbond', output=.true.)
-        call add_kind(desc='Residue nonbond monitor', key='nb_prot_qatom', output=.true.)
-        call add_kind(desc='ChemScore',                                                         key='chemscore', output=.true.)
-        call add_kind(desc='X-Score',                                                                   key = 'xscore', output=.true.)
-        call add_kind(desc='PMF-Score',                                                         key = 'pmfscore', output=.true.)
-        call add_kind(desc='RDF',                                                               key = 'rdf', output=.true.)
-        call add_kind(desc='RMSF',                                                              key = 'rmsf', output=.true.)
-        call add_kind(desc='Center of mass Kinetic Energy',             key = 'com_ke', output=.true.)
-        call add_kind(desc='Center of mass position',           key = 'com', output=.true.)
-        !add more calc. kind registrations here...
+  !register the calculation kinds
+  call add_kind(desc='RMS coord. deviation',              key='rmsd', output=.true.)
+  call add_kind(desc='Least squares fit',                         key='fit', output=.false.)
+  call add_kind(desc='Distance, bond energy',             key='dist', output=.true.)
+  call add_kind(desc='Angle, angle energy',                       key='angle', output=.true.)
+  call add_kind(desc='Torsion, torsion energy', key='torsion', output=.true.)
+  call add_kind(desc='Entropy [Schlitters formula]', key='entropy', output=.true.) 
+  call add_kind(desc='Nonbonded monitor',                         key='nonbond', output=.true.)
+  call add_kind(desc='Residue nonbond monitor', key='nb_prot_qatom', output=.true.)
+  call add_kind(desc='ChemScore',                                                         key='chemscore', output=.true.)
+  call add_kind(desc='X-Score',                                                                   key = 'xscore', output=.true.)
+  call add_kind(desc='PMF-Score',                                                         key = 'pmfscore', output=.true.)
+  call add_kind(desc='RDF',                                                               key = 'rdf', output=.true.)
+  call add_kind(desc='RMSF',                                                              key = 'rmsf', output=.true.)
+  call add_kind(desc='Center of mass Kinetic Energy',             key = 'com_ke', output=.true.)
+  call add_kind(desc='Center of mass position',           key = 'com', output=.true.)
+  !add more calc. kind registrations here...
 
-        ! startup prints welcome msg and calls calc_help to print 
-        ! helper info. mask_startup and topo_startup are dummy routines
+  ! startup prints welcome msg and calls calc_help to print 
+  ! helper info. mask_startup and topo_startup are dummy routines
 
-        call startup
+  call startup
 
-        if(get_topology()) then         ! attempt to load topology (req. user input)
-                                                                                                                ! reads bnd(:) among other things
-                
-                call initialize                 ! initialize modules, mostly allocating arrays and def.ing constants
-                call add_calcs                  ! display calc menu and add calcs
+  if(get_topology()) then         ! attempt to load topology (req. user input)
+                                                                                                          ! reads bnd(:) among other things
+          
+          call initialize                 ! initialize modules, mostly allocating arrays and def.ing constants
+          call add_calcs                  ! display calc menu and add calcs
 
-                call do_pre_calcs
-                
-                call process_help
-                call print_headings
-                call process_data               ! processes data frame by frame
-                               
-                call finalize_topology
-                call finalize
-        else
+          call do_pre_calcs
+          
+          call process_help
+          call print_headings
+          call process_data               ! processes data frame by frame
+                         
+          call finalize_topology
+          call finalize
+  else
                 write(*,900)
 900             format('>>>>> ERROR: Failed to load topology. Exiting')
         end if
@@ -686,5 +687,5 @@ subroutine calc_all(frame)
          end do 
 end subroutine calc_all
 
-end program QCALC
+end program qcalc
 

@@ -16,50 +16,50 @@
 !------------------------------------------------------------------------------!
 MODULE PREP
 
-        use TRJ
-        use PARSE
-        use PRMFILE
-        use INDEXER
-        use PREFS
-        use MASKMANIP
+  use TRJ
+  use PARSE
+  use PRMFILE
+  use INDEXER
+  use PREFS
+  use MASKMANIP
 
-        IMPLICIT none
+  IMPLICIT none
 
 !constants
-        character(*), private, parameter        ::      MODULE_VERSION = '5.7'
-        character(*), private, parameter        ::      MODULE_DATE = '2015-02-22'
+  character(*), private, parameter :: MODULE_VERSION = '5.7'
+  character(*), private, parameter :: MODULE_DATE = '2015-02-22'
 
-        !library
-        !max number of library entries
-        integer, parameter              ::      max_entry = 1000
-        !max atoms in a residue (only used when reading PDB file)
-        integer, parameter              ::      max_atlib = 500
-        integer, parameter              ::      max_cgplib = 100
-        integer, parameter              ::      max_atcgplib = 100
+  !library
+  !max number of library entries
+  integer, parameter              ::      max_entry = 1000
+  !max atoms in a residue (only used when reading PDB file)
+  integer, parameter              ::      max_atlib = 500
+  integer, parameter              ::      max_cgplib = 100
+  integer, parameter              ::      max_atcgplib = 100
 
 
-        !FF parameters
-        integer, parameter                      ::      max_old_atyps = 100
-        !Extra bonds(S-S bridges etc.)
-        integer, parameter                      ::      max_extrabnd = 100
+  !FF parameters
+  integer, parameter                      ::      max_old_atyps = 100
+  !Extra bonds(S-S bridges etc.)
+  integer, parameter                      ::      max_extrabnd = 100
 
-        !Topology
-        integer, parameter                      ::      max_lib = 1000
-        integer, parameter                      ::      max_long = 10000
+  !Topology
+  integer, parameter                      ::      max_lib = 1000
+  integer, parameter                      ::      max_long = 10000
 
-        integer, parameter                      :: max_conn = 10
+  integer, parameter                      :: max_conn = 10
 
 !default values for user-settable variables
-        !minimum solvent - solute heavy atom distance for solvation
-        real, target                            ::      solvent_pack = 2.4
-        !average heavy atom number density of proteins
-        real, target                            ::  rho_solute = 0.05794  ! atoms / A**3
-        !maximum cross-linking bond distance
-        real, target                            ::      max_xlink = 2.1
-        character(len=200), target      ::      solvent_names = ''
-        !Random numbers for H generation 
-        integer, target                         ::      random_seed_solute = 179857
-        integer, target                         ::      random_seed_solvent = 758971
+  !minimum solvent - solute heavy atom distance for solvation
+  real, target                            ::      solvent_pack = 2.4
+  !average heavy atom number density of proteins
+  real, target                            ::  rho_solute = 0.05794  ! atoms / A**3
+  !maximum cross-linking bond distance
+  real, target                            ::      max_xlink = 2.1
+  character(len=200), target      ::      solvent_names = ''
+  !Random numbers for H generation 
+  integer, target                         ::      random_seed_solute = 179857
+  integer, target                         ::      random_seed_solvent = 758971
 
 !variables
 !     Library information                                               

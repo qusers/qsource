@@ -51,7 +51,6 @@ breakatwhitespace=true,
 tabsize=3}
 
 
-
 %===============================================================================
 %  Fonts in Document
 %===============================================================================
@@ -65,7 +64,6 @@ tabsize=3}
 \renewcommand*\familydefault{\sfdefault}
 %\renewcommand*{\encodingdefault}{T1}
 % For more options go to: http://www.tug.dk/FontCatalogue/
-
 
 
 %===============================================================================
@@ -134,20 +132,27 @@ tabsize=3}
 \bibliographystyle{nar}
 \vspace{20pt}
 \section{Introduction}
-This is  the developers manual  for \textbf{Q}, the free  enegies from
-molecular dynamics program.  Q is  entirely written in modern Fortran.
-Its initial  development was in  Fortran 90, but the  incorporation of
-object  oriented paradigms  into  modern Fortran  have  seen the  code
-evolve to take advantage of  the evolution of the language.  Currently
-the program incorporporates elements of  the Fortran 2008 standard and
-it is developing the use  of the OpenMP 4.0 standard\footnote{which is
-now  fully implemented  into  gnu  Fortran version  5.1}  for in-node
-parallelization.
+This is  the developers manual  for \textbf{Q}, the free  energy from
+molecular dynamics program.\\
+\noindent \textbf{Q}  is entirely written in  modern \textbf{FORTRAN}.
+Its  initial   development  was   in  \textbf{FORTRAN}  90,   but  the
+incorporation    of   object    oriented    paradigms   into    modern
+\textbf{FORTRAN} have  seen the code  evolve to take advantage  of the
+evolution  of the  language.   Currently  the program  incorporporates
+elements of  the \textbf{FORTRAN} 2008  standard and it's developing
+the  use  of  the  OpenMP 4.0  standard\footnote{which  is  now  fully
+implemented   into    gnu   Fortran    version   5.1}    for   in-node
+parallelization.\\
 
 
 \subsection{Makefile}
 \label{makefile}
-
+The  makefile follows  closely the  \textbf{GNU} \textbf{make}  manual
+(\url{http://www.gnu.org/software/make/manual/make.html}).         Any
+modifications to the makefile should  make sure that user-space is not
+broken,  that  is,  \textbf{Q}  should  compile on  any  of  the  main
+operating  systems and  avoid as  much as  possible hardware  specific
+compiler options.\\
 
 \subsection{Cluster Architectures}
 \label{clusterarchitectures}
@@ -208,11 +213,11 @@ qprep generate.inp >& generate.out &
 -DG95=1 -c
 \end{Verbatim}
 
-Development flags recommended from fortran90.org:\\
--Wall -Wextra -Wimplicit-interface -fPIC -fmax-errors=1 -g -fcheck=all -fbacktrace
+\textbf{Development} flags recommended from fortran90.org:\\
+-Wall -Wextra -Wimplicit-interface -fPIC -fmax-errors=1 -g -fcheck=all -fbacktrace\\
 
-Production flags recommended from fortran90.org:\\
--Wall -Wextra -Wimplicit-interface -fPIC -Werror -fmax-errors=1 -O3 -march=native -ffast-math -funroll-loops
+\textbf{Production} flags recommended from fortran90.org:\\
+-Wall -Wextra -Wimplicit-interface -fPIC -Werror -fmax-errors=1 -O3 -march=native -ffast-math -funroll-loops\\
 
 sizes: Specifies data storage for all Q programs.\\
 Modules used= NONE
@@ -338,19 +343,23 @@ A mainfile document is included in the file maintext.txt
 
 
 \subsection{Fortran codes available online}
+These projects are  a good resource to check-out  development and good
+practices on coding. Even though FORTRAN does not enforce syntax rules
+as  Python  does,  the user  should  use  them  so  that the  code  is
+readable. An analog of the  sytax rules for Python, frequently refered
+to as PEP8, would be very useful for FORTRAN programers. \\
 
-These  projects  are  a  good resource  to  check-out  development  and
-practices on coding.
+Jason Blevins. Benchmarking ansi C and FORTRAN.\\
+\url{http://jblevins.org/git/scicomp.git/tree/}\\
 
 Gyro-Kinetics at Warwick. A program for turbulence study in plasmas.\\
-\url{https://bitbucket.org/gkw/gkw/wiki/Home}
+\url{https://bitbucket.org/gkw/gkw/wiki/Home}\\
 
 OpenMC. A Monte Carlo code.\\
-\url{https://github.com/mit-crpg/openmc}
+\url{https://github.com/mit-crpg/openmc}\\
 
-
-A collection of generic Fortran routines.
-\url{https://github.com/astrofrog/fortranlib}
+A collection of generic Fortran routines.\\
+\url{https://github.com/astrofrog/fortranlib}\\
 
 
 \bibliography{biblio}

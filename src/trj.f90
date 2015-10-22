@@ -15,7 +15,6 @@
 !  Q trajectory data, access and DCD format I/O                                !
 !------------------------------------------------------------------------------!
 module trj
-
   use atom_mask
   use misc
   implicit none

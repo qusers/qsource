@@ -18,6 +18,7 @@
 program qdyn
   use md
   use mpiglob
+  use version
 
 #if defined (_DF_VERSION_)
   use dfport ! portability lib for signals. Used in windows.
@@ -26,28 +27,30 @@ program qdyn
   implicit none
 
   ! version data
-  character(10)             :: QDYN_VERSION = '5.7'
-  character(12)             :: QDYN_DATE = '2015-02-22'
+  character(10) :: QDYN_NAME = 'qdyn'
+  character(10) :: QDYN_VERSION = '5.7'
+  character(12) :: QDYN_DATE = '2015-02-22'
 #if defined (USE_MPI)
-  character(10)             :: QDYN_SUFFIX = '_parallel'
+  character(10) :: QDYN_SUFFIX = '_parallel'
 #else
-  character(10)             :: QDYN_SUFFIX = ''
+  character(10) :: QDYN_SUFFIX = ''
 #endif
 
 
 #if defined (USE_MPI)
   ! MPI error code
-  integer                 :: qdyn_ierr
+  integer :: qdyn_ierr
 #endif
 
   ! signal handler data and declarations
-  integer(4)                :: sigret
+  integer(4) :: sigret
+
 #if defined (_DF_VERSION_)
   ! nothing
 #else
-  integer(4), parameter   :: SIGINT = 2   ! CTRL-C signal
-  integer(4), parameter   :: SIGKILL = 9  ! kill/CTRL-BREAK signal
-  integer(4), parameter   :: SIGABRT = 6  ! kill/CTRL-BREAK signal
+  integer(4), parameter :: SIGINT = 2   ! CTRL-C signal
+  integer(4), parameter :: SIGKILL = 9  ! kill/CTRL-BREAK signal
+  integer(4), parameter :: SIGABRT = 6  ! kill/CTRL-BREAK signal
 #endif
 
   external sigint_handler
@@ -187,8 +190,6 @@ contains
 #endif
 
 end program qdyn
-
-
 
 
 

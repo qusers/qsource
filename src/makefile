@@ -5,7 +5,7 @@
 #  Kajsa Ljunjberg, John Marelius, Martin Nervall                              #
 #  Maintainers: Beat Amrein, Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, #
 #  Irek Szeler                                                                 #
-#  Latest update: February 25, 2015                                            #
+#  Latest update: October 15, 2015                                             #
 #  make [option] [COMP=compiler]                                               #
 ################################################################################
 
@@ -13,54 +13,60 @@
 # Intel Fortran ifort ( tested in linux and osx)
 ################################################################################
 ifeq ($(COMP),ifort)
-	FC=		ifort
+	FC=             ifort
 	FC_OPT=         -O3
-	FFLAGS=         -ip -ipo -unroll -static-intel -fstack-protector ${FC_OPT}
-	FPP_FLG=	-fpp
+	FFLAGS=         -ip -ipo -unroll -static-intel -fstack-protector \
+	                ${FC_OPT}
+	FPP_FLG=        -fpp
 
-	MPIFC=		mpiifort
-	MPIFLAGS=	-f90=${FC}
-	OMPI_FC=	${FC}
-	MPI_FC=		${FC}
-	MPI_FCFLAGS=	${FFLAGS}
-	MPI=		${MPI_FCFLAGS}
+	MPIFC=          mpiifort
+	MPIFLAGS=       -f90=${FC}
+	OMPI_FC=        ${FC}
+	MPI_FC=         ${FC}
+	MPI_FCFLAGS=    ${FFLAGS}
+	MPI=            ${MPI_FCFLAGS}
 
-	DEBUG=          -debug -traceback -g  -I${VT_ROOT}/include -L${VT_LIB_DIR} ${VT_ADD_LIBS} ${FC_OPT}
-	DEBUGMPI=       -debug -traceback -g  -I${VT_ROOT}/include -L${VT_LIB_DIR} ${VT_ADD_LIBS} ${FC_OPT}
+	DEBUG=          -debug -traceback -g  -I${VT_ROOT}/include \
+	                -L${VT_LIB_DIR} ${VT_ADD_LIBS} ${FC_OPT}
+	DEBUGMPI=       -debug -traceback -g  -I${VT_ROOT}/include \
+	                -L${VT_LIB_DIR} ${VT_ADD_LIBS} ${FC_OPT}
+
 
 ################################################################################
 # OSX Yosemite using gfortran 5.1
 ################################################################################
 else ifeq ($(COMP),osx)
-	FC= gfortran
+	FC=             gfortran
 	FC_OPT=         -O3
-	FFLAGS=         -ffree-line-length-none -fcray-pointer -fall-intrinsics \
-	                -std=legacy -Wall -Wtabs -fstack-protector ${FC_OPT} -DG95=1
-#	FFLAGS=         -Wall -Wextra -Wimplicit-interface -fPIC -Werror -fmax-errors=1 \
-#	                -msse4.2 -ffast-math -funroll-loops
+	FFLAGS=         -ffree-line-length-none -fcray-pointer \
+	                -fall-intrinsics -std=legacy -Wall -Wtabs \
+	                -fstack-protector ${FC_OPT} -DG95=1
+
 	FPP_FLG=        -cpp
 
 	MPIFC=          mpif90
 	OMPI_FC=        ${FC}
 	OMPI_FCFLAGS=   ${FFLAGS}
-	MPI=		${OMPI_FCFLAGS}
+	MPI=            ${OMPI_FCFLAGS}
 
-	DEBUG=          -debug  -g ${FC_OPT}
-	DEBUGMPI=       -debug  -g ${FC_OPT}
+	DEBUG=          -debug -g ${FC_OPT}
+	DEBUGMPI=       -debug -g ${FC_OPT}
+
 
 ################################################################################
 # PGI Compiler -- compiles at csb
 ################################################################################
 else ifeq ($(COMP),pgi)
-	FC=		pgf90
-	FC_OPT=		-fastsse -Mipa=fast,inline -O3 -Munroll -mcmodel=medium
-	FFLAGS=		${FC_OPT}
-	FPP_FLG=	-Mpreprocess
+	FC=             pgf90
+	FC_OPT=         -fastsse -Mipa=fast,inline -O3 -Munroll -mcmodel=medium
+	FFLAGS=         ${FC_OPT}
+	FPP_FLG=        -Mpreprocess
 
-	MPIFC=		mpif90
-	MPIFLAGS=	-lmpi#-f90=${FC}
-	MPI=		${MPIFLAGS} ${FFLAGS}
-	MPI_FC=		${FC}
+	MPIFC=          mpif90
+	MPIFLAGS=       -lmpi  #-f90=${FC}
+	MPI=            ${MPIFLAGS} ${FFLAGS}
+	MPI_FC=         ${FC}
+
 
 ################################################################################
 # IBM Compiler -- untested
@@ -70,31 +76,40 @@ else ifeq ($(COMP),ibm)
 	FC_OPT=         -qsmp=omp
 	FFLAGS=
 
+
 ################################################################################
 # GNU gcc-gfortran
 ################################################################################
 else ifeq ($(COMP),gcc)
-	FC=		gfortran
-	FC_OPT=		-O3 -unroll --static -ffree-line-length-none -fcray-pointer -fall-intrinsics -std=legacy -Wall	
-	FFLAGS=		-fstack-protector ${FC_OPT} -DG95=1
-	FPP_FLG=	-cpp
+	FC=             gfortran
+	FC_OPT=         -O3 -funroll-loops -static-libgfortran \
+	                -ffree-line-length-none -fcray-pointer \
+	                -fall-intrinsics -std=legacy -Wall
+	FFLAGS=         -fstack-protector ${FC_OPT} -DG95=1
+	FPP_FLG=        -cpp
 
-	MPIFC=		mpif90
-	OMPI_FC=	${FC}
-	OMPI_FCFLAGS=	${FFLAGS}
-	MPI=		${OMPI_FCFLAGS}
+	MPIFC=          mpif90
+	OMPI_FC=        ${FC}
+	OMPI_FCFLAGS=   ${FFLAGS}
+	MPI=            ${OMPI_FCFLAGS}
 
 	DEBUG=          -debug -fbacktrace -g ${FC_OPT}	
 	DEBUGMPI=       -debug -fbacktrace -g ${FC_OPT}
 
-else
-	FC=		gfortran
-	FC_OPT=		-O3 -unroll --static -ffree-line-length-none -fcray-pointer -fall-intrinsics -std=legacy
-	FFLAGS=		-fstack-protector ${FC_OPT} -DG95=1
-	FPP_FLG=	-cpp
 
-	MPI=		${FFLAGS}
+################################################################################
+# If no COMP option is given
+################################################################################
+else
+	FC=             gfortran
+	FC_OPT=         -O3 -unroll --static -ffree-line-length-none \
+	                -fcray-pointer -fall-intrinsics -std=legacy
+	FFLAGS=         -fstack-protector ${FC_OPT} -DG95=1
+	FPP_FLG=        -cpp
+
+	MPI=            ${FFLAGS}
 endif
+
 
 ################################################################################
 # Display options
@@ -122,9 +137,10 @@ clean:
 	-rm -f *.o  *.mod *.M *.kmo *.il *.oo
 
 nuke:
-	-rm -rf *.o  *.mod *.M *.kmo *.il *.oo qfep qdynp qdyn qprep qcalc qdum ../bin ../obj
+	-rm -rf *.o  *.mod *.M *.kmo *.il *.oo qfep qdynp qdyn qprep qcalc \
+	qdum ../bin ../obj
 
-qcalc qdyn qdum qdynp qprep qfep: misc.o mpiglob.o
+qcalc qdyn qdum qdynp qprep qfep: version.o misc.o mpiglob.o
 
 qcalc qdyn qdum qdynp qprep: mask.o prmfile.o sizes.o topo.o trj.o index.o
 
@@ -182,10 +198,12 @@ calc_geom.o:calc_geom.f90 calc_base.o
 calc_nb.o:calc_nb.f90 calc_base.o maskmanip.o parse.o qatom.o prmfile.o
 	${FC} ${FFLAGS} -c $<
 
-calc_pmfscore.o: calc_pmfscore.f90 calc_base.o maskmanip.o trj.o topo.o prmfile.o index.o qatom.o misc.o
+calc_pmfscore.o: calc_pmfscore.f90 calc_base.o maskmanip.o trj.o topo.o \
+	prmfile.o index.o qatom.o misc.o
 	${FC} ${FFLAGS} -c $<
 
-calc_xscore.o: calc_xscore.f90 calc_base.o maskmanip.o trj.o topo.o prmfile.o index.o qatom.o misc.o
+calc_xscore.o: calc_xscore.f90 calc_base.o maskmanip.o trj.o topo.o prmfile.o \
+	index.o qatom.o misc.o
 	${FC} ${FFLAGS} -c $<
 
 calc_rdf.o:calc_rdf.f90 calc_base.o parse.o maskmanip.o
@@ -215,13 +233,13 @@ mask.o:	mask.f90 topo.o
 maskmanip.o:maskmanip.f90 mask.o misc.o parse.o
 	${FC} ${FFLAGS} -c $<
 
-md.o:	md.f90 mpiglob.o qatom.o sizes.o trj.o topo.o
+md.o:	md.f90 mpiglob.o qatom.o sizes.o trj.o topo.o version.o
 	${FC} ${FFLAGS} ${FPP_FLG} -c md.f90
 
-md_dum.o:md.f90 mpiglob.o qatom.o sizes.o topo.o
+md_dum.o:md.f90 mpiglob.o qatom.o sizes.o topo.o version.o
 	${FC} ${FFLAGS} ${FPP_FLG} -DDUM -c md.f90 -o md_dum.o
 
-md_mpi.o: md.f90 mpiglob.o qatom.o sizes.o topo.o trj.o
+md_mpi.o: md.f90 mpiglob.o qatom.o sizes.o topo.o trj.o version.o
 	${MPIFC} ${MPIFLAGS} ${FFLAGS} ${FPP_FLG} -DUSE_MPI \
 	-c md.f90 -o md_mpi.o
 
@@ -246,26 +264,27 @@ prep.o: prep.f90 maskmanip.o sizes.o parse.o prmfile.o trj.o index.o prefs.o
 prmfile.o: prmfile.f90 misc.o mpiglob.o
 	${FC} ${FFLAGS} -c $<
 
-qprep.o: qprep.f90 prep.o avetr.o
+qprep.o: qprep.f90 prep.o avetr.o version.o
 	${FC} ${FFLAGS} -c $<
 
 qatom.o: qatom.f90 misc.o nrgy.o prmfile.o sizes.o index.o topo.o
 	${FC} ${FFLAGS} -c $<
 
-qcalc.o: qcalc.f90 calc_chemscore.o calc_pmfscore.o calc_xscore.o trj.o calc_base.o calc_rms.o calc_fit.o calc_geom.o
+qcalc.o: qcalc.f90 calc_chemscore.o calc_pmfscore.o calc_xscore.o trj.o \
+	calc_base.o calc_rms.o calc_fit.o calc_geom.o
 	${FC} ${FFLAGS} ${FPP_FLG} -c qcalc.f90
 
-qdyn.o: qdyn.f90 md.o mpiglob.o
+qdyn.o: qdyn.f90 md.o mpiglob.o version.o
 	${FC} ${FFLAGS} ${FPP_FLG} -c qdyn.f90
 
-qdyn_dum.o: qdyn.f90 md.o mpiglob.o
+qdyn_dum.o: qdyn.f90 md.o mpiglob.o version.o
 	${FC} ${FFLAGS} ${FPP_FLG} -DDUM -c qdyn.f90 -o qdyn_dum.o
 
-qdyn_mpi.o: qdyn.f90 md_mpi.o mpiglob.o
+qdyn_mpi.o: qdyn.f90 md_mpi.o mpiglob.o version.o
 	${MPIFC} ${MPIFLAGS} ${FFLAGS} ${FPP_FLG} -DUSE_MPI \
         -c qdyn.f90 -o qdyn_mpi.o
 
-qfep.o: qfep.f90 nrgy.o parse.o
+qfep.o: qfep.f90 nrgy.o parse.o version.o
 	${FC} ${FFLAGS} ${FPP_FLG} -c qfep.f90
 
 sizes.o: sizes.f90
@@ -276,6 +295,9 @@ topo.o:  topo.f90 misc.o mpiglob.o sizes.o
 
 trj.o:  trj.f90 mask.o misc.o
 	${FC} ${FFLAGS} -c $<
+
+version.o: version.f90
+	${FC} ${FFLAGS} ${FPP_FLG} ${BUILD_NUMBER_LDFLAGS} -c $<
 
 move1:
 	mkdir -p ../obj ; mv *.o *.mod ../obj/

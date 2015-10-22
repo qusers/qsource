@@ -5,7 +5,7 @@
 !  Kajsa Ljunjberg, John Marelius, Martin Nervall                              !
 !  Maintainers: Beat Amrein, Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, !
 !  Irek Szeler                                                                 !
-!  latest update: july 13, 2015                                                !
+!  latest update: october 14, 2015                                             !
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
@@ -14,16 +14,21 @@
 !  by Johan Aqvist & John Marelius                                             !
 !  Qprep topology preparation main program                                     !
 !------------------------------------------------------------------------------!
-PROGRAM qprep
-use PREP
-use AVETR
-IMPLICIT none
 
+program qprep
+  use version
+  use prep
+  use avetr
+
+implicit none
+
+character(*), parameter :: PROGRAM_NAME = 'qdyn'
 character(*), parameter :: PROGRAM_VERSION = '5.7'
 character(*), parameter :: PROGRAM_DATE = '2015-02-22'
+character(*), parameter :: PROGRAM_SUFFIX  = ''
 logical                 :: use_inputfile
 character(200)          :: fileName=''
-!.......................................................................
+
 
 call startup
 
@@ -276,12 +281,14 @@ end subroutine help
 
 subroutine startup
 
-integer :: i
+!integer :: i
 
-write(*,'(79a)')('#',i=1,79)
-write(*,'(a,a)') 'Welcome to Qprep version ',PROGRAM_VERSION
-write(*,'(79a)')('#',i=1,79)
-write(*,'(79a)')(' ',i=1,79)
+!write(*,'(79a)')('#',i=1,79)
+!write(*,'(a,a)') 'Welcome to Qprep version ',PROGRAM_VERSION
+!write(*,'(79a)')('#',i=1,79)
+!write(*,'(79a)')(' ',i=1,79)
+call version_check(PROGRAM_NAME, PROGRAM_VERSION, PROGRAM_DATE, PROGRAM_SUFFIX) ! print version and check for flags
+
 call prep_startup
 write(*,*)
 
@@ -291,11 +298,11 @@ end subroutine startup
 
 subroutine shutdown
         call prep_shutdown
-        stop 'Qprep ended'
+        stop 'qprep ended'
 end subroutine shutdown
 
 !*************************************************************************
-!*  Determine if Qprep is to be run from command line or from input file
+!*  Determine if qprep is to be run from command line or from input file
 !*************************************************************************
 
 logical function check_inputfile(infilename)

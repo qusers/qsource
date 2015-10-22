@@ -18,11 +18,12 @@
 module md
 
   ! load modules
-  ! use PROFILING
+  ! use profiling
   use sizes
   use trj
   use mpiglob
   use qatom
+  use version
 
 #if defined (_DF_VERSION_)
   use dfport

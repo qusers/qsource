@@ -15,12 +15,13 @@
 !  Qfep free energy analysis program for FEP, EVB & umbrella sampling
 !------------------------------------------------------------------------------!
 program qfep
-  use NRGY      
-  use PARSE
+  use nrgy  
+  use parse
+  use version
 
   implicit none
-  character*(*), parameter                      ::      MODULE_VERSION = '5.7'
-  character*(*), parameter                      ::      MODULE_DATE = '2015-04-01'
+  character*(*), parameter  :: MODULE_VERSION = '5.7'
+  character*(*), parameter  :: MODULE_DATE = '2015-04-01'
 
   integer,parameter ::mxpts=20000,mxbin=100,mxstates=4
   character(80)      ::filnam, line
@@ -32,22 +33,22 @@ program qfep
   real(8) ::rt,gapmin,gapmax,sum,dv,gaprange, &
        xint,dvg,veff1,veff2,dGa,dGb,dGg,alpha_B,scale_Hij, &
        veff,min                        
-  real(8),dimension(mxbin)              ::sumg,sumg2,avdvg,avc1,avc2,avr
+  real(8),dimension(mxbin)               ::sumg,sumg2,avdvg,avc1,avc2,avr
 
-  real(8),dimension(mxbin,4)            ::binsum
-  integer,dimension(mxbin)              ::nbinpts,ptsum
+  real(8),dimension(mxbin,4)             ::binsum
+  integer,dimension(mxbin)               ::nbinpts,ptsum
 
-  type(Q_ENERGIES), dimension(mxstates)   :: EQ   
-  type(Q_ENERGIES), dimension(mxstates)   :: avEQ
-  real(8),dimension(mxstates)                             :: dvv,dGv,alfa,coeff
+  type(Q_ENERGIES), dimension(mxstates)  :: EQ   
+  type(Q_ENERGIES), dimension(mxstates)  :: avEQ
+  real(8),dimension(mxstates)            :: dvv,dGv,alfa,coeff
 
-  real(8),dimension(3)                  ::u,y
-  real(8),allocatable              ::dgf(:),dgr(:),dgfsum(:),dgrsum(:),dG(:)
-  real(8),dimension(mxstates,mxstates)  ::A,mu,eta,rxy0
-  real(8),allocatable                   ::Hij(:,:),d(:),e(:)
+  real(8),dimension(3)                   :: u,y
+  real(8),allocatable                    :: dgf(:),dgr(:),dgfsum(:),dgrsum(:),dG(:)
+  real(8),dimension(mxstates,mxstates)   :: A,mu,eta,rxy0
+  real(8),allocatable                    :: Hij(:,:),d(:),e(:)
   type FEP_DATA_TYPE
-     integer                                 ::      npts
-     real(8)                                 ::      lambda(mxstates)
+     integer                             ::      npts
+     real(8)                             ::      lambda(mxstates)
      real(8), pointer                ::      v(:,:), r(:,:) !indices are state, point
      real(8), pointer                ::      vg(:), gap(:), c1(:), c2(:) !index is point
   end type FEP_DATA_TYPE

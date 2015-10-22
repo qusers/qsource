@@ -1,5 +1,7 @@
 bin/
 obj/
+*.o
+*.mod
 *.toc
 *.dvi
 *.log
@@ -14,3 +16,4 @@ obj/
 slurm*
 osbinaries/
 *.Rhistory
+argcount*
