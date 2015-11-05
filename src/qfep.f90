@@ -12,48 +12,48 @@
 !  (C) 2000 Molekylmekanikerna HB, Uppsala, Sweden
 !  qfep.f90
 !  by Johan Aqvist, Karin Kolmodin, John Marelius, Johan Sund
-!  Qfep free energy analysis program for FEP, EVB & umbrella sampling
+!  qfep free energy analysis program for FEP, EVB & Umbrella Sampling
 !------------------------------------------------------------------------------!
 program qfep
-  use nrgy  
-  use parse
-  use version
+  use NRGY      
+  use PARSE
 
   implicit none
-  character*(*), parameter  :: MODULE_VERSION = '5.7'
-  character*(*), parameter  :: MODULE_DATE = '2015-04-01'
+  character(*), parameter                 ::      MODULE_VERSION = '5.7'
+  character(*), parameter                 ::      MODULE_DATE = '2015-04-01'
 
-  integer,parameter ::mxpts=20000,mxbin=100,mxstates=4
+  integer,parameter ::mxpts=20000000,mxbin=100,mxstates=4
   character(80)      ::filnam, line
   integer           ::i,j,ifile,ipt,istate,ibin,nfiles,nstates,ERR, &
-       nskip,nbins,nmin,idum,noffd,nnoffd,offel
+       nskip,nbins,nmin,idum,noffd,nnoffd,offel,ngroups,iexclg,igrp,mpts,iexclgn,astate,bstate
 
   type(OFFDIAG_SAVE), dimension(mxstates) :: offd
 
   real(8) ::rt,gapmin,gapmax,sum,dv,gaprange, &
        xint,dvg,veff1,veff2,dGa,dGb,dGg,alpha_B,scale_Hij, &
-       veff,min                        
-  real(8),dimension(mxbin)               ::sumg,sumg2,avdvg,avc1,avc2,avr
+       veff,min,dlam,sumf,sumb,konst,fel,nfnr,nrnf     
+  real(8),dimension(mxbin)              ::sumg,sumg2,avdvg,avc1,avc2,avc11,avc12,avc13,avc21,avc22,avc23,avc31,avc32,avc33,avr
 
-  real(8),dimension(mxbin,4)             ::binsum
-  integer,dimension(mxbin)               ::nbinpts,ptsum
+  real(8),dimension(mxbin,4)            ::binsum
+  integer,dimension(mxbin)              ::nbinpts,ptsum
 
-  type(Q_ENERGIES), dimension(mxstates)  :: EQ   
-  type(Q_ENERGIES), dimension(mxstates)  :: avEQ
-  real(8),dimension(mxstates)            :: dvv,dGv,alfa,coeff
+  type(Q_ENERGIES), dimension(mxstates) :: EQ   
+  type(Q_ENERGIES), dimension(mxstates) :: avEQ
+  real(8),dimension(mxstates)                           :: dvv,dGv,alfa,coeff,Vel,Vvdw
 
-  real(8),dimension(3)                   :: u,y
-  real(8),allocatable                    :: dgf(:),dgr(:),dgfsum(:),dgrsum(:),dG(:)
-  real(8),dimension(mxstates,mxstates)   :: A,mu,eta,rxy0
-  real(8),allocatable                    :: Hij(:,:),d(:),e(:)
+  real(8),dimension(3)                  ::u,y
+  real(8),allocatable              ::dgf(:),dgr(:),dgfsum(:),dgrsum(:),dG(:),dgti(:),dgtisum(:), &
+       dglu(:),dglusum(:),dgbar(:),dgbarsum(:)
+  real(8),dimension(mxstates,mxstates)  ::A,mu,eta,rxy0
+  real(8),allocatable                   ::Hij(:,:),d(:),e(:)
   type FEP_DATA_TYPE
-     integer                             ::      npts
-     real(8)                             ::      lambda(mxstates)
-     real(8), pointer                ::      v(:,:), r(:,:) !indices are state, point
-     real(8), pointer                ::      vg(:), gap(:), c1(:), c2(:) !index is point
+     integer                                 ::      npts
+     real(8)                                 ::      lambda(mxstates)
+     real(8), pointer           ::      v(:,:), r(:,:) !indices are state, point
+     real(8), pointer           ::      vg(:), gap(:), c1(:), c2(:) !index is point
   end type FEP_DATA_TYPE
-  type(FEP_DATA_TYPE), allocatable        ::      FEP(:) !index is file
-  type(FEP_DATA_TYPE)                             ::      FEPtmp !temporary storage for one file
+  type(FEP_DATA_TYPE), allocatable      ::      FEP(:) !index is file
+  type(FEP_DATA_TYPE)                           ::      FEPtmp !temporary storage for one file
 
   real(8),dimension(mxstates,mxbin)     ::avdvv,sumv,sumv2 
 
@@ -142,8 +142,10 @@ program qfep
   allocate(FEP(nfiles), FEPtmp%v(nstates,mxpts), FEPtmp%r(nstates,mxpts), &
        FEPtmp%vg(mxpts), FEPtmp%gap(mxpts), &
        FEPtmp%c1(mxpts), FEPtmp%c2(mxpts), &
-       dgf(0:nfiles+1),dgr(0:nfiles+1), &
-       dgfsum(0:nfiles+1),dgrsum(0:nfiles+1),dG(0:nfiles+1), &
+       dgf(0:nfiles+1),dgr(0:nfiles+1),dgti(0:nfiles+1), &
+       dglu(0:nfiles+1),dgbar(0:nfiles+1), &
+       dgfsum(0:nfiles+1),dgrsum(0:nfiles+1),dG(0:nfiles+1),dgtisum(0:nfiles+1), &
+       dglusum(0:nfiles+1),dgbarsum(0:nfiles+1), &
        STAT=ERR)
   if(ERR /= 0) then
      stop 'Qfep5 terminated abnormally: Out of memory when allocating arrays.'
@@ -322,7 +324,7 @@ program qfep
              avEQ(istate)%qw%el,avEQ(istate)%qw%vdw,avEQ(istate)%restraint
 
      end do
-17   format(a,t23,i2,1x,i6,f9.6,14f8.2)
+17   format(a,t23,i2,1x,i6,1x,f8.6,14f8.2)
   end do  !ifile
 
   if(nfiles > 1) then !the following is meaningless for a single file
@@ -375,6 +377,109 @@ program qfep
         dgrsum(ifile-1)=dgrsum(ifile)+dgr(ifile)
         sum=0.
      end do
+     dgtisum=0.
+     dgti=0.
+     sum=0.
+     veff1=0.
+     veff2=0.
+     dv=0.
+     astate=1
+     bstate=2 
+     istate=1
+     do ifile=1,nfiles                        
+        do ipt=nskip+1,FEP(ifile)%npts
+           veff1=FEP(ifile)%v(astate,ipt)
+           veff2=FEP(ifile)%v(bstate,ipt)
+           dv=veff2-veff1
+           veff1=0.
+           veff2=0.
+           sum=sum+dv
+        end do
+        dgti(ifile)=sum/real(FEP(ifile)%npts-nskip)
+        sum=0.
+     end do
+     do ifile=2,nfiles
+        dlam=FEP(ifile-1)%lambda(istate)-FEP(ifile)%lambda(istate)
+        dgtisum(ifile)=dgtisum(ifile-1)+(0.5*(dgti(ifile-1)+dgti(ifile))*dlam)
+     end do
+     dglu=0.
+     dglusum=0.
+     sum=0.
+     veff1=0.
+     veff2=0.
+     dv=0.
+     do ifile=1,nfiles-1
+        do ipt=nskip+1,FEP(ifile)%npts
+           do istate=1,nstates
+              veff1=veff1+FEP(ifile)%lambda(istate)*FEP(ifile)%v(istate,ipt)
+              veff2=veff2+FEP(ifile+1)%lambda(istate)*FEP(ifile)%v(istate,ipt)
+           end do
+           dv=(veff2-veff1)/2
+           veff1=0.
+           veff2=0.
+           sum=sum+exp(-dv/rt)
+        end do
+        sumf=sum/real(FEP(ifile)%npts-nskip)
+        sum=0.
+        do ipt=nskip+1,FEP(ifile+1)%npts
+           do istate=1,nstates
+              veff1=veff1+FEP(ifile)%lambda(istate)*FEP(ifile+1)%v(istate,ipt)
+              veff2=veff2+FEP(ifile+1)%lambda(istate)*FEP(ifile+1)%v(istate,ipt)
+           end do
+           dv=(veff2-veff1)/2
+           veff1=0.
+           veff2=0.
+           sum=sum+exp(dv/rt)
+        end do
+        sumb=sum/real(FEP(ifile+1)%npts-nskip)
+        dglu(ifile)=-rt*dlog(sumf/sumb)
+        dglusum(ifile+1)=dglusum(ifile)+dglu(ifile)
+        sum=0.
+     end do
+     dgbar=0.
+     dgbarsum=0.
+     sum=0.
+     veff1=0.
+     veff2=0.
+     dv=0.
+     konst=0
+     fel=1
+     do ifile=1,nfiles-1
+        konst=dglu(ifile)
+        do while (fel>0.001)  
+           nfnr=real(FEP(ifile)%npts-nskip)/real(FEP(ifile+1)%npts-nskip)
+           nrnf=real(FEP(ifile+1)%npts-nskip)/real(FEP(ifile)%npts-nskip)
+           do ipt=nskip+1,FEP(ifile)%npts
+              do istate=1,nstates
+                 veff1=veff1+FEP(ifile)%lambda(istate)*FEP(ifile)%v(istate,ipt)
+                 veff2=veff2+FEP(ifile+1)%lambda(istate)*FEP(ifile)%v(istate,ipt)
+              end do
+              dv=(veff2-veff1)
+              veff1=0.
+              veff2=0.
+              sum=sum+1/((1+(nfnr*exp((dv-konst)/rt))))
+           end do
+           sumf=sum/real(FEP(ifile)%npts-nskip)
+           sum=0.
+           do ipt=nskip+1,FEP(ifile+1)%npts
+              do istate=1,nstates
+                 veff1=veff1+FEP(ifile)%lambda(istate)*FEP(ifile+1)%v(istate,ipt)
+                 veff2=veff2+FEP(ifile+1)%lambda(istate)*FEP(ifile+1)%v(istate,ipt)
+              end do
+              dv=(veff2-veff1)
+              veff1=0.
+              veff2=0.
+              sum=sum+1/((1+(nrnf*exp((-dv+konst)/rt))))
+           end do
+           sumb=sum/real(FEP(ifile+1)%npts-nskip)
+           dgbar(ifile)=-rt*dlog((sumf/sumb)*exp(-konst/rt)*nfnr)
+           sum=0.
+           fel=ABS(konst-dgbar(ifile))
+           konst=dgbar(ifile)
+        end do
+        dgbarsum(ifile+1)=dgbarsum(ifile)+dgbar(ifile)
+        fel=1
+     end do
      write(*,*) 
      write(*,*) 
      write(*,21)
@@ -390,12 +495,12 @@ program qfep
              FEP(ifile)%lambda(1),dgf(ifile-1),dgfsum(ifile), &
              dgr(ifile+1),dgrsum(ifile),dG(ifile)
      end do
-23   format(2x,f9.6,5f9.3)
+23   format(3x,f8.6,5f9.3)
+
 
      write (*,*)
      write (*,'(a,f9.2)') '# Min energy-gap is: ',gapmin
      write (*,'(a,f9.2)') '# Max energy-gap is: ',gapmax
-
      !-----------------------------------
      ! Reaction free energy is calculated
      !-----------------------------------
@@ -406,7 +511,7 @@ program qfep
      write(*,25)
 24   format('# Part 2: Reaction free energy summary:')
 25   format('# Lambda(1)  bin Energy gap      dGa     dGb     dGg    # pts    c1**2    c2**2')
-26   format(2x,f9.6,i5,2x,4f9.2,2x,i5,2f9.3)
+26   format(3x,f8.6,i5,2x,4f9.2,2x,i5,2f9.3)
      gaprange=gapmax-gapmin      !Range of reaction coordinate
      xint=gaprange/real(nbins)   !Divide R.C. into bins
      do ifile=1,nfiles         
@@ -436,7 +541,7 @@ program qfep
            !Only gives first r_xy distance
            if(nnoffd > 0)  avr(ibin)=avr(ibin)+FEP(ifile)%r(1,ipt)          
            nbinpts(ibin)=nbinpts(ibin)+1
-        end do          !ipt
+        end do           !ipt
         do ibin=1,nbins
            if ( nbinpts(ibin) .ne. 0 ) then
               avc1(ibin)=avc1(ibin)/real(nbinpts(ibin))
@@ -514,6 +619,40 @@ program qfep
         end if
      end do !ibin
   end if !nfiles >1
+
+
+     write(*,*) 
+     write(*,*) 
+     write(*,30)
+     write(*,31)
+30   format('# Part 4: Termodynamic integration:')
+31   format('# lambda(1)      dGti    sum(dGti) ')
+     do ifile=1,nfiles
+        write (*,23) &
+             FEP(ifile)%lambda(1),dgti(ifile-1),dgtisum(ifile)
+     end do
+     write(*,*) 
+     write(*,*) 
+     write(*,32)
+     write(*,33)
+32   format('# Part 5: Overlap sampling Lu et al:')
+33   format('# lambda(1)      dG    sum(dG) ')
+     do ifile=1,nfiles
+        write (*,23) &
+             FEP(ifile)%lambda(1),dglu(ifile-1),dglusum(ifile)
+     end do
+     write(*,*) 
+     write(*,*) 
+     write(*,33)
+     write(*,34)
+34   format('# Part 6: BAR Bennet:')
+35   format('# lambda(1)      dG    sum(dG) ')
+     do ifile=1,nfiles
+        write (*,23) &
+             FEP(ifile)%lambda(1),dgbar(ifile-1),dgbarsum(ifile)
+     end do
+
+
 
   !clean up
   do ifile=1,nfiles

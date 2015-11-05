@@ -16,15 +16,14 @@
 !  molecular dynamics                                                          !
 !------------------------------------------------------------------------------!
 module md
-
   ! load modules
-  ! use profiling
   use sizes
   use trj
   use mpiglob
   use qatom
   use version
 
+  ! use profiling
 #if defined (_DF_VERSION_)
   use dfport
   use dflib
@@ -36,12 +35,12 @@ module md
   include "mpif.h"
 #endif
 
-  !-------------------------------------------------------------------------------
+  !-----------------------------------------------------------------------------
   !       shared variables
-  !-------------------------------------------------------------------------------
-  !-------------------------------------------------------------------------------
+  !-----------------------------------------------------------------------------
+  !-----------------------------------------------------------------------------
   !       Constants
-  !-------------------------------------------------------------------------------
+  !-----------------------------------------------------------------------------
   character*(*), parameter  :: MD_VERSION = '5.7'
   character*(*), parameter  :: MD_DATE = '2015-02-22'
   real, parameter           :: rho_wat = 0.0335  ! molecules / A**3
@@ -69,9 +68,9 @@ module md
   real(4)                   :: crg_ow, crg_hw, mu_w
 
 
-  !-------------------------------------------------------------------------------
+  !-----------------------------------------------------------------------------
   !       Periodic box information
-  !-------------------------------------------------------------------------------
+  !-----------------------------------------------------------------------------
   !******PWadded variable 2001-10-10
   logical                   :: box, rigid_box_centre
   logical                   :: put_solute_back_in_box, put_solvent_back_in_box
@@ -88,9 +87,9 @@ module md
   logical                   :: control_box
   real(8)                   :: new_boxl(3) 
 
-  !-------------------------------------------------------------------------------
+  !-----------------------------------------------------------------------------
   !       Dynamics control information
-  !-------------------------------------------------------------------------------
+  !-----------------------------------------------------------------------------
   ! --- MD parameters
   integer                   :: nsteps, istep
   integer                   :: iseed
@@ -130,9 +129,9 @@ module md
   integer                   :: nwpolr_shell, n_max_insh
 
   type SHELL_TYPE
-     real                   :: rout, dr, cstb
-     real                   :: avtheta, avn_insh, theta_corr
-     integer                :: n_insh
+    real                   :: rout, dr, cstb
+    real                   :: avtheta, avn_insh, theta_corr
+    integer                :: n_insh
   end type SHELL_TYPE
 
 
@@ -435,7 +434,7 @@ contains
        write (*,'(79a)') ('!',i=1,79)
        call close_output_files
 
-       ! apologise
+       ! apologize
        write(*,'(a)') 'ABNORMAL TERMINATION of qdyn'
        if (present(cause)) then
           write(*,'(79a)') 'Terminating due to ', cause
@@ -820,10 +819,9 @@ contains
 
   end subroutine reallocate_nonbondlist_ww
 
+
   !----------------------------------------------------------------------
-
   ! --- Dynamics subroutines, alphabetically
-
   real(8) function angle(istart, iend)
     ! *** arguments
     integer                                         ::      istart, iend
@@ -1751,14 +1749,12 @@ contains
        end if
 
        ! ---       energy
-
        arg = phi - lib%imp0
        arg = arg - 2.*pi*nint(arg/(2.*pi))
        dv  = lib%fk*arg
        improper = improper + 0.5*dv*arg
 
        ! ---       forces
-
        f1 = sin ( phi ) 
        if ( abs(f1) .lt. 1.e-12 ) f1 = 1.e-12
        f1 =  -1.0 / f1
@@ -1864,13 +1860,11 @@ contains
        end if
 
        ! ---       energy
-
        arg = 2*phi - lib%imp0
        improper2 = improper2 + lib%fk * (1 + cos(arg))
        dv  = -2*lib%fk * sin(arg)
 
        ! ---       forces
-
        f1 = sin ( phi ) 
        if ( abs(f1) .lt. 1.e-12 ) f1 = 1.e-12
        f1 =  -1.0 / f1
@@ -13283,8 +13277,8 @@ end do
 
 end subroutine p_restrain
 
-!-----------------------------------------------------------------------
 
+!-----------------------------------------------------------------------
 subroutine pot_energy
   ! local variables
  integer                                 :: istate, i, nat3
@@ -13480,14 +13474,12 @@ subroutine pot_energy
          E%ww%vdw + E%q%bond + E%q%angle + E%q%torsion + &
          E%q%improper + E%qx%el + E%qx%vdw + E%restraint%total + E%LRF
  end if
-
 end subroutine pot_energy
 
-!-----------------------------------------------------------------------
 
+!-----------------------------------------------------------------------
 subroutine pot_energy_bonds
   ! bond, angle, torsion and improper potential energy
-
  select case(ff_type)
  case(FF_GROMOS)
     E%p%bond = bond(1, nbonds_solute)
@@ -13519,8 +13511,8 @@ subroutine pot_energy_bonds
     E%p%improper = improper(1, nimps_solute)
     E%w%improper = improper(nimps_solute+1, nimps)
  end select
-
 end subroutine pot_energy_bonds
+
 
 !-----------------------------------------------------------------------
 subroutine pot_energy_nonbonds
@@ -13603,8 +13595,8 @@ subroutine pot_energy_nonbonds
 
 end subroutine pot_energy_nonbonds
 
-!-----------------------------------------------------------------------
 
+!-----------------------------------------------------------------------
 subroutine prep_coord
 
 
@@ -14196,7 +14188,6 @@ subroutine qimproper (istate)
        if ( sgn .lt. 0 ) phi = -phi
 
        ! ---       energy
-
        arg = phi - qimp0(ic)
        arg = arg - 2.*pi*nint(arg/(2.*pi))
        dv  = qfkimp(ic)*arg
@@ -14343,14 +14334,12 @@ subroutine qtorsion (istate)
 
 
        ! ---       energy
-
        arg = qrmult(ic)*phi-qdeltor(ic)
        pe  = qfktor(ic)*(1.0+cos(arg))
        EQ(istate)%q%torsion = EQ(istate)%q%torsion + pe*gamma
        dv = -qrmult(ic)*qfktor(ic)*sin(arg)*gamma*EQ(istate)%lambda
 
        ! ---       forces
-
        f1 = sin ( phi ) 
        if ( abs(f1) .lt. 1.e-12 ) f1 = 1.e-12
        f1 =  -1.0 / f1
@@ -14845,7 +14834,6 @@ real(8) function torsion(istart, iend)
     end if
 
     ! ---       energy
-
     arg = lib%rmult*phi-lib%deltor
     torsion = torsion + lib%fk*(1.0+cos(arg))*lib%paths   !lib%paths is previously inverted 
     dv = -lib%rmult*lib%fk*sin(arg)*lib%paths
@@ -14948,8 +14936,8 @@ subroutine restrain_solvent
  end do
 end subroutine restrain_solvent
 
-!-----------------------------------------------------------------------
 
+!-----------------------------------------------------------------------
 subroutine wat_sphere
   ! local variables
  integer                                 :: i,i3,kr,isort,int_wat,istate
@@ -15279,8 +15267,8 @@ subroutine watpol
  end do
 end subroutine watpol
 
-!----------------------------------------------------------------------------
 
+!----------------------------------------------------------------------------
 subroutine write_out
   ! local variables
  integer                                 ::      i,istate
@@ -15969,7 +15957,7 @@ subroutine new_potential( old )
  end if !(nodeid .eq. 0)
 end subroutine new_potential
 
-!----------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 
 #if defined (USE_MPI)
 !***********************
@@ -16038,7 +16026,7 @@ subroutine gather_nonbond()
 end subroutine gather_nonbond
 
 #endif
-!----------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !*******************************************************
 !Will find and return the xtop atom number from 
 !  residue number and atom number in residue from
@@ -16084,6 +16072,6 @@ integer function get_atom_from_resnum_atnum(aid)
 120 format('>>>>> ERROR: There is no atom number ',i4,' in residue ',i4,'.')
 end function get_atom_from_resnum_atnum
 
-!----------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 
 end module md

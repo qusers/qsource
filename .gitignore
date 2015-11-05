@@ -17,3 +17,4 @@ slurm*
 osbinaries/
 *.Rhistory
 argcount*
+usercases/

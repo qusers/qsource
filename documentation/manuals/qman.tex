@@ -2,6 +2,7 @@
 %  Preamble
 %===============================================================================
 \documentclass[a4paper,10pt]{article}
+\renewcommand{\thefootnote}{\roman{footnote}}
 \usepackage[latin1]{inputenc}
 \usepackage[dvips,pdftex]{graphicx}
 \usepackage[small]{caption}  %Set text in Figure captions
@@ -28,6 +29,14 @@
 \singlespacing
 \setcounter{page}{0}
 %\renewcommand{\thesection}{\Alph{section}}
+%\usepackage[linktoc=all]{hyperref}
+\hypersetup{
+    colorlinks,
+    citecolor=blue,
+    filecolor=blue,
+    linkcolor=blue,
+    urlcolor=blue
+}
 
 
 
@@ -57,18 +66,30 @@
 \thispagestyle{empty}
 \begin{figure}[h]
 \begin{center}
-\resizebox{8cm}{!}{\includegraphics[scale=0.7]{\dirfig/qlogo.png}}
+\resizebox{9cm}{!}{\includegraphics[scale=0.9]{\dirfig/qlogo.png}}
 \end{center}
 \end{figure}
 \begin{center}
 %\Huge{M}\huge{ANUAL}\\
 %\huge{FOR}\\
-\huge{\textbf{our}} \Huge{M}\huge{OLECULAR} \Huge{D}\huge{YNAMICS}\\
-\huge{PACKAGE}\\% \Huge{Q}\\
-\vspace{0.7cm}
-\large{Version 5.7\\
-June 18, 2015}\\
+%\huge{\textbf{our}} \Huge{M}\huge{OLECULAR} \Huge{D}\huge{YNAMICS}\\
+%\huge{PACKAGE}\\% \Huge{Q}\\
+\huge{\textbf{our}} 
+{\fontsize{46}{46}\selectfont M}{\fontsize{30}{30}\selectfont OLECULAR}
+{\fontsize{46}{46}\selectfont D}{\fontsize{30}{30}\selectfont YNAMICS}\\
+\vspace{0.2cm}
+{\fontsize{30}{30}\selectfont PACKAGE}
+%\Huge{M}\huge{OLECULAR} \Huge{D}\huge{YNAMICS}\\
+%\huge{PACKAGE}\\% \Huge{Q}\\
+
+
+
+
+\vspace{8.0cm}
+\Huge{Version 5.7}\\
+\Huge{November 5, 2015}\\
 %\footnotesize{February 6, 2015}\\
+\vspace{0.8cm}
 \large{\url{http://xray.bmc.uu.se/~aqwww/q}}
 \end{center}
 
@@ -666,6 +687,7 @@ space is not significant), but all data in the record must be on
 the same line.The units used are based on {\AA}, K and kcal/mol
 (see Units on page \pageref{subsec:units}).
 
+\bigskip
 \textbf{Dynamics control information}\\*[0.25cm] The section
 [\textbf{MD}] is normally the first in the input file the most
 apparently required section, since it defines the core parameters
@@ -686,6 +708,7 @@ input file:
 \end{tabularx}
 \end{center}
 
+\bigskip
 \textbf{Periodic boundary conditions}\\*[0.25cm] The
 [\textbf{PBC}] section contains options and settings for
 simulations with periodic boundary. The mere existence of the
@@ -709,6 +732,7 @@ above example the Monte-Carlo constant pressure algorithm,
 described in \cite{Wennerstroem}, is performed with target
 pressure 1.5 bar and maximum volume displacement 65 {\AA}$^{3}$.
 
+\bigskip
 \textbf{Non-bonded interactions} \\*[0.25cm] Cut-off radii for the
 non-bonded interactions for different categories of atoms are
 given in the section [\textbf{cut-offs}], as exemplified below:
@@ -729,6 +753,7 @@ Q-atoms and non-Q-atoms. No cut-off is used for interactions among
 Q-atoms. When using periodic boundary conditions, make certain all
 cut-off radii are less than half the shortest boxlength.
 
+\bigskip
 \textbf{Sphere}\\*[0.25cm] The \textbf{sphere} section defines
 parameters concerning the spherical boundary. The most frequently
 used parameter is the shell\_radius that allow the user to
@@ -744,6 +769,7 @@ defined in the topology.
 \end{tabularx}
 \end{center}
 
+\bigskip
 \textbf{Solvent}\\*[0.25cm] The [\textbf{solvent}] section
 controls the solvent boundary restraints when simulating with a
 spherical boundary. This section is thus omitted when periodic
@@ -759,6 +785,7 @@ simulations. The contents may often be as simple as:
 \end{tabularx}
 \end{center}
 
+\bigskip
 \textbf{Update and data collection intervals}\\*[0.25cm] The
 frequencies of regular events in the simulation are defined in the
 section [\textbf{intervals}]. These events are the regeneration of
@@ -781,6 +808,7 @@ regenerated every 25 time steps, energy summaries written to the
 terminal or log file every 5 steps, no energy file is to be
 written and coordinates written to the trajectory every 100 steps.
 
+\bigskip
 \textbf{Trajectory}\\*[0.25cm] If the coordinates of only a subset
 of the atoms are to be stored in a trajectory file, the selection
 of atoms is done in the section [\textbf{trajectory{\_}atoms}],
@@ -801,6 +829,7 @@ inside the simulation sphere and all atoms of residues 105-106 and
 109 are selected. For further information see Atom masks on page
 \pageref{subsubsec:atom_masks}.
 
+\bigskip
 \textbf{Files}\\*[0.25cm] The names of files to be read and
 written are grouped together in this section. A topology file and
 a name for the final coordinates file must always be specified
@@ -822,6 +851,7 @@ should be generated they need to be named here.
 \end{tabularx}
 \end{center}
 
+\bigskip
 \textbf{FEP state weight coefficients $\lambda $}\\*[0.25cm] For
 multi-state perturbation simulations the mapping vector $\lambda $
 whose components are the weight coefficients for the FEP states is
@@ -837,24 +867,27 @@ given on a single line under the section heading
 \end{tabularx}
 \end{center}
 
-\textbf{Restraints}\\*[0.25cm] Several types of geometrical
-restraints can be applied to the simulated system to eliminate
-large movements, maintain interatomic distances or to stop the
-diffusion of a solute towards the sphere boundary. The most
-straight-forward type of restraints are harmonic potentials
-applied to restrain a sequence of atoms to their initial
-coordinates (in the topology file). This type of restraining is
-specified in the [\textbf{sequence{\_}restraints}] section and
-requires only the number of the first and last atom of the
-sequence and a force constant. The restraints may be applied to
-heavy atoms only or to all atoms in the sequence. Instead of
-restraining each atom individually to its initial position, the
-set of atoms can be restrained as a whole to its initial
-geometrical centre. In this case identical forces are applied to
-all the atoms. This alternative, used with a low force constant,
-is useful $e.g.$ to keep a small solute molecule at the centre of
-the simulation sphere without hindering its tumbling motion
-(rotation). Both variants are exemplified below:
+
+\bigskip
+\textbf{Restraints}\\*[0.25cm] 
+Several  types  of  geometrical  restraints  can  be  applied  to  the
+simulated system  to eliminate  large movements,  maintain interatomic
+distances or  to stop  the diffusion  of a  solute towards  the sphere
+boundary.  The most  straightforward type  of restraints  are harmonic
+potentials applied  to restrain a  sequence of atoms to  their initial
+coordinates  (in the  topology  file).  This  type  of restraining  is
+specified   in  the   [\textbf{sequence{\_}restraints}]  section   and
+requires the number of  the first and last atom of  the sequence and a
+force constant. The  restraints may be applied to heavy  atoms only or
+to  all  atoms in  the  sequence.  Instead  of restraining  each  atom
+individually  to  its  initial  position,  the set  of  atoms  can  be
+restrained as a whole to its  initial geometrical centre (use 1 in the
+fifth column) or center  of mass (use 2 in the  fifth column). In this
+case identical forces are applied  to all the atoms. This alternative,
+used  with a  low force  constant, is  useful $e.g.$  to keep  a small
+solute  molecule  at  the  centre of  the  simulation  sphere  without
+hindering   its  tumbling   motion  (rotation).   Both  variants   are
+exemplified below:
 
 \begin{center}
 \begin{tabularx}{\textwidth}{|l l l l X|}
@@ -948,9 +981,10 @@ to define an angle restraint, one has to define three atoms, as follows:
 \end{tabularx}
 \end{center}
 
-In this case, a harmonic angle force is applied between the atoms 133, 132 and 3400,
- in order to enforce a 180$^{\circ}$, with 3.0 kcal$\cdot $mol$^{-1}\cdot ${degrees}$^{-2}$
-at the state 2.
+In this case, a harmonic angle force is applied between the atoms 133,
+132 and 3400, in order to enforce a 180$^{\circ}$, with 3.0 kcal$\cdot
+$mol$^{-1}\cdot ${degrees}$^{-2}$ at the state 2.\\
+
 
 \subsubsection{\textbf{qdyn} input file examples}
 We give two annotated examples below. The first is the simplest
@@ -1020,8 +1054,8 @@ information about the data in each section is found in the section
   \hline [lambdas]                &              & Weights for the FEP states \\
   \hline 0.70 0.30                &              & Lambda value for each state \\
   \hline [sequence{\_}restraints] &              & Restrain contiguous sequences of atoms to initial coordinates \\
-  \hline 21 40  5.0  0            &              & First \& last atom, force const. (kcal$\cdot $mol$^{-1}\cdot ${\AA}$^{-2}$), H-flag\\
-  \hline 65  72 2.0  1  1         &              & First \& last atom, force const., H-flag, restrain-to-centre-flag \\
+  \hline 21 40 5.0 0              &              & First \& last atom, force const. (kcal$\cdot $mol$^{-1}\cdot ${\AA}$^{-2}$), H-flag\\
+  \hline 65 72 2.0 1 1            &              & First \& last atom, force const., H-flag, restrain to geometric center (1) mass center (2) \\
   \hline [atom{\_}restraints]     &              & Individual atom positional restraints \\
   \hline \multicolumn{2}{|l|}{8 \; 2.5 \; 8.3\; 7.6 \; 5. \; 5. \; 5. \; 0} & atom, x0,y0,z0, fcx, fcy, fcz, FEP state (0=all) \\
   \hline [distance{\_}restraints] &              & Atom-atom distance restraints \\
@@ -1032,46 +1066,45 @@ information about the data in each section is found in the section
 \end{longtable}
 
 \subsubsection{FEP file}
-The purpose of the FEP file is to define a set of atoms as Q-atoms
-and to redefine their interaction parameters. All kinds of
-force-field parameters for these atoms can be controlled and
-several different "states" can be defined. The parameters for the
-different states may differ very little, $e.g.$, in the van der
-Waals parameters of a single atom, or the states can represent
-different valence bond structures. A typical application of the
-latter case would be to model reactants and products of a chemical
-reaction to be investigated by EVB simulation as two different
-states or, for a multi-step reaction, one state for the products
-of each elementary reaction step. In such a model of a reaction
-bonds, angles, torsions, partial charges, vdW parameters etc. may
-change for many atoms.
+The purpose of the FEP file is to define a set of atoms as Q-atoms and
+to  redefine their  interaction parameters.  All kinds  of force-field
+parameters for  these atoms  can be  controlled and  several different
+``states'' can be defined. The parameters for the different states may
+differ  very little,  $e.g.$, in  the van  der Waals  parameters of  a
+single  atom,  or the  states  can  represent different  valence  bond
+structures. A typical application of the latter case would be to model
+reactants and  products of a  chemical reaction to be  investigated by
+EVB simulation as two different  states or, for a multi-step reaction,
+one state for the products of each elementary reaction step. In such a
+model  of a  reaction bonds,  angles, torsions,  partial charges,  vdW
+parameters etc. may change for many atoms.
 
-The idea behind this definition of different states is that \textbf{qdyn},
-for each configuration of the system's particles, will keep track
-of the energies of each state and write these to the energy file.
-The mapping potential or sampling potential used to generate the
-forces controlling the dynamics is a mixture of the FEP/EVB
-states, determined by the mapping parameter or weight coefficient
-$\lambda $ given to each (pure) state in the \textbf{qdyn} input file. The
-free energy differences between FEP/EVB states can then easily be
-calculated by \textbf{qfep} using the standard FEP formula or the potential
-of mean force (umbrella sampling) approach to obtain the EVB
-ground state reaction free energy profiles.
+The  idea  behind   this  definition  of  different   states  is  that
+\textbf{qdyn}, for each configuration  of the system's particles, will
+keep track of the energies of each state and write these to the energy
+file.  The  mapping potential or  sampling potential used  to generate
+the  forces controlling  the  dynamics  is a  mixture  of the  FEP/EVB
+states,  determined by  the  mapping parameter  or weight  coefficient
+$\lambda  $ given  to each  (pure)  state in  the \textbf{qdyn}  input
+file.  The free  energy differences  between FEP/EVB  states can  then
+easily be calculated  by \textbf{qfep} using the  standard FEP formula
+or the potential of mean  force (umbrella sampling) approach to obtain
+the EVB ground state reaction free energy profiles.
 
-The FEP file has the same overall structure as the \textbf{qdyn} input file
-(see page \pageref{subsubsec:prep_qdyn_inp_f}) with various kinds
-of data grouped into sections, the majority of which are optional.
-We will describe FEP files for a couple of prototype cases,
-starting with the simpler ones. For a complete description of the
-file format, see FEP file format on page
-\pageref{subsubsec:fepfileformat}.
+The FEP file has the same overall structure as the \textbf{qdyn} input
+file (see page \pageref{subsubsec:prep_qdyn_inp_f}) with various kinds
+of data grouped into sections, the majority of which are optional.  We
+will describe FEP files for a couple of prototype cases, starting with
+the simpler ones.  For a complete description of the  file format, see
+FEP file format on page \pageref{subsubsec:fepfileformat}.\\
 
-\textbf{Example: Charging a benzene molecule}\\*[0.25cm] The FEP
-file shown below may be used to calculate the electrostatic
-contribution to the free energy of solvation for a benzene
-molecule. The atoms and bonds of the molecule are defined in a
-topology file (not shown). In our topology the carbon atoms have
-odd numbers and hydrogens have even numbers.
+
+\textbf{Example: Charging a benzene molecule}\\*[0.25cm] 
+The FEP  file shown below may  be used to calculate  the electrostatic
+contribution  to   the  free  energy   of  solvation  for   a  benzene
+molecule.  The atoms  and  bonds  of the  molecule  are  defined in  a
+topology file (not  shown). In our topology the carbon  atoms have odd
+numbers and hydrogens have even numbers.
 
 \begin{longtable}{|p{30pt} p{30pt} p{30pt}|p{280pt}|}
   \hline \textbf{Data}    &    &     & \textbf{Description} \\
@@ -1106,21 +1139,21 @@ odd numbers and hydrogens have even numbers.
   \hline 12      & +0.15  & 0.0 & \\ \hline
 \end{longtable}
 
-The value following the keyword states in the section
-[\textbf{FEP}] is the number of FEP/EVB states. In the
-[\textbf{atoms}] sections atoms from the topology are designated
-as q-atoms. The first column of the data records in this section
-is the q-atom number given to the atom (used later to refer to it)
-and the second column is the number of the atom in the topology.
-The data in the section [\textbf{change{\_}charges}] defines the
-charge of q-atoms in each state. Here we are changing the charges
-of all atoms, but in general only the charges which change need to
-be listed.
+The value following  the keyword states in  the section [\textbf{FEP}]
+is  the number  of FEP/EVB  states. In  the [\textbf{atoms}]  sections
+atoms from the topology are designated as q-atoms. The first column of
+the data  records in this  section is the  q-atom number given  to the
+atom (used later to  refer to it) and the second  column is the number
+of   the  atom   in   the   topology.   The   data   in  the   section
+[\textbf{change{\_}charges}]  defines the  charge of  q-atoms in  each
+state. Here we  are changing the charges of all  atoms, but in general
+only the charges which change need to be listed.
 
-In the case above we have made no changes to the bonded or vdW
-parameters of the benzene molecule and the FEP file is simply used
-to define two "charge" states, one with the CH dipolar charges
-being $\pm $0.15~e and one state with zero partial charges.
+In  the case  above we  have  made no  changes  to the  bonded or  vdW
+parameters of the benzene molecule and  the FEP file is simply used to
+define two  ``charge'' states, one  with the CH dipolar  charges being
+$\pm $0.15~e and one state with zero partial charges.\\
+
 
 \textbf{Example: Changing van der Waals parameters}\\*[0.25cm] In
 this example we will take a look at how to redefine van der Waals
@@ -1138,53 +1171,52 @@ define two sets of Lennard-Jones interaction parameters.
 
 \small
 \begin{longtable}{|p{35pt} p{35pt} p{35pt} p{35pt} p{35pt} p{35pt} p{35pt}| p{100pt}|}
-  \caption{FEP file for perturbation of Na$^{+}$ to K$^{+}$.}\\
-  \hline \textbf{Data}    &    &  &  &  &  \multicolumn{3}{|l|}{\textbf{Description}}
-  \endhead
-  \hline [FEP]            &     &   &  &  &  \multicolumn{3}{|l|}{} \\
-  \hline states           & 2   &   &  &  &  \multicolumn{3}{|l|}{No. of states} \\
-  \hline [atoms]          &     &   &  &  &  \multicolumn{3}{|l|}{Designate atoms in topology as q-atoms} \\
-  \hline 1                & 1   &   &  &  &  \multicolumn{3}{|l|}{Q-atom no., topology atom no.} \\
-  \hline [atom{\_}types]  &     &   &  &  &  \multicolumn{3}{|l|}{Define new atom types (LJ parameters, )} \\
-  \hline !Name            & Ai  & Bi  & Ci  & ai  & Ai(1-4) & \multicolumn{1}{l}{Bi(1-4)} & \multicolumn{1}{l|}{Mass} \\
-  \hline Na    & 143.70 & 3.89  & 0.0 & 0.0 & 0.0 & \multicolumn{1}{l}{0.0} & \multicolumn{1}{l|}{22.99}\\
-  \hline K     & 522.70 & 4.35  & 0.0 & 0.0 & 0.0 & \multicolumn{1}{l}{0.0} & \multicolumn{1}{l|}{39.10} \\
-  \hline [change{\_}atoms]&     &   &  &  &  \multicolumn{3}{|l|}{Assign new atom types to Q-atoms} \\
-  \hline 1                & Na  & K &  &  &  \multicolumn{3}{|l|}{Q-atom no., q-atom type in states 1 and 2} \\ \hline
+\caption{FEP file for perturbation of Na$^{+}$ to K$^{+}$.}\\ \hline
+\textbf{Data}    &     &   &  &  & \multicolumn{3}{|l|}{\textbf{Description}} \endhead \hline
+[FEP]            &     &   &  &  & \multicolumn{3}{|l|}{} \\ \hline
+states           & 2   &   &  &  & \multicolumn{3}{|l|}{No. of states}\\ \hline
+[atoms]          &     &   &  &  &  \multicolumn{3}{|l|}{Designate atoms in topology as q-atoms} \\ \hline
+1                & 1   &   &  &  &  \multicolumn{3}{|l|}{Q-atom no., topology atom no.} \\ \hline
+[atom{\_}types]  &     &   &  &  &  \multicolumn{3}{|l|}{Define new atom types (LJ parameters, )} \\ \hline
+!Name            & Ai  & Bi  & Ci  & ai  & Ai(1-4) & \multicolumn{1}{l}{Bi(1-4)} & \multicolumn{1}{l|}{Mass} \\ \hline
+Na    & 143.70 & 3.89  & 0.0 & 0.0 & 0.0 & \multicolumn{1}{l}{0.0} & \multicolumn{1}{l|}{22.99}\\ \hline
+K     & 522.70 & 4.35  & 0.0 & 0.0 & 0.0 & \multicolumn{1}{l}{0.0} & \multicolumn{1}{l|}{39.10} \\ \hline
+[change{\_}atoms]&     &   &  &  &  \multicolumn{3}{|l|}{Assign new atom types to Q-atoms} \\ \hline
+1                & Na  & K &  &  &  \multicolumn{3}{|l|}{Q-atom no., q-atom type in states 1 and 2} \\ \hline
 \end{longtable}
 \normalsize
 
-Here we again define two states, but now only for one Q-atom that
-has number 1 in our simple topology file which only contains the
-single ion. No charges need to be changed since both ions are
-monovalent cations, and the section [\textbf{change{\_}charges}]
-is therefore omitted. The only specific definitions needed here
-are the following. In the section [\textbf{atom{\_}types}] the
-parameters for the atoms involved in the perturbation are given.
-Whether (A$_{i}$, B$_{i})$ or (R$^{\ast }$, $\varepsilon )$ LJ
-parameters are used depends on the combination rule specified in
-the FF parameter file used to generate the topology. The first
-column is the name of the Q-atom type, then follows the
-Lennard-Jones A$_{i}$ (or R$^{\ast })$ and B$_{i}$ (or
-$\varepsilon )$ parameters. Columns four to seven are not used in
-this case (two parameters for the exponential repulsion function
-and two LJ parameters for 1-4 interactions). The last column is
-the atomic mass. The [\textbf{change{\_}atoms}] section states
-that q-atom number one is of type Na in state 1 and type K in
-state 2.
+Here we again define two states, but  now only for one Q-atom that has
+number 1  in our simple topology  file which only contains  the single
+ion. No  charges need  to be  changed since  both ions  are monovalent
+cations,  and the  section  [\textbf{change{\_}charges}] is  therefore
+omitted.   The  only   specific  definitions   needed  here   are  the
+following. In the section  [\textbf{atom{\_}types}] the parameters for
+the atoms involved  in the perturbation are  given.  Whether (A$_{i}$,
+B$_{i})$  or (R$^{\ast  }$,  $\varepsilon )$  LJ  parameters are  used
+depends on  the combination  rule specified in  the FF  parameter file
+used to  generate the topology.  The first column  is the name  of the
+Q-atom type, then  follows the Lennard-Jones A$_{i}$  (or R$^{\ast })$
+and B$_{i}$ (or $\varepsilon )$  parameters. Columns four to seven are
+not used  in this case  (two parameters for the  exponential repulsion
+function and two LJ parameters  for 1-4 interactions). The last column
+is the atomic mass. The [\textbf{change{\_}atoms}] section states that
+q-atom number one is of type Na in state 1 and type K in state 2.
 
-So, in this example all we have done is to define the relevant LJ
-parameters for Na$^{+}$ and K$^{+}$ (Q-atom types for Na and K) as
-the two different states for our single ion.
+So, in  this example  all we have  done is to  define the  relevant LJ
+parameters for Na$^{+}$ and K$^{+}$ (Q-atom types for Na and K) as the
+two different states for our single ion.\\
+
 
 \textbf{Example: Valence bond (EVB) states for a proton transfer
-reaction}\\*[0.25cm] This is an example from the reaction of a
-protein tyrosine phosphatase where proton transfer from a Cys
-residue of the enzyme to the doubly negatively charged phosphate
-group of the substrate (phenylphosphate) is considered. The states
-representing different bonding arrangements we want to define are
-schematically drawn in figure \ref{fig:EVB-states}, where also the
-topology number of the relevant atoms are given.
+reaction}\\*[0.25cm] 
+This is an example from the reaction of a protein tyrosine phosphatase
+where proton transfer  from a Cys residue of the  enzyme to the doubly
+negatively charged phosphate group  of the substrate (phenylphosphate)
+is considered. The states  representing different bonding arrangements
+we   want    to   define    are   schematically   drawn    in   figure
+\ref{fig:EVB-states}, where  also the topology number  of the relevant
+atoms are given.
 
 \begin{figure}[h]
 \begin{center}
@@ -2854,20 +2886,21 @@ water molecule n in PDB format. \\
 \subsection{Boundary conditions}
 \label{subsec:boundary}
 \subsubsection{Solute boundary restraints}
-\label{subsubsec:soluteboundary} Solute atoms outside the
-simulation sphere are excluded from non-bonded interactions and
-are tightly restrained to their initial coordinates by a harmonic
-potential with a force constant of 200
-kcal$\cdot$mol$^{-1}\cdot$�$^{-2}$. All bonded interactions are
-evaluated as for atoms inside the sphere. Solute atoms in the
-outermost shell of the simulation sphere are also restrained to
-their initial coordinates with a harmonic potential to avoid
-distortion of bonds across the sphere boundary. The radius
-of this shell and the force constant is given in the \textbf{qdyn} input
-file (section [\textbf{sphere}], keywords shell\_radius and
-shell\_force). The restrained shell radius is by default equal to the outer,
-\emph{i.e.} no atoms will be restrained unless the restrained shell radius is redefined. The force constant has
-a default value of 10 kcal$\cdot$mol$^{-1}\cdot$�$^{-2}$.
+
+\label{subsubsec:soluteboundary} Solute  atoms outside  the simulation
+sphere  are  excluded from  non-bonded  interactions  and are  tightly
+restrained to their initial coordinates by a harmonic potential with a
+force constant  of 200 kcal$\cdot$mol$^{-1}\cdot$�$^{-2}$.  All bonded
+interactions  are evaluated  as for  atoms inside  the sphere.  Solute
+atoms  in  the outermost  shell  of  the  simulation sphere  are  also
+restrained to their  initial coordinates with a  harmonic potential to
+avoid distortion  of bonds across  the sphere boundary. The  radius of
+this shell and the force constant  is given in the \textbf{qdyn} input
+file   (section   [\textbf{sphere}],    keywords   shell\_radius   and
+shell\_force). The restrained shell radius  is by default equal to the
+outer, \emph{i.e.} no  atoms will be restrained  unless the restrained
+shell radius is  redefined. The force constant has a  default value of
+10 kcal$\cdot$mol$^{-1}\cdot$�$^{-2}$.
 
 The grouping of atoms in the inside shell or excluded regions is
 done before the simulation starts using the initial coordinates
@@ -3328,7 +3361,7 @@ output from \textbf{qdyn}. Sections with no required entries are optional.
 \hline 2 & \multicolumn{2}{p{320pt}|}{Number of last atom in sequence.}\\
 \hline 3 & \multicolumn{2}{p{320pt}|}{Force constant (kcal$\cdot$mol$^{-1}\cdot$�$^{-2}$) for harmonic potential.}\\
 \hline 4 & \multicolumn{2}{p{320pt}|}{Flag for restraining also hydrogens (0=no, 1=yes).}\\
-\hline 5 & \multicolumn{2}{p{320pt}|}{Flag for restraining the sequence of atoms to its mass center (2), geometrical centre by the force proportianl to the corresponding atom mass normalized with C12 mass and acting on all atoms (1), or each atom to its initial coordinates (0 or missing).}\\
+\hline 5 & \multicolumn{2}{p{320pt}|}{Flag for restraining the sequence of atoms to its mass center (2), geometrical centre by a force proportional to the corresponding atom mass normalized with C12 mass and acting on all atoms (1), or each atom to its initial coordinates (0 or missing).}\\
 \hline
 \multicolumn{3}{p{394pt}}{}\\
 

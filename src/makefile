@@ -102,12 +102,20 @@ else ifeq ($(COMP),gcc)
 ################################################################################
 else
 	FC=             gfortran
-	FC_OPT=         -O3 -unroll --static -ffree-line-length-none \
-	                -fcray-pointer -fall-intrinsics -std=legacy
-	FFLAGS=         -fstack-protector ${FC_OPT} -DG95=1
+	FC_OPT=         -O3
+	FFLAGS=         -ffree-line-length-none -fcray-pointer \
+	                -fall-intrinsics -std=legacy -Wall -Wtabs \
+	                -fstack-protector ${FC_OPT} -DG95=1
+
 	FPP_FLG=        -cpp
 
-	MPI=            ${FFLAGS}
+	MPIFC=          mpif90
+	OMPI_FC=        ${FC}
+	OMPI_FCFLAGS=   ${FFLAGS}
+	MPI=            ${OMPI_FCFLAGS}
+
+	DEBUG=          -debug -g ${FC_OPT}
+	DEBUGMPI=       -debug -g ${FC_OPT}
 endif
 
 
@@ -115,6 +123,7 @@ endif
 # Display options
 ################################################################################
 default: what
+
 
 ################################################################################
 # Targets
@@ -173,6 +182,7 @@ qdum : md_dum.o
 
 qdynp : md_mpi.o qdyn_mpi.o
 	${MPIFC} ${MPIFLAGS} ${FFLAGS} ${FLIBS} $+ -o $@
+
 
 ################################################################################
 # Object modules
@@ -318,18 +328,17 @@ what:
 	@echo "Use: make [target] [COMP=compiler]"
 	@echo
 	@echo "[target] is one of:"
-	@echo "all              Everything except the MPI parallel version of Q (qdynp)"
-	@echo "debug            All with debug information (stacktraces)."
-	@echo "mpi              qdynp using a currently loaded MPI library"
-	@echo "mpidebug         qdynp with debug information (stacktraces)."
+	@echo "all      Everything except the MPI parallel version of Q (qdynp)"
+	@echo "debug    All with debug information (stacktraces)."
+	@echo "mpi      qdynp using a currently loaded MPI library"
+	@echo "mpidebug qdynp with debug information (stacktraces)."
 	@echo
 	@echo "For compiler/os pick one of:"
-	@echo "ifort            Intel Fortran compiler"
-	@echo "osx              Gnu Compiler Collection (GCC) in mac"
-	@echo "gcc              GCC in linux"
-	@echo "pgi              Portland Group compiler"
+	@echo "ifort    Intel Fortran compiler"
+	@echo "osx      Gnu Compiler Collection (GCC) in mac"
+	@echo "gcc      GCC in linux"
+	@echo "pgi      Portland Group compiler"
 	@echo
 	@echo "Example: make all COMP=ifort"
 	@echo
 ################################################################################
-

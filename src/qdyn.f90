@@ -27,15 +27,16 @@ program qdyn
   implicit none
 
   ! version data
-  character(10) :: QDYN_NAME = 'qdyn'
-  character(10) :: QDYN_VERSION = '5.7'
-  character(12) :: QDYN_DATE = '2015-02-22'
-#if defined (USE_MPI)
-  character(10) :: QDYN_SUFFIX = '_parallel'
-#else
-  character(10) :: QDYN_SUFFIX = ''
-#endif
+  
+  character(*), parameter :: PROGRAM_NAME = 'qdyn'
+  character(*), parameter :: PROGRAM_VERSION = '5.7'
+  character(*), parameter :: PROGRAM_DATE = '2015-02-22'
 
+#if defined (USE_MPI)
+  character(10) :: PROGRAM_SUFFIX = '_parallel'
+#else
+  character(10) :: PROGRAM_SUFFIX = ''
+#endif
 
 #if defined (USE_MPI)
   ! MPI error code
@@ -48,9 +49,9 @@ program qdyn
 #if defined (_DF_VERSION_)
   ! nothing
 #else
-  integer(4), parameter :: SIGINT = 2   ! CTRL-C signal
-  integer(4), parameter :: SIGKILL = 9  ! kill/CTRL-BREAK signal
-  integer(4), parameter :: SIGABRT = 6  ! kill/CTRL-BREAK signal
+  integer(4), parameter :: SIGINT = 2  ! CTRL-C signal
+  integer(4), parameter :: SIGKILL = 9 ! kill/CTRL-BREAK signal
+  integer(4), parameter :: SIGABRT = 6 ! kill/CTRL-BREAK signal
 #endif
 
   external sigint_handler
@@ -106,16 +107,17 @@ program qdyn
   ! initialize slave nodes
   if (numnodes .gt. 1) call init_nodes
 #endif
-  ! count non-bonded pairs to get the maximum number, then distribute them among the nodes
-
+  
+  ! count non-bonded pairs to get the maximum number, then distribute them 
+  ! among the nodes
   call distribute_nonbonds
 
   ! do the work!
   call md_run
 
   if (nodeid .eq. 0) then
-     ! master node: close output files
-     call close_output_files
+    ! master node: close output files
+    call close_output_files
   end if
 
   ! deallocate memory etc.
@@ -128,9 +130,9 @@ program qdyn
 
 contains
 
-  !-------------------------------------------------------------------------------
+  !-----------------------------------------------------------------------------
   ! startup subroutine
-  !-------------------------------------------------------------------------------
+  !-----------------------------------------------------------------------------
   subroutine startup
     integer :: i
     integer :: datum(8)
@@ -140,13 +142,13 @@ contains
        write (*,'(79a)') ('#',i=1,79)
 
 #if defined (DUM)
-       write(*,'(a,a,a)') 'QDum input checker version ', trim(QDYN_VERSION), ' initializing'
+       write(*,'(a,a,a)') 'qdum input checker version ', trim(PROGRAM_VERSION), ' initializing'
 #elif defined(EVAL)
-       write(*,'(a,a,a)') 'QDyn evaluation version ', trim(QDYN_VERSION), ' initializing'
+       write(*,'(a,a,a)') 'qdyn evaluation version ', trim(PROGRAM_VERSION), ' initializing'
        write(*,'(a)') 'This version is for evaluation purposes only.'
        write(*,'(a)') 'Optimizations are disabled - runs at <20% of maximum speed.'
 #else
-       write(*,'(a,a,a,a)') 'QDyn version ', trim(QDYN_VERSION), trim(QDYN_SUFFIX),' initializing'
+       write(*,'(a,a,a,a)') 'qdyn version ', trim(PROGRAM_VERSION), trim(PROGRAM_SUFFIX),' initializing'
 #endif
 
        call date_and_time(values=datum)
@@ -154,23 +156,22 @@ contains
 130    format('Current date ',i4,'-',i2,'-',i2,' and time ',i2,':',i2,':',i2)
     end if
 
-
     ! initialize used modules
     call md_startup
 
   end subroutine startup
 
-  !-------------------------------------------------------------------------------
+  !-----------------------------------------------------------------------------
   ! shutdown subroutine
-  !-------------------------------------------------------------------------------
+  !-----------------------------------------------------------------------------
   subroutine shutdown
     integer :: i
 
     if (nodeid .eq. 0) then
 #if defined (DUM)
-       write(*,*) 'QDum input checker version ', QDYN_VERSION, ' terminated normally.'
+       write(*,*) 'QDum input checker version ', PROGRAM_VERSION, ' terminated normally.'
 #else
-       write(*,*) 'QDyn version ', trim(QDYN_VERSION), trim(QDYN_SUFFIX), ' terminated normally.'
+       write(*,*) 'QDyn version ', trim(PROGRAM_VERSION), trim(PROGRAM_SUFFIX), ' terminated normally.'
 #endif
        write (*,'(79a)') ('#',i=1,79)
     end if

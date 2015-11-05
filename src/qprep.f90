@@ -9,10 +9,10 @@
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
-!  (c) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden                       !
-!  qprep.f90                                                                   !
-!  by Johan Aqvist & John Marelius                                             !
-!  Qprep topology preparation main program                                     !
+!  (c) 2015 Uppsala Molekylmekaniska HB, Uppsala, Sweden
+!  qprep.f90
+!  by Johan Aqvist & John Marelius
+!  qprep topology preparation main program
 !------------------------------------------------------------------------------!
 
 program qprep
@@ -20,45 +20,45 @@ program qprep
   use prep
   use avetr
 
-implicit none
+  implicit none
 
-character(*), parameter :: PROGRAM_NAME = 'qdyn'
-character(*), parameter :: PROGRAM_VERSION = '5.7'
-character(*), parameter :: PROGRAM_DATE = '2015-02-22'
-character(*), parameter :: PROGRAM_SUFFIX  = ''
-logical                 :: use_inputfile
-character(200)          :: fileName=''
+  character(*), parameter :: PROGRAM_NAME = 'qprep'
+  character(*), parameter :: PROGRAM_VERSION = '5.7'
+  character(*), parameter :: PROGRAM_DATE = '2015-02-22'
+  character(*), parameter :: PROGRAM_SUFFIX  = ''
+  logical                 :: use_inputfile
+  character(200)          :: fileName=''
 
 
-call startup
+  call startup
 
-!  allocate memory for libraries
-call topo_set_max(0, max_lib, 0)
-        
-!  reset residue count
-call clearlib
+! allocate memory for libraries
+  call topo_set_max(0, max_lib, 0)
 
-use_inputfile = check_inputfile(fileName)
-if (use_inputfile) then
-  call qprep_from_inputfile(fileName)
-else
-  call qprep_from_commandline
-endif
-        
-call shutdown
+! reset residue count
+  call clearlib
+
+  use_inputfile = check_inputfile(fileName)
+  if (use_inputfile) then
+    call qprep_from_inputfile(fileName)
+  else
+    call qprep_from_commandline
+  endif
+
+  call shutdown
 
 contains
 
-!*************************************************************************
-!*  Read input from file and execute commands
-!*************************************************************************
-subroutine qprep_from_inputfile(filename)
+  !----------------------------------------------------------------------------!
+  !*  Read input from file and execute commands
+  !----------------------------------------------------------------------------!
+  subroutine qprep_from_inputfile(filename)
 
-character(200)  :: filename
-character(200)  :: command
-logical         :: readable
-integer         :: INPF_U = 0
-integer         :: stat
+  character(200)  :: filename
+  character(200)  :: command
+  logical         :: readable
+  integer         :: INPF_U = 0
+  integer         :: stat
 
 !Fix so that file is read per line and parsed in the same way as in the command line
 if (.not. parse_open_file(filename)) then
@@ -81,6 +81,7 @@ enddo
 
 end subroutine qprep_from_inputfile
 
+
 !*************************************************************************
 !*  Read input from command line and execute commands
 !*************************************************************************
@@ -89,19 +90,19 @@ character(200) :: command
 
 do
   call parse_reset
-  call get_string_arg(command, 'Qprep> ')
+  call get_string_arg(command, 'qprep> ')
   call locase(command) !make all lower case
   select case (command)
-  case('quit', 'q') 
-          exit
+  case('quit', 'q')
+    exit
   case default
-          call parse_command(command)
+    call parse_command(command)
   end select
 enddo
 
 end subroutine qprep_from_commandline
 
-   
+
 !*************************************************************************
 !*  Parse a command and call corresponding subroutine
 !*************************************************************************
@@ -187,11 +188,11 @@ end subroutine parse_command
 subroutine help
 WRITE( *, * )
 WRITE( * , '(a)') &
-'command      argument            decription', &
+'command      argument            description', &
 '----------- ------------------- -------------------------------------------------', &
 'addbond                          adds extra bonds(e.g. S-S)',&
-'average                          Calulates an average structure from a trajectory file.',&
-'boundary    [boundry condition]  set boundary condition',&
+'average                          Computes an average structure from a trajectory file.',&
+'boundary    [boundary condition]  set boundary condition',&
 '            [centre] ',&
 '            (box) [boxlengths]',&
 '            (sphere) [radius]',&
@@ -281,24 +282,18 @@ end subroutine help
 
 subroutine startup
 
-!integer :: i
-
-!write(*,'(79a)')('#',i=1,79)
-!write(*,'(a,a)') 'Welcome to Qprep version ',PROGRAM_VERSION
-!write(*,'(79a)')('#',i=1,79)
-!write(*,'(79a)')(' ',i=1,79)
-call version_check(PROGRAM_NAME, PROGRAM_VERSION, PROGRAM_DATE, PROGRAM_SUFFIX) ! print version and check for flags
-
+call version_check(PROGRAM_NAME, PROGRAM_VERSION, PROGRAM_DATE, PROGRAM_SUFFIX)
 call prep_startup
 write(*,*)
 
 end subroutine startup
 
+
 !-----------------------------------------------------------------------
 
 subroutine shutdown
-        call prep_shutdown
-        stop 'qprep ended'
+  call prep_shutdown
+  stop 'qprep ended'
 end subroutine shutdown
 
 !*************************************************************************

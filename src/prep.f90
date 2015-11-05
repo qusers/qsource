@@ -14,16 +14,16 @@
 !  by Johan Aqvist & John Marelius
 !  topology preparation, solvation, validation and PDB I/O
 !------------------------------------------------------------------------------!
-MODULE PREP
+module prep
 
-  use TRJ
-  use PARSE
-  use PRMFILE
-  use INDEXER
-  use PREFS
-  use MASKMANIP
+  use trj
+  use parse
+  use prmfile
+  use indexer
+  use prefs
+  use maskmanip
 
-  IMPLICIT none
+  implicit none
 
 !constants
   character(*), private, parameter :: MODULE_VERSION = '5.7'
@@ -31,62 +31,60 @@ MODULE PREP
 
   !library
   !max number of library entries
-  integer, parameter              ::      max_entry = 1000
+  integer, parameter               :: max_entry = 1000
   !max atoms in a residue (only used when reading PDB file)
-  integer, parameter              ::      max_atlib = 500
-  integer, parameter              ::      max_cgplib = 100
-  integer, parameter              ::      max_atcgplib = 100
+  integer, parameter               :: max_atlib = 500
+  integer, parameter               :: max_cgplib = 100
+  integer, parameter               :: max_atcgplib = 100
 
 
   !FF parameters
-  integer, parameter                      ::      max_old_atyps = 100
+  integer, parameter               ::      max_old_atyps = 100
   !Extra bonds(S-S bridges etc.)
-  integer, parameter                      ::      max_extrabnd = 100
+  integer, parameter               ::      max_extrabnd = 100
 
   !Topology
-  integer, parameter                      ::      max_lib = 1000
-  integer, parameter                      ::      max_long = 10000
-
-  integer, parameter                      :: max_conn = 10
+  integer, parameter               :: max_lib = 1000
+  integer, parameter               :: max_long = 10000
+  integer, parameter               :: max_conn = 10
 
 !default values for user-settable variables
   !minimum solvent - solute heavy atom distance for solvation
-  real, target                            ::      solvent_pack = 2.4
+  real, target                     :: solvent_pack = 2.4
   !average heavy atom number density of proteins
-  real, target                            ::  rho_solute = 0.05794  ! atoms / A**3
+  real, target                     :: rho_solute = 0.05794  ! atoms / A**3
   !maximum cross-linking bond distance
-  real, target                            ::      max_xlink = 2.1
-  character(len=200), target      ::      solvent_names = ''
+  real, target                     :: max_xlink = 2.1
+  character(len=200), target       :: solvent_names = ''
   !Random numbers for H generation 
-  integer, target                         ::      random_seed_solute = 179857
-  integer, target                         ::      random_seed_solvent = 758971
+  integer, target                  :: random_seed_solute = 179857
+  integer, target                  :: random_seed_solvent = 758971
 
 !variables
-!     Library information                                               
-!-----------------------------------------------------------------------
+!  Library information
+!-------------------------------------------------------------------------------
 
+  type lib_bond_type
+    integer(AI)                    :: i,j
+  end type lib_bond_type
 
-        TYPE LIB_BOND_TYPE
-                integer(AI)                             ::      i,j
-        end TYPE LIB_BOND_TYPE
-        
-        TYPE LIB_IMP_TYPE !for explicit improper definitions +/- and 4-char. atom names 
-                character(len=1+4)              ::      i, j, k, l
-        end TYPE LIB_IMP_TYPE
-        
-        type LIB_RULE_TYPE
-                integer                                 ::      kind
-                integer                                 ::      atom(4)
-                real                                    ::      value
-        end type LIB_RULE_TYPE
-        
-        integer, parameter              ::      BUILD_RULE_TORSION = 1
+  type lib_imp_type !for explicit improper definitions +/- and 4-char. atom names 
+    character(len=1+4)             :: i, j, k, l
+  end type lib_imp_type
+
+  type lib_rule_type
+    integer                        :: kind
+    integer                        :: atom(4)
+    real                           :: value
+  end type lib_rule_type
+
+  integer, parameter               :: BUILD_RULE_TORSION = 1
 
         TYPE LIB_ENTRY_TYPE
-                integer                                 ::      nat, nbnd, nimp, ncgp, nrules
-                integer                                 ::      head, tail
-                logical                                 ::      HETATM, solvent
-                real                                    ::      density
+                integer                    :: nat, nbnd, nimp, ncgp, nrules
+                integer                    :: head, tail
+                logical                    :: HETATM, solvent
+                real                       :: density
                 character(len=4)                ::      nam
                 character(len=8)                ::      SYBYLTYPE
                 character(len=4), pointer       ::      atnam(:)
@@ -103,8 +101,8 @@ MODULE PREP
         integer                                         ::      nlibres 
         type(LIB_ENTRY_TYPE), target::  lib(max_entry)
 
-! topology generation flags                                                                        
-!-----------------------------------------------------------------------
+! topology generation flags
+!-------------------------------------------------------------------------------
         LOGICAL                                         ::      have_prm_file_name = .false.
         logical                                         ::      have_solute_sphere = .false.
         logical                                         ::      have_title = .false.
@@ -2470,35 +2468,35 @@ end FUNCTION randm
 
 subroutine oldreadlib(filnam)
 !arguments
-        character(*)                            ::      filnam
+  character(*)                     :: filnam
 ! *** local variables
-        CHARACTER                                       ::      line*80
-        integer                                         ::      irec, i, iat, ires, j, igp, ntot
-        real                                            ::      qtot, qgrp, qtot_grp
+  character                        :: line*200
+  integer                          :: irec, i, iat, ires, j, igp, ntot
+  real                             :: qtot, qgrp, qtot_grp
 
-        !some extra arrays used only for allocation. This circumvents 
-        !an unaligned access error on Digitail UNIX 4.0 / Digital FORTRAN
-        !(Compiler bug?)
-        
-        character(len=KEYLENGTH), pointer::     tac_lib(:)
-        character(len=4), pointer       ::      atnam(:)
-        real, pointer                           ::      crg_lib(:)
-        integer(AI), pointer            ::      natcgp(:), switch(:)
-        integer(AI), pointer            ::      atcgp(:,:)      
-        type(LIB_BOND_TYPE), pointer::bnd(:)
-        integer                                         :: stat
+  ! some extra arrays used only for allocation. This circumvents 
+  ! an unaligned access error on Digital UNIX 4.0 / Digital FORTRAN
+  ! (Compiler bug?)
 
-1       format(a,t7,a,t14,a,t21,a,t28,a)
-2       format(a4)
-3       format(t9,i3)
-4       format(t14,f5.2)
-5       format(t23,i3)
-6       format(t31,i3)
-!.......................................................................
+  character(len=KEYLENGTH), pointer:: tac_lib(:)
+  character(len=4), pointer        :: atnam(:)
+  real, pointer                    :: crg_lib(:)
+  integer(AI), pointer             :: natcgp(:), switch(:)
+  integer(AI), pointer             :: atcgp(:,:)
+  type(LIB_BOND_TYPE), pointer     :: bnd(:)
+  integer                          :: stat
+
+1  format(a,t7,a,t14,a,t21,a,t28,a)
+2  format(a4)
+3  format(t9,i3)
+4  format(t14,f5.2)
+5  format(t23,i3)
+6  format(t31,i3)
+
 
         if(openit(1, filnam, 'old', 'formatted', 'read') /= 0) then
                 write(*, '(a,a)') '>>>>>ERROR: Could not open library file ', &
-                        trim(filnam)
+                trim(filnam)
                 return
         end if
 
@@ -2617,15 +2615,15 @@ end subroutine oldreadlib
 
 subroutine readlib(file)
 !arguments
-        character(*), optional          ::      file
+  character(*), optional           :: file
 ! *** local variables
-        CHARACTER                                       ::      line*80, filnam*80
-        integer                                         ::      irec, i, iat, ires, j, igp, ntot
-        real                                            ::      qtot, qgrp, qtot_grp
-        character(len=80)                       ::      resnam
-        integer                                         ::      res_count
-        logical                                         ::      prm_res
-        integer                                         ::      cgp_read(max_atcgplib)
+  character                        :: line*200, filnam*200
+  integer                          :: irec, i, iat, ires, j, igp, ntot
+  real                             :: qtot, qgrp, qtot_grp
+  character(len=80)                :: resnam
+  integer                          :: res_count
+  logical                          :: prm_res
+  integer                          :: cgp_read(max_atcgplib)
         
         !some extra arrays used only for allocation. This circumvents 
         !an unaligned access error on Digital UNIX 4.0 / Digital FORTRAN
@@ -4061,7 +4059,7 @@ end subroutine readpdb
 
 subroutine readtop
         ! *** local variables
-        character(len=80)                       ::      filnam
+        character(len=200)                       ::      filnam
         character(len=200)                      ::      files_to_load
         integer                                         ::       i, j, ires
         logical                                         ::      loaded, res_found
@@ -6347,4 +6345,4 @@ get_centre_by_mass = .true.
 end function get_centre_by_mass
 !*************************************************************************
 
-END module PREP
+end module prep
