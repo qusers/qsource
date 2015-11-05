@@ -8,61 +8,67 @@
 !  latest update: july 13, 2015                                                !
 !------------------------------------------------------------------------------!
 
-!------------------------------------------------------------------------------!
-!  (C) 2000 Molekylmekanikerna HB, Uppsala, Sweden
+!-------------------------------------------------------------------------------
+!  (C) 2015 Molekylmekanikerna HB, Uppsala, Sweden
 !  qfep.f90
 !  by Johan Aqvist, Karin Kolmodin, John Marelius, Johan Sund
 !  qfep free energy analysis program for FEP, EVB & Umbrella Sampling
-!------------------------------------------------------------------------------!
+!-------------------------------------------------------------------------------
 program qfep
-  use NRGY      
-  use PARSE
+  use nrgy
+  use parse
 
   implicit none
-  character(*), parameter                 ::      MODULE_VERSION = '5.7'
-  character(*), parameter                 ::      MODULE_DATE = '2015-04-01'
+  character(*), parameter :: MODULE_VERSION = '5.7'
+  character(*), parameter :: MODULE_DATE = '2015-04-01'
 
-  integer,parameter ::mxpts=20000000,mxbin=100,mxstates=4
-  character(80)      ::filnam, line
-  integer           ::i,j,ifile,ipt,istate,ibin,nfiles,nstates,ERR, &
-       nskip,nbins,nmin,idum,noffd,nnoffd,offel,ngroups,iexclg,igrp,mpts,iexclgn,astate,bstate
+  integer,parameter :: mxpts = 20000000
+  integer,parameter :: mxbin = 100
+  integer,parameter :: mxstates = 4
+  character(80)     :: filnam, line
+  integer           :: i,j,ifile,ipt,istate,ibin,nfiles,nstates,ERR, &
+                       nskip,nbins,nmin,idum,noffd,nnoffd,offel,ngroups, &
+                       iexclg,igrp,mpts,iexclgn,astate,bstate
 
   type(OFFDIAG_SAVE), dimension(mxstates) :: offd
 
-  real(8) ::rt,gapmin,gapmax,sum,dv,gaprange, &
-       xint,dvg,veff1,veff2,dGa,dGb,dGg,alpha_B,scale_Hij, &
-       veff,min,dlam,sumf,sumb,konst,fel,nfnr,nrnf     
-  real(8),dimension(mxbin)              ::sumg,sumg2,avdvg,avc1,avc2,avc11,avc12,avc13,avc21,avc22,avc23,avc31,avc32,avc33,avr
+  real(8) :: rt,gapmin,gapmax,sum,dv,gaprange,xint,dvg,veff1,veff2, &
+             dGa,dGb,dGg,alpha_B,scale_Hij,veff,min,dlam,sumf,sumb, &
+             konst,fel,nfnr,nrnf
+  real(8),dimension(mxbin) :: sumg,sumg2,avdvg,avc1,avc2,avc11,avc12,avc13, &
+                              avc21,avc22,avc23,avc31,avc32,avc33,avr
 
-  real(8),dimension(mxbin,4)            ::binsum
-  integer,dimension(mxbin)              ::nbinpts,ptsum
+  real(8),dimension(mxbin,4) :: binsum
+  integer,dimension(mxbin)   :: nbinpts,ptsum
 
-  type(Q_ENERGIES), dimension(mxstates) :: EQ   
+  type(Q_ENERGIES), dimension(mxstates) :: EQ
   type(Q_ENERGIES), dimension(mxstates) :: avEQ
-  real(8),dimension(mxstates)                           :: dvv,dGv,alfa,coeff,Vel,Vvdw
+  real(8),dimension(mxstates)           :: dvv,dGv,alfa,coeff,Vel,Vvdw
 
-  real(8),dimension(3)                  ::u,y
-  real(8),allocatable              ::dgf(:),dgr(:),dgfsum(:),dgrsum(:),dG(:),dgti(:),dgtisum(:), &
-       dglu(:),dglusum(:),dgbar(:),dgbarsum(:)
-  real(8),dimension(mxstates,mxstates)  ::A,mu,eta,rxy0
-  real(8),allocatable                   ::Hij(:,:),d(:),e(:)
+  real(8),dimension(3) :: u,y
+  real(8),allocatable  :: dgf(:),dgr(:),dgfsum(:),dgrsum(:),dG(:),dgti(:), &
+                          dgtisum(:),dglu(:),dglusum(:),dgbar(:),dgbarsum(:)
+  real(8),dimension(mxstates,mxstates) :: A,mu,eta,rxy0
+  real(8),allocatable                  :: Hij(:,:),d(:),e(:)
+
   type FEP_DATA_TYPE
-     integer                                 ::      npts
-     real(8)                                 ::      lambda(mxstates)
-     real(8), pointer           ::      v(:,:), r(:,:) !indices are state, point
-     real(8), pointer           ::      vg(:), gap(:), c1(:), c2(:) !index is point
+     integer           :: npts
+     real(8)           :: lambda(mxstates)
+     real(8), pointer  :: v(:,:), r(:,:) !indices are state, point
+     real(8), pointer  :: vg(:), gap(:), c1(:), c2(:) !index is point
   end type FEP_DATA_TYPE
-  type(FEP_DATA_TYPE), allocatable      ::      FEP(:) !index is file
-  type(FEP_DATA_TYPE)                           ::      FEPtmp !temporary storage for one file
 
-  real(8),dimension(mxstates,mxbin)     ::avdvv,sumv,sumv2 
+  type(FEP_DATA_TYPE), allocatable :: FEP(:) !index is file
+  type(FEP_DATA_TYPE) :: FEPtmp !temporary storage for one file
 
-  integer                                                         ::      f
+  real(8),dimension(mxstates,mxbin) :: avdvv,sumv,sumv2 
+
+  integer :: f
 
   !header
   write(*,100) MODULE_VERSION,  MODULE_DATE
   write(*,*)
-100 format('# Qfep',t30,'version ',a,t50,'(modified on ',a,')')
+100 format('# qfep',t30,'version ',a,t50,'(modified on ',a,')')
 
   !------------------------------------------ 
   ! INPUT OF PARAMETERS
@@ -79,11 +85,10 @@ program qfep
 
 
   !size of secular determinant is allocated
-
   allocate(Hij(nstates,nstates),d(nstates),e(nstates),STAT=ERR)
   if(ERR /= 0) then
      write(*,*) 'ERROR: Out of memory when allocation Hij array.'
-     stop 'Qfep5 terminated abnormally: Out of memory.'
+     stop 'qfep terminated abnormally: Out of memory.'
   end if
 
   ! Continue to read input
@@ -148,7 +153,7 @@ program qfep
        dglusum(0:nfiles+1),dgbarsum(0:nfiles+1), &
        STAT=ERR)
   if(ERR /= 0) then
-     stop 'Qfep5 terminated abnormally: Out of memory when allocating arrays.'
+     stop 'qfep terminated abnormally: Out of memory when allocating arrays.'
   end if
 
   !---------------------------------
@@ -178,7 +183,7 @@ program qfep
      read(*,*) filnam
      write (*,*) ''
      if(openit(f,filnam,'old','unformatted','read') /= 0) then
-        stop 'Qfep5 terminated abnormally: Failed to open energy file.'
+        stop 'qfep terminated abnormally: Failed to open energy file.'
      end if
 
      !read 1st record to get lambdas
@@ -191,13 +196,13 @@ program qfep
            !the problem is in energies
            write(*,'(a,i1)') 'while reading energies of state ',idum
            write(*,'(a,i1,a)') 'Maybe there are only ',idum-1, ' states?'
-           stop 'Qfep5 terminated abnormally: Failed to read energies.'
+           stop 'qfep terminated abnormally: Failed to read energies.'
         else
            !idum < 0 indicates problems with offdiags
            write(*,'(a)') 'while reading off-diagonal elements.'
            write(*,'(a,i1,a)') 'Maybe there are less than ',nnoffd, &
                 ' off-diagonal elements?'
-           stop 'Qfep5 terminated abnormally: Failed to read off-diagonals.'
+           stop 'qfep terminated abnormally: Failed to read off-diagonals.'
         end if
      end if
 
@@ -288,7 +293,7 @@ program qfep
           FEP(ifile)%c2(FEP(ifile)%npts), &
           STAT=ERR)
      if(ERR /= 0) then
-        stop 'Qfep5 terminated abnormally: Out of memory when allocating arrays.'
+        stop 'qfep terminated abnormally: Out of memory when allocating arrays.'
      end if
      FEP(ifile)%v(:,:) = FEPtmp%v(1:nstates, 1:FEP(ifile)%npts)
      FEP(ifile)%vg(:) = FEPtmp%vg(1:FEP(ifile)%npts)
@@ -298,7 +303,7 @@ program qfep
      if(nnoffd > 0) then 
         allocate(FEP(ifile)%r(nstates, FEP(ifile)%npts), STAT=ERR)
         if(ERR /= 0) then
-           stop 'Qfep5 terminated abnormally: Out of memory when allocating arrays.'
+           stop 'qfep terminated abnormally: Out of memory when allocating arrays.'
         end if
         FEP(ifile)%r(:,:) = FEPtmp%r(1:nstates, 1:FEP(ifile)%npts)
      end if
@@ -310,7 +315,7 @@ program qfep
         write(*,900) trim(filnam)
 900     format('>>>>> ERROR: number of data sets in ',a,&
              ' is less than number of points to skip!')
-        stop 'Qfep5 terminated abnormally: Too few data points in file.'
+        stop 'qfep terminated abnormally: Too few data points in file.'
      else
         avEQ(:) = avEQ(:) * (1./(FEP(ifile)%npts-nskip)) !use new * operator
      end if
@@ -480,6 +485,8 @@ program qfep
         dgbarsum(ifile+1)=dgbarsum(ifile)+dgbar(ifile)
         fel=1
      end do
+
+
      write(*,*) 
      write(*,*) 
      write(*,21)
@@ -539,14 +546,14 @@ program qfep
            avc1(ibin)=avc1(ibin)+FEP(ifile)%c1(ipt)
            avc2(ibin)=avc2(ibin)+FEP(ifile)%c2(ipt)
            !Only gives first r_xy distance
-           if(nnoffd > 0)  avr(ibin)=avr(ibin)+FEP(ifile)%r(1,ipt)          
+           if(nnoffd > 0)  avr(ibin)=avr(ibin)+FEP(ifile)%r(1,ipt)
            nbinpts(ibin)=nbinpts(ibin)+1
         end do           !ipt
         do ibin=1,nbins
            if ( nbinpts(ibin) .ne. 0 ) then
               avc1(ibin)=avc1(ibin)/real(nbinpts(ibin))
               avc2(ibin)=avc2(ibin)/real(nbinpts(ibin))
-              avr(ibin)=avr(ibin)/real(nbinpts(ibin))                         
+              avr(ibin)=avr(ibin)/real(nbinpts(ibin))
               avdvv(:,ibin)=avdvv(:,ibin)/nbinpts(ibin)
               avdvg(ibin)=avdvg(ibin)/nbinpts(ibin)
 
@@ -631,6 +638,8 @@ program qfep
         write (*,23) &
              FEP(ifile)%lambda(1),dgti(ifile-1),dgtisum(ifile)
      end do
+
+
      write(*,*) 
      write(*,*) 
      write(*,32)
@@ -641,6 +650,8 @@ program qfep
         write (*,23) &
              FEP(ifile)%lambda(1),dglu(ifile-1),dglusum(ifile)
      end do
+
+
      write(*,*) 
      write(*,*) 
      write(*,33)
@@ -666,7 +677,6 @@ program qfep
   !.......................................................................
 
 contains
-
   !------------------------------
 
   subroutine prompt (outtxt)

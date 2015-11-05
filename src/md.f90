@@ -1935,14 +1935,14 @@ contains
     !  boxlength, inv_boxl, boxcentre, sc_lookup 
     !
 
-    integer, parameter                      :: vars = 40    !increment this var when adding data to broadcast in batch 1
+    integer, parameter              :: vars = 40 !increment this var when adding data to broadcast in batch 1
     integer                         :: blockcnt(vars), ftype(vars) 
-    integer(kind=MPI_ADDRESS_KIND)                          :: fdisp(vars)
-    integer                                 :: mpitype_batch,mpitype_batch2
-    integer                                 :: nat3
-    real(kind=wp8), allocatable             :: temp_lambda(:)
-    integer, parameter                      ::maxint=2147483647
-    real(kind=wp8), parameter                        ::maxreal=1E35
+    integer(kind=MPI_ADDRESS_KIND)  :: fdisp(vars)
+    integer                         :: mpitype_batch,mpitype_batch2
+    integer                         :: nat3
+    real(kind=wp8), allocatable     :: temp_lambda(:)
+    integer, parameter              :: maxint=2147483647
+    real(kind=wp8), parameter       :: maxreal=1E35
     integer  :: MPI_AI_INTEGER, MPI_TINY_INTEGER, i_loop
 
     !external MPI_Address
@@ -2087,8 +2087,7 @@ contains
        xwcent(:)=maxreal 
     end if
 
-    ! --- MD data, second batch ---
-
+    ! --- MD data, second batch ---s
     if (nodeid .eq. 0) write (*,'(80a)') 'MD data, second batch'
 
     ! allocate arrays
@@ -2128,10 +2127,7 @@ contains
     ! --- Periodic boundary condition data ---
 
 
-
-
     ! --- shake data ---
-
     !if (shake_solute .or. shake_solvent .or. shake_hydrogens) then
     ! shake stuff
 
@@ -2341,10 +2337,10 @@ contains
     ! initialize shake constraints
     !
     !locals
-    integer                                         ::      mol, b, ia, ja, constr, angle
-    real(8)                                         :: exclshk
-    integer                                         ::      src, trg
-    integer                                         ::      solute_shake_constraints
+    integer :: mol, b, ia, ja, constr, angle
+    real(8) :: exclshk
+    integer :: src, trg
+    integer :: solute_shake_constraints
 
     !allocate molecule list
     allocate(shake_mol(nmol), stat=alloc_status)

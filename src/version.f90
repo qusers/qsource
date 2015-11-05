@@ -153,8 +153,8 @@ subroutine version_print(Q_PROGRAM, Q_VERSION, Q_DATE, Q_SUFFIX)
   character(*)  :: Q_SUFFIX
 
 ! local
-  integer  :: i
-  integer  :: datum(8)
+  integer :: i
+  integer :: datum(8)
 
 ! start-of-header
   write(*,*)
