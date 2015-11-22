@@ -296,32 +296,28 @@ subroutine shutdown
   stop 'qprep ended'
 end subroutine shutdown
 
+
 !*************************************************************************
 !*  Determine if qprep is to be run from command line or from input file
 !*************************************************************************
-
 logical function check_inputfile(infilename)
-!local variables
-integer :: num_args
-character(200), intent(OUT) :: infilename
-character(300) :: text
+  !local variables
+  integer :: num_args
+  character(200), intent(OUT) :: infilename
+  character(300) :: text
 
+  ! read name of input file from the command line
+  num_args = command_argument_count()
+  if (num_args .lt. 1) then
+    check_inputfile = .false.
+    return
+  endif
 
-! read name of input file from the command line
-num_args = command_argument_count()
-if (num_args .lt. 1) then
-  check_inputfile = .false.
-  return
-endif
-
-call getarg(num_args, infilename)
-
-text = 'Reading input from '//infilename
-call centered_heading(trim(text), '-')
-
-check_inputfile = .true.
-
+  call getarg(num_args, infilename)
+  text = 'Reading input from '//infilename
+  call centered_heading(trim(text), '-')
+  check_inputfile = .true.
 end function check_inputfile
 
 
-END PROGRAM qprep
+end program qprep

@@ -39,9 +39,9 @@ module prep
 
 
   !FF parameters
-  integer, parameter               ::      max_old_atyps = 100
+  integer, parameter               :: max_old_atyps = 100
   !Extra bonds(S-S bridges etc.)
-  integer, parameter               ::      max_extrabnd = 100
+  integer, parameter               :: max_extrabnd = 100
 
   !Topology
   integer, parameter               :: max_lib = 1000
@@ -80,30 +80,30 @@ module prep
 
   integer, parameter               :: BUILD_RULE_TORSION = 1
 
-        TYPE LIB_ENTRY_TYPE
-                integer                    :: nat, nbnd, nimp, ncgp, nrules
-                integer                    :: head, tail
-                logical                    :: HETATM, solvent
-                real                       :: density
-                character(len=4)                ::      nam
-                character(len=8)                ::      SYBYLTYPE
-                character(len=4), pointer       ::      atnam(:)
-                character(len=KEYLENGTH), pointer :: tac_lib(:)
-                real, pointer                   ::      crg_lib(:)
-                type(LIB_RULE_TYPE), pointer::rules(:)
-                type(LIB_BOND_TYPE), pointer::bnd(:)
-                type(LIB_IMP_TYPE), pointer::imp(:)
-                integer(AI), pointer    ::      natcgp(:)
-                integer(AI), pointer    ::      switch(:)
-                integer(AI), pointer    ::      atcgp(:,:)
-        end type LIB_ENTRY_TYPE
+  type lib_entry_type
+    integer                        :: nat, nbnd, nimp, ncgp, nrules
+    integer                        :: head, tail
+    logical                        :: HETATM, solvent
+    real                           :: density
+    character(len=4)               :: nam
+    character(len=8)               :: SYBYLTYPE
+    character(len=4), pointer      :: atnam(:)
+    character(len=KEYLENGTH), pointer :: tac_lib(:)
+    real, pointer                  :: crg_lib(:)
+    type(LIB_RULE_TYPE), pointer   :: rules(:)
+    type(LIB_BOND_TYPE), pointer   :: bnd(:)
+    type(LIB_IMP_TYPE), pointer    :: imp(:)
+    integer(AI), pointer           :: natcgp(:)
+    integer(AI), pointer           :: switch(:)
+    integer(AI), pointer           :: atcgp(:,:)
+  end type lib_entry_type
 
-        integer                                         ::      nlibres 
-        type(LIB_ENTRY_TYPE), target::  lib(max_entry)
+  integer :: nlibres 
+  type(lib_entry_type), target :: lib(max_entry)
 
 ! topology generation flags
 !-------------------------------------------------------------------------------
-        LOGICAL                                         ::      have_prm_file_name = .false.
+        logical                                         ::      have_prm_file_name = .false.
         logical                                         ::      have_solute_sphere = .false.
         logical                                         ::      have_title = .false.
         logical                                         ::      have_solvent_boundary = .false. 
@@ -4036,8 +4036,8 @@ subroutine readpdb()
         nwat = (nat_pro - nat_solute) / 3
         write(*,110) nmol,nres, nres_solute, nat_pro, nat_solute
 110     format(/,'Successfully read PDB file with', i5,' molecules,',/,&
-                i5,' residues totally (',i5,' in solute).',/,&
-                i5,' atoms totally (',i5,' in solute).')
+                i5,' residues total (',i5,' in solute).',/,&
+                i5,' atoms total (',i5,' in solute).')
 
         write( * , '(/,a,/)') 'Sequence listing:'
         write( * , '(16(a4,1x))') res(1:nres)%name

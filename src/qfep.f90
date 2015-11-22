@@ -66,11 +66,11 @@ program qfep
   integer :: f
 
   !header
-  write(*,100) MODULE_VERSION,  MODULE_DATE
+  write(*,100) MODULE_VERSION, MODULE_DATE
   write(*,*)
 100 format('# qfep',t30,'version ',a,t50,'(modified on ',a,')')
 
-  !------------------------------------------ 
+  !------------------------------------------
   ! INPUT OF PARAMETERS
   !------------------------------------------
   call prompt ('--> Number of energy files: ')
@@ -83,11 +83,10 @@ program qfep
 2 format('# Number of states                 =',i6,/, &
        '# Number of off-diagonal elements =',i6)
 
-
-  !size of secular determinant is allocated
+  !allocate size of secular determinant
   allocate(Hij(nstates,nstates),d(nstates),e(nstates),STAT=ERR)
   if(ERR /= 0) then
-     write(*,*) 'ERROR: Out of memory when allocation Hij array.'
+     write(*,*) 'ERROR: Out of memory when allocating Hij array.'
      stop 'qfep terminated abnormally: Out of memory.'
   end if
 
@@ -119,29 +118,29 @@ program qfep
 
   scale_Hij=0.0
   if (noffd /=0) then
-     call prompt ('--> Hij scaling:')
-     read (*,*) scale_Hij
-     write (*,8) scale_Hij
-8    format('# Scale factor for Hij            =',f6.2)
+    call prompt ('--> Hij scaling:')
+    read (*,*) scale_Hij
+    write (*,8) scale_Hij
+8   format('# Scale factor for Hij            =',f6.2)
   else
-     call prompt ('--> Number of off-diagonal elements:')
-     read (*,*) nnoffd
-     write (*,9) nnoffd
-     if(nnoffd >0) write(*,11) 
-     do offel=1,nnoffd
-        call prompt ('--> i, j, A_ij, mu_ij, eta_ij, r_xy0: ')
-        read (*,*) i, j, A(i,j), mu(i,j), eta(i,j), rxy0(i,j)
-        write(*,12) i, j, A(i,j), mu(i,j), eta(i,j), rxy0(i,j)
-     end do
-9    format('# Number of off-diagonal elements =',i6)
-11   format('#   i   j   A(i,j)  mu(i,j) eta(i,j) rxy0(i,j)')
-12   format('#',2i4,4f9.2) 
+    call prompt ('--> Number of off-diagonal elements:')
+    read (*,*) nnoffd
+    write (*,9) nnoffd
+    if(nnoffd >0) write(*,11) 
+    do offel=1,nnoffd
+      call prompt ('--> i, j, A_ij, mu_ij, eta_ij, r_xy0: ')
+      read (*,*) i, j, A(i,j), mu(i,j), eta(i,j), rxy0(i,j)
+      write(*,12) i, j, A(i,j), mu(i,j), eta(i,j), rxy0(i,j)
+    end do
+9   format('# Number of off-diagonal elements =',i6)
+11  format('#   i   j   A(i,j)  mu(i,j) eta(i,j) rxy0(i,j)')
+12  format('#',2i4,4f9.2) 
   end if
 
   call prompt ('--> linear combination of states defining reaction coord: ')
   read (*,*) (coeff(i),i=1,nstates)
-  write(*,13) coeff(1:nstates)            
-13 format('# Linear combination co-efficients=',8f6.2)
+  write(*,13) coeff(1:nstates)
+13 format('# Linear combination coefficients=',8f6.2)
 
   !allocate large arrays
   allocate(FEP(nfiles), FEPtmp%v(nstates,mxpts), FEPtmp%r(nstates,mxpts), &
@@ -153,7 +152,7 @@ program qfep
        dglusum(0:nfiles+1),dgbarsum(0:nfiles+1), &
        STAT=ERR)
   if(ERR /= 0) then
-     stop 'qfep terminated abnormally: Out of memory when allocating arrays.'
+    stop 'qfep terminated abnormally: Out of memory when allocating arrays.'
   end if
 
   !---------------------------------
@@ -177,113 +176,113 @@ program qfep
        '  EQang   EQtor   EQimp    EQel   EQvdW  Eel_qq  EvdW_qq Eel_qp  EvdW_qp Eel_qw EvdW_qw Eqrstr')
 
   do ifile=1,nfiles
-     write(line,14) ifile
-14   format('--> Name of file number',i4,':')
-     call prompt(line)
-     read(*,*) filnam
-     write (*,*) ''
-     if(openit(f,filnam,'old','unformatted','read') /= 0) then
-        stop 'qfep terminated abnormally: Failed to open energy file.'
-     end if
+    write(line,14) ifile
+14  format('--> Name of file number',i4,':')
+    call prompt(line)
+    read(*,*) filnam
+    write (*,*) ''
+    if(openit(f,filnam,'old','unformatted','read') /= 0) then
+      stop 'qfep terminated abnormally: Failed to open energy file.'
+    end if
 
-     !read 1st record to get lambdas
-     idum = get_ene(f, EQ(:), offd, nstates,nnoffd)
-     if(idum /= 0) then 
-        !we have a problem
-        write(*,'(a,a)') 'ERROR: Unexpected end-of-file in first record of ', &
-             trim(filnam)
-        if(idum > 0) then
-           !the problem is in energies
-           write(*,'(a,i1)') 'while reading energies of state ',idum
-           write(*,'(a,i1,a)') 'Maybe there are only ',idum-1, ' states?'
-           stop 'qfep terminated abnormally: Failed to read energies.'
-        else
-           !idum < 0 indicates problems with offdiags
-           write(*,'(a)') 'while reading off-diagonal elements.'
-           write(*,'(a,i1,a)') 'Maybe there are less than ',nnoffd, &
-                ' off-diagonal elements?'
-           stop 'qfep terminated abnormally: Failed to read off-diagonals.'
-        end if
-     end if
+    !read 1st record to get lambdas
+    idum = get_ene(f, EQ(:), offd, nstates,nnoffd)
+    if(idum /= 0) then 
+      !we have a problem
+      write(*,'(a,a)') 'ERROR: Unexpected end-of-file in first record of ', &
+           trim(filnam)
+      if(idum > 0) then
+        !the problem is in energies
+        write(*,'(a,i1)') 'while reading energies of state ',idum
+        write(*,'(a,i1,a)') 'Maybe there are only ',idum-1, ' states?'
+        stop 'qfep terminated abnormally: Failed to read energies.'
+      else
+        !idum < 0 indicates problems with offdiags
+        write(*,'(a)') 'while reading off-diagonal elements.'
+        write(*,'(a,i1,a)') 'Maybe there are less than ',nnoffd, &
+             ' off-diagonal elements?'
+        stop 'qfep terminated abnormally: Failed to read off-diagonals.'
+      end if
+    end if
 
-     FEP(ifile)%lambda(:) = EQ(:)%lambda
+    FEP(ifile)%lambda(:) = EQ(:)%lambda
 
-     rewind (f)
-
-     ipt = 0
-     avEQ(:) = avEQ(:) * 0. !set all fields to zero using multiplication operator
-     FEPtmp%gap(:) = 0.
-     do while(get_ene(f, EQ(:), offd, nstates, nnoffd) == 0) !keep reading till EOF
-        ipt = ipt + 1
-        if(ipt > nskip) then
-           avEQ(:) = avEQ(:) + EQ(:) !use Qenergies + operator 
-        end if
-
-        !-------------------------------------------
-        ! Correct H_ii with alfa, and modify H_ij...
-        !-------------------------------------------
-
-        alfa(1)=0.
-        EQ(:)%total=EQ(:)%total+alfa(:)
-        FEPtmp%v(1:nstates, ipt) = EQ(1:nstates)%total
-        if (nnoffd .ne. 0) then
-           FEPtmp%r(:,ipt) = offd(:)%rkl
-        end if
+    rewind (f)
 
 
-        do i=1, noffd
-           Hij(offd(i)%i, offd(i)%j) = offd(i)%Hij
+    ipt = 0
+    avEQ(:) = avEQ(:) * 0. !set all fields to zero using multiplication operator
+    FEPtmp%gap(:) = 0.
+    do while(get_ene(f, EQ(:), offd, nstates, nnoffd) == 0) !keep reading till EOF
+      ipt = ipt + 1
+      if(ipt > nskip) then
+        avEQ(:) = avEQ(:) + EQ(:) !use Qenergies + operator 
+      end if
+
+      !-------------------------------------------
+      ! Correct H_ii with alfa, and modify H_ij...
+      !-------------------------------------------
+      alfa(1)=0.
+      EQ(:)%total=EQ(:)%total+alfa(:)
+      FEPtmp%v(1:nstates, ipt) = EQ(1:nstates)%total
+      if (nnoffd .ne. 0) then
+        FEPtmp%r(:,ipt) = offd(:)%rkl
+      end if
+
+      do i=1, noffd
+        Hij(offd(i)%i, offd(i)%j) = offd(i)%Hij
+      end do
+
+      if ( scale_Hij .gt. 0.0 ) then
+        Hij(1,2) = scale_Hij*Hij(1,2)
+      else
+        do i=1,nstates
+          do j=1,nstates
+            if (i==j) then
+              Hij(i,j)=EQ(i)%total
+            else
+              if (A(i,j)==0.0) then
+                Hij(i,j) = A(j,i)*exp(-mu(j,i)*(offd(1)%rkl-rxy0(j,i)))* &
+                exp(-eta(j,i)*(offd(1)%rkl-rxy0(j,i))**2)
+              else 
+                Hij(i,j) = A(i,j)*exp(-mu(i,j)*(offd(1)%rkl-rxy0(i,j)))* &
+                exp(-eta(i,j)*(offd(1)%rkl-rxy0(i,j))**2)
+              end if
+            end if
+          end do
         end do
+      end if
 
-        if ( scale_Hij .gt. 0.0 ) then
-           Hij(1,2) = scale_Hij*Hij(1,2)
-        else
-           do i=1,nstates
-              do j=1,nstates
-                 if (i==j) then
-                    Hij(i,j)=EQ(i)%total
-                 else
-                    if (A(i,j)==0.0) then
-                       Hij(i,j) = A(j,i)*exp(-mu(j,i)*(offd(1)%rkl-rxy0(j,i)))* &
-                            exp(-eta(j,i)*(offd(1)%rkl-rxy0(j,i))**2)
-                    else 
-                       Hij(i,j) = A(i,j)*exp(-mu(i,j)*(offd(1)%rkl-rxy0(i,j)))* &
-                            exp(-eta(i,j)*(offd(1)%rkl-rxy0(i,j))**2)
-                    end if
-                 end if
-              end do
-           end do
+      !-----------------------------------------------------------
+      ! Ground state energy is calculated from secular determinant
+      !-----------------------------------------------------------
+      if (nstates==2) then
+        FEPtmp%vg(ipt)=0.5*(EQ(1)%total+EQ(2)%total)-  &
+        0.5*sqrt( (EQ(1)%total-EQ(2)%total)**2 + 4.*Hij(1,2)**2 )
+        if(nnoffd > 0) then
+          FEPtmp%c1(ipt)=1./(1.+((FEPtmp%vg(ipt)-EQ(1)%total)/Hij(1,2))**2)
+          FEPtmp%c2(ipt)=1-FEPtmp%c1(ipt)
         end if
-
-        !-----------------------------------------------------------
-        ! Ground state energy is calculated from secular determinant
-        !-----------------------------------------------------------
-
-        if (nstates==2) then
-           FEPtmp%vg(ipt)=0.5*(EQ(1)%total+EQ(2)%total)-  &
-                0.5*sqrt( (EQ(1)%total-EQ(2)%total)**2 + 4.*Hij(1,2)**2 )
-           if(nnoffd > 0) then
-              FEPtmp%c1(ipt)=1./(1.+((FEPtmp%vg(ipt)-EQ(1)%total)/Hij(1,2))**2)
-              FEPtmp%c2(ipt)=1-FEPtmp%c1(ipt)
-           end if
         else 
-           call tred2(Hij,nstates,nstates,d,e)
-           call tqli(d,e,nstates,nstates,Hij)
-           FEPtmp%vg(ipt)=MINVAL(d)
-        end if
+          call tred2(Hij,nstates,nstates,d,e)
+          call tqli(d,e,nstates,nstates,Hij)
+          FEPtmp%vg(ipt)=MINVAL(d)
+      end if
 
-        do istate=1,nstates
-           FEPtmp%gap(ipt)=FEPtmp%gap(ipt)+FEPtmp%v(istate,ipt)*coeff(istate)
-        end do
+      do istate=1,nstates
+        FEPtmp%gap(ipt)=FEPtmp%gap(ipt)+FEPtmp%v(istate,ipt)*coeff(istate)
+      end do
 
 
-        if(ipt .gt. nskip) then
-           if(FEPtmp%gap(ipt) .lt. gapmin) gapmin=FEPtmp%gap(ipt)
-           if(FEPtmp%gap(ipt) .gt. gapmax) gapmax=FEPtmp%gap(ipt)
-        end if
-     end do  !(ipt)
-     close(f)
-     FEP(ifile)%npts = ipt
+      if(ipt .gt. nskip) then
+        if(FEPtmp%gap(ipt) .lt. gapmin) gapmin=FEPtmp%gap(ipt)
+        if(FEPtmp%gap(ipt) .gt. gapmax) gapmax=FEPtmp%gap(ipt)
+      end if
+    end do  !(ipt)
+    close(f)
+    FEP(ifile)%npts = ipt
+
+
 
      !copy FEPtmp to D
      allocate(FEP(ifile)%v(nstates, FEP(ifile)%npts), &
@@ -703,7 +702,7 @@ contains
 
   !------------------------------
 
-  SUBROUTINE TRED2(A,N,NP,D,E)
+  subroutine tred2(A,N,NP,D,E)
     !------------------------------------------------------------
     ! This subroutine reduces a symmetric matrix to tridiagonal
     ! form. The tridiagonal matrix can further be diagonalized by
@@ -712,10 +711,10 @@ contains
     ! from http://rsc.anu.au/HWS/COURSES/MATHMETH/node70.html
     ! and rewritten in f90.
     !------------------------------------------------------------ 
-    real(8),dimension(:)      ::D,E
-    real(8),dimension(:,:)    ::A
-    integer                   ::NP,I,J,K,L,N,ERR
-    real(8)                   ::SCALE,F,G,H,HH
+    real(8),dimension(:)   :: D,E
+    real(8),dimension(:,:) :: A
+    integer                :: NP,I,J,K,L,N,ERR
+    real(8)                :: SCALE,F,G,H,HH
 
     IF(N.GT.1)THEN
        DO I=N,2,-1  
@@ -793,11 +792,10 @@ contains
           end do
        END IF
     end do
-  END subroutine TRED2
-
+  end subroutine tred2
   !-----------------------------------
 
-  SUBROUTINE TQLI(D,E,N,NP,Z)
+  subroutine tqli(D,E,N,NP,Z)
     !------------------------------------------------------------ 
     ! This subroutine diagonalizes a tridiagonal matrix which has 
     ! been prepared by the subroutine tred2.
@@ -806,10 +804,10 @@ contains
     ! and rewritten in f90
     !------------------------------------------------------------  
     implicit none
-    real(8),dimension(:)               ::D,E
-    real(8),dimension(:,:)             ::Z
-    integer                            ::I,N,NP,K,L,M,ITER
-    real(8)                            ::DD,G,R,S,C,P,F,B
+    real(8),dimension(:)   :: D,E
+    real(8),dimension(:,:) :: Z
+    integer                :: I,N,NP,K,L,M,ITER
+    real(8)                :: DD,G,R,S,C,P,F,B
 
     IF (N.GT.1) THEN
        DO I=2,N
@@ -867,8 +865,7 @@ contains
        end do
     END IF
     RETURN
-  END subroutine TQLI
-
+  end subroutine tqli
   !-----------------------------------
 
 end program qfep
