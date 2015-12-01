@@ -1,36 +1,28 @@
 Qsource development.
+================================================================================
+
+This is a repository to hold clean Q code.
+The code is in the process of being reorganized and cleaned-up
+according to best coding practices.
+
+Some basic rules taken from the gromacs developers team follow.
+
+Coding Standards
 --------------------------------------------------------------------------------
 
-Creating  a  hierarchy  of  "folders"  corresponding  to  branches  of
-development.
+The GROMACS developers have identified the following important main
+points for taking into account into organizing a molecular dynamics
+code. 
 
-The  idea is  to  migrate the  already  existing personal  development
-branches to a development hierarchy that will look something like:
+1. Code formatting - how to indent code, where to put braces etc.
+2. Code constructs - argument order, return values
+3. Encapsulation using abstract data types
+4. Interfaces - the Application Programming Interface should say it all
+5. Comments in code - need we say more?
+6. Compilation - now and later
+7. Allowed Fortran Features
+8. Handling Errors
 
-    development/alex
-    development/beat
-    development/esguerra	
-    development/irek
-    development/paul
 
-New folders for development branches should be added under development.
-Say, if  I (username:esguerra) wanted to  create a new branch  for the
-development hierarchy I could do:
-
-##Create new development branch which can latter be merged to master    
-
-    git branch development/esguerra
-    git checkout development/esguerra
-    git add .
-    git commit -a
-    git push --set-upstream origin development/esguerra
-
-##To go back to master.  
-
-    git checkout master
-
-When you want to clone only one branch and not the full repository use:  
-
-    git clone https://github.com/qusers/qsource.git --branch development/esguerra --single-branch esguerra
-
+1. [Code formatting](1. Code formating)
 
