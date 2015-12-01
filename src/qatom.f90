@@ -38,7 +38,7 @@ module qatom
   !-----------------------------------------------------------------------
 
   integer, parameter                      :: max_states = 10
-  integer, parameter                      :: max_qat    = 100
+  integer, parameter                      :: max_qat    = 1000
   integer, parameter                      :: max_link   = 10
 
   integer                                 :: nstates, nqat
@@ -142,13 +142,13 @@ module qatom
   integer, parameter                      :: MAX_ATOMS_IN_SPECIAL_GROUP=30
   integer                                 :: monitor_group_pairs, monitor_groups
 
-  !type holding all scaling factors for electostatic interactions in qq-pairs
-  type qq_el_scale_TYPE
-     integer(AI)      ::iqat,jqat
-     real(8)          ::el_scale
-  end type qq_el_scale_TYPE
+  !type holding all scaling factors for electrostatic interactions in qq-pairs
+  type qq_el_scale_type
+     integer(AI)      :: iqat, jqat
+     real(8)          :: el_scale(max_states) ! holds the el_scale for different states "masoud Oct_2013"
+  end type qq_el_scale_type
 
-  type(qq_el_scale_TYPE),allocatable      :: qq_el_scale(:) 
+  type(qq_el_scale_type),allocatable      :: qq_el_scale(:) 
 
   integer               ::nel_scale !number of defined scale factors
 
@@ -174,7 +174,7 @@ contains
   !-------------------------------------------------------------------------
 
   subroutine qatom_startup
-    ! initialise used modules
+    ! initialize used modules
     call prmfile_startup
     call nrgy_startup
 
@@ -856,26 +856,26 @@ contains
 
 999 close(4)
     qatom_old_load_fep = .true.
-    !.......................................................................
+  !.......................................................................
   end function qatom_old_load_fep
 
   !-----------------------------------------------------------------------
   logical function qatom_load_fep(fep_file)
     !arguments
-    character(*), intent(in)        ::      fep_file
+    character(*), intent(in)              :: fep_file
     ! *** local variables
-    character(len=200)            ::      line
-    integer                                       ::      i,j,k,l,iat,st
-    integer                                       ::      nqcrg,nqcod
-    character(len=40)                     ::      section
-    logical, allocatable, dimension(:)            ::      type_read
-    integer                                       ::      type_count, filestat
-    real(8)                   ::  el_scale
+    character(len=200)                    :: line
+    integer                               :: i,j,k,l,iat,st,h
+    integer                               :: nqcrg,nqcod
+    character(len=40)                     :: section
+    logical, allocatable, dimension(:)    :: type_read
+    integer                               :: type_count, filestat
+    real(8)                   ::  el_scale(max_states) ! local variable for scaling of different states "masoud Oct_2013"
     integer                   ::  stat
 
     !temp. array to read integer flags before switching to logicals
-    integer                                 ::      exspectemp(max_states)
-    character(len=keylength)        :: qtac_tmp(max_states)
+    integer                               :: exspectemp(max_states)
+    character(len=keylength)              :: qtac_tmp(max_states)
 
     !temp array for reading special atom group members
     integer                   ::  temp_atom(MAX_ATOMS_IN_SPECIAL_GROUP)             
@@ -1062,18 +1062,18 @@ contains
 146 format (i8,1x,i8)
 148 format('>>>>> ERROR: Invalid q-atom number in this group: ',4i5)
 
-    ! --- Read scaling factors for el. interactions between qq-atoms
+    ! --- Read scaling factors for electrostatic interactions between qq-atoms
     section = 'el_scale'
     nel_scale = prm_count(section)
     if(nel_scale > 0) then
        allocate(qq_el_scale(nel_scale))
        write (*,154) nel_scale
-       write(*,155)
+       write (*,155) ('state', i, i=1, nstates) !header fir qq_el_scale at different states "masoud Oct_2013"
        do i=1,nel_scale
           if(.not. prm_get_line(line)) goto 1000
-          read(line,*, err=1000) j, k, el_scale
+          read(line,*, err=1000) j, k, el_scale(1:nstates)
           if(j < 1 .or. j > nqat .or. k < 1 .or. k > nqat) then !Check if qatoms...
-             write(*,148) j,k
+             write (*,148) j,k
              qatom_load_fep = .false.
              cycle
           else if(iqseq(j) == 0 .or. iqseq(k) == 0) then
@@ -1083,13 +1083,13 @@ contains
           end if
           qq_el_scale(i)%iqat=j
           qq_el_scale(i)%jqat=k
-          qq_el_scale(i)%el_scale=el_scale
-          write (*,156) qq_el_scale(i)%iqat,qq_el_scale(i)%jqat,qq_el_scale(i)%el_scale
+          qq_el_scale(i)%el_scale(1:nstates)=el_scale(1:nstates) ! assign scale factor to qq_el_scale variable "masoud Oct_2013"
+          write (*,156) qq_el_scale(i)%iqat, qq_el_scale(i)%jqat, qq_el_scale(i)%el_scale(1:nstates)
        end do
     end if
 154 format (/,'No. of el. scaling factors between q-q-atoms = ',i5)
-155 format('q-atom_i q-atom_j el_scale')
-156 format (i8,1x,i8,1x,f8.2)
+155 format ('q-atom_i q-atom_j el_scale', 7(1x, a5, i2))
+156 format (i8, 1x, i8, 7x, 7(f8.2)) ! print out up to 7 states "masoud Oct_2013"
 
     ! --- Read special exclusions among quantum atoms
     section='excluded_pairs'

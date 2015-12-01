@@ -15,17 +15,15 @@
 !  topology preparation, solvation, validation and PDB I/O
 !------------------------------------------------------------------------------!
 module prep
-
   use trj
   use parse
   use prmfile
   use indexer
   use prefs
   use maskmanip
-
   implicit none
 
-!constants
+  !constants
   character(*), private, parameter :: MODULE_VERSION = '5.7'
   character(*), private, parameter :: MODULE_DATE = '2015-02-22'
 
@@ -37,7 +35,6 @@ module prep
   integer, parameter               :: max_cgplib = 100
   integer, parameter               :: max_atcgplib = 100
 
-
   !FF parameters
   integer, parameter               :: max_old_atyps = 100
   !Extra bonds(S-S bridges etc.)
@@ -48,7 +45,7 @@ module prep
   integer, parameter               :: max_long = 10000
   integer, parameter               :: max_conn = 10
 
-!default values for user-settable variables
+  !default values for user-settable variables
   !minimum solvent - solute heavy atom distance for solvation
   real, target                     :: solvent_pack = 2.4
   !average heavy atom number density of proteins
@@ -68,7 +65,8 @@ module prep
     integer(AI)                    :: i,j
   end type lib_bond_type
 
-  type lib_imp_type !for explicit improper definitions +/- and 4-char. atom names 
+  !for explicit improper definitions +/- and 4-char. atom names
+  type lib_imp_type  
     character(len=1+4)             :: i, j, k, l
   end type lib_imp_type
 
@@ -78,7 +76,7 @@ module prep
     real                           :: value
   end type lib_rule_type
 
-  integer, parameter               :: BUILD_RULE_TORSION = 1
+  integer, parameter               :: build_rule_torsion = 1
 
   type lib_entry_type
     integer                        :: nat, nbnd, nimp, ncgp, nrules
@@ -98,40 +96,45 @@ module prep
     integer(AI), pointer           :: atcgp(:,:)
   end type lib_entry_type
 
-  integer :: nlibres 
+  integer :: nlibres
+
   type(lib_entry_type), target :: lib(max_entry)
 
 ! topology generation flags
 !-------------------------------------------------------------------------------
-        logical                                         ::      have_prm_file_name = .false.
-        logical                                         ::      have_solute_sphere = .false.
-        logical                                         ::      have_title = .false.
-        logical                                         ::      have_solvent_boundary = .false. 
-        logical                                         ::  boundary_set = .false.
+  logical                          :: have_prm_file_name = .false.
+  logical                          :: have_solute_sphere = .false.
+  logical                          :: have_title = .false.
+  logical                          :: have_solvent_boundary = .false. 
+  logical                          :: boundary_set = .false.
 
 !     FF parameter information 
 ! --- Bond parameters 
-        integer                                         ::      nbnd_prm
-        integer                                         ::      nbnd_types
-        TYPE BOND_TYPE_TYPE
-                character(len=KEYLENGTH)::      taci, tacj
-                integer                                 ::      cod
-        end type BOND_TYPE_TYPE
-        TYPE BOND_PRM_TYPE
-                type(BONDLIB_TYPE)              ::      prm
-                character(len=2)                ::      SYBYLtype
-        end type BOND_PRM_TYPE
-        type(BOND_TYPE_TYPE), allocatable::     bnd_types(:)
-        type(BOND_PRM_TYPE), allocatable ::     bnd_prm(:)
+  integer                          :: nbnd_prm
+  integer                          :: nbnd_types
+  type bond_type_type
+    character(len=KEYLENGTH)       :: taci, tacj
+    integer                        :: cod
+  end type bond_type_type
+  
+  type bond_prm_type
+    type(BONDLIB_TYPE)             :: prm
+    character(len=2)               :: SYBYLtype
+  end type bond_prm_type
+
+  type(bond_type_type), allocatable:: bnd_types(:)
+  type(bond_prm_type), allocatable :: bnd_prm(:)
+
 ! --- Angle parameters 
-        TYPE ANGLE_TYPE_TYPE
-                character(len=KEYLENGTH)::      taci, tacj, tack
-                integer                                 ::      cod
-        end type ANGLE_TYPE_TYPE
-        type(ANGLE_TYPE_TYPE), allocatable::    ang_types(:)
-        type(ANGLIB_TYPE), allocatable::        ang_prm(:)
-        integer                                         ::      nang_types
-        integer                                         ::      nang_prm
+   type ANGLE_TYPE_TYPE
+     character(len=KEYLENGTH)      :: taci, tacj, tack
+     integer                       :: cod
+   end type ANGLE_TYPE_TYPE
+
+   type(ANGLE_TYPE_TYPE), allocatable :: ang_types(:)
+   type(ANGLIB_TYPE), allocatable     :: ang_prm(:)
+   integer                            :: nang_types
+   integer                            :: nang_prm
 
 ! --- Torsion parameters 
         TYPE TORSION_TYPE_TYPE
@@ -150,23 +153,23 @@ module prep
 ! --- Improper torsion parameters 
         TYPE IMP_PRM_TYPE
                 character(len=KEYLENGTH)::      taci, tacj, tack, tacl
-                type(IMPLIB_TYPE)               ::      prm
+                type(IMPLIB_TYPE)               :: prm
         end type IMP_PRM_TYPE
         type(IMP_PRM_TYPE), allocatable :: imp_prm(:)
-        integer                                         ::      nimp_prm
-        logical                                         ::      imp_explicit !explicit or automatic defs
+        integer                                 :: nimp_prm
+        logical                                 :: imp_explicit !explicit or automatic defs
 
 ! --- Coordinate information
-        integer                                         ::      natom, nat_wat, nwat
+        integer                                 ::      natom, nat_wat, nwat
         character(len=100)                      ::      coord_source = ''
         character(len=80)                       ::      auto_name = ''
         integer, parameter                      ::      trj_unit = 17
-        integer                                         ::      trj_frame = 0
+        integer                                 ::      trj_frame = 0
         character(len=180)                      ::      trj_filnam
         type(MASK_TYPE)                         ::      mask
 
 ! --- Extra bonds(S-S bridges etc.)
-        integer                                         ::      nextrabnd
+        integer                                 ::      nextrabnd
         type(BOND_TYPE)                         ::      extrabnd(max_extrabnd)
 
 !     Things needed for topology generation 
@@ -192,21 +195,28 @@ module prep
         logical                                         ::      ff_ok = .false.
 
 !       Memory management
-        integer, private                        ::      alloc_status
+        integer, private              ::      alloc_status
         !private subroutine
-        private                                         ::      check_alloc 
+        private                       ::      check_alloc 
+
+
+
+
+
+
+
+
 
 contains
 
 !-----------------------------------------------------------------------
-
 subroutine prep_startup
         logical                                         ::      l
-        !initialise used modules
-        call topo_startup                       ! empty
+        !initialize used modules
+        call topo_startup               ! empty
         call prmfile_startup            ! empty
-        call parse_startup                      ! some code
-        call index_startup                      ! empty
+        call parse_startup              ! some code
+        call index_startup              ! empty
 
         !initialize preference module & add user-settable variables
         call pref_initialize() !        ! allocates mem for p(:)
@@ -223,11 +233,10 @@ subroutine prep_startup
         !without reading solute pdb file 
         call allocate_for_pdb(1,1,1)    
         call cleartop           ! clears pdb filename and prm name
-        CALL clearpdb           !get rid of old PDB data
+        call clearpdb           !get rid of old PDB data
 end subroutine prep_startup
 
 !-----------------------------------------------------------------------
-
 subroutine allocate_for_pdb(atoms, residues, molecules)
 !arguments
         integer, intent(in)                     ::      atoms, residues, molecules
@@ -272,8 +281,8 @@ subroutine check_alloc(message)
         end if
 end subroutine check_alloc
 
-!-----------------------------------------------------------------------
 
+!-----------------------------------------------------------------------
 subroutine addbond
 ! *** local variables
         integer                                         ::      ia, ja
@@ -353,7 +362,6 @@ subroutine clearbond
 end subroutine clearbond
 
 !-----------------------------------------------------------------------
-
 subroutine angle_ene(emax, nlarge, av_ene)
 ! *** local variables
         integer i, j, k, ia, ic, istart, iend, i3, j3, k3, nlarge
@@ -411,7 +419,6 @@ subroutine angle_ene(emax, nlarge, av_ene)
 end subroutine angle_ene
 
 !-----------------------------------------------------------------------
-
 integer function anglecode(taci, tacj, tack)
 !arguments
         character(*), intent(in)                ::      taci, tacj, tack
@@ -3830,7 +3837,7 @@ subroutine readpdb()
 !
 !       PDB format(we need only atom name, res. name, number and coords):
 !   The format is
-!  1. |    1 -  6    |   A6    | Record ID (eg ATOM, HETATM)       
+!   1. |    1 -  6    |   A6    | Record ID (eg ATOM, HETATM)       
 !   2. |    7 - 11    |   I5    | Atom serial number                            
 !   -  |   12 - 12    |   1X    | Blank                                         
 !   3. |   13 - 16    |   A4    | Atom name (eg " CA " , " ND1")   
@@ -4839,201 +4846,204 @@ subroutine solvate_box_grid
 
 end subroutine solvate_box_grid
 
+
 !-----------------------------------------------------------------------
 subroutine solvate_box_file
-
 !local variables
-        character(len=80)               ::      xwat_file
-        integer                                 ::      fstat
-        character(len=80)               ::      line
-        real(8)                                 ::      boxl, waterbox_v, waterbox(1:3)
-        character(len=6)                ::      sphere
-        logical                                 ::      replicate
-        integer                                 ::      extension(1:3)
-        real(8)                                 ::      extensionbox_v, ext(3,3)
-        integer                                 ::      nw, nnw !water molecule counters 
-        integer                                 ::      i, j, k !loop indecis
-        integer                                 ::      filestat !error variable
-        character(len=3)                ::      atomnames
-        character(len=4)                ::      resnam(3)
-        integer                                 ::      resno(3)
-        integer                                 ::      nbox !number of replicated boxes
-        integer                                 ::      nwat_allocate
-        real(8)                                 ::      xcm(3) !center of the waterbox
-        real(8)                                 ::      wshift(3) !distanse to move waters
-        integer                                 ::      nwat_keep !how many waters to keep
-        real(8)                                 ::      temp(3) !temporary coordinate
+  character(len=80)                 :: xwat_file
+  integer                           :: fstat
+  character(len=80)                 :: line
+  real(8)                           :: boxl, waterbox_v, waterbox(1:3)
+  character(len=6)                  :: sphere
+  logical                           :: replicate
+  integer                           :: extension(1:3)
+  real(8)                           :: extensionbox_v, ext(3,3)
+  integer                           :: nw, nnw ! water molecule counters 
+  integer                           :: i, j, k ! loop indices
+  integer                           :: filestat ! error variable
+  character(len=3)                  :: atomnames
+  character(len=4)                  :: resnam(3)
+  integer                           :: resno(3)
+  integer                           :: nbox ! number of replicated boxes
+  integer                           :: nwat_allocate
+  real(8)                           :: xcm(3) ! center of the waterbox
+  real(8)                           :: wshift(3) ! distance to move waters
+  integer                           :: nwat_keep ! how many waters to keep
+  real(8)                           :: temp(3) ! temporary coordinate
 
 !get the name of the file and open the file in unit 13
-        call get_string_arg(xwat_file, '-----> Solvent file name: ')
-        open (unit=13, file=xwat_file, status='old', form='formatted', action='read', iostat=fstat)
-        
-        if( fstat /= 0 ) then
-                write(*,'(a)') '>>>>> ERROR: Could not open water coordinate file.'
-                call parse_reset
-                return
-        end if
+  call get_string_arg(xwat_file, '-----> Solvent file name: ')
+  open (unit=13, file=xwat_file, status='old', form='formatted', action='read', iostat=fstat)
+  
+  if( fstat /= 0 ) then
+          write(*,'(a)') '>>>>> ERROR: Could not open water coordinate file.'
+          call parse_reset
+          return
+  end if
 
 !read the size of the waterbox
-        read(13, '(a80)') line
-        read(line, *, iostat=fstat) boxl
-        if( fstat /= 0 ) then
-                write(*, '(a)') '>>>>> ERROR: Size not specified in water file.'
-                close(13)
-                call parse_reset
-                return
-        end if
-        if( boxl < 0 ) then
-                write(*, '(a)' ) '>>>>> WARNING: Size with negative sign. Converting to positive.'
-                boxl = - boxl
-        end if
+  read(13, '(a80)') line
+  read(line, *, iostat=fstat) boxl
+
+  if( fstat /= 0 ) then
+    write(*, '(a)') '>>>>> ERROR: Size not specified in water file.'
+    close(13)
+    call parse_reset
+    return
+  end if
+
+  if( boxl < 0 ) then
+    write(*, '(a)' ) '>>>>> WARNING: Size with negative sign. Converting to positive.'
+    boxl = - boxl
+  end if
 
 !check if the file contains a sphere of water instead of a box
-        read(line, *, iostat=fstat) boxl, sphere
-        call upcase(sphere)
-        if(sphere == 'SPHERE' ) then
-                write(*, '(a)') '>>>>> ERROR: This file containts a sphere of water. Use a file with a box of water instead.'
-                close(13)
-                call parse_reset
-                return
-        end if
+  read(line, *, iostat=fstat) boxl, sphere
+  call upcase(sphere)
+
+  if(sphere == 'SPHERE' ) then
+    write(*, '(a)') '>>>>> ERROR: This file containts a sphere of water. Use a file with a box of water instead.'
+    close(13)
+    call parse_reset
+    return
+  end if
 
 !Compute waterbox volume and display the waterbox sidelength
-        waterbox(:) = boxl
-        waterbox_v = boxl**3
-        write(*, '(a, f10.3)') 'Boxlength of solvent file               =', waterbox(1)
+  waterbox(:) = boxl
+  waterbox_v = boxl**3
+  write(*, '(a, f10.3)') 'Boxlength of solvent file               =', waterbox(1)
 
 !Determine residue name to use for solvent molecule
-        read(13,1) atomnames(1:1), solvent_name
-        backspace(13)
-        if( .not. set_irc_solvent() ) then
-                close(13)
-                call parse_reset
-                return
-        else if( lib(irc_solvent)%nat /= 3 ) then
-                write(*,'(a)') '>>>>> ERROR: Solvate only works for 3-atom solvents (in this version).'
-                close(13)
-                call parse_reset
-                return
-        else if( lib(irc_solvent)%density <= 0. ) then
-                write(*, '(a, a)' ) '>>>>> ERROR: Density not set in library entry ', lib(irc_solvent)%nam
-                close(13)
-                call parse_reset
-                return
-        end if
+  read(13,1) atomnames(1:1), solvent_name
+  backspace(13)
+  if( .not. set_irc_solvent() ) then
+          close(13)
+          call parse_reset
+          return
+  else if( lib(irc_solvent)%nat /= 3 ) then
+          write(*,'(a)') '>>>>> ERROR: Solvate only works for 3-atom solvents (in this version).'
+          close(13)
+          call parse_reset
+          return
+  else if( lib(irc_solvent)%density <= 0. ) then
+          write(*, '(a, a)' ) '>>>>> ERROR: Density not set in library entry ', lib(irc_solvent)%nam
+          close(13)
+          call parse_reset
+          return
+  end if
 
-!Estimate amount of memory to allocate for temporary waters
-        if( all(boxlength(:)<waterbox(1)) ) then ! don't need to replicate. 5% margin
-                replicate = .false.
-                nwat_allocate = int( lib(irc_solvent)%density*1.05*waterbox_v )
+! Estimate amount of memory to allocate for temporary waters
+  if( all(boxlength(:)<waterbox(1)) ) then ! don't need to replicate. 5% margin
+          replicate = .false.
+          nwat_allocate = int( lib(irc_solvent)%density*1.05*waterbox_v )
+  
+  else ! the waterbox is not big enough 
+          replicate = .true.
+          ! find out in wich direction replication is needed
+          extension(:) = ceiling( boxlength(:)/boxl )
+          extensionbox_v = extension(1)*extension(2)*extension(3)*waterbox_v
+          nwat_allocate = int( lib(irc_solvent)%density*1.05*extensionbox_v )
+  end if
+
+  allocate( xw(3, lib(irc_solvent)%nat, nwat_allocate), keep(nwat_allocate), stat=alloc_status )
+  call check_alloc('temporary solvent coord. arrays')
         
-        else !the waterbox is not big enough 
-                replicate = .true.
-                !find out in wich direction replication is needed
-                extension(:) = ceiling( boxlength(:)/boxl )
-                extensionbox_v = extension(1)*extension(2)*extension(3)*waterbox_v
-                nwat_allocate = int( lib(irc_solvent)%density*1.05*extensionbox_v )
-        end if
+! Coordinate reading.
+1 format(13x, a1, 3x, a4, i5, 4x, 3f8.3)
 
-        allocate( xw(3, lib(irc_solvent)%nat, nwat_allocate), keep(nwat_allocate), stat=alloc_status )
-        call check_alloc('temporary solvent coord. arrays')
-        
-!The reading of the coordinates
-1       format(13x, a1, 3x, a4, i5, 4x, 3f8.3)
+  nw = 0
 
-        nw = 0
+  do i = 1, nwat_allocate-1
+          read(13, 1, iostat=filestat, end=10) &
+                  atomnames(1:1), resnam(1), resno(1), xw(:, 1, nw+1), &
+                  & atomnames(2:2), resnam(2), resno(2), xw(:, 2, nw+1), &
+                  & atomnames(3:3),       resnam(3), resno(3), xw(:, 3, nw+1)
+          !checking the read info
+          if(filestat > 0) then 
+                  write(*, 7) nw
+                  close(13)
+                  call parse_reset
+                  deallocate(xw, keep)
+                  return
+          else if ( any( resnam(:)/=solvent_name ) ) then
+                  write(*, 8) solvent_name, nw
+                  close(13)
+                  call parse_reset
+                  deallocate(xw, keep)
+                  return
+          else if ( any( resno(:)/=resno(1) ) ) then
+                  write(*, 9) nw
+                  close(13)
+                  call parse_reset
+                  deallocate(xw, keep)
+                  return
+          else
+                  nw = nw + 1 
+          end if
+  end do
 
-        do i = 1, nwat_allocate-1
-                read(13, 1, iostat=filestat, end=10) &
-                        atomnames(1:1), resnam(1), resno(1), xw(:, 1, nw+1), &
-                        & atomnames(2:2), resnam(2), resno(2), xw(:, 2, nw+1), &
-                        & atomnames(3:3),       resnam(3), resno(3), xw(:, 3, nw+1)
-                !checking the read info
-                if(filestat > 0) then 
-                        write(*, 7) nw
-                        close(13)
-                        call parse_reset
-                        deallocate(xw, keep)
-                        return
-                else if ( any( resnam(:)/=solvent_name ) ) then
-                        write(*, 8) solvent_name, nw
-                        close(13)
-                        call parse_reset
-                        deallocate(xw, keep)
-                        return
-                else if ( any( resno(:)/=resno(1) ) ) then
-                        write(*, 9) nw
-                        close(13)
-                        call parse_reset
-                        deallocate(xw, keep)
-                        return
-                else
-                        nw = nw + 1 
-                end if
-        end do
+7 format('>>>>> ERROR: Read failure at molecule', i6)
+8 format('>>>>> ERROR: Residue name other than ', a4, ' found at molecule ', i6)
+9 format('>>>>> ERROR: Inconsistent residue numbering at molecule ', i6)
 
-7       format('>>>>> ERROR: Read failure at molecule', i6)
-8       format('>>>>> ERROR: Residue name other than ', a4, ' found at molecule ', i6)
-9       format('>>>>> ERROR: Inconsistent residue numbering at molecule ', i6)
+10 write(*, '(a, i10)') 'No. of molecules in solvent file ', nw 
 
-10      write(*, '(a, i10)') 'No. of molecules in solvent file ', nw 
+  nnw = nw
 
-        nnw = nw
 !Replicate if necessary
-        if(replicate) then
-                write(*, '(a)') 'Replicating box of water...'
-                ext(:,1) = (/boxl, 0._8, 0._8/)
-                ext(:,2) = (/0._8, boxl, 0._8/)
-                ext(:,3) = (/0._8, 0._8, boxl/)
+  if(replicate) then
+    write(*, '(a)') 'Replicating box of water...'
+    ext(:,1) = (/boxl, 0._8, 0._8/)
+    ext(:,2) = (/0._8, boxl, 0._8/)
+    ext(:,3) = (/0._8, 0._8, boxl/)
 
-                nbox = 0
-                do k=1,3 !the three coordinates
-                        if( .not. extension(k) > 1) cycle
-                        
-                        do i = 1,extension(k)-1
-                                nbox = nbox + 1
-                                do j = 1,nw
-                                        nnw = nnw + 1
-                                        xw(:,1,nnw) = xw(:,1,j) + i*ext(k,:)
-                                        xw(:,2,nnw) = xw(:,2,j) + i*ext(k,:)
-                                        xw(:,3,nnw) = xw(:,3,j) + i*ext(k,:)            
-                                end do
-                                waterbox(k) = waterbox(k) + boxl
-                                end do
-            nw = nnw
-                end do
+    nbox = 0
+    do k=1,3 !the three coordinates
+            if( .not. extension(k) > 1) cycle
+            
+            do i = 1,extension(k)-1
+                    nbox = nbox + 1
+                    do j = 1,nw
+                            nnw = nnw + 1
+                            xw(:,1,nnw) = xw(:,1,j) + i*ext(k,:)
+                            xw(:,2,nnw) = xw(:,2,j) + i*ext(k,:)
+                            xw(:,3,nnw) = xw(:,3,j) + i*ext(k,:)            
+                    end do
+                    waterbox(k) = waterbox(k) + boxl
+                    end do
+    nw = nnw
+    end do
 
-                nw = nnw
-                write(*, '(a, i5, a)') 'Added', nbox, ' boxes of water'
-                write(*,'(a, i10)') 'No of molecules after replication          = ', nw
-
-        end if
+    nw = nnw
+    write(*, '(a, i5, a)') 'Added', nbox, ' boxes of water'
+    write(*,'(a, i10)') 'No of molecules after replication          = ', nw
+  end if
 
 
 !Compute the centre coordinates for the waterbox
-        xcm(:) = sum( sum(xw, dim=3), dim=2) / (nw*lib(irc_solvent)%nat)
-        wshift(:) = boxcentre(:) - xcm(:)
+  xcm(:) = sum( sum(xw, dim=3), dim=2) / (nw*lib(irc_solvent)%nat)
+  wshift(:) = boxcentre(:) - xcm(:)
 
 !Remove water molecules outside of periodic box
-        nwat_keep = 0
+  nwat_keep = 0
 
-        do i = 1,nw
-                temp = xw(:,1,i)
-                
-                if(all(temp(:)<xcm(:)+0.5*boxlength(:)) &
-                        .and. all(temp(:)>xcm(:)-0.5*boxlength(:))) then
-                        !keep this molecule
-                        nwat_keep = nwat_keep + 1
-                        keep(i) = .true.
-                        !shift to periodic box centre
-                        do j = 1, lib(irc_solvent)%nat
-                                xw(:, j, i) = xw(:, j, i) + wshift(:)
-                        end do
-                
-                else !do not keep this molecule
-                        keep(i) = .false.
-                
-                end if
+  do i = 1,nw
+          temp = xw(:,1,i)
+          
+          if(all(temp(:)<xcm(:)+0.5*boxlength(:)) &
+                  .and. all(temp(:)>xcm(:)-0.5*boxlength(:))) then
+                  !keep this molecule
+                  nwat_keep = nwat_keep + 1
+                  keep(i) = .true.
+                  !shift to periodic box centre
+                  do j = 1, lib(irc_solvent)%nat
+                          xw(:, j, i) = xw(:, j, i) + wshift(:)
+                  end do
+          
+          else !do not keep this molecule
+                  keep(i) = .false.
+          
+          end if
 
         end do
 
@@ -5043,50 +5053,42 @@ subroutine solvate_box_file
 
         close(13)
         deallocate(xw, keep)
-
 end subroutine solvate_box_file
 
+
 !---------------------------------------------------------------------------------------------
+subroutine solvate_sphere        
+  character(len=80)                 :: solvate_mode
+        
+  if(.not. set_solvent_sphere()) then
+    call parse_reset !clear command line
+    return
+  end if
 
-subroutine solvate_sphere
+  !chose solvation mode
+  call get_string_arg(solvate_mode, &
+  '-----> Select solvation mode: grid(1), file(2), restart(3), DWF(4): ')
+  call upcase(solvate_mode)
         
-        character(len=80)                       ::      solvate_mode
-        
-        if(.not. set_solvent_sphere()) then
-                call parse_reset !clear command line
-                return
-        end if
-
-        !chose solvation mode
-        call get_string_arg(solvate_mode, &
-                '-----> Select solvation mode: grid(1), file(2), restart(3), DWF(4): ')
-        call upcase(solvate_mode)
-        
-        select case(solvate_mode)
-        case ('GRID','1')
-                call solvate_sphere_grid
-        
-        case ('FILE','2')
-                call solvate_sphere_file(.true.)
-        
-        case ('RESTART','3')
-                call solvate_restart
-
-        case ('DWF','4')
-                call solvate_sphere_file(.false.)
-        
-        case default
-                write(*,'(a)') '>>>>> ERROR: Unknown mode of solvation.'
-                call parse_reset
-                return
-        end select              
-
+  select case(solvate_mode)
+    case ('GRID','1')
+      call solvate_sphere_grid
+    case ('FILE','2')
+      call solvate_sphere_file(.true.)
+    case ('RESTART','3')
+      call solvate_restart
+    case ('DWF','4')
+      call solvate_sphere_file(.false.)
+    case default
+      write(*,'(a)') '>>>>> ERROR: Unknown mode of solvation.'
+      call parse_reset
+      return
+  end select
 end subroutine solvate_sphere
 
-!------------------------------------------------------------------------------------------------
 
-logical function set_solvent_sphere()
-        
+!------------------------------------------------------------------------------------------------
+logical function set_solvent_sphere()        
         !locals
         character(len=80)                       ::      line
         integer                                         ::      filestat
@@ -5228,14 +5230,14 @@ subroutine solvate_sphere_grid
 
 end subroutine solvate_sphere_grid
 
-!-----------------------------------------------------------------------
 
+!-----------------------------------------------------------------------
 subroutine solvate_sphere_file(shift)
 ! parameters
         logical, intent(in), optional:: shift
 
 ! local variables
-        integer                                         ::      i,j,nw,nnw
+        integer                    ::      i,j,nw,nnw
         integer                                         ::      nwat_allocate, nwat_keep
         real(8)                                         ::      rmax2,dx2,boxl, newboxl
         real(8), save                           ::      xcm(3),wshift(3)

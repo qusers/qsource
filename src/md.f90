@@ -7494,7 +7494,7 @@ subroutine nbqqlist
                    l=qq_el_scale(i)%jqat
                    if ((iq == k .and. jq == l) .or. &
                         (iq == l .and. jq == k)) then
-                      nbqq(nbqq_pair(is),is)%el_scale = qq_el_scale(i)%el_scale
+                      nbqq(nbqq_pair(is),is)%el_scale = qq_el_scale(i)%el_scale(is)!masoud
                       set=.true.
                       exit
                    end if

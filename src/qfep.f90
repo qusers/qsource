@@ -39,7 +39,7 @@ program qfep
                               avc21,avc22,avc23,avc31,avc32,avc33,avr
 
   real(8),dimension(mxbin,4) :: binsum
-  integer,dimension(mxbin)   :: nbinpts,ptsum
+  integer,dimension(mxbin)   :: nbinpts, ptsum
 
   type(Q_ENERGIES), dimension(mxstates) :: EQ
   type(Q_ENERGIES), dimension(mxstates) :: avEQ
@@ -63,7 +63,9 @@ program qfep
 
   real(8),dimension(mxstates,mxbin) :: avdvv,sumv,sumv2 
 
-  integer :: f
+  integer        :: f, gas=0, error, dummyno ! masoud
+  real           :: dummy !masoud
+  character(100) :: iline !masoud
 
   !header
   write(*,100) MODULE_VERSION, MODULE_DATE
@@ -80,9 +82,9 @@ program qfep
   call prompt ('--> No. of states, no. of predefined off-diag elements: ')
   read (*,*) nstates, noffd
   write (*,2) nstates, noffd
+
 2 format('# Number of states                 =',i6,/, &
        '# Number of off-diagonal elements =',i6)
-
   !allocate size of secular determinant
   allocate(Hij(nstates,nstates),d(nstates),e(nstates),STAT=ERR)
   if(ERR /= 0) then
@@ -91,11 +93,34 @@ program qfep
   end if
 
   ! Continue to read input
-  call prompt ('--> Give kT & no, of pts to skip: ')
-  read (*,*) rt,nskip
-  write (*,3) rt,nskip
+  call prompt ('--> Give kT & num. of pts to skip & calculation mode: ')
+  read(*,'(a)') iline
+
+  ! masoud reading an extra option for just calculating QQ energies
+  !print*, iline
+  do i=1,4
+    read (iline,*,iostat=error)(dummy,j=1,i)
+!   print*, error,"***",i,dummy
+    if (error .ne. 0) then
+      dummyno=i-1
+      exit
+    endif
+  enddo
+  if (dummyno .eq. 2) then
+          read (iline,*) rt,nskip
+  elseif (dummyno .eq. 3) then
+          read (iline,*) rt,nskip,gas
+  else
+          print*, "num. correct arguments for KT, data points to skip or calculation mode"
+          stop
+  end if
+  ! masoud
+
+! read (*,*) rt,nskip
+  write (*,3) rt,nskip,gas
 3 format('# kT                              =',f6.3,/, &
-       '# Number of data points to skip   =',i6)
+         '# Number of data points to skip   =',i6,/, '# Only QQ interactions will be considered   = ',i3)
+
 
   call prompt ('--> Give number of gap-bins: ')
   read (*,*) nbins
@@ -108,10 +133,10 @@ program qfep
 5 format('# Minimum number of points per bin=',i6)
 
   do istate=2,nstates
-     write(line,7) istate
-     call prompt(line)
-     read (*,*) alfa(istate)
-     write (*,6) istate,alfa(istate)
+    write(line,7) istate
+    call prompt(line)
+    read (*,*) alfa(istate)
+    write (*,6) istate,alfa(istate)
   end do
 6 format('# Alpha for state ',i2,'              =',f6.2)
 7 format('--> Give alpha for state ',i2,':')
@@ -209,15 +234,26 @@ program qfep
 
     rewind (f)
 
-
     ipt = 0
     avEQ(:) = avEQ(:) * 0. !set all fields to zero using multiplication operator
     FEPtmp%gap(:) = 0.
     do while(get_ene(f, EQ(:), offd, nstates, nnoffd) == 0) !keep reading till EOF
       ipt = ipt + 1
-      if(ipt > nskip) then
-        avEQ(:) = avEQ(:) + EQ(:) !use Qenergies + operator 
+!   masoud
+!if the gas flag is > 0 then total energy will be just q (bonded), qq(nonbonded) and restraint
+      if (gas .gt. 0 ) then
+        do i=1,nstates
+          EQ(i)%total=EQ(i)%q%bond+EQ(i)%q%angle+EQ(i)%q%torsion+EQ(i)%q%improper+EQ(i)%qq%el+EQ(i)%qq%vdw+EQ(i)%restraint
+!         print*, EQ(i)%total, EQ(i)%q,EQ(i)%qq,EQ(i)%restraint
+!         print*, "''''''''''"
+!         if (ipt > 10 ) stop
+        end do
       end if
+!   masoud
+    if(ipt > nskip) then
+      avEQ(:) = avEQ(:) + EQ(:) !use Qenergies + operator
+    end if
+
 
       !-------------------------------------------
       ! Correct H_ii with alfa, and modify H_ij...
@@ -273,12 +309,13 @@ program qfep
         FEPtmp%gap(ipt)=FEPtmp%gap(ipt)+FEPtmp%v(istate,ipt)*coeff(istate)
       end do
 
-
       if(ipt .gt. nskip) then
         if(FEPtmp%gap(ipt) .lt. gapmin) gapmin=FEPtmp%gap(ipt)
         if(FEPtmp%gap(ipt) .gt. gapmax) gapmax=FEPtmp%gap(ipt)
       end if
-    end do  !(ipt)
+  end do  !(ipt)
+
+
     close(f)
     FEP(ifile)%npts = ipt
 
