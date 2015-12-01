@@ -24,5 +24,13 @@ code.
 8. Handling Errors
 
 
-1. [Code formatting](1. Code formating)
+1. **Code formatting**  
+* No tabs, spaces only.  
+* Two spaces for indentation of each level.  
+* No more than 80 characters to allow for easy code visualization
+  across editors.  
+* No trailing whitespaces. They are not seen by default in most
+  editors but still count as changes in git.  
+
+
 
