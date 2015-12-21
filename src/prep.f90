@@ -4590,10 +4590,10 @@ logical function set_simulation_sphere()
         !as residue:atom or x y z
         
         !locals
-        character(len=80)                       ::      line
-        integer                                         ::      filestat
-        integer                                         ::      centre_atom
-        real                                            ::      rwat_in, xwat_in
+        character(len=80)           :: line
+        integer                     :: filestat
+        integer                     :: centre_atom
+        real                        :: rwat_in, xwat_in
 
         set_simulation_sphere = .false.
 
@@ -5708,14 +5708,14 @@ subroutine grow_arrays_for_solvent(nmore, atoms_per_molecule)
         end if          
 end subroutine grow_arrays_for_solvent
 
-!-----------------------------------------------------------------------
 
+!-----------------------------------------------------------------------
 real function rwat_eff()
   ! local variables
-  integer                                               :: i,kr,isort,bins
-  real(8)                                               :: rc,rnwat
-  integer, allocatable                  :: npro_of_r(:)
-        real(8)                                         ::      rho_ratio, solvent_volume, rho_solvent
+  integer                           :: i,kr,isort,bins
+  real(8)                           :: rc,rnwat
+  integer, allocatable              :: npro_of_r(:)
+  real(8)                           :: rho_ratio, solvent_volume, rho_solvent
 
         rwat_eff = 0
         if ( nwat .eq. 0 ) return
