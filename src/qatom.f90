@@ -604,8 +604,12 @@ logical function qatom_load_fep(fep_file)
   logical,allocatable			:: testarray(:)
   type(Q_SANITYCHECK),allocatable	:: break_bonds(:)
   type(Q_SAN_CHECK),allocatable		:: break_angles(:)
+  type(Q_SAN_CHECK),allocatable         :: tmp_break_angles(:)
   type(Q_SAN_CHECK),allocatable		:: break_torsions(:)
+  type(Q_SAN_CHECK),allocatable         :: tmp_break_torsions(:)
   type(Q_SAN_CHECK),allocatable		:: break_impropers(:)
+  type(Q_SAN_CHECK),allocatable         :: tmp_break_impropers(:)
+  integer                               :: q_sanity_counter
   integer				:: nbreak_ang=-1
   integer				:: nbreak_tor=-1
   integer				:: nbreak_imp=-1
@@ -1100,7 +1104,8 @@ logical function qatom_load_fep(fep_file)
 !then get the angles that those atoms are involved in if not set to zero
 !and check if they are broken in the angles section
 !allocate the maximum number of angles that can theoretically break
-	allocate(break_angles(nqangle+1),stat=alloc_status_qat)
+        q_sanity_counter = 1
+	allocate(break_angles(nqangle+q_sanity_counter),stat=alloc_status_qat)
 	call check_alloc_general(alloc_status_qat,'Q angle break array')
 	nbreak_ang = 0
 	do i=1,nbreak_bnd
@@ -1115,6 +1120,17 @@ logical function qatom_load_fep(fep_file)
 				(ang(j)%j.eq.ibreak .and. ang(j)%i.eq.jbreak)) .and. &
 				ang(j)%cod.ne.0) then
 				nbreak_ang = nbreak_ang + 1
+                                if(nbreak_ang .gt. nqangle+q_sanity_counter) then
+                                        allocate(tmp_break_angles(nbreak_ang),stat=alloc_status_qat)
+                                        call check_alloc_general(alloc_status_qat,'TMP Q angle break array')
+                                        tmp_break_angles(1:nbreak_ang-1) = break_angles(1:nbreak_ang-1)
+                                        deallocate(break_angles)
+                                        q_sanity_counter = q_sanity_counter + 10
+                                        allocate(break_angles(nqangle+q_sanity_counter),stat=alloc_status_qat)
+                                        call check_alloc_general(alloc_status_qat,'Q angle break array')
+                                        break_angles(1:nbreak_ang-1) = tmp_break_angles(1:nbreak_ang-1)
+                                        deallocate(tmp_break_angles)
+                                end if
 				break_angles(nbreak_ang)%num = j
 				break_angles(nbreak_ang)%code = ang(j)%cod
 				break_angles(nbreak_ang)%brk_state = istate
@@ -1294,7 +1310,8 @@ logical function qatom_load_fep(fep_file)
 !then get the torsions that those atoms are involved in if not set to zero
 !and check if they are broken in the torsion section
 !allocate the maximum number of torsions that can theoretically break
-        allocate(break_torsions(nqtor+1),stat=alloc_status_qat)
+        q_sanity_counter = 1
+        allocate(break_torsions(nqtor+q_sanity_counter),stat=alloc_status_qat)
 	call check_alloc_general(alloc_status_qat,'Q torsion breaking array')
 	nbreak_tor=0
         do i=1,nbreak_bnd
@@ -1311,6 +1328,17 @@ logical function qatom_load_fep(fep_file)
                                 (tor(j)%j.eq.ibreak .and. tor(j)%i.eq.jbreak)) .and. &
                                 tor(j)%cod.ne.0) then
                                 nbreak_tor = nbreak_tor + 1
+                                if(nbreak_tor .gt. (nqtor+q_sanity_counter)) then
+                                        allocate(tmp_break_torsions(nbreak_tor),stat=alloc_status_qat)
+                                        call check_alloc_general(alloc_status_qat,'TMP Q torsion break array')
+                                        tmp_break_torsions(1:nbreak_tor-1) = break_torsions(1:nbreak_tor-1)
+                                        deallocate(break_torsions)
+                                        q_sanity_counter = q_sanity_counter + 10
+                                        allocate(break_torsions(nqtor+q_sanity_counter),stat=alloc_status_qat)
+                                        call check_alloc_general(alloc_status_qat,'Q torsion break array')
+                                        break_torsions(1:nbreak_tor-1) = tmp_break_torsions(1:nbreak_tor-1)
+                                        deallocate(tmp_break_torsions)
+                                end if
                                 break_torsions(nbreak_tor)%num = j
                                 break_torsions(nbreak_tor)%code = tor(j)%cod
                                 break_torsions(nbreak_tor)%brk_state = istate
@@ -1482,7 +1510,8 @@ logical function qatom_load_fep(fep_file)
 !then get the torsions that those atoms are involved in if not set to zero
 !and check if they are broken in the improper section
 !allocate the maximum number of impropers that can theoretically break
-        allocate(break_impropers(nbreak_bnd*4),stat=alloc_status_qat)
+        q_sanity_counter = 1
+        allocate(break_impropers(nqimp+q_sanity_counter),stat=alloc_status_qat)
 	call check_alloc_general(alloc_status_qat,'Q improper breaking array')
 	nbreak_imp = 0
         do i=1,nbreak_bnd
@@ -1499,6 +1528,17 @@ logical function qatom_load_fep(fep_file)
 				(imp(j)%l.eq.ibreak .and. imp(j)%j.eq.jbreak)) .and. &
 				imp(j)%cod.ne.0) then
                                 nbreak_imp = nbreak_imp + 1
+                                if(nbreak_tor .gt. nqimp+q_sanity_counter) then
+                                        allocate(tmp_break_impropers(nbreak_imp),stat=alloc_status_qat)
+                                        call check_alloc_general(alloc_status_qat,'TMP Q improper break array')
+                                        tmp_break_impropers(1:nbreak_imp-1) = break_impropers(1:nbreak_imp-1)
+                                        deallocate(break_impropers)
+                                        q_sanity_counter = q_sanity_counter + 10
+                                        allocate(break_impropers(nqimp+q_sanity_counter),stat=alloc_status_qat)
+                                        call check_alloc_general(alloc_status_qat,'Q improper break array')
+                                        break_impropers(1:nbreak_imp-1) = tmp_break_impropers(1:nbreak_imp-1)
+                                        deallocate(tmp_break_impropers)
+                                end if
                                 break_impropers(nbreak_imp)%num = j
                                 break_impropers(nbreak_imp)%code = imp(j)%cod
                                 break_impropers(nbreak_imp)%brk_state = istate
