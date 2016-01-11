@@ -12,19 +12,23 @@ Coding Standards
 
 The GROMACS developers have identified the following important main
 points for taking into account into organizing a molecular dynamics
-code. 
+code.  
 
-1. Code formatting - how to indent code, where to put braces etc.
-2. Code constructs - argument order, return values
-3. Encapsulation using abstract data types
-4. Interfaces - the Application Programming Interface should say it all
-5. Comments in code - need we say more?
-6. Compilation - now and later
-7. Allowed Fortran Features
-8. Handling Errors
+1. Code formatting - how to indent code, where to put braces etc.  
+2. Code constructs - argument order, return values  
+3. Encapsulation using abstract data types  
+4. Interfaces - the Application Programming Interface should say it
+   all  
+5. Comments in code - need we say more?  
+6. Compilation - now and later  
+7. Allowed Fortran Features  
+8. Handling Errors  
+
 
 
 1. **Code formatting**  
+--------------------------------------------------------------------------------
+
 * No tabs, spaces only.  
 * Two spaces for indentation of each level.  
 * No more than 80 characters to allow for easy code visualization
