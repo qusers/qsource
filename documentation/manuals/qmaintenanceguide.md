@@ -157,6 +157,39 @@ to  adapt to  the  slurm manager  at  Glenn and  also  make sure  path
 declarations point to your **Q** binaries.
 
 
+###Linux - CentOS 6.7 (hebbe) Intel 2650v3 (haswell)  
+
+For hardware info on the cluster go to:
+
+    http://www.c3se.chalmers.se/index.php/Hardware_Hebbe
+
+Q can be compiled in Hebbe with either GCC (GNU Compiler Collection) in the following way:  
+
+```bash
+unset SSH_ASKPASS
+git clone https://yourusername@github.com/qusers/qsource.git
+cd qsource/src
+module load GCC/5.2.0
+module load OpenMPI/1.10.1-GCC-5.2.0
+make mpi COMP=gcc
+```  
+
+Or it can also be compiled using Intel Fortran following these steps:  
+
+```bash
+unset SSH_ASKPASS
+git clone https://yourusername@github.com/qusers/qsource.git
+cd qsource/src
+module load iimpi
+make mpi COMP=ifort
+```  
+
+After compilation make sure to run the benchmarks changing the options
+to  adapt to  the  slurm manager  at  Hebbe and  also  make sure that 
+path declarations in the test scripts point to your **Q** binaries.  
+Remember also to load the MPI module for running the parallel version of **Q**.
+
+
 ###Linux - CentOS 6.3 (csb) Intel
 
 To compile at csb follow these steps:  
