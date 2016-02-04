@@ -25,7 +25,6 @@ ifeq ($(COMP),ifort)
 				-unroll-aggressive -finline-limit=1000 \
 				-no-inline-max-size -no-prec-div
 	FFLAGS=		-fp-model precise -fp-model except
-	FFLAGS_R8=	-r8
 	FC_DEBUG=	-unroll 
 	FPP_FLG=	-fpp -DINTEL
 
@@ -51,7 +50,6 @@ else ifeq ($(COMP),osx)
 	FFLAGS=         -fstack-protector -DG95=1 \
                         -ffree-line-length-none -fcray-pointer -fall-intrinsics\
                         -std=legacy -Wall -Wtabs 
-	FFLAGS_R8=	-fdefault-real-8
 	FPP_FLG=        -cpp -DOSX
 
 	MPIFC=          mpif90
@@ -69,7 +67,6 @@ else ifeq ($(COMP),pgi)
 	FC=		pgf90
 	FC_OPT=		-fastsse -Mipa=fast,inline -Minline=lrf_update,size:10000,levels:2 -O4 -Munroll -mcmodel=medium -Minfo=inline
 	FFLAGS=		
-	FFLAGS_R8=	-r8
 	FPP_FLG=	-Mpreprocess -DPGI
 
 	MPIFC=		mpif90
@@ -84,7 +81,7 @@ else ifeq ($(COMP),pgi)
 else ifeq ($(COMP),ibm)
 	FC=             xlf90
 	FC_OPT=         -qsmp=omp
-	FFLAGS=		-qrealsize=8 -DIBM
+	FFLAGS=		-DIBM
 
 ################################################################################
 # GNU gcc-gfortran
@@ -102,7 +99,6 @@ else ifeq ($(COMP),gcc)
 	MPFLAG=		-fopenmp ${MPI}
 
 	FFLAGS=		--static ${OMPI_FCFLAGS}
-	FFLAGS_R8=	-fdefault-real-8
 
 	DEBUG=          -fbacktrace -g ${DEBUG_FC}	-ffree-line-length-none -fcray-pointer -fall-intrinsics -std=legacy
 	DEBUGMPI=       -fbacktrace -g ${DEBUG_FC}      -ffree-line-length-none -fcray-pointer -fall-intrinsics -std=legacy
@@ -119,7 +115,6 @@ else
                         -ffree-line-length-none -fcray-pointer -fall-intrinsics -std=legacy
 	MPFLAG=		-fopenmp ${MPI}
 	FFLAGS=		--static ${MPI}
-	FFLAGS_R8=	-fdefault-real-8
 endif
 
 ################################################################################
