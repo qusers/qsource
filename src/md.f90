@@ -1940,9 +1940,9 @@ contains
     integer(kind=MPI_ADDRESS_KIND)  :: fdisp(vars)
     integer                         :: mpitype_batch,mpitype_batch2
     integer                         :: nat3
-    real(kind=wp8), allocatable     :: temp_lambda(:)
+    real(kind=dp), allocatable     :: temp_lambda(:)
     integer, parameter              :: maxint=2147483647
-    real(kind=wp8), parameter       :: maxreal=1E35
+    real(kind=dp), parameter       :: maxreal=1E35
     integer  :: MPI_AI_INTEGER, MPI_TINY_INTEGER, i_loop
 
     !external MPI_Address
@@ -15983,7 +15983,7 @@ subroutine gather_nonbond()
 
     ! Post receives for each of the d/E/EQ_recv structures
     ! E/EQ_Recv should really be handled with MPI_Type_create_struct
-    ! and d_recv's type should be handled correctly (it's KIND=wp8)
+    ! and d_recv's type should be handled correctly (it's KIND=dp)
     ! should preferably use size(d_recv, 1) for count
     do i = 1,numnodes-1
        call MPI_IRecv(d_recv(1,i), natom*3, MPI_REAL8, i, tag(1,i), MPI_COMM_WORLD, &

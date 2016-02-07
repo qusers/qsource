@@ -32,7 +32,7 @@ module  mpiglob
   !Gathering
   type MPI_NB_ENERGIES
      sequence
-     real(kind=wp8)       :: lrf
+     real(kind=dp)       :: lrf
      type(NB_ENERGIES)    :: pp,pw,ww
   end type MPI_NB_ENERGIES
 
@@ -47,7 +47,7 @@ module  mpiglob
   integer,allocatable      :: mpi_status(:,:)  
 
   !Used for gathering d,E,EQ
-  real(kind=wp8),allocatable         :: d_recv(:,:)
+  real(kind=dp),allocatable         :: d_recv(:,:)
   type(MPI_NB_ENERGIES),allocatable  :: E_recv(:),E_send(:)
   type(MPI_NBQ_ENERGIES),allocatable :: EQ_recv(:,:),EQ_send(:)
   integer,allocatable                :: request_recv(:,:)
