@@ -15,7 +15,6 @@
 ! by Ireneusz Szeler
 ! q version and help print info
 !------------------------------------------------------------------------------!
-
 module version
   implicit none
 

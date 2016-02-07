@@ -10,7 +10,7 @@
 
 !------------------------------------------------------------------------------!
 !  (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
-!  prep.f90
+!  module: prep.f90
 !  by Johan Aqvist & John Marelius
 !  topology preparation, solvation, validation and PDB I/O
 !------------------------------------------------------------------------------!
@@ -96,9 +96,9 @@ module prep
     integer(AI), pointer           :: atcgp(:,:)
   end type lib_entry_type
 
-  integer :: nlibres
+  integer                          :: nlibres
 
-  type(lib_entry_type), target :: lib(max_entry)
+  type(lib_entry_type), target     :: lib(max_entry)
 
 ! topology generation flags
 !-------------------------------------------------------------------------------
@@ -126,38 +126,41 @@ module prep
   type(bond_prm_type), allocatable :: bnd_prm(:)
 
 ! --- Angle parameters 
-   type ANGLE_TYPE_TYPE
-     character(len=KEYLENGTH)      :: taci, tacj, tack
-     integer                       :: cod
-   end type ANGLE_TYPE_TYPE
+  type ANGLE_TYPE_TYPE
+    character(len=KEYLENGTH)       :: taci, tacj, tack
+    integer                        :: cod
+  end type ANGLE_TYPE_TYPE
 
-   type(ANGLE_TYPE_TYPE), allocatable :: ang_types(:)
-   type(ANGLIB_TYPE), allocatable     :: ang_prm(:)
-   integer                            :: nang_types
-   integer                            :: nang_prm
+  type(ANGLE_TYPE_TYPE), allocatable :: ang_types(:)
+  type(ANGLIB_TYPE), allocatable     :: ang_prm(:)
+  integer                            :: nang_types
+  integer                            :: nang_prm
 
 ! --- Torsion parameters 
-        TYPE TORSION_TYPE_TYPE
-                character(len=KEYLENGTH)::      taci, tacj, tack, tacl
-                integer                                 ::      cod
-        end type TORSION_TYPE_TYPE
-        type(TORSION_TYPE_TYPE), allocatable :: tor_types(:)
-        type(TORLIB_TYPE), allocatable :: tor_prm(:)
-        integer                                         ::      ntor_types
-        integer                                         ::      ntor_prm
-        type TOR_CODES
-                integer                                 ::      ncod
-                integer                                 ::      cod(10)
-        end type TOR_CODES
+  TYPE TORSION_TYPE_TYPE
+    character(len=KEYLENGTH)       :: taci, tacj, tack, tacl
+    integer                        :: cod
+  end type TORSION_TYPE_TYPE
+
+  type(TORSION_TYPE_TYPE), allocatable :: tor_types(:)
+  type(TORLIB_TYPE), allocatable   :: tor_prm(:)
+  integer                          :: ntor_types
+  integer                          :: ntor_prm
+
+  type TOR_CODES
+    integer                        :: ncod
+    integer                        :: cod(10)
+  end type TOR_CODES
 
 ! --- Improper torsion parameters 
-        TYPE IMP_PRM_TYPE
-                character(len=KEYLENGTH)::      taci, tacj, tack, tacl
-                type(IMPLIB_TYPE)               :: prm
-        end type IMP_PRM_TYPE
-        type(IMP_PRM_TYPE), allocatable :: imp_prm(:)
-        integer                                 :: nimp_prm
-        logical                                 :: imp_explicit !explicit or automatic defs
+  TYPE IMP_PRM_TYPE
+    character(len=KEYLENGTH)       :: taci, tacj, tack, tacl
+    type(IMPLIB_TYPE)              :: prm
+  end type IMP_PRM_TYPE
+
+  type(IMP_PRM_TYPE), allocatable  :: imp_prm(:)
+  integer                          :: nimp_prm
+  logical                          :: imp_explicit !explicit or automatic defs
 
 ! --- Coordinate information
         integer                                 ::      natom, nat_wat, nwat
@@ -202,14 +205,13 @@ module prep
 
 
 
-
-
-
-
-
 contains
 
-!-----------------------------------------------------------------------
+
+!------------------------------------------------------------------------------!
+! subroutine: prep_startup
+!
+!------------------------------------------------------------------------------!
 subroutine prep_startup
         logical                                         ::      l
         !initialize used modules
@@ -236,7 +238,11 @@ subroutine prep_startup
         call clearpdb           !get rid of old PDB data
 end subroutine prep_startup
 
-!-----------------------------------------------------------------------
+
+!------------------------------------------------------------------------------!
+! subroutine: allocate_for_pdb
+!
+!------------------------------------------------------------------------------!
 subroutine allocate_for_pdb(atoms, residues, molecules)
 !arguments
         integer, intent(in)                     ::      atoms, residues, molecules
@@ -251,8 +257,11 @@ subroutine allocate_for_pdb(atoms, residues, molecules)
 
 end subroutine allocate_for_pdb
 
-!-----------------------------------------------------------------------
 
+!------------------------------------------------------------------------------!
+! subroutine: prep_shutdown
+!
+!------------------------------------------------------------------------------!
 subroutine prep_shutdown
         call topo_deallocate
 
@@ -261,15 +270,21 @@ subroutine prep_shutdown
         call trj_shutdown
 end subroutine prep_shutdown
 
-!-----------------------------------------------------------------------
 
+!------------------------------------------------------------------------------!
+! subroutine: clearlib
+!
+!------------------------------------------------------------------------------!
 subroutine clearlib
         lib_files = ''
         nlibres = 0
 end subroutine clearlib
 
-!-----------------------------------------------------------------------
 
+!------------------------------------------------------------------------------!
+! subroutine: check_alloc
+!
+!------------------------------------------------------------------------------!
 subroutine check_alloc(message)
 !arguments
         character(*) message
@@ -282,7 +297,11 @@ subroutine check_alloc(message)
 end subroutine check_alloc
 
 
-!-----------------------------------------------------------------------
+
+!------------------------------------------------------------------------------!
+! subroutine: addbond
+!
+!------------------------------------------------------------------------------!
 subroutine addbond
 ! *** local variables
         integer                                         ::      ia, ja
@@ -354,14 +373,23 @@ subroutine addbond
 
 end subroutine addbond
 
-!-----------------------------------------------------------------------
 
+
+!------------------------------------------------------------------------------!
+! subroutine: clearbond
+!
+!------------------------------------------------------------------------------!
 subroutine clearbond
         !clear extra bonds
         nextrabnd = 0
 end subroutine clearbond
 
-!-----------------------------------------------------------------------
+
+
+!------------------------------------------------------------------------------!
+! subroutine: angle_ene
+!
+!------------------------------------------------------------------------------!
 subroutine angle_ene(emax, nlarge, av_ene)
 ! *** local variables
         integer i, j, k, ia, ic, istart, iend, i3, j3, k3, nlarge
@@ -418,7 +446,11 @@ subroutine angle_ene(emax, nlarge, av_ene)
 !.......................................................................
 end subroutine angle_ene
 
-!-----------------------------------------------------------------------
+
+!------------------------------------------------------------------------------!
+! function: anglecode
+!
+!------------------------------------------------------------------------------!
 integer function anglecode(taci, tacj, tack)
 !arguments
         character(*), intent(in)                ::      taci, tacj, tack
@@ -448,8 +480,12 @@ integer function anglecode(taci, tacj, tack)
 !.......................................................................
 end function anglecode
 
-!-----------------------------------------------------------------------
 
+
+!------------------------------------------------------------------------------!
+! subroutine: bond_ene
+!
+!------------------------------------------------------------------------------!
 subroutine bond_ene(emax, nlarge, av_ene)
 ! *** local variables
         integer i, j, ib, ic, istart, iend, i3, j3, nlarge
@@ -496,27 +532,36 @@ subroutine bond_ene(emax, nlarge, av_ene)
 !.......................................................................
 end subroutine bond_ene
 
-!-----------------------------------------------------------------------
 
-character(KEYLENGTH) function wildcard_tac(taci)
+
+!------------------------------------------------------------------------------!
+! function: wildcard_tac
+!
+!------------------------------------------------------------------------------!
+character(keylength) function wildcard_tac(taci)
 !arguments
-        character(*), intent(in)        ::      taci
+  character(*), intent(in)        ::      taci
 ! *** local variables
-        integer                                         ::      hash_pos
-        !find # sign and truncate there - will match anything after
-        hash_pos = scan(taci, '#')
-        if(hash_pos > 0) then
-                wildcard_tac = taci(1:hash_pos-1) 
-        else
-                wildcard_tac = taci
-        endif
+  integer                         ::      hash_pos
+  !find # sign and truncate there - will match anything after
+  hash_pos = scan(taci, '#')
+  if(hash_pos > 0) then
+    wildcard_tac = taci(1:hash_pos-1) 
+  else
+    wildcard_tac = taci
+  endif
 end function wildcard_tac
 
+
+!------------------------------------------------------------------------------!
+! function: bondcode
+!
+!------------------------------------------------------------------------------!
 integer function bondcode(taci, tacj)
 !arguments
         character(*), intent(in)        ::      taci, tacj
 ! *** local variables
-        character(len=KEYLENGTH)                ::      ti, tj
+        character(len=keylength)                ::      ti, tj
         integer i
         integer                                         ::      leni, lenj
         integer                                         ::      score, max_score = 0, max_cod
@@ -542,8 +587,11 @@ integer function bondcode(taci, tacj)
 !.......................................................................
 end function bondcode
 
-!-----------------------------------------------------------------------
 
+!------------------------------------------------------------------------------!
+! subroutine: changeimp
+!
+!------------------------------------------------------------------------------!
 subroutine changeimp
 ! *** local variables
         integer ii, ip, i, j, k, l, noptimp, nchange, nlarge
@@ -590,7 +638,7 @@ subroutine changeimp
 !.......................................................................
 end subroutine changeimp
 
-!-----------------------------------------------------------------------
+
 
 subroutine checkangs
 ! *** local variables
@@ -613,7 +661,7 @@ subroutine checkangs
 
 end subroutine checkangs
 
-!-----------------------------------------------------------------------
+
 
 subroutine checkbonds
 ! *** local variables
@@ -636,7 +684,7 @@ subroutine checkbonds
 
 end subroutine checkbonds
 
-!-----------------------------------------------------------------------
+
 
 subroutine checkimps
 ! *** local variables
@@ -662,7 +710,7 @@ subroutine checkimps
 !.......................................................................
 end subroutine checkimps
 
-!-----------------------------------------------------------------------
+
 
 subroutine checktors
 ! *** local variables
@@ -687,7 +735,7 @@ subroutine checktors
 !.......................................................................
 end subroutine checktors
 
-!-----------------------------------------------------------------------
+
 
 function cross_product(a,b)
         real(8)                                         ::      a(3), b(3), cross_product(3)
@@ -697,7 +745,6 @@ function cross_product(a,b)
         cross_product(3) = a(1) * b(2) - a(2) * b(1)
 end function cross_product
 
-!-----------------------------------------------------------------------
 
 
 subroutine xlink
@@ -778,7 +825,7 @@ jloop:                  do jat=1, lib(jrc)%nat-1
 100     format('Atoms',i6,1x,a,1x,i5,':',a,' and',i6,1x,a,1x,i5,':',a,' are',f5.2,' A apart. Connect [Y/n]?')                                                                   
 end subroutine xlink
 
-!-----------------------------------------------------------------------
+
 
 integer function impcode(taci, tacj, tack, tacl)
 !arguments
@@ -1114,7 +1161,7 @@ integer function impcode(taci, tacj, tack, tacl)
 !.......................................................................
 end function impcode
 
-!-----------------------------------------------------------------------
+
 
 subroutine impr_ene(emax, nlarge, av_ene, mode)
 ! *** local variables
@@ -1203,7 +1250,7 @@ subroutine impr_ene(emax, nlarge, av_ene, mode)
 !.......................................................................
 end subroutine impr_ene
 
-!-----------------------------------------------------------------------
+
 
 subroutine listres
 ! *** local variables
@@ -1231,7 +1278,7 @@ subroutine listres
 
 end subroutine listres
 
-!-----------------------------------------------------------------------
+
 
 subroutine listseq
 ! *** local variables
@@ -1246,7 +1293,7 @@ subroutine listseq
 
 end subroutine listseq
 
-!-----------------------------------------------------------------------
+
 
 subroutine make14list
 ! *** local variables
@@ -1312,7 +1359,7 @@ itloop: do it = 1, ntors
 !.......................................................................
 end subroutine make14list
 
-!-----------------------------------------------------------------------
+
 
 subroutine makeangles
 ! *** local variables
@@ -1421,7 +1468,7 @@ subroutine makeangles
 
 end subroutine makeangles
 
-!-----------------------------------------------------------------------
+
 
 subroutine make_solute_bonds
         !make solute bond list
@@ -1446,7 +1493,7 @@ subroutine make_solute_bonds
         
 end subroutine make_solute_bonds
 
-!--------------------------------------------------------------------
+
 
 subroutine makebonds
         !locals
@@ -1474,7 +1521,7 @@ subroutine makebonds
 
 end subroutine makebonds
 
-!-----------------------------------------------------------------------
+
 
 integer function makeextrabonds()
         !locals
@@ -1508,7 +1555,7 @@ extra:do ix = 1, nextrabnd
 
 end function makeextrabonds
 
-!-----------------------------------------------------------------------
+
 
 subroutine set_bondcodes
         !locals
@@ -1550,7 +1597,7 @@ subroutine set_bondcodes
 
 end subroutine set_bondcodes
 
-!-----------------------------------------------------------------------
+
 
 integer function makesomebonds(startres, endres)
 !arguments
@@ -1602,7 +1649,7 @@ integer function makesomebonds(startres, endres)
 !.......................................................................
 end function makesomebonds
 
-!-----------------------------------------------------------------------
+
 
 subroutine makeexlist
 ! *** local variables
@@ -1680,7 +1727,7 @@ subroutine makeexlist
 !.......................................................................
 end subroutine makeexlist
 
-!-----------------------------------------------------------------------
+
 
 subroutine makehyds
 !local variables
@@ -1723,7 +1770,7 @@ subroutine makehyds
         makeH(:) = .false. !don't need to redo when making topology
 end subroutine makehyds
 
-!-----------------------------------------------------------------------
+
 
 integer function genH(j, residue)
 !arguments
@@ -1977,7 +2024,7 @@ integer function genH(j, residue)
         end do !hydrogens to make
 end function genh
 
-!-----------------------------------------------------------------------
+
 
 subroutine makeimps
 ! *** local variables
@@ -2001,7 +2048,7 @@ subroutine makeimps
 
 end subroutine makeimps
 
-!-----------------------------------------------------------------------
+
 
 subroutine imp_params
 ! *** local variables
@@ -2050,7 +2097,7 @@ subroutine imp_params
 !.......................................................................
 end subroutine imp_params
 
-!-----------------------------------------------------------------------
+
 
 integer function find_atom(ires, atom)
 !arguments
@@ -2110,7 +2157,7 @@ integer function find_atom(ires, atom)
 
 end function find_atom
 
-!-----------------------------------------------------------------------
+
 
 subroutine makeimps_explicit
 !generate impropers using definitions in library file
@@ -2140,7 +2187,7 @@ subroutine makeimps_explicit
 
 end subroutine makeimps_explicit
 
-!-----------------------------------------------------------------------
+
 
 subroutine maketop
 
@@ -2286,7 +2333,7 @@ subroutine maketop
   100 format('parameter file: ', a)
 end subroutine maketop
 
-!----------------------------------------------------------------------
+
 
 subroutine set_default_mask
 
@@ -2298,7 +2345,7 @@ subroutine set_default_mask
         !add all atoms (in_mask is not used)
         call mask_all(mask)
 end subroutine set_default_mask
-!-----------------------------------------------------------------------
+
 
 subroutine makeconn
 !locals
@@ -2321,7 +2368,7 @@ subroutine makeconn
         enddo
 end subroutine makeconn
 
-!-----------------------------------------------------------------------
+
 
 subroutine maketors
 ! *** local variables
@@ -2419,7 +2466,7 @@ subroutine maketors
 !.......................................................................
 end subroutine maketors
 
-!-----------------------------------------------------------------------
+
 
 subroutine prompt(outtxt)
 ! *** local variables
@@ -2433,7 +2480,7 @@ subroutine prompt(outtxt)
 !.......................................................................
 end subroutine prompt
 
-!-----------------------------------------------------------------------
+
 
 real FUNCTION randm(seed, seed_only)
 !arguments
@@ -2471,7 +2518,7 @@ real FUNCTION randm(seed, seed_only)
 !.......................................................................
 end FUNCTION randm
 
-!-----------------------------------------------------------------------
+
 
 subroutine oldreadlib(filnam)
 !arguments
@@ -2618,7 +2665,7 @@ subroutine oldreadlib(filnam)
 
 end subroutine oldreadlib
 
-!-----------------------------------------------------------------------
+
 
 subroutine readlib(file)
 !arguments
@@ -2963,7 +3010,7 @@ ruleloop: do i = 1, lib(nlibres)%nrules
 
 end subroutine readlib
 
-!---------------------------------------------------------------------------------
+
 
 subroutine check_overload(resnam)
         ! arguments
@@ -2981,7 +3028,7 @@ subroutine check_overload(resnam)
         end do
 end subroutine check_overload
 
-!---------------------------------------------------------------------------------
+
 
 subroutine oldreadparm(flag)
 !       arguments
@@ -3161,7 +3208,7 @@ subroutine oldreadparm(flag)
 !.......................................................................
 end subroutine oldreadparm
 
-!-----------------------------------------------------------------------
+
 
 subroutine readff
         !read parameters
@@ -3187,7 +3234,7 @@ subroutine readff
         end if
 end subroutine readff
 
-!-----------------------------------------------------------------------
+
 
 subroutine readparm(filnam) 
 !       arguments
@@ -3676,7 +3723,7 @@ torloop: do i = 1, ntor_types
 !.......................................................................
 end subroutine readparm
 
-!-----------------------------------------------------------------------
+
 
 subroutine clearpdb
 
@@ -3694,7 +3741,7 @@ subroutine clearpdb
 
 end subroutine clearpdb
 
-!-----------------------------------------------------------------------
+
 
 subroutine cleartop
         !forget the name of the parameter file
@@ -3704,7 +3751,7 @@ subroutine cleartop
         topo_ok = .false.
 end subroutine cleartop
 
-!-----------------------------------------------------------------------
+
 
 logical function countpdb(pdb_fileno, atoms, residues, molecules)
 !count atoms, residues and molecules in a pdb file
@@ -3814,7 +3861,7 @@ logical function countpdb(pdb_fileno, atoms, residues, molecules)
 
 end function countpdb
 
-!-----------------------------------------------------------------------
+
 
 subroutine readpdb()
 
@@ -4062,7 +4109,7 @@ subroutine readpdb()
         pdb_file = ''
 end subroutine readpdb
 
-!-----------------------------------------------------------------------
+
 
 subroutine readtop
         ! *** local variables
@@ -4138,7 +4185,7 @@ subroutine readtop
 
 end subroutine readtop
 
-!-----------------------------------------------------------------------
+
 
 subroutine readx
 ! *** local variables
@@ -4172,7 +4219,7 @@ subroutine readx
 100     format('restart file ', a)
 end subroutine readx
 
-!-----------------------------------------------------------------------
+
 
 subroutine readnext
         integer                                         ::      filestat, nat3
@@ -4197,7 +4244,7 @@ subroutine readnext
 110     format(a,'.',a) !for auto file naming trj_filnam.frame
 end subroutine readnext
 
-!-----------------------------------------------------------------------
+
 
 subroutine readframe
 ! *** local variables
@@ -4212,7 +4259,7 @@ subroutine readframe
 
 end subroutine readframe
 
-!-----------------------------------------------------------------------
+
 
 subroutine trajectory
 !locals
@@ -4240,7 +4287,7 @@ subroutine trajectory
                 ' of these are in the mask')
 end subroutine trajectory
 
-!-----------------------------------------------------------------------
+
 
 subroutine modify_mask
 !locals
@@ -4268,7 +4315,7 @@ subroutine modify_mask
         end if
 end subroutine modify_mask
 
-!-----------------------------------------------------------------------
+
 
 subroutine set_cgp
 ! *** local variables
@@ -4370,7 +4417,7 @@ subroutine set_cgp
 140     format('Effective water radius                     :',f6.2)
 end subroutine set_cgp
 
-!-----------------------------------------------------------------------
+
 
 subroutine set_crg
 ! *** local variables
@@ -4396,7 +4443,7 @@ subroutine set_crg
 100 format('Assigned',i6,' atomic charges.')
 end subroutine set_crg
 
-!-----------------------------------------------------------------------
+
 
 subroutine set_iac
 ! *** local variables
@@ -4439,7 +4486,7 @@ subroutine set_iac
 120     format('>>>>> ERROR: Atom type ',a8,' has mass ',f6.2)
 end subroutine set_iac
 
-!-----------------------------------------------------------------------
+
 
 logical function set_irc_solvent()
 
@@ -4461,7 +4508,7 @@ logical function set_irc_solvent()
 
 end function set_irc_solvent
 
-!-----------------------------------------------------------------------
+
 
 subroutine set_solvent_type
         !set solvent type (SPC-like, TIP3P-like or general)
@@ -4503,7 +4550,7 @@ subroutine set_solvent_type
         end if
 end subroutine set_solvent_type
 
-!-----------------------------------------------------------------------
+
 
 integer function get_atom_from_descriptor(aid)
         !arguments
@@ -4528,7 +4575,7 @@ integer function get_atom_from_descriptor(aid)
 
 end function get_atom_from_descriptor
 
-!-----------------------------------------------------------------------
+
 
 !Routine to call from other modules
 subroutine define_boundary_condition
@@ -4538,7 +4585,7 @@ subroutine define_boundary_condition
    end if
 end subroutine define_boundary_condition
 
-!-----------------------------------------------------------------------
+
 
 !Set the boundary condition & read parameterts connected to the boundary. 
 logical function set_boundary_condition()
@@ -4582,7 +4629,7 @@ logical function set_boundary_condition()
 
 end function set_boundary_condition
 
-!-----------------------------------------------------------------------
+
 
 logical function set_simulation_sphere()
                 
@@ -4641,7 +4688,7 @@ logical function set_simulation_sphere()
 
 end function set_simulation_sphere
 
-!-----------------------------------------------------------------------
+
 
 logical function set_solvent_box()
 
@@ -4710,7 +4757,7 @@ logical function set_solvent_box()
 
 end function set_solvent_box
 
-!--------------------------------------------------------------------------------
+
 
 subroutine solvate
         ! Make sure boundary condition is set.
@@ -4728,7 +4775,7 @@ subroutine solvate
 
 end subroutine solvate
 
-!-------------------------------------------------------------------------
+
 
 subroutine solvate_box
         character(len=80)                       ::      solvate_mode
@@ -4762,7 +4809,7 @@ subroutine solvate_box
 
 end subroutine solvate_box
 
-!----------------------------------------------------------------------------
+
 
 subroutine solvate_box_grid
 
@@ -4847,7 +4894,8 @@ subroutine solvate_box_grid
 end subroutine solvate_box_grid
 
 
-!-----------------------------------------------------------------------
+
+
 subroutine solvate_box_file
 !local variables
   character(len=80)                 :: xwat_file
@@ -5056,7 +5104,8 @@ subroutine solvate_box_file
 end subroutine solvate_box_file
 
 
-!---------------------------------------------------------------------------------------------
+
+
 subroutine solvate_sphere        
   character(len=80)                 :: solvate_mode
         
@@ -5087,7 +5136,8 @@ subroutine solvate_sphere
 end subroutine solvate_sphere
 
 
-!------------------------------------------------------------------------------------------------
+
+
 logical function set_solvent_sphere()        
         !locals
         character(len=80)                       ::      line
@@ -5150,7 +5200,7 @@ logical function set_solvent_sphere()
 
 end function set_solvent_sphere
 
-!-----------------------------------------------------------------------
+
 
 subroutine solvate_sphere_grid
 
@@ -5231,7 +5281,8 @@ subroutine solvate_sphere_grid
 end subroutine solvate_sphere_grid
 
 
-!-----------------------------------------------------------------------
+
+
 subroutine solvate_sphere_file(shift)
 ! parameters
         logical, intent(in), optional:: shift
@@ -5434,7 +5485,7 @@ subroutine solvate_sphere_file(shift)
 
 end subroutine solvate_sphere_file
 
-!-------------------------------------------------------------------------
+
 
 subroutine solvate_restart
 
@@ -5495,7 +5546,8 @@ subroutine solvate_restart
 
 end subroutine solvate_restart
 
-!-------------------------------------------------------------------------
+
+
 subroutine add_solvent_to_topology(waters_in_sphere, max_waters, make_hydrogens, pack)
 !arguments
         integer                                         ::      waters_in_sphere
@@ -5625,7 +5677,7 @@ ploop:          do p_atom = 1, nat_pro !for each water check all other atoms
         end do
 end subroutine add_solvent_to_topology
 
-!-----------------------------------------------------------------------
+
 
 subroutine grow_arrays_for_solvent(nmore, atoms_per_molecule)
 !make space for nmore more water molecules
@@ -5709,7 +5761,8 @@ subroutine grow_arrays_for_solvent(nmore, atoms_per_molecule)
 end subroutine grow_arrays_for_solvent
 
 
-!-----------------------------------------------------------------------
+
+
 real function rwat_eff()
   ! local variables
   integer                           :: i,kr,isort,bins
@@ -5761,7 +5814,8 @@ real function rwat_eff()
         deallocate(npro_of_r)
 end function rwat_eff
 
-!-----------------------------------------------------------------------
+
+
 
 type(TOR_CODES) function torcode(taci, tacj, tack, tacl)
 !arguments
@@ -5858,7 +5912,8 @@ type(TOR_CODES) function torcode(taci, tacj, tack, tacl)
 !.......................................................................
 end function torcode
 
-!-----------------------------------------------------------------------
+
+
 
 subroutine tors_ene(emax, nlarge, av_ene)
 ! *** local variables
@@ -5934,7 +5989,8 @@ subroutine tors_ene(emax, nlarge, av_ene)
 
 end subroutine tors_ene
 
-!-----------------------------------------------------------------------
+
+
 
 logical function check_residues()
 !locals
@@ -5963,7 +6019,8 @@ libloop:do j = 1, nlibres
         enddo resloop
 end function check_residues
 
-!-----------------------------------------------------------------------
+
+
 
 subroutine writepdb
 ! *** local variables
@@ -6073,7 +6130,8 @@ subroutine writepdb
 
 end subroutine writepdb
 
-!-----------------------------------------------------------------------
+
+
 
 subroutine writemol2
 ! *** local variables
@@ -6225,7 +6283,8 @@ subroutine writemol2
 
 end subroutine writemol2
 
-!-----------------------------------------------------------------------
+
+
 
 subroutine writetop
 ! *** local variables
@@ -6253,98 +6312,108 @@ subroutine writetop
 
 end subroutine writetop
 
-!-----------------------------------------------------------------------
 
+
+!------------------------------------------------------------------------------!
+! subroutine: listprefs
+!
+!------------------------------------------------------------------------------!
 subroutine listprefs
         call pref_list('Preferences (use set command to change):')
 end subroutine listprefs
 
-!-----------------------------------------------------------------------
 
+
+!------------------------------------------------------------------------------!
+! subroutine: set
+!
+!------------------------------------------------------------------------------!
 subroutine set
-        !locals
-        character(len=PREF_LEN)         ::      name, value
-        logical                                         ::      l
+  !locals
+  character(len=PREF_LEN)         ::  name, value
+  logical                         ::  l
 
-        call get_string_arg(name, '-----> Enter name (or number): ')
-        call get_string_arg(value, '-----> Enter value: ')
-        
-        l = pref_set(name, value)
+  call get_string_arg(name, '-----> Enter name (or number): ')
+  call get_string_arg(value, '-----> Enter value: ')
+
+  l = pref_set(name, value)
 end subroutine set
 
-!*************************************************************************
-!*Sort out atoms in restrained shell. Use protein center to calculate distance.
-!*Use coordinates from topology unless 'implicit_rstr_from_file' is specified
-!*Swiped from md.f90, needed when using atom masks "not restrained"
-!*************************************************************************
+
+!------------------------------------------------------------------------------!
+! subroutine: make_shell2
+!
+! Sort out atoms in restrained shell. Use protein center to calculate distance.
+! Use coordinates from topology unless 'implicit_rstr_from_file' is specified
+! Swiped from md.f90, needed when using atom masks "not restrained"
+!------------------------------------------------------------------------------!
 subroutine make_shell2
 ! *** Local variables
-        integer                                         ::      i,ig,i3,k
-        real(8)                                         ::      rout2,rin2,r2
-        real(8), allocatable            ::      cgp_cent(:,:)
-        nshellats = 0
+  integer                          :: i,ig,i3,k
+  real(8)                          :: rout2,rin2,r2
+  real(8), allocatable             :: cgp_cent(:,:)
+  nshellats = 0
 
-        rexcl_i = get_real_arg('-----> Inner radius of restrained shell ')
+  rexcl_i = get_real_arg('-----> Inner radius of restrained shell ')
+  rin2  = rexcl_i**2
+  shell(:) = .false.
+  allocate(cgp_cent(3,ncgp+nwat))
+  cgp_cent(:,:) = 0.
 
-        rin2  = rexcl_i**2
-
-        shell(:) = .false.
-
-        allocate(cgp_cent(3,ncgp+nwat))
-
-        cgp_cent(:,:) = 0.
-
-        do ig=1,ncgp_solute
+  do ig=1,ncgp_solute
     if (.not. excl(cgp(ig)%iswitch)) then
-                do i = cgp(ig)%first,cgp(ig)%last
-                        i3 = cgpatom(i)*3
-                        cgp_cent(:,ig) = cgp_cent(:,ig) + xtop(i3-2:i3)
-                end do
-        cgp_cent(:,ig) = cgp_cent(:,ig)/real(cgp(ig)%last - cgp(ig)%first +1)
-                r2 = dot_product(cgp_cent(:,ig)-xpcent(:),cgp_cent(:,ig)-xpcent(:))
+      do i = cgp(ig)%first,cgp(ig)%last
+        i3 = cgpatom(i)*3
+        cgp_cent(:,ig) = cgp_cent(:,ig) + xtop(i3-2:i3)
+      end do
+      cgp_cent(:,ig) = cgp_cent(:,ig)/real(cgp(ig)%last - cgp(ig)%first +1)
+      r2 = dot_product(cgp_cent(:,ig)-xpcent(:),cgp_cent(:,ig)-xpcent(:))
 
-                if ( r2 .gt. rin2 ) then
-                        do i=cgp(ig)%first, cgp(ig)%last
-                                nshellats = nshellats + 1
-                                shell(cgpatom(i)) = .true.
-                        end do
-                end if
-   end if
+      if ( r2 .gt. rin2 ) then
+        do i=cgp(ig)%first, cgp(ig)%last
+          nshellats = nshellats + 1
+          shell(cgpatom(i)) = .true.
         end do
+      end if
+    end if
+  end do
 
-        deallocate(cgp_cent) 
-        write(*,105) nshellats, rexcl_i, rexcl_o
-105     format('Found   ',i6,' solute atoms in the restrained shell region (',f6.2,' to ',f6.2,')')
+  deallocate(cgp_cent) 
+  write(*,105) nshellats, rexcl_i, rexcl_o
+105  format('Found   ',i6,' solute atoms in the restrained shell region (',f6.2,' to ',f6.2,')')
 end subroutine make_shell2
 
-!*************************************************************************
-!* Returns true if centre of mass can be assigned
-!*  and returns centre of mass for a mask of atoms in the vector 'centre'
-!*************************************************************************
+
+!------------------------------------------------------------------------------!
+! function: get_centre_by_mass
+!
+! Returns true if centre of mass can be assigned
+! and returns centre of mass for a mask of atoms in the vector 'centre'
+!------------------------------------------------------------------------------!
 logical function get_centre_by_mass(centre)
-real(8), intent(OUT)   :: centre(3)
-type(MASK_TYPE)        :: mask
-integer                :: ats, imaskat, iat
-real(8)                :: totmass, mass
-get_centre_by_mass = .false.
-centre = 0
-totmass=0
-call mask_initialize(mask)
-ats = maskmanip_make_pretop(mask)  
-if (.not. allocated(iac))allocate(iac(nat_pro))
-call set_iac        !Set info about masses
-do iat = 1,nat_pro
-  if (mask%mask(iat)) then
-    if(heavy(iat)) then !skip hydrogens
-      mass=iaclib(iac(iat))%mass
-      totmass=totmass+mass
-          centre = centre + mass*xtop(iat*3-2:iat*3)
+  real(8), intent(out)             :: centre(3)
+  type(mask_type)                  :: mask
+  integer                          :: ats, imaskat, iat
+  real(8)                          :: totmass, mass
+  get_centre_by_mass = .false.
+  centre = 0
+  totmass = 0
+  call mask_initialize(mask)
+  ats = maskmanip_make_pretop(mask)  
+  if (.not. allocated(iac))allocate(iac(nat_pro))
+    call set_iac        !Set info about masses
+  do iat = 1,nat_pro
+    if (mask%mask(iat)) then
+      if(heavy(iat)) then !skip hydrogens
+        mass=iaclib(iac(iat))%mass
+        totmass=totmass+mass
+        centre = centre + mass*xtop(iat*3-2:iat*3)
+      end if
     end if
-  end if
-end do
-centre = centre/totmass  
-get_centre_by_mass = .true.
+  end do
+  centre = centre/totmass  
+  get_centre_by_mass = .true.
 end function get_centre_by_mass
-!*************************************************************************
+
 
 end module prep

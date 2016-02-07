@@ -19,14 +19,15 @@ program qprep
   use version
   use prep
   use avetr
+
   implicit none
 
-  character(*), parameter :: PROGRAM_NAME = 'qprep'
+  character(*), parameter :: PROGRAM_NAME    = 'qprep'
   character(*), parameter :: PROGRAM_VERSION = '5.7'
-  character(*), parameter :: PROGRAM_DATE = '2015-02-22'
+  character(*), parameter :: PROGRAM_DATE    = '2015-02-22'
   character(*), parameter :: PROGRAM_SUFFIX  = ''
   logical                 :: use_inputfile
-  character(200)          :: fileName=''
+  character(200)          :: fileName        = ''
 
   call startup
 
@@ -48,7 +49,7 @@ program qprep
 contains
 
   !----------------------------------------------------------------------------!
-  !  Read input from file and execute commands
+  !>  Read input from file and execute commands
   !----------------------------------------------------------------------------!
   subroutine qprep_from_inputfile(filename)
 
@@ -78,7 +79,7 @@ contains
 
 
   !----------------------------------------------------------------------------!
-  !  Read input from command line and execute commands
+  !>  Read input from command line and execute commands
   !----------------------------------------------------------------------------!
   subroutine qprep_from_commandline
   character(200) :: command

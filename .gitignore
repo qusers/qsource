@@ -1,5 +1,5 @@
-bin/
-obj/
+bin/**
+obj/**
 *.o
 *.mod
 *.toc
@@ -14,7 +14,9 @@ obj/
 *DS_Store*
 *.DS_Store
 slurm*
-osbinaries/
+osbinaries/**
 *.Rhistory
 argcount*
-usercases/
+usercases/**
+logs/**
+doxygen/**

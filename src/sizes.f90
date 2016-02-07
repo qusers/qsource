@@ -15,10 +15,20 @@
 !  data storage specifications for all Q programs
 !-------------------------------------------------------------------------------
 module sizes
+  implicit none
 
   ! Martin Nervall 2002-11-11
   ! set a nice, portable standard for variables
-  integer, parameter :: wp8 = selected_real_kind(15,307) 
+  integer, parameter :: wp8 = selected_real_kind(15,307)
+
+  integer, parameter :: sp = selected_real_kind(6, 37)
+  integer, parameter :: dp = selected_real_kind(15, 307)
+  integer, parameter :: qp = selected_real_kind(33, 4931)
+
+  integer, parameter :: q_int2 = selected_int_kind(4)
+  integer, parameter :: q_int4 = selected_int_kind(9)
+  integer, parameter :: q_int8 = selected_int_kind(18) 
+  integer, parameter :: int_byte = selected_int_kind(2)
 
   ! storage specifications for q
   ! change according to 

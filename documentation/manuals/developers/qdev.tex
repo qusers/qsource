@@ -181,9 +181,11 @@ compiler options.\\
 
 \section{qprep}
 \label{qprep}
-\textbf{qprep} is the utility which allows the translation of pdb files into
-a format which the dynamics engine can understand. The main file generated
-by \textbf{qprep} is refered to as the topology.
+\textbf{qprep}  is the  utility which  allows the  translation of  pdb
+files into a format which the dynamics engine can understand. The main
+file  generated  by \textbf{qprep}  is  refered  to as  the  topology,
+generally  given the  \textit{.top} extension.  The following  command
+passes an input file to qprep.
 
 \lstset{language=sh, frame=single}
 %\begin{Verbatim}[numbers=left]
@@ -192,6 +194,100 @@ by \textbf{qprep} is refered to as the topology.
 \begin{Verbatim}
 qprep generate.inp >& generate.out &
 \end{Verbatim}
+
+\subsection{qprep.f90}
+
+\textbf{qprep.f90} is the  main program which acts as  an interface to
+the main  code which resides  mainly in the  \textbf{prep.f90} module.
+It's composed of six subroutines.\\
+
+\textbf{Modules: }\\
+\textit{version}\\
+\textit{prep}\\
+\textit{avetr}\\
+
+
+\textbf{Subroutines: }\\
+
+
+\subsubsection{version} 
+\subsubsection{prep}
+\begin{Verbatim}
+subroutine prep_startup
+subroutine allocate_for_pdb(atoms, residues, molecules)
+subroutine prep_shutdown
+subroutine clearlib
+subroutine check_alloc(message)
+subroutine addbond
+subroutine clearbond
+subroutine angle_ene(emax, nlarge, av_ene)
+subroutine bond_ene(emax, nlarge, av_ene)
+subroutine changeimp
+subroutine checkangs
+subroutine checkbonds
+subroutine checkimps
+subroutine checktors
+subroutine xlink
+subroutine impr_ene(emax, nlarge, av_ene, mode)
+subroutine listres
+subroutine listseq
+subroutine make14list
+subroutine makeangles
+subroutine make_solute_bonds
+subroutine makebonds
+subroutine set_bondcodes
+subroutine makeexlist
+subroutine makehyds
+subroutine makeimps
+subroutine imp_params
+subroutine makeimps_explicit
+subroutine maketop
+subroutine set_default_mask
+subroutine makeconn
+subroutine maketors
+subroutine prompt(outtxt)
+subroutine oldreadlib(filnam)
+subroutine readlib(file)
+subroutine check_overload(resnam)
+subroutine oldreadparm(flag)
+subroutine readff
+subroutine readparm(filnam)
+subroutine clearpdb
+subroutine cleartop
+subroutine readpdb()
+subroutine readtop
+subroutine readx
+subroutine readnext
+subroutine readframe
+subroutine trajectory
+subroutine modify_mask
+subroutine set_cgp
+subroutine set_crg
+subroutine set_iac
+subroutine set_solvent_type
+subroutine define_boundary_condition
+subroutine solvate
+subroutine solvate_box
+subroutine solvate_box_grid
+subroutine solvate_box_file
+subroutine solvate_sphere
+subroutine solvate_sphere_grid
+subroutine solvate_sphere_file(shift)
+subroutine solvate_restart
+subroutine add_solvent_to_topology(waters_in_sphere, max_waters,
+make_hydrogens, pack)
+subroutine grow_arrays_for_solvent(nmore, atoms_per_molecule)
+subroutine tors_ene(emax, nlarge, av_ene)
+subroutine writepdb
+subroutine writemol2
+subroutine writetop
+subroutine listprefs
+subroutine set
+subroutine make_shell2
+\end{Verbatim}
+ 
+\subsubsection{avetr} 
+
 
 
 \section{qdum}
