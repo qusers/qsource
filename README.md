@@ -5,7 +5,14 @@ This is a repository to hold clean and readable Q code.
 The code is in the process of being reorganized and cleaned-up
 according to best coding practices.
 
-Some basic rules taken from the gromacs developers team follow.
+We are documenting the code using doxygen. To generate the doxygen
+documentation do:  
+
+    cd documentation/manuals/developers
+	doxygen DoxygenConfigFortran
+
+
+Some basic development rules taken from the **gromacs** developers team follow.
 
 
 Coding Standards
