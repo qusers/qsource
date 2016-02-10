@@ -9,25 +9,27 @@
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
-!  (c) 2015 Uppsala Molekylmekaniska HB, Uppsala, Sweden
-!  qprep.f90
-!  by Johan Aqvist & John Marelius
-!  qprep topology preparation main program
+!>  (c) 2015 Uppsala Molekylmekaniska HB, Uppsala, Sweden
+!!  program: qprep.f90
+!!  by Johan Aqvist & John Marelius
+!<  qprep topology preparation main program
 !------------------------------------------------------------------------------!
-
 program qprep
-  use version
   use prep
   use avetr
+  use iso_fortran_env
 
   implicit none
-
-  character(*), parameter :: PROGRAM_NAME    = 'qprep'
+  character(*), parameter :: PROGRAM_NAME = 'qprep'
   character(*), parameter :: PROGRAM_VERSION = '5.7'
-  character(*), parameter :: PROGRAM_DATE    = '2015-02-22'
+  character(*), parameter :: PROGRAM_DATE = '2015-04-01'
   character(*), parameter :: PROGRAM_SUFFIX  = ''
   logical                 :: use_inputfile
   character(200)          :: fileName        = ''
+  character(len=32)       :: arg
+  integer                 :: i
+
+  call commandlineoptions
 
   call startup
 
@@ -49,7 +51,8 @@ program qprep
 contains
 
   !----------------------------------------------------------------------------!
-  !>  Read input from file and execute commands
+  !>  subroutine: qprep_from_inputfile
+  !!  Read input from file and execute commands
   !----------------------------------------------------------------------------!
   subroutine qprep_from_inputfile(filename)
 
@@ -277,7 +280,18 @@ contains
   ! Startup subroutine
   !----------------------------------------------------------------------------!
   subroutine startup
-    call version_check(PROGRAM_NAME, PROGRAM_VERSION, PROGRAM_DATE, PROGRAM_SUFFIX)
+!    call version_check(PROGRAM_NAME, PROGRAM_VERSION, PROGRAM_DATE, PROGRAM_SUFFIX)
+    print '(a)',  '------------------------------------------------------------'
+    print '(4a)', 'Welcome to ', PROGRAM_NAME, ' version: ', PROGRAM_VERSION
+    print '(a)',  ' '
+    print '(2a)', 'This version was compiled using: ', compiler_version()
+    print '(a)',  ' '
+    print '(a)',  'And using the following compiler options: '
+    print '(a)',  compiler_options()
+    print '(a)',  '------------------------------------------------------------'
+    print '(a)',  ' '
+    print '(a)',  'If you are using the interactive mode for help type "help"'
+    print '(a)',  'at the prompt, to quit type "quit".'
     call prep_startup
     write(*,*)
   end subroutine startup
@@ -288,12 +302,49 @@ contains
   !----------------------------------------------------------------------------!
   subroutine shutdown
     call prep_shutdown
-    stop 'qprep ended'
+    stop 'qprep ended normally'
   end subroutine shutdown
+
+  
+  !----------------------------------------------------------------------------!
+  !> subroutine: commandlineoptions
+  !----------------------------------------------------------------------------!
+  subroutine commandlineoptions
+  do i = 1, command_argument_count()
+    call get_command_argument(i, arg)
+    select case (arg)
+    case ('-v', '--version')
+      print '(3a)', PROGRAM_NAME, ' version ', PROGRAM_VERSION
+      stop
+    case ('-h', '--help')
+      call print_help()
+      stop
+    case default
+      print '(a,a,/)', 'Unrecognized command-line option: ', arg
+      call print_help()
+      stop
+    end select
+  end do
+  end subroutine commandlineoptions
+
+  !----------------------------------------------------------------------------!
+  !> subroutine: print_help
+  !----------------------------------------------------------------------------!
+  subroutine print_help()
+    print '(a)', 'usage: qprep [OPTIONS]'
+    print '(a)', ''
+    print '(a)', 'Without options, qprep goes into interactive mode.'
+    print '(a)', ''
+    print '(a)', 'qprep options:'
+    print '(a)', ''
+    print '(a)', '  -v, --version     print version information and exit'
+    print '(a)', '  -h, --help        print usage information and exit'
+  end subroutine print_help
 
 
   !----------------------------------------------------------------------------!
-  !  Determine if qprep is to be run from command line or from input file
+  !> function: check_inputfile
+  !> Determine if qprep is to be run from command line or from input file
   !----------------------------------------------------------------------------!
   logical function check_inputfile(infilename)
     !local variables

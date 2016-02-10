@@ -10,7 +10,7 @@
 
 !-------------------------------------------------------------------------------
 !  (C) 2015 Molekylmekanikerna HB, Uppsala, Sweden
-!  qfep.f90
+!  program: qfep.f90
 !  by Johan Aqvist, Karin Kolmodin, John Marelius, Johan Sund
 !  qfep free energy analysis program for FEP, EVB & Umbrella Sampling
 !-------------------------------------------------------------------------------
@@ -19,8 +19,8 @@ program qfep
   use parse
 
   implicit none
-  character(*), parameter :: MODULE_VERSION = '5.7'
-  character(*), parameter :: MODULE_DATE = '2015-04-01'
+  character(*), parameter :: PROGRAM_VERSION = '5.7'
+  character(*), parameter :: PROGRAM_DATE = '2015-04-01'
 
   integer,parameter :: mxpts = 20000000
   integer,parameter :: mxbin = 100
@@ -68,7 +68,7 @@ program qfep
   character(100) :: iline !masoud
 
   !header
-  write(*,100) MODULE_VERSION, MODULE_DATE
+  write(*,100) PROGRAM_VERSION, PROGRAM_DATE
   write(*,*)
 100 format('# qfep',t30,'version ',a,t50,'(modified on ',a,')')
 
@@ -544,10 +544,10 @@ program qfep
      write (*,*)
      write (*,'(a,f9.2)') '# Min energy-gap is: ',gapmin
      write (*,'(a,f9.2)') '# Max energy-gap is: ',gapmax
+
      !-----------------------------------
      ! Reaction free energy is calculated
      !-----------------------------------
-
      write (*,*)
      write (*,*)
      write(*,24)

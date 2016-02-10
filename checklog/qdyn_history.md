@@ -1,4 +1,4 @@
-# Qdyn version history
+# **qdyn** version history
 
 
 ## Beta Version 5.7, 2016-02-07
@@ -12,6 +12,9 @@
 - The checklogs have been rescued and reformated to markdown and are
   now being used.
 
+- All binaries have dropped the version on them and now they have a
+  canonical static name. A module contained in *version.f90* now takes
+  care of giving version information by parsing command line arguments.
 
 ## Release 5.05
 - Added feature to select q-atoms in the fep file under [atoms]

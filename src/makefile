@@ -274,7 +274,7 @@ prep.o: prep.f90 maskmanip.o sizes.o parse.o prmfile.o trj.o index.o prefs.o
 prmfile.o: prmfile.f90 misc.o mpiglob.o
 	${FC} ${FFLAGS} -c $<
 
-qprep.o: qprep.f90 prep.o avetr.o version.o
+qprep.o: qprep.f90 prep.o avetr.o
 	${FC} ${FFLAGS} -c $<
 
 qatom.o: qatom.f90 misc.o nrgy.o prmfile.o sizes.o index.o topo.o
