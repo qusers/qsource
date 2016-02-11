@@ -4,8 +4,10 @@
 # Uncomment or modify the next two lines depending on your system
 # openmpi or impi version, and the path to your Q binaries.
 #################################################################
-# module load openmpi-x86_64
-export bindir="/Users/esguerra/software/qsource/development/esguerra/bin"
+module load openmpi-x86_64
+module load gcc/5.3.0
+export bindir="/home/esguerra/software/qdevesguerra/bin"
+#export bindir="/Users/esguerra/software/qsource/development/esguerra/bin"
 
 if [ "x$bindir" == "x" ]
 then 
@@ -38,7 +40,7 @@ FAILED="(\033[0;31m FAILED \033[0m)"
 for step in {1..5}
 do
  echo -n "Running equilibration step ${step} of 5                         "
- if mpirun -np $CORES $bindir/qdynp eq${step}.inp > eq${step}.log
+ if time mpirun -np $CORES $bindir/qdynp eq${step}.inp > eq${step}.log
  then echo -e "$OK"
  else 
   echo -e "$FAILED"
@@ -51,7 +53,7 @@ done
 for step in {1..5}
 do
  echo -n "Running production run step ${step} of 5                        "
- if mpirun -np $CORES $bindir/qdynp dc${step}.inp > dc${step}.log
+ if time mpirun -np $CORES $bindir/qdynp dc${step}.inp > dc${step}.log
   then echo -e "$OK"
  else 
   echo -e "$FAILED"

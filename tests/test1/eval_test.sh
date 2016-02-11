@@ -177,7 +177,8 @@ if which /sw/bin/gnuplot >& /dev/null
 then 
  echo -e "$OK"
  echo "Launching Gnuplot..."
- /sw/bin/gnuplot -persist < qsurr.plot &
+ # /sw/bin/gnuplot -persist < qsurr.plot &
+ gnuplot -persist < qsurr.plot 
 else
  echo -e "$FAILED"
  echo "Gnuplot file qsurr.plot written."
