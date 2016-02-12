@@ -107,15 +107,15 @@ program qcalc
 contains
 
 subroutine startup
-        integer                                         ::      i
+  integer :: i
 
-        write(*,'(79a)')('#',i=1,79)
-        write(*,'(a,a)') 'Welcome to Qcalc version ',PROGRAM_VERSION
-        
-        call mask_startup       ! mask_startup calls topo_startup, which is empty
-        write(*,*)
-        
-        call calc_help          ! outputs help to screen
+  write(*,'(79a)')('#',i=1,79)
+  write(*,'(a,a)') 'Welcome to qcalc version ', PROGRAM_VERSION
+  
+  call mask_startup       ! mask_startup calls topo_startup, which is empty
+  write(*,*)
+  
+  call calc_help          ! outputs help to screen
 end subroutine startup
 
 
@@ -214,11 +214,11 @@ end subroutine finalize
 
 
 subroutine calc_help
-        WRITE( * , '(a)') &
-        'Qcalc works in three stages:', &
-        '1. Load topology.', &
-        '2. Set up a list of calculations to make.', &
-        '3. Read coordinates from trajectory and/or restart files and calculate.' 
+  WRITE( * , '(a)') &
+  'qcalc works in three stages:', &
+  '1. Load topology.', &
+  '2. Set up a list of calculations to make.', &
+  '3. Read coordinates from trajectory and/or restart files and calculate.' 
 end subroutine calc_help
 
 

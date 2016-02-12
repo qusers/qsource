@@ -15,9 +15,10 @@
 !<  qprep topology preparation main program
 !------------------------------------------------------------------------------!
 program qprep
+  use iso_fortran_env
+
   use prep
   use avetr
-  use iso_fortran_env
 
   implicit none
   character(*), parameter :: PROGRAM_NAME = 'qprep'
@@ -110,65 +111,65 @@ contains
   ! --- Command loop
   select case (command)
     case ('average', 'av')
-          CALL avetr_calc
+          call avetr_calc
     case ('readlib', 'rl')
-          CALL readlib
+          call readlib
     case('clearlib', 'cl')
-          CALL clearlib
+          call clearlib
     case('readpdb', 'rp')
-          CALL readpdb
+          call readpdb
     case('readprm', 'readff', 'rff', 'rprm')
-          CALL readff
+          call readff
     case('addbond', 'ab')
-          CALL addbond
+          call addbond
     case('clearbond', 'clearbonds')
-          CALL clearbond
+          call clearbond
     case('maketop', 'mt')
-          CALL maketop
+          call maketop
     case('cleartop')
-          CALL cleartop
+          call cleartop
     case('listseq', 'ls')
-          CALL listseq
+          call listseq
     case('listres', 'lr')
-          CALL listres
+          call listres
     case('writetop', 'wt')
-          CALL writetop
+          call writetop
     case('checkbonds', 'cb')
-          CALL checkbonds
+          call checkbonds
     case('checkangs', 'ca')
-          CALL checkangs
+          call checkangs
     case('checktors', 'ct')
-          CALL checktors
+          call checktors
     case('checkimps', 'ci')
-          CALL checkimps
+          call checkimps
     case('changeimp')
-          CALL changeimp
+          call changeimp
     case('readtop', 'rt')
-          CALL readtop
+          call readtop
     case('readx', 'rx')
-          CALL readx
+          call readx
     case('makeshell', 'ms')
-          CALL make_shell2
+          call make_shell2
     case('mask', 'ma')
-          CALL modify_mask
+          call modify_mask
     case('trajectory', 'trj', 'tr')
-          CALL trajectory
+          call trajectory
     case('readtrajectory', 'readframe','rf')
-          CALL readframe
+          call readframe
     case('readnext', 'rn')
-          CALL readnext
+          call readnext
     case('solvate', 'so')
-          CALL solvate
+          call solvate
     case('writepdb', 'wp')
-          CALL writepdb 
+          call writepdb 
     case('writemol2', 'wm')
-          CALL writemol2
+          call writemol2
     case('xlink', 'crosslink', 'xl')
-          CALL xlink
+          call xlink
     case('prefs', 'preferences')
-          CALL listprefs
+          call listprefs
     case('set', 's')
-          CALL set
+          call set
     case('help', '?', 'h')
           call help
     case('boundary', 'bc')

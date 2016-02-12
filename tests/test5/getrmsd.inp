@@ -1,0 +1,8 @@
+init.top
+rmsd
+residue 10
+end
+go
+relax1.dcd
+.
+

@@ -1,0 +1,37 @@
+[MD]
+steps                     10000
+stepsize                  1
+temperature               50.0
+bath_coupling             5
+random_seed               666
+initial_temperature       50
+shake_solvent             on
+shake_solute              off
+lrf                       on
+
+[cut_offs]
+solute_solute             10
+solute_solvent            10
+solvent_solvent           10
+q_atom                    99
+lrf                       99
+
+[sphere]
+shell_force               10
+shell_radius              0.8
+
+[intervals]
+non_bond                  50
+output                    50
+energy                    0
+trajectory                500
+
+[files]
+topology                  init.top
+fep                       protein.fep
+restart                   start.re
+final                     heat1.re
+trajectory                heat1.dcd
+
+[sequence_restraints]
+1 2486 25.0 0 1

@@ -1,21 +1,20 @@
 *-------------------------------------------------------------
-*
 * Q-FF params:
-*Translation of OplsAA force field parameters.
-*Use CAREFULLY!!
-*Only natural amino acid parameters have been adopted.
+* Translation of OplsAA force field parameters.
+* Use CAREFULLY!!
+* Only natural amino acid parameters have been adopted.
 *-------------------------------------------------------------
 [options] force-field options
-name	Q-OPLSAA
-type	AMBER
-vdw_rule	geometric !vdW combination rule
-scale_14	0.5	!electrostatic 1-4 scaling factor
-switch_atoms	on
-improper_potential	periodic
-improper_definition	explicit
+name                  Q-OPLSAA
+type                  AMBER
+vdw_rule              geometric ! vdW combination rule
+scale_14              0.5       ! electrostatic 1-4 scaling factor
+switch_atoms	      on
+improper_potential    periodic
+improper_definition   explicit
 
 [atom_types] atom type definitions
-*tac-----------Avdw1---Avdw2---Bvdw1----Avdw3---Bvdw2&3---mass----SYBYL-name-old-comment
+*tac----Avdw1---Avdw2---Bvdw1----Avdw3---Bvdw2&3---mass----SYBYL-name-old-comment
 H	0.00	0.00	0.00	0.00	0.00	1.008	! Peptide
 H2	0.00	0.00	0.00	0.00	0.00	1.008	!
 HA	69.58	69.58	4.91	49.20	3.47	1.008	! Aromatic

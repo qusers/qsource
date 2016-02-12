@@ -114,12 +114,12 @@ module prep
   integer                          :: nbnd_prm
   integer                          :: nbnd_types
   type bond_type_type
-    character(len=KEYLENGTH)       :: taci, tacj
+    character(len=keylength)       :: taci, tacj
     integer                        :: cod
   end type bond_type_type
   
   type bond_prm_type
-    type(BONDLIB_TYPE)             :: prm
+    type(bondlib_type)             :: prm
     character(len=2)               :: SYBYLtype
   end type bond_prm_type
 
@@ -127,13 +127,13 @@ module prep
   type(bond_prm_type), allocatable :: bnd_prm(:)
 
 ! --- Angle parameters 
-  type ANGLE_TYPE_TYPE
-    character(len=KEYLENGTH)       :: taci, tacj, tack
+  type angle_type_type
+    character(len=keylength)       :: taci, tacj, tack
     integer                        :: cod
-  end type ANGLE_TYPE_TYPE
+  end type angle_type_type
 
-  type(ANGLE_TYPE_TYPE), allocatable :: ang_types(:)
-  type(ANGLIB_TYPE), allocatable     :: ang_prm(:)
+  type(angle_type_type), allocatable :: ang_types(:)
+  type(anglib_type), allocatable     :: ang_prm(:)
   integer                            :: nang_types
   integer                            :: nang_prm
 
@@ -164,79 +164,78 @@ module prep
   logical                          :: imp_explicit !explicit or automatic defs
 
 ! --- Coordinate information
-        integer                                 ::      natom, nat_wat, nwat
-        character(len=100)                      ::      coord_source = ''
-        character(len=80)                       ::      auto_name = ''
-        integer, parameter                      ::      trj_unit = 17
-        integer                                 ::      trj_frame = 0
-        character(len=180)                      ::      trj_filnam
-        type(MASK_TYPE)                         ::      mask
+  integer                          :: natom, nat_wat, nwat
+  character(len=100)               :: coord_source = ''
+  character(len=80)                :: auto_name = ''
+  integer, parameter               :: trj_unit = 17
+  integer                          :: trj_frame = 0
+  character(len=180)               :: trj_filnam
+  type(MASK_TYPE)                  :: mask
 
 ! --- Extra bonds(S-S bridges etc.)
-        integer                                 ::      nextrabnd
-        type(BOND_TYPE)                         ::      extrabnd(max_extrabnd)
+  integer                                 ::      nextrabnd
+  type(BOND_TYPE)                         ::      extrabnd(max_extrabnd)
 
 !     Things needed for topology generation 
 !-----------------------------------------------------------------------
-        logical, allocatable            ::      makeH(:)
-        integer, allocatable            ::      nconn(:)
+  logical, allocatable            ::      makeH(:)
+  integer, allocatable            ::      nconn(:)
 
-        integer, allocatable            ::      iconn(:,:)
+  integer, allocatable            ::      iconn(:,:)
 
-        real(8)                                         ::      pi, deg2rad
-        !temporary storage for solvent coordinates
-        real(8), allocatable            ::      xw(:,:,:) !solvent coordinates zyx,atom,molecule
-        !flag for solvent molecules not clashing with any solute heavy atom
-        logical, allocatable            ::      keep(:)
-        !residue code for solvent
-        integer                                         ::      irc_solvent
-        !residue name for solvent
-        character(len=4)                        ::      solvent_name
+  real(8)                         ::      pi, deg2rad
+  !temporary storage for solvent coordinates
+  real(8), allocatable            ::      xw(:,:,:) !solvent coordinates zyx,atom,molecule
+  !flag for solvent molecules not clashing with any solute heavy atom
+  logical, allocatable            ::      keep(:)
+  !residue code for solvent
+  integer                         ::      irc_solvent
+  !residue name for solvent
+  character(len=4)                ::      solvent_name
 
 
 ! --- Flag to keep track of missing parameters without bailing out
-        LOGICAL                                         ::      topo_ok = .false.
-        logical                                         ::      ff_ok = .false.
+  LOGICAL                         ::      topo_ok = .false.
+  logical                         ::      ff_ok = .false.
 
 !       Memory management
-        integer, private              ::      alloc_status
-        !private subroutine
-        private                       ::      check_alloc 
+  integer, private              ::      alloc_status
+  !private subroutine
+  private                       ::      check_alloc 
 
 
 
 
 contains
 
-
 !------------------------------------------------------------------------------!
 ! subroutine: prep_startup
 !
 !------------------------------------------------------------------------------!
 subroutine prep_startup
-        logical                                         ::      l
-        !initialize used modules
-        call topo_startup               ! empty
-        call prmfile_startup            ! empty
-        call parse_startup              ! some code
-        call index_startup              ! empty
+  logical                   ::      l
+  !initialize used modules
+  call topo_startup               ! empty
+  call prmfile_startup            ! empty
+  call parse_startup              ! some code
+  call index_startup              ! empty
 
-        !initialize preference module & add user-settable variables
-        call pref_initialize() !        ! allocates mem for p(:)
+  !initialize preference module & add user-settable variables
+  call pref_initialize() !        ! allocates mem for p(:)
 
-        l = pref_add('solvent_pack', rval=solvent_pack)
-        l = pref_add('solvent_names', sval=solvent_names)
-        l = pref_add('solute_density', rval=rho_solute)
-        l = pref_add('random_seed_solute', ival=random_seed_solute)
-        l = pref_add('random_seed_solvent', ival=random_seed_solvent)
-        pi = 4.0 * atan(1.0)
-        deg2rad = pi/180.0
+  l = pref_add('solvent_pack', rval=solvent_pack)
+  l = pref_add('solvent_names', sval=solvent_names)
+  l = pref_add('solute_density', rval=rho_solute)
+  l = pref_add('random_seed_solute', ival=random_seed_solute)
+  l = pref_add('random_seed_solvent', ival=random_seed_solvent)
+  pi = 4.0 * atan(1.0)
+  deg2rad = pi/180.0
 
-        !make sure all arrays are allocated so that solvation can be done
-        !without reading solute pdb file 
-        call allocate_for_pdb(1,1,1)    
-        call cleartop           ! clears pdb filename and prm name
-        call clearpdb           !get rid of old PDB data
+  !make sure all arrays are allocated so that solvation can be done
+  !without reading solute pdb file 
+  call allocate_for_pdb(1,1,1)    
+  call cleartop           ! clears pdb filename and prm name
+  call clearpdb           !get rid of old PDB data
 end subroutine prep_startup
 
 
@@ -246,15 +245,15 @@ end subroutine prep_startup
 !------------------------------------------------------------------------------!
 subroutine allocate_for_pdb(atoms, residues, molecules)
 !arguments
-        integer, intent(in)                     ::      atoms, residues, molecules
-        allocate(xtop(3*atoms), heavy(atoms), makeH(atoms), &
-                res(residues), istart_mol(molecules), &
-                stat=alloc_status)
-        
-        if(alloc_status /= 0) then
-                write(*,*) 'ERROR: Out of memory when allocating arrays for new atoms'
-                stop 255
-        end if
+  integer, intent(in) :: atoms, residues, molecules
+  allocate(xtop(3*atoms), heavy(atoms), makeH(atoms), &
+          res(residues), istart_mol(molecules), &
+          stat=alloc_status)
+  
+  if(alloc_status /= 0) then
+          write(*,*) 'ERROR: Out of memory when allocating arrays for new atoms'
+          stop 255
+  end if
 
 end subroutine allocate_for_pdb
 
@@ -288,13 +287,13 @@ end subroutine clearlib
 !------------------------------------------------------------------------------!
 subroutine check_alloc(message)
 !arguments
-        character(*) message
+  character(*) message
 
-        if(alloc_status .ne. 0) then
-                write(*,*) &
-                        '>>> Out of memory trying to allocate ', message
-                stop 255
-        end if
+  if(alloc_status .ne. 0) then
+    write(*,*) &
+      '>>> Out of memory trying to allocate ', message
+    stop 255
+  end if
 end subroutine check_alloc
 
 
