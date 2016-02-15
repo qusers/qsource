@@ -3,8 +3,8 @@
 #  code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      #
 #  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          #
 #  Kajsa Ljunjberg, John Marelius, Martin Nervall                              #
-#  keeper of the code: Paul Bauer                                              #
-#  maintainers: Beat Amrein, Alexandre Barrozo, Paul Bauer                     #
+#  keeper of the code:                                                         #
+#  maintainers: Beat Amrein, Alexandre Barrozo                                 #
 #  latest update: Oct 17, 2014                                                 #
 #  make [option] [COMP=compiler]                                               #
 ################################################################################
