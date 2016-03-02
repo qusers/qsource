@@ -1,0 +1,4141 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	 
+    <meta name="description" content="Documentation for Fortran Program">
+	 
+    <meta name="author" content="Chris MacMackin" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>calc_chemscore &ndash; Fortran Program</title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../js/jquery-2.1.3.min.js"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+
+    
+    <script src="../tipuesearch/tipuesearch_content.js"></script>
+    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+    <script src="../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../tipuesearch/tipuesearch.js"></script>
+    
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">Fortran Program </a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+				
+                
+            <li><a href="../lists/files.html">Source Files</a></li>
+				
+				
+            <li><a href="../lists/modules.html">Modules</a></li>
+				
+				
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+				
+								
+            <li><a href="../lists/types.html">Derived Types</a></li>
+				
+				
+            <li><a href="../lists/programs.html">Programs</a></li>
+				
+          </ul>
+        
+        <form action="../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+    
+  
+  <div class="row">
+    <h1>calc_chemscore 
+    <small>Module</small>
+    
+    </h1>
+	 
+<div class="row">
+<div class="col-lg-12">
+<div class="well well-sm">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+    <li><i class="fa fa-code"></i><a href="../src/calc_chemscore.f90"> Source File</a></li>
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+     <li><a href='../sourcefile/calc_chemscore.f90.html'>calc_chemscore.f90</a></li>
+  
+     <li class="active">calc_chemscore</li>
+  </ol>
+</div>
+</div>
+</div>
+    
+  </div>
+  
+  <div class="row">
+    <div class="col-lg-3">
+    
+<div id="sidebar">
+  
+  
+  
+  <div class="panel panel-primary">
+    <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#vars">Variables</a></h3></div>
+    <div id="vars" class="panel-collapse collapse">
+      <div class="list-group">
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-score%7E5">score</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-frame%7E7">frame</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-stat%7E9">stat</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-i%7E171">i</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-trj_type%7E2">trj_type</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-top_file">top_file</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-fep_file%7E4">fep_file</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-max_masks">MAX_MASKS</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-nscores">nScores</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-maxscores">maxScores</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-lph_r">lph_r</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-lph_l">lph_l</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-hbd_r">hbd_r</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-hbd_l">hbd_l</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-hba_r">hba_r</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-hba_l">hba_l</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-met_r">met_r</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-waters%7E2">waters</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-pol_con">pol_con</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-nlph_r">nlph_r</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-nlph_l">nlph_l</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-nhbd_r">nhbd_r</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-nhbd_l">nhbd_l</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-nhba_r">nhba_r</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-nhba_l">nhba_l</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-nmet_r">nmet_r</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-nwaters">nwaters</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-nqbonds">nqbonds</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-nhbd_prot">nhbd_prot</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-nhba_prot">nhba_prot</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-nrings">nrings</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-lipo">LIPO</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-metal">METAL</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-sulphur">SULPHUR</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-acceptor">ACCEPTOR</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-sp3">SP3</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-sp2">SP2</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-sp3_n">SP3_N</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-pl_n">PL_N</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-hydrogen">HYDROGEN</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-oxygen">OXYGEN</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-carbon_lipo">CARBON_LIPO</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-carbonyl_carbon">CARBONYL_CARBON</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-carbonyl_oxygen">CARBONYL_OXYGEN</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-nprops">NPROPS</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-file_heading">file_heading</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-atom_data">atom_data</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-iqatom">iqatom</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-vdwr">vdwr</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-atom_data_file">atom_data_file</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-coord_file">coord_file</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-hbond_term">hbond_term</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-metal_term">metal_term</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-lipo_term">lipo_term</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-rot_term">rot_term</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-dgconst">dGconst</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-dghbond">dGhbond</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-dgmetal">dGmetal</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-dglipo">dGlipo</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#variable-dgrot">dGrot</a>
+        
+      </div>
+    </div>
+  </div>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <div class="panel panel-primary">
+    <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#types">Derived Types</a></h3></div>
+    <div id="types" class="panel-collapse collapse">
+      <div class="list-group">
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#type-score_precalc_type">score_precalc_type</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#type-score_type">score_type</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#type-score_coord_type">SCORE_COORD_TYPE</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#type-wat">wat</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#type-donor">donor</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#type-lipos">lipos</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#type-bond_pointer">bond_pointer</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#type-q_atom">q_atom</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#type-q_bond">q_bond</a>
+        
+        <a class="list-group-item" href="../module/calc_chemscore.html#type-atom_data_type">ATOM_DATA_TYPE</a>
+        
+      </div>
+    </div>
+  </div>
+  
+  
+  
+  <div class="panel panel-primary">
+    <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#funcs">Functions</a></h3></div>
+    <div id="funcs" class="panel-collapse collapse">
+        <div class="list-group">
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-lip_atom">lip_atom</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-find_contact">find_contact</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-trace_ring">trace_ring</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-angle">angle</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-dist">dist</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-distsq">distsq</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-fr_lip">fr_lip</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-fr_met">fr_met</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-g1_hb">g1_hb</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-g2_hb">g2_hb</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-score_add">score_add</a>
+          
+        </div>
+    </div>
+  </div>
+  
+  
+  
+  <div class="panel panel-primary">
+    <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#subs">Subroutines</a></h3></div>
+    <div class="list-group">
+        <div id="subs" class="panel-collapse collapse">
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-score_initialize">score_initialize</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-chemscore_finalize">chemscore_finalize</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-log_frame">log_frame</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-score_heading">score_heading</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-calc_hbonds">calc_hbonds</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-calc_lipo">calc_lipo</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-calc_metals">calc_metals</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-calc_rot">calc_rot</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-calc_scores">calc_scores</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-count_qlipo">count_qlipo</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-frozen">frozen</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-get_atom_data">get_atom_data</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-make_tac_index">make_tac_index</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-q_contacts">q_contacts</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-q_types">q_types</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-report_ligand">report_ligand</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-report_protein">report_protein</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-report_rings">report_rings</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-reset_waters">reset_waters</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-score_waters">score_waters</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-set_ligand">set_ligand</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-set_rings">set_rings</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-search_ring">search_ring</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-mark_ring">mark_ring</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-set_rotatable">set_rotatable</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-set_waters">set_waters</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-sort_atoms">sort_atoms</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-sort_bonds">sort_bonds</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-sort_waters">sort_waters</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-start">start</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-store_waters">store_waters</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-score_precalc">score_precalc</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-score_mean">score_mean</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html#proc-score_calc">score_calc</a>
+          
+        </div>
+    </div>
+  </div>
+  
+  
+  
+  
+  
+  
+  
+  
+  <hr>
+  
+  <div class="panel panel-default">
+    <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#allmods">All Modules</a></h3></div>
+    <div id="allmods" class="panel-collapse collapse">
+        <div class="list-group">
+          
+          <a class="list-group-item" href="../module/atom_mask.html">atom_mask</a>
+          
+          <a class="list-group-item" href="../module/avetr.html">avetr</a>
+          
+          <a class="list-group-item" href="../module/calc_base.html">calc_base</a>
+          
+          <a class="list-group-item" href="../module/calc_chemscore.html">calc_chemscore</a>
+          
+          <a class="list-group-item" href="../module/calc_com.html">calc_com</a>
+          
+          <a class="list-group-item" href="../module/calc_com_ke.html">calc_com_ke</a>
+          
+          <a class="list-group-item" href="../module/calc_entropy.html">calc_entropy</a>
+          
+          <a class="list-group-item" href="../module/calc_fit.html">calc_fit</a>
+          
+          <a class="list-group-item" href="../module/calc_geom.html">calc_geom</a>
+          
+          <a class="list-group-item" href="../module/calc_nb.html">CALC_NB</a>
+          
+          <a class="list-group-item" href="../module/calc_nb%7E2.html">CALC_NB</a>
+          
+          <a class="list-group-item" href="../module/calc_rdf.html">CALC_RDF</a>
+          
+          <a class="list-group-item" href="../module/calc_rms.html">CALC_RMS</a>
+          
+          <a class="list-group-item" href="../module/calc_rmsf.html">CALC_RMSF</a>
+          
+          <a class="list-group-item" href="../module/indexer.html">indexer</a>
+          
+          <a class="list-group-item" href="../module/maskmanip.html">MASKMANIP</a>
+          
+          <a class="list-group-item" href="../module/misc.html">misc</a>
+          
+          <a class="list-group-item" href="../module/mpiglob.html">mpiglob</a>
+          
+          <a class="list-group-item" href="../module/parse.html">PARSE</a>
+          
+          <a class="list-group-item" href="../module/prefs.html">PREFS</a>
+          
+          <a class="list-group-item" href="../module/prep.html">prep</a>
+          
+          <a class="list-group-item" href="../module/prmfile.html">prmfile</a>
+          
+          <a class="list-group-item" href="../module/qatom.html">qatom</a>
+          
+          <a class="list-group-item" href="../module/sizes.html">sizes</a>
+          
+          <a class="list-group-item" href="../module/topo.html">topo</a>
+          
+          <a class="list-group-item" href="../module/trj.html">trj</a>
+          
+          <a class="list-group-item" href="../module/version.html">version</a>
+          
+        </div>
+    </div>
+  </div>
+  
+</div>
+
+    </div>
+    
+    <div class="col-lg-9" id='text'>
+    
+    
+  
+    <ul class="list-inline">
+      <li><h4>Uses:</h4></li>
+      
+      <li><a href='../module/calc_base.html'>calc_base</a></li>
+      
+      <li><a href='../module/maskmanip.html'>MASKMANIP</a></li>
+      
+      <li><a href='../module/trj.html'>trj</a></li>
+      
+      <li><a href='../module/prmfile.html'>prmfile</a></li>
+      
+      <li><a href='../module/indexer.html'>indexer</a></li>
+      
+      <li><a href='../module/qatom.html'>qatom</a></li>
+      
+    </ul>
+  
+
+    
+    
+    
+    
+    
+
+    
+    <section>
+    <h2>Variables</h2>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-score%7E5"></span>real,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>score</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-frame%7E7"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>frame</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-stat%7E9"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>stat</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-i%7E171"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>i</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-trj_type%7E2"></span>character(len=4),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>trj_type</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-top_file"></span>character(len=0),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>top_file</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-fep_file%7E4"></span>character(len=0),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>fep_file</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-max_masks"></span>integer,</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>MAX_MASKS</strong></td><td> =</td><td>10</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nscores"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>nScores</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-maxscores"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>maxScores</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-lph_r"></span>integer(kind=AI),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>lph_r</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-lph_l"></span>integer(kind=AI),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>lph_l</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-hbd_r"></span>type(<a href='../type/donor.html'>donor</a>),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>hbd_r</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-hbd_l"></span>type(<a href='../type/donor.html'>donor</a>),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>hbd_l</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-hba_r"></span>integer(kind=AI),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>hba_r</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-hba_l"></span>integer(kind=AI),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>hba_l</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-met_r"></span>integer(kind=AI),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>met_r</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-waters%7E2"></span>type(<a href='../type/wat.html'>wat</a>),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>waters</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-pol_con"></span>integer,</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>pol_con</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nlph_r"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>nlph_r</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nlph_l"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>nlph_l</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nhbd_r"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>nhbd_r</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nhbd_l"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>nhbd_l</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nhba_r"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>nhba_r</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nhba_l"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>nhba_l</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nmet_r"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>nmet_r</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nwaters"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>nwaters</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nqbonds"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>nqbonds</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nhbd_prot"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>nhbd_prot</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nhba_prot"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>nhba_prot</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nrings"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>nrings</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-lipo"></span>integer,</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>LIPO</strong></td><td> =</td><td>1</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-metal"></span>integer,</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>METAL</strong></td><td> =</td><td>2</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-sulphur"></span>integer,</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>SULPHUR</strong></td><td> =</td><td>3</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-acceptor"></span>integer,</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>ACCEPTOR</strong></td><td> =</td><td>4</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-sp3"></span>integer,</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>SP3</strong></td><td> =</td><td>5</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-sp2"></span>integer,</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>SP2</strong></td><td> =</td><td>6</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-sp3_n"></span>integer,</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>SP3_N</strong></td><td> =</td><td>7</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-pl_n"></span>integer,</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>PL_N</strong></td><td> =</td><td>8</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-hydrogen"></span>integer,</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>HYDROGEN</strong></td><td> =</td><td>9</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-oxygen"></span>integer,</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>OXYGEN</strong></td><td> =</td><td>10</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-carbon_lipo"></span>integer,</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>CARBON_LIPO</strong></td><td> =</td><td>11</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-carbonyl_carbon"></span>integer,</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>CARBONYL_CARBON</strong></td><td> =</td><td>12</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-carbonyl_oxygen"></span>integer,</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>CARBONYL_OXYGEN</strong></td><td> =</td><td>13</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nprops"></span>integer,</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>NPROPS</strong></td><td> =</td><td>13</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-file_heading"></span>character(len=*),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>file_heading</strong>(NPROPS)</td><td> =</td><td>['lipophilic&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', 'metal&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', 'sulphur&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', 'acceptor&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', 'sp3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', 'sp2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', 'sp3_nitrogen&nbsp;&nbsp;&nbsp;', 'planar_nitrogen', 'hydrogen&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', 'oxygen&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', 'carbon_lipo&nbsp;&nbsp;&nbsp;&nbsp;', 'carbonyl_carbon', 'carbonyl_oxygen']</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-atom_data"></span>type(<a href='../type/atom_data_type.html'>ATOM_DATA_TYPE</a>),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>atom_data</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-iqatom"></span>integer,</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>iqatom</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-vdwr"></span>real,</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>vdwr</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-atom_data_file"></span>character(len=0),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>atom_data_file</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-coord_file"></span>character(len=0),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>coord_file</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-hbond_term"></span>real,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>hbond_term</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-metal_term"></span>real,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>metal_term</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-lipo_term"></span>real,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>lipo_term</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-rot_term"></span>real,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>rot_term</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dgconst"></span>real,</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>dGconst</strong></td><td> =</td><td>-5.48</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dghbond"></span>real,</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>dGhbond</strong></td><td> =</td><td>-3.34</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dgmetal"></span>real,</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>dGmetal</strong></td><td> =</td><td>-6.03</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dglipo"></span>real,</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>dGlipo</strong></td><td> =</td><td>-0.117</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dgrot"></span>real,</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>dGrot</strong></td><td> =</td><td>2.56</td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+    </section>
+    <br>
+    
+    
+    
+    
+    
+
+    
+    
+    
+    <section>
+     <h2>Derived Types</h2>
+	 
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="type-score_precalc_type"></span><h3>type, public :: <a href='../type/score_precalc_type.html'>score_precalc_type</a>
+    
+  </h3></div>
+  <div class="panel-body">
+     
+     <h4>Components</h4>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-chfilename"></span>character(len=80),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>chFilename</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-itype"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iType</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+     
+     
+          
+     
+     
+  </div>
+</div>
+
+     
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="type-score_type"></span><h3>type, public :: <a href='../type/score_type.html'>score_type</a>
+    
+  </h3></div>
+  <div class="panel-body">
+     
+     <h4>Components</h4>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-chfilename%7E2"></span>character(len=80),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>chFilename</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-frame"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>frame</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-score"></span>real(kind=8),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>score</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-h_bonds"></span>real(kind=8),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>h_bonds</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-metal"></span>real(kind=8),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>metal</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-lipophil"></span>real(kind=8),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>lipophil</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-rot_bond"></span>real(kind=8),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>rot_bond</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+     
+     
+          
+     
+     
+  </div>
+</div>
+
+     
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="type-score_coord_type"></span><h3>type, public :: <a href='../type/score_coord_type.html'>SCORE_COORD_TYPE</a>
+    
+  </h3></div>
+  <div class="panel-body">
+     
+     <h4>Components</h4>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-xr"></span>real(kind=8),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>xr</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-xrcm"></span>real(kind=8),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>xrcm</strong>(3)</td><td></td><td></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+     
+     
+          
+     
+     
+  </div>
+</div>
+
+     
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="type-wat"></span><h3>type, public :: <a href='../type/wat.html'>wat</a>
+    
+  </h3></div>
+  <div class="panel-body">
+     
+     <h4>Components</h4>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-o"></span>integer(kind=AI),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>O</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-h1"></span>integer(kind=AI),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>H1</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-h2"></span>integer(kind=AI),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>H2</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-score%7E2"></span>real,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>score</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+     
+     
+          
+     
+     
+  </div>
+</div>
+
+     
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="type-donor"></span><h3>type, public :: <a href='../type/donor.html'>donor</a>
+    
+  </h3></div>
+  <div class="panel-body">
+     
+     <h4>Components</h4>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-heavy"></span>integer(kind=AI),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>heavy</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-hydr"></span>integer(kind=AI),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>hydr</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+     
+     
+          
+     
+     
+  </div>
+</div>
+
+     
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="type-lipos"></span><h3>type, public :: <a href='../type/lipos.html'>lipos</a>
+    
+  </h3></div>
+  <div class="panel-body">
+     
+     <h4>Components</h4>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-n_lip"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>n_lip</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-n_nonlip"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>n_nonlip</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+     
+     
+          
+     
+     
+  </div>
+</div>
+
+     
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="type-bond_pointer"></span><h3>type, public :: <a href='../type/bond_pointer.html'>bond_pointer</a>
+    
+  </h3></div>
+  <div class="panel-body">
+     
+     <h4>Components</h4>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-qb"></span>type(<a href='../type/q_bond.html'>q_bond</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>qb</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+     
+     
+          
+     
+     
+  </div>
+</div>
+
+     
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="type-q_atom"></span><h3>type, public :: <a href='../type/q_atom.html'>q_atom</a>
+    
+  </h3></div>
+  <div class="panel-body">
+     
+     <h4>Components</h4>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-top_nr"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>top_nr</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-n"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>n</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-bd"></span>type(<a href='../type/bond_pointer.html'>bond_pointer</a>),</td>
+  
+  <td>public,</td>
+  <td>dimension(1:6)</td><td>::</td>
+  <td><strong>bd</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-contact"></span>logical,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>contact</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-at_type"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>at_type</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-hybrid"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>hybrid</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-been_there"></span>logical,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>been_there</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-cyclic"></span>logical,</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>cyclic</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-active"></span>logical,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>active</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+     
+     
+          
+     
+     
+  </div>
+</div>
+
+     
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="type-q_bond"></span><h3>type, public :: <a href='../type/q_bond.html'>q_bond</a>
+    
+  </h3></div>
+  <div class="panel-body">
+     
+     <h4>Components</h4>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-a"></span>type(<a href='../type/q_atom.html'>q_atom</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>a</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-b"></span>type(<a href='../type/q_atom.html'>q_atom</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>b</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-rotatable"></span>logical,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>rotatable</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-acontact"></span>logical,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>acontact</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-bcontact"></span>logical,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>bcontact</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-been_there%7E2"></span>logical,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>been_there</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-a_nonlip"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>a_nonlip</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-b_nonlip"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>b_nonlip</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-a_lip"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>a_lip</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-b_lip"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>b_lip</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-cyclic%7E2"></span>logical,</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>cyclic</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-active%7E2"></span>logical,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>active</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+     
+     
+          
+     
+     
+  </div>
+</div>
+
+     
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="type-atom_data_type"></span><h3>type, public :: <a href='../type/atom_data_type.html'>ATOM_DATA_TYPE</a>
+    
+  </h3></div>
+  <div class="panel-body">
+     
+     <h4>Components</h4>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-radius"></span>real,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>radius</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-prop"></span>logical,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>prop</strong>(NPROPS)</td><td></td><td></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+     
+     
+          
+     
+     
+  </div>
+</div>
+
+     
+    </section>
+	<br>
+    
+    
+     
+    <section>
+    <h2>Functions</h2>
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-lip_atom"></span><h3>
+public recursive function <a href='../proc/lip_atom.html'>lip_atom</a>(atom) result(ans)
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/q_atom.html'>q_atom</a>),</td>
+  <td>,</td>
+  <td></td>
+  
+  <td>pointer</td><td>::</td>
+  <td><strong>atom</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>type(<a href='../type/lipos.html'>lipos</a>)
+  </small></h4>
+  
+    
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-find_contact"></span><h3>
+public recursive function <a href='../proc/find_contact.html'>find_contact</a>(atom) result(ans)
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/q_atom.html'>q_atom</a>),</td>
+  <td>,</td>
+  <td></td>
+  
+  <td>pointer</td><td>::</td>
+  <td><strong>atom</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical
+  </small></h4>
+  
+    
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-trace_ring"></span><h3>
+public recursive function <a href='../proc/trace_ring.html'>trace_ring</a>(atom, ir) result(ans)
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/q_atom.html'>q_atom</a>),</td>
+  <td>,</td>
+  <td></td>
+  
+  <td>pointer</td><td>::</td>
+  <td><strong>atom</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>ir</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical
+  </small></h4>
+  
+    
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-angle"></span><h3>
+public function <a href='../proc/angle.html'>angle</a>(a, b, c)
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>a</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>b</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>c</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real
+  </small></h4>
+  
+    
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-dist"></span><h3>
+public function <a href='../proc/dist.html'>dist</a>(a, b)
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>a</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>b</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real
+  </small></h4>
+  
+    
+    
+    <h4>Description</h4>
+       
+       
+
+
+       
+       <p>! Gives the distance between two atoms.</p>
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-distsq"></span><h3>
+public function <a href='../proc/distsq.html'>distsq</a>(a, b)
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>a</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>b</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real
+  </small></h4>
+  
+    
+    
+    <h4>Description</h4>
+       
+       
+
+
+       
+       <p>! Gives the squared distance between two atoms.</p>
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-fr_lip"></span><h3>
+public function <a href='../proc/fr_lip.html'>fr_lip</a>(a, b)
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>a</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>b</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real
+  </small></h4>
+  
+    
+    
+    <h4>Description</h4>
+       
+       
+
+
+       
+       <p>! Gives f(rlL) i.e. contribution from one lipophilic - lipophilic pair</p>
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-fr_met"></span><h3>
+public function <a href='../proc/fr_met.html'>fr_met</a>(a, b)
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>a</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>b</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real
+  </small></h4>
+  
+    
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-g1_hb"></span><h3>
+public function <a href='../proc/g1_hb.html'>g1_hb</a>(a, b)
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>a</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>b</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real
+  </small></h4>
+  
+    
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-g2_hb"></span><h3>
+public function <a href='../proc/g2_hb.html'>g2_hb</a>(a, b, c)
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>a</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>b</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>c</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real
+  </small></h4>
+  
+    
+    
+    <h4>Description</h4>
+       
+       
+
+
+       
+       <p>! Gives g2(dev_ang) i.e. contribution depending on the H-bond angle at the hydrogen atom</p>
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-score_add"></span><h3>
+public function <a href='../proc/score_add.html'>score_add</a>(desc)
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>desc</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer
+  </small></h4>
+  
+    
+        
+
+  </div>
+  </div>
+
+    
+    </section>
+    <br>
+    
+
+    
+    <section>
+    <h2>Subroutines</h2>
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-score_initialize"></span><h3>
+public subroutine <a href='../proc/score_initialize.html'>score_initialize</a>()
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      <em>None</em>
+    
+    
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-chemscore_finalize"></span><h3>
+public subroutine <a href='../proc/chemscore_finalize.html'>chemscore_finalize</a>()
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      <em>None</em>
+    
+    
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-log_frame"></span><h3>
+public subroutine <a href='../proc/log_frame.html'>log_frame</a>(iFrame)
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iFrame</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-score_heading"></span><h3>
+public subroutine <a href='../proc/score_heading.html'>score_heading</a>(i)
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>i</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-calc_hbonds"></span><h3>
+public subroutine <a href='../proc/calc_hbonds.html'>calc_hbonds</a>()
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      <em>None</em>
+    
+    
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-calc_lipo"></span><h3>
+public subroutine <a href='../proc/calc_lipo.html'>calc_lipo</a>()
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      <em>None</em>
+    
+    
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-calc_metals"></span><h3>
+public subroutine <a href='../proc/calc_metals.html'>calc_metals</a>()
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      <em>None</em>
+    
+    
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-calc_rot"></span><h3>
+public subroutine <a href='../proc/calc_rot.html'>calc_rot</a>()
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      <em>None</em>
+    
+    
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-calc_scores"></span><h3>
+public subroutine <a href='../proc/calc_scores.html'>calc_scores</a>()
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      <em>None</em>
+    
+    
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-count_qlipo"></span><h3>
+public subroutine <a href='../proc/count_qlipo.html'>count_qlipo</a>()
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      <em>None</em>
+    
+    
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-frozen"></span><h3>
+public subroutine <a href='../proc/frozen.html'>frozen</a>()
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      <em>None</em>
+    
+    
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-get_atom_data"></span><h3>
+public subroutine <a href='../proc/get_atom_data.html'>get_atom_data</a>()
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      <em>None</em>
+    
+    
+    
+    <h4>Description</h4>
+       
+       
+
+
+       
+       <p>! Go through all atoms and give them a vdW radius.
+! I represents atom number.</p>
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-make_tac_index"></span><h3>
+public subroutine <a href='../proc/make_tac_index.html'>make_tac_index</a>()
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      <em>None</em>
+    
+    
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-q_contacts"></span><h3>
+public subroutine <a href='../proc/q_contacts.html'>q_contacts</a>()
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      <em>None</em>
+    
+    
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-q_types"></span><h3>
+public subroutine <a href='../proc/q_types.html'>q_types</a>()
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      <em>None</em>
+    
+    
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-report_ligand"></span><h3>
+public subroutine <a href='../proc/report_ligand.html'>report_ligand</a>()
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      <em>None</em>
+    
+    
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-report_protein"></span><h3>
+public subroutine <a href='../proc/report_protein.html'>report_protein</a>()
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      <em>None</em>
+    
+    
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-report_rings"></span><h3>
+public subroutine <a href='../proc/report_rings.html'>report_rings</a>()
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      <em>None</em>
+    
+    
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-reset_waters"></span><h3>
+public subroutine <a href='../proc/reset_waters.html'>reset_waters</a>()
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      <em>None</em>
+    
+    
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-score_waters"></span><h3>
+public subroutine <a href='../proc/score_waters.html'>score_waters</a>()
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      <em>None</em>
+    
+    
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-set_ligand"></span><h3>
+public subroutine <a href='../proc/set_ligand.html'>set_ligand</a>()
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      <em>None</em>
+    
+    
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-set_rings"></span><h3>
+public subroutine <a href='../proc/set_rings.html'>set_rings</a>()
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      <em>None</em>
+    
+    
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-search_ring"></span><h3>
+public recursive subroutine <a href='../proc/search_ring.html'>search_ring</a>(bond, ir)
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/q_bond.html'>q_bond</a>),</td>
+  <td>,</td>
+  <td></td>
+  
+  <td>pointer</td><td>::</td>
+  <td><strong>bond</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>ir</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-mark_ring"></span><h3>
+public subroutine <a href='../proc/mark_ring.html'>mark_ring</a>(bond, ir)
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/q_bond.html'>q_bond</a>),</td>
+  <td>,</td>
+  <td></td>
+  
+  <td>pointer</td><td>::</td>
+  <td><strong>bond</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>ir</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-set_rotatable"></span><h3>
+public subroutine <a href='../proc/set_rotatable.html'>set_rotatable</a>()
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      <em>None</em>
+    
+    
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-set_waters"></span><h3>
+public subroutine <a href='../proc/set_waters.html'>set_waters</a>()
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      <em>None</em>
+    
+    
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-sort_atoms"></span><h3>
+public subroutine <a href='../proc/sort_atoms.html'>sort_atoms</a>()
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      <em>None</em>
+    
+    
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-sort_bonds"></span><h3>
+public subroutine <a href='../proc/sort_bonds.html'>sort_bonds</a>()
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      <em>None</em>
+    
+    
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-sort_waters"></span><h3>
+public subroutine <a href='../proc/sort_waters.html'>sort_waters</a>()
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      <em>None</em>
+    
+    
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-start"></span><h3>
+public subroutine <a href='../proc/start.html'>start</a>()
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      <em>None</em>
+    
+    
+    
+    <h4>Description</h4>
+       
+       
+
+
+       
+       <p>! Takes vdw_radii from vdw_file and puts into vector vdwr.
+! Also assigns radii to every solute atom</p>
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-store_waters"></span><h3>
+public subroutine <a href='../proc/store_waters.html'>store_waters</a>()
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      <em>None</em>
+    
+    
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-score_precalc"></span><h3>
+public subroutine <a href='../proc/score_precalc.html'>score_precalc</a>()
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      <em>None</em>
+    
+    
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-score_mean"></span><h3>
+public subroutine <a href='../proc/score_mean.html'>score_mean</a>()
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      <em>None</em>
+    
+    
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-score_calc"></span><h3>
+public subroutine <a href='../proc/score_calc.html'>score_calc</a>(iCalc, iFrame)
+    
+    
+    
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iCalc</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iFrame</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+        
+
+  </div>
+  </div>
+
+    
+    </section>    
+    <br>
+    
+    
+    
+    </div>
+  </div>
+
+    <hr>
+    <footer>
+        <div class="row">
+        <div class="col-md-4">&copy; 2016 </div>
+	<div class="col-md-4"><span class="text-center"> Fortran Program was developed by </span></div>
+        <div class="col-md-4"><span class="pull-right">Documentation generated by <a href="https://github.com/cmacmackin/ford">FORD</a></span></div>
+        </div>
+        <br>
+    </footer>
+    </div> <!-- /container -->
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js'],
+        'HTML-CSS': { 
+           styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: '#000000 ! important'} }
+        }
+      });
+    </script>
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </body>
+</html>

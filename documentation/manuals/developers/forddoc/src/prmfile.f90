@@ -2,9 +2,9 @@
 !  Q v.5.7 makefile                                                            !
 !  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
-!  Kajsa Ljunjberg, John Marelius, Martin Nervall,                             !
-!  Beat Amrein, Alexandre Barrozo, Mauricio Esguerra, Irek Szeler, Miha Purg   !
-!  Johan Sund, Masoud Karemi                                                   !
+!  Kajsa Ljunjberg, John Marelius, Martin Nervall                              !
+!  Maintainers: Beat Amrein, Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, !
+!  Irek Szeler                                                                 !
 !  latest update: july 13, 2015                                                !
 !------------------------------------------------------------------------------!
 
@@ -106,264 +106,238 @@ contains
 
   end subroutine prmfile_startup
 
+  !---------------------------------------------------------------------
 
-!-------------------------------------------------------------------------------
-logical function prm_get_integer_by_key(key, value, default)
-  !arguments
-  character(*)                            :: key
-  integer, intent(out)                    :: value
-  integer, intent(in), optional           :: default
+  logical function prm_get_integer_by_key(key, value, default)
+    !arguments
+    character(*)                            :: key
+    integer, intent(out)                    :: value
+    integer, intent(in), optional           :: default
 
-  !locals
-  character(len=80)                       :: inkey
-  character(200)                          :: str_value
+    !locals
+    character(len=80)                       :: inkey
 
-!    do while (prm_get_string_int(inkey, value))
-!       if(inkey .eq. key) then
-!          prm_get_integer_by_key = .true.
-!          return  
-!       end if
-!    end do
-!    ! go to beginning of section and try again
-
-  call rewind_section
-!    do while (prm_get_string_int(inkey, value))
-!       if(inkey .eq. key) then
-!          prm_get_integer_by_key = .true.
-!          return  
-!       end if
-!    end do
-  do while (get_strings(inkey, str_value))
-    read(str_value, fmt=*, iostat=stat) value ! read integer from value
-      if (inkey .eq. key .and. stat == 0) then
-        prm_get_integer_by_key = .true.
-        return
-      endif
-  end do 
-    
-  if(present(default)) then
-    value = default
-    prm_get_integer_by_key = .true.
-  else
-    value = 0
-    prm_get_integer_by_key = .false.
-  end if
-end function prm_get_integer_by_key
-
-
-!-------------------------------------------------------------------------------
-logical function prm_get_real_by_key(key, value, default)
-  !arguments
-  character(*)                            :: key
-  real, intent(out)                       :: value
-  real, intent(in), optional              :: default
-  !locals
-  character(len=80)                       :: inkey
-  character(200)                          :: str_value
-
-!  do while (prm_get_string_real(inkey, value))
-!     if(inkey .eq. key) then
-!        prm_get_real_by_key = .true.
-!        return  
-!     end if
-!  end do
-  !go to beginning of section and try again
-  call rewind_section
-  do while (get_strings(inkey, str_value))
-    read(str_value, fmt=*, iostat=stat) value ! read integer from value
-      if (inkey .eq. key .and. stat == 0) then
-        prm_get_real_by_key = .true.
-        return
-      end if
-  end do
-  
-!  do while (prm_get_string_real(inkey, value))
-!     if(inkey .eq. key) then
-!        prm_get_real_by_key = .true.
-!        return  
-!     end if
-!  end do
-
-  if(present(default)) then
-     value = default
-     prm_get_real_by_key = .true.
-  else
-     value = 0.
-     prm_get_real_by_key = .false.
-  end if
-
-end function prm_get_real_by_key
-
-
-!-------------------------------------------------------------------------------
-logical function prm_get_real8_by_key(key, value, default)
-  !arguments
-  character(*)                            :: key
-  real(8), intent(out)                    :: value
-  real(8), intent(in), optional           :: default
-  !locals
-  character(len=80)                       :: inkey
-  character(200)                          :: str_value
-
-!  do while (prm_get_string_real8(inkey, value))
-!     if(inkey .eq. key) then
-!        prm_get_real8_by_key = .true.
-!        return  
-!     end if
-!  end do
-  !go to beginning of section and try again
-  call rewind_section
-  do while (get_strings(inkey, str_value))
-     read(str_value, fmt=*, iostat=stat) value ! read integer from value
-       if (inkey .eq. key .and. stat == 0) then
-         prm_get_real8_by_key = .true.
-         return
+    do while (prm_get_string_int(inkey, value))
+       if(inkey .eq. key) then
+          prm_get_integer_by_key = .true.
+          return  
        end if
-  end do
-!  do while (prm_get_string_real8(inkey, value))
-!     if(inkey .eq. key) then
-!        prm_get_real8_by_key = .true.
-!        return  
-!     end if
-!  end do
+    end do
+    !go to beginning of section and try again
+    call rewind_section
+    do while (prm_get_string_int(inkey, value))
+       if(inkey .eq. key) then
+          prm_get_integer_by_key = .true.
+          return  
+       end if
+    end do
 
-  if(present(default)) then
-     value = default
-     prm_get_real8_by_key = .true.
-  else
-     value = 0.
-     prm_get_real8_by_key = .false.
-  end if
+    if(present(default)) then
+       value = default
+       prm_get_integer_by_key = .true.
+    else
+       value = 0
+       prm_get_integer_by_key = .false.
+    end if
+  end function prm_get_integer_by_key
 
-end function prm_get_real8_by_key
+  !--------------------------------------------------------------
 
+  logical function prm_get_real_by_key(key, value, default)
+    !arguments
+    character(*)                            ::      key
+    real, intent(out)                       ::      value
+    real, intent(in), optional      :: default
+    !locals
+    character(len=80)                       ::      inkey
 
-!-------------------------------------------------------------------------------
-logical function prm_get_string_by_key(key, value, default)
-  !arguments
-  character(*)                            :: key
-  character(*), intent(out)               :: value
-  character(*), intent(in), optional      :: default
-  !locals
-  character(len=80)                       :: mykey,inkey, invalue
+    do while (prm_get_string_real(inkey, value))
+       if(inkey .eq. key) then
+          prm_get_real_by_key = .true.
+          return  
+       end if
+    end do
+    !go to beginning of section and try again
+    call rewind_section
+    do while (prm_get_string_real(inkey, value))
+       if(inkey .eq. key) then
+          prm_get_real_by_key = .true.
+          return  
+       end if
+    end do
 
-  mykey = trim(key)
-  call upcase(mykey)
+    if(present(default)) then
+       value = default
+       prm_get_real_by_key = .true.
+    else
+       value = 0.
+       prm_get_real_by_key = .false.
+    end if
 
-!  do while (prm_get_string_string(inkey, invalue))
-!     call upcase(inkey)
-!     if(trim(inkey) .eq. mykey) then
-!        prm_get_string_by_key = .true.
-!        value = invalue
-!        return  
-!     end if
-!  end do
-  !go to beginning of section and try again
-  call rewind_section
-  do while (prm_get_string_string(inkey, invalue))
-     call upcase(inkey)
-     if(trim(inkey) .eq. mykey) then
-        prm_get_string_by_key = .true.
-        value = invalue
-        return  
-     end if
-  end do
+  end function prm_get_real_by_key
 
-  if(present(default)) then
-     value = default
-     prm_get_string_by_key = .true.
-  else
-     !don't change value if not found
-     prm_get_string_by_key = .false.
-  end if
+  !-----------------------------------------------------------------
 
-end function prm_get_string_by_key
+  logical function prm_get_real8_by_key(key, value, default)
+    !arguments
+    character(*)                            ::      key
+    real(8), intent(out)                    ::      value
+    real(8), intent(in), optional   :: default
+    !locals
+    character(len=80)                       ::      inkey
 
+    do while (prm_get_string_real8(inkey, value))
+       if(inkey .eq. key) then
+          prm_get_real8_by_key = .true.
+          return  
+       end if
+    end do
+    !go to beginning of section and try again
+    call rewind_section
+    do while (prm_get_string_real8(inkey, value))
+       if(inkey .eq. key) then
+          prm_get_real8_by_key = .true.
+          return  
+       end if
+    end do
 
-!-------------------------------------------------------------------------------
-logical function prm_get_line_by_key(key, value, default)
-  !arguments
-  character(*)                            :: key
-  character(*), intent(out)               :: value
-  character(*), intent(in), optional      :: default
-  !locals
-  character(len=80)                       :: inkey
-  character(len=200)                      :: invalue
+    if(present(default)) then
+       value = default
+       prm_get_real8_by_key = .true.
+    else
+       value = 0.
+       prm_get_real8_by_key = .false.
+    end if
 
-!  do while (prm_get_string_line(inkey, invalue))
-!     if(inkey .eq. key) then
-!        prm_get_line_by_key = .true.
-!        value = invalue
-!        return  
-!     end if
-!  end do
-  !go to beginning of section and try again
-  call rewind_section
-  do while (prm_get_string_line(inkey, invalue))
-     if(inkey .eq. key) then
-        prm_get_line_by_key = .true.
-        value = invalue
-        return  
-     end if
-  end do
+  end function prm_get_real8_by_key
 
-  if(present(default)) then
-     value = default
-     prm_get_line_by_key = .true.
-  else
-     !don't change value if not found
-     prm_get_line_by_key = .false.
-  end if
+  !----------------------------------------------------------
 
-end function prm_get_line_by_key
+  logical function prm_get_string_by_key(key, value, default)
+    !arguments
+    character(*)                            ::      key
+    character(*), intent(out)       ::      value
+    character(*), intent(in), optional      ::      default
+    !locals
+    character(len=80)                       ::      mykey,inkey, invalue
 
+    mykey = trim(key)
+    call upcase(mykey)
 
-!-------------------------------------------------------------------------------
-logical function prm_get_logical_by_key(key, value, default)
-  !arguments
-  character(*)                            :: key
-  logical, intent(out)                    :: value
-  logical, intent(in), optional           :: default
+    do while (prm_get_string_string(inkey, invalue))
+       call upcase(inkey)
+       if(trim(inkey) .eq. mykey) then
+          prm_get_string_by_key = .true.
+          value = invalue
+          return  
+       end if
+    end do
+    !go to beginning of section and try again
+    call rewind_section
+    do while (prm_get_string_string(inkey, invalue))
+       call upcase(inkey)
+       if(trim(inkey) .eq. mykey) then
+          prm_get_string_by_key = .true.
+          value = invalue
+          return  
+       end if
+    end do
 
-  !locals
-  character(len=80)                       :: inkey
-  character(len=80)                       :: invalue
+    if(present(default)) then
+       value = default
+       prm_get_string_by_key = .true.
+    else
+       !don't change value if not found
+       prm_get_string_by_key = .false.
+    end if
 
-!  do while (prm_get_string_string(inkey, invalue))
-!     if(inkey .eq. key) then
-!        goto 100
-!     end if
-!  end do
-  !go to beginning of section and try again
-  call rewind_section
-  do while (prm_get_string_string(inkey, invalue))
-     if(inkey .eq. key) then
-        goto 100
-     end if
-  end do
+  end function prm_get_string_by_key
 
-  if(present(default)) then
-     value = default
-     prm_get_logical_by_key = .true.
-  else
-     !don't change value if not found
-     prm_get_logical_by_key = .false.
-  end if
-  return
+  !----------------------------------------------------------------
+
+  logical function prm_get_line_by_key(key, value, default)
+    !arguments
+    character(*)                            ::      key
+    character(*), intent(out)       ::      value
+    character(*), intent(in), optional      ::      default
+    !locals
+    character(len=80)                       ::      inkey
+    character(len=200)                      ::      invalue
+
+    do while (prm_get_string_line(inkey, invalue))
+       if(inkey .eq. key) then
+          prm_get_line_by_key = .true.
+          value = invalue
+          return  
+       end if
+    end do
+    !go to beginning of section and try again
+    call rewind_section
+    do while (prm_get_string_line(inkey, invalue))
+       if(inkey .eq. key) then
+          prm_get_line_by_key = .true.
+          value = invalue
+          return  
+       end if
+    end do
+
+    if(present(default)) then
+       value = default
+       prm_get_line_by_key = .true.
+    else
+       !don't change value if not found
+       prm_get_line_by_key = .false.
+    end if
+
+  end function prm_get_line_by_key
+
+  !------------------------------------------------------------------
+
+  logical function prm_get_logical_by_key(key, value, default)
+    !arguments
+    character(*)                            ::      key
+    logical, intent(out)            ::      value
+    logical, intent(in), optional:: default
+
+    !locals
+    character(len=80)                       ::      inkey
+    character(len=80)                       ::      invalue
+
+    do while (prm_get_string_string(inkey, invalue))
+       if(inkey .eq. key) then
+          goto 100
+       end if
+    end do
+    !go to beginning of section and try again
+    call rewind_section
+    do while (prm_get_string_string(inkey, invalue))
+       if(inkey .eq. key) then
+          goto 100
+       end if
+    end do
+
+    if(present(default)) then
+       value = default
+       prm_get_logical_by_key = .true.
+    else
+       !don't change value if not found
+       prm_get_logical_by_key = .false.
+    end if
+    return
 
 100 if(invalue == 'on' .or. invalue == 'ON' .or. invalue =='1') then
-     value = .true.
-     prm_get_logical_by_key = .true.
-  elseif(invalue == 'off' .or. invalue == 'OFF' .or. invalue =='0') then
-     value = .false.
-     prm_get_logical_by_key = .true.
-  else
-     prm_get_logical_by_key = .false.
-  end if
-end function prm_get_logical_by_key
+       value = .true.
+       prm_get_logical_by_key = .true.
+    elseif(invalue == 'off' .or. invalue == 'OFF' .or. invalue =='0') then
+       value = .false.
+       prm_get_logical_by_key = .true.
+    else
+       prm_get_logical_by_key = .false.
+    end if
+  end function prm_get_logical_by_key
 
+  !--------------------------------------------------------------------------------
 
-!-------------------------------------------------------------------------------
   logical function prm_get_line(line)
     !arguments
     character(*), intent(out)       ::      line

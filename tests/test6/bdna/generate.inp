@@ -1,0 +1,40 @@
+!Read the topology (library) file/files
+rl ff/charmm36.lib
+
+!Read the parameter file (i.e. force-field specific)
+rff ff/charmm36.prm
+
+!Read the starting, usually precleaned pdb file.
+rp bdna.pdb
+
+!list residues sequence
+ls
+
+!list atoms in residue 1
+lr 1
+
+!sulfur-sulfur bridges need to be created by the user.
+!addbond atomnum atomnum y
+
+!Create water sphere
+boundary 1 -0.338 0.070 -0.096 32
+solvate -0.338 0.070 -0.096 32 1 HOH
+
+!Create initial topology
+mt init
+wt init.top
+
+!Punch to output unusually large energies
+checkbonds 6
+checkangs  6
+checktors  6
+checkimps  6
+
+!Write pdb file corresponding to the created topology.
+wp init.pdb y
+
+!show a list of Q preferences for this run
+prefs
+
+q
+
