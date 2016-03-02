@@ -9,10 +9,10 @@
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
-!  (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
-!  module: prep.f90
-!  by Johan Aqvist & John Marelius
-!  topology preparation, solvation, validation and PDB I/O
+!>  (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
+!>  module: prep.f90
+!>  by Johan Aqvist & John Marelius
+!>  topology preparation, solvation, validation and PDB I/O
 !------------------------------------------------------------------------------!
 module prep
   use trj
@@ -82,19 +82,19 @@ module prep
   type lib_entry_type
     integer                        :: nat, nbnd, nimp, ncgp, nrules
     integer                        :: head, tail
-    logical                        :: HETATM, solvent
+    logical                        :: hetatm, solvent
     real                           :: density
     character(len=4)               :: nam
-    character(len=8)               :: SYBYLTYPE
+    character(len=8)               :: sybyltype
     character(len=4), pointer      :: atnam(:)
-    character(len=KEYLENGTH), pointer :: tac_lib(:)
+    character(len=keylength), pointer :: tac_lib(:)
     real, pointer                  :: crg_lib(:)
-    type(LIB_RULE_TYPE), pointer   :: rules(:)
-    type(LIB_BOND_TYPE), pointer   :: bnd(:)
-    type(LIB_IMP_TYPE), pointer    :: imp(:)
-    integer(AI), pointer           :: natcgp(:)
-    integer(AI), pointer           :: switch(:)
-    integer(AI), pointer           :: atcgp(:,:)
+    type(lib_rule_type), pointer   :: rules(:)
+    type(lib_bond_type), pointer   :: bnd(:)
+    type(lib_imp_type), pointer    :: imp(:)
+    integer(ai), pointer           :: natcgp(:)
+    integer(ai), pointer           :: switch(:)
+    integer(ai), pointer           :: atcgp(:,:)
   end type lib_entry_type
 
   integer                          :: nlibres
@@ -137,48 +137,48 @@ module prep
   integer                            :: nang_types
   integer                            :: nang_prm
 
-! --- Torsion parameters 
-  TYPE TORSION_TYPE_TYPE
-    character(len=KEYLENGTH)       :: taci, tacj, tack, tacl
+! --- torsion parameters 
+  type torsion_type_type
+    character(len=keylength)       :: taci, tacj, tack, tacl
     integer                        :: cod
-  end type TORSION_TYPE_TYPE
+  end type torsion_type_type
 
-  type(TORSION_TYPE_TYPE), allocatable :: tor_types(:)
-  type(TORLIB_TYPE), allocatable   :: tor_prm(:)
+  type(torsion_type_type), allocatable :: tor_types(:)
+  type(torlib_type), allocatable   :: tor_prm(:)
   integer                          :: ntor_types
   integer                          :: ntor_prm
 
-  type TOR_CODES
+  type tor_codes
     integer                        :: ncod
     integer                        :: cod(10)
-  end type TOR_CODES
+  end type tor_codes
 
-! --- Improper torsion parameters 
-  TYPE IMP_PRM_TYPE
-    character(len=KEYLENGTH)       :: taci, tacj, tack, tacl
-    type(IMPLIB_TYPE)              :: prm
-  end type IMP_PRM_TYPE
+! --- improper torsion parameters 
+  type imp_prm_type
+    character(len=keylength)       :: taci, tacj, tack, tacl
+    type(implib_type)              :: prm
+  end type imp_prm_type
 
-  type(IMP_PRM_TYPE), allocatable  :: imp_prm(:)
+  type(imp_prm_type), allocatable  :: imp_prm(:)
   integer                          :: nimp_prm
   logical                          :: imp_explicit !explicit or automatic defs
 
-! --- Coordinate information
+! --- coordinate information
   integer                          :: natom, nat_wat, nwat
   character(len=100)               :: coord_source = ''
   character(len=80)                :: auto_name = ''
   integer, parameter               :: trj_unit = 17
   integer                          :: trj_frame = 0
   character(len=180)               :: trj_filnam
-  type(MASK_TYPE)                  :: mask
+  type(mask_type)                  :: mask
 
-! --- Extra bonds(S-S bridges etc.)
+! --- extra bonds(s-s bridges etc.)
   integer                                 ::      nextrabnd
-  type(BOND_TYPE)                         ::      extrabnd(max_extrabnd)
+  type(bond_type)                         ::      extrabnd(max_extrabnd)
 
-!     Things needed for topology generation 
+!     things needed for topology generation 
 !-----------------------------------------------------------------------
-  logical, allocatable            ::      makeH(:)
+  logical, allocatable            ::      makeh(:)
   integer, allocatable            ::      nconn(:)
 
   integer, allocatable            ::      iconn(:,:)
@@ -194,11 +194,11 @@ module prep
   character(len=4)                ::      solvent_name
 
 
-! --- Flag to keep track of missing parameters without bailing out
-  LOGICAL                         ::      topo_ok = .false.
+! --- flag to keep track of missing parameters without bailing out
+  logical                         ::      topo_ok = .false.
   logical                         ::      ff_ok = .false.
 
-!       Memory management
+!       memory management
   integer, private              ::      alloc_status
   !private subroutine
   private                       ::      check_alloc 
@@ -209,7 +209,7 @@ module prep
 contains
 
 !------------------------------------------------------------------------------!
-! subroutine: prep_startup
+!>  subroutine: prep_startup
 !
 !------------------------------------------------------------------------------!
 subroutine prep_startup
@@ -240,7 +240,7 @@ end subroutine prep_startup
 
 
 !------------------------------------------------------------------------------!
-! subroutine: allocate_for_pdb
+!>  subroutine: allocate_for_pdb
 !
 !------------------------------------------------------------------------------!
 subroutine allocate_for_pdb(atoms, residues, molecules)
@@ -259,7 +259,7 @@ end subroutine allocate_for_pdb
 
 
 !------------------------------------------------------------------------------!
-! subroutine: prep_shutdown
+!>  subroutine: prep_shutdown
 !
 !------------------------------------------------------------------------------!
 subroutine prep_shutdown
@@ -272,7 +272,7 @@ end subroutine prep_shutdown
 
 
 !------------------------------------------------------------------------------!
-! subroutine: clearlib
+!>  subroutine: clearlib
 !
 !------------------------------------------------------------------------------!
 subroutine clearlib
@@ -282,7 +282,7 @@ end subroutine clearlib
 
 
 !------------------------------------------------------------------------------!
-! subroutine: check_alloc
+!>  subroutine: check_alloc
 !
 !------------------------------------------------------------------------------!
 subroutine check_alloc(message)
@@ -639,7 +639,10 @@ subroutine changeimp
 end subroutine changeimp
 
 
-
+!------------------------------------------------------------------------------!
+!>  subroutine: checkangs
+!
+!------------------------------------------------------------------------------!
 subroutine checkangs
 ! *** local variables
         integer nlarge
@@ -662,7 +665,10 @@ subroutine checkangs
 end subroutine checkangs
 
 
-
+!------------------------------------------------------------------------------!
+!>  subroutine: checkbonds
+!
+!------------------------------------------------------------------------------!
 subroutine checkbonds
 ! *** local variables
         integer nlarge
@@ -685,7 +691,10 @@ subroutine checkbonds
 end subroutine checkbonds
 
 
-
+!------------------------------------------------------------------------------!
+!>  subroutine: checkimps
+!
+!------------------------------------------------------------------------------!
 subroutine checkimps
 ! *** local variables
         integer nlarge
@@ -711,7 +720,10 @@ subroutine checkimps
 end subroutine checkimps
 
 
-
+!------------------------------------------------------------------------------!
+!>  subroutine: checktors
+!
+!------------------------------------------------------------------------------!
 subroutine checktors
 ! *** local variables
         integer nlarge
@@ -736,17 +748,23 @@ subroutine checktors
 end subroutine checktors
 
 
-
+!------------------------------------------------------------------------------!
+!>  function: cross_product 
+!
+!------------------------------------------------------------------------------!
 function cross_product(a,b)
-        real(8)                                         ::      a(3), b(3), cross_product(3)
+  real(8) :: a(3), b(3), cross_product(3)
 
-        cross_product(1) = a(2) * b(3) - a(3) * b(2)
-        cross_product(2) = a(3) * b(1) - a(1) * b(3)
-        cross_product(3) = a(1) * b(2) - a(2) * b(1)
+  cross_product(1) = a(2) * b(3) - a(3) * b(2)
+  cross_product(2) = a(3) * b(1) - a(1) * b(3)
+  cross_product(3) = a(1) * b(2) - a(2) * b(1)
 end function cross_product
 
 
-
+!------------------------------------------------------------------------------!
+!>  subroutine: xlink
+!
+!------------------------------------------------------------------------------!
 subroutine xlink
 !add cross-linking bonds like SS-bridges 
 !locals
@@ -923,19 +941,6 @@ integer function impcode(taci, tacj, tack, tacl)
                                 return
                         endif
         enddo
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
         !now we have to handle force fields differently
@@ -1298,9 +1303,6 @@ end subroutine listseq
 subroutine make14list
 ! *** local variables
         integer                                         ::      it, i, j, ioff, l
-
-
-
 
         n14nbrs = 0
         n14long = 0
@@ -3365,8 +3367,9 @@ subroutine readparm(filnam)
         end if
 
         if(.not. prm_get_real_by_key('coulomb_constant', rdummy)) then
-                write(*,*) 'Coulomb constant is set to the default value of 332.'
-                coulomb_constant = 332.0
+          print '(a)', 'Coulomb constant is set to the default value of 332.'
+          !write(*,*) 'Coulomb constant is set to the default value of 332.'
+          coulomb_constant = 332.0
         else 
                 coulomb_constant = real(rdummy,8)
                 write(*,80) coulomb_constant
@@ -4502,7 +4505,7 @@ logical function set_irc_solvent()
                 return
         end if
         write(*,95) solvent_name
-95      format('Library entry used to generate solvent  : ',a10)
+95      format('Library entry used to generate solvent  = ',a10)
 
         set_irc_solvent = .true.
 
@@ -4678,11 +4681,11 @@ logical function set_simulation_sphere()
         end if
 
     write(*,*)
-        write(*,100) xpcent(:)
+    write(*,100) xpcent(:)
     write(*,110) rexcl_o
-100     format('Simulation sphere centre                   :   ',3f8.3)
-110 format('Simulation radius                          :   ',f8.3)
-        set_simulation_sphere = .true.
+100 format('Simulation sphere centre                =   ',3f8.3)
+110 format('Simulation radius                       =   ',f8.3)
+    set_simulation_sphere = .true.
 
 
 
@@ -5192,11 +5195,11 @@ logical function set_solvent_sphere()
         end if
 
     write(*,*)
-        write(*,100) xwcent(:)
-100     format('Solvation sphere centre                   :   ',3f8.3)
+    write(*,100) xwcent(:)
+100 format('Solvation sphere centre                 =   ',3f8.3)
 
-        set_solvent_sphere = .true.
-        have_solvent_boundary = .true. 
+    set_solvent_sphere = .true.
+    have_solvent_boundary = .true. 
 
 end function set_solvent_sphere
 

@@ -10,9 +10,9 @@
 
 !------------------------------------------------------------------------------!
 !>  (c) 2015 Uppsala Molekylmekaniska HB, Uppsala, Sweden
-!!  program: qprep.f90
-!!  by Johan Aqvist & John Marelius
-!<  qprep topology preparation main program
+!>  program: qprep.f90
+!>  by Johan Aqvist & John Marelius
+!>  qprep topology preparation main program
 !------------------------------------------------------------------------------!
 program qprep
   use iso_fortran_env
@@ -25,6 +25,7 @@ program qprep
   character(*), parameter :: PROGRAM_VERSION = '5.7'
   character(*), parameter :: PROGRAM_DATE = '2015-04-01'
   character(*), parameter :: PROGRAM_SUFFIX  = ''
+  character(*), parameter :: options = compiler_options()
   logical                 :: use_inputfile
   character(200)          :: fileName        = ''
   character(len=32)       :: arg
@@ -53,7 +54,7 @@ contains
 
   !----------------------------------------------------------------------------!
   !>  subroutine: qprep_from_inputfile
-  !!  Read input from file and execute commands
+  !>  Read input from file and execute commands
   !----------------------------------------------------------------------------!
   subroutine qprep_from_inputfile(filename)
 
@@ -104,7 +105,7 @@ contains
 
 
   !----------------------------------------------------------------------------!
-  !  Parse a command and call corresponding subroutine
+  !>  Parse a command and call corresponding subroutine
   !----------------------------------------------------------------------------!
   subroutine parse_command(command)
   character(*), intent(IN) :: command
@@ -181,7 +182,7 @@ contains
 
 
   !----------------------------------------------------------------------------!
-  ! Give help on commands
+  !> Give help on commands
   !----------------------------------------------------------------------------!
   subroutine help
   write( *, * )
@@ -189,7 +190,7 @@ contains
   'command      argument            description', &
   '----------- ------------------- -------------------------------------------------', &
   'addbond                          adds extra bonds(e.g. S-S)',&
-  'average                          Computes an average structure from a trajectory file.',&
+  'average                          computes an average structure from a trajectory file',&
   'boundary    [boundary condition]  set boundary condition',&
   '            [centre] ',&
   '            (box) [boxlengths]',&
@@ -238,8 +239,7 @@ contains
   '',&                                
   'writemol2   [mol_no]             writes molecule mol_no (0 for all) to',&
   '            [mol2_file]          SYBYL mol2 file', &
-  '            [hydrogen_flag ',& 
-  '                         [water_flag]]',&
+  '            [hydrogen_flag [water_flag]]',&
   '',&                                
   'xlink                            add crosslink bonds interactively', &
   '', &
@@ -278,28 +278,33 @@ contains
 
 
   !----------------------------------------------------------------------------!
-  ! Startup subroutine
+  !> Startup subroutine
   !----------------------------------------------------------------------------!
-  subroutine startup
+subroutine startup
 !    call version_check(PROGRAM_NAME, PROGRAM_VERSION, PROGRAM_DATE, PROGRAM_SUFFIX)
-    print '(a)',  '------------------------------------------------------------'
-    print '(4a)', 'Welcome to ', PROGRAM_NAME, ' version: ', PROGRAM_VERSION
-    print '(a)',  ' '
-    print '(2a)', 'This version was compiled using: ', compiler_version()
-    print '(a)',  ' '
-    print '(a)',  'And using the following compiler options: '
-    print '(a)',  compiler_options()
-    print '(a)',  '------------------------------------------------------------'
-    print '(a)',  ' '
-    print '(a)',  'If you are using the interactive mode for help type "help"'
-    print '(a)',  'at the prompt, to quit type "quit".'
-    call prep_startup
-    write(*,*)
-  end subroutine startup
+
+  print '(a)',  '--------------------------------------------------------------------------------'
+  print '(4a)', 'Welcome to ', PROGRAM_NAME, ' version: ', PROGRAM_VERSION
+  print '(a)',  ' '
+  print '(2a)', 'This version was compiled using: ', compiler_version()
+  print '(a)',  ' '
+  print '(a)',  'And using the following compiler options: '
+  write (output_unit, *, delim='quote') options
+!  write ( *, '( A /)' ) trim ( compiler_options() )
+!  print '(a)',  trim(compiler_options())
+  print '(a)',  ' '
+  print '(a)',  'For command line options type qprep --help  or qprep -h at the terminal.'
+  print '(a)',  ' '
+  print '(a)',  'If you are using the interactive mode you can type "help"'
+  print '(a)',  'at the prompt. To quit type "quit".'
+  print '(a)',  '--------------------------------------------------------------------------------'
+  call prep_startup
+  write(*,*)
+end subroutine startup
 
 
   !----------------------------------------------------------------------------!
-  ! Shutdown subroutine
+  !> Shutdown subroutine
   !----------------------------------------------------------------------------!
   subroutine shutdown
     call prep_shutdown
@@ -332,11 +337,14 @@ contains
   !> subroutine: print_help
   !----------------------------------------------------------------------------!
   subroutine print_help()
-    print '(a)', 'usage: qprep [OPTIONS]'
+    print '(a)', 'usage:'
+    print '(a)', 'qprep [OPTION]'
+    print '(a)', '  or'
+    print '(a)', 'qprep < inputfile.inp > outputfile.out'
     print '(a)', ''
     print '(a)', 'Without options, qprep goes into interactive mode.'
     print '(a)', ''
-    print '(a)', 'qprep options:'
+    print '(a)', 'qprep [OPTION]:'
     print '(a)', ''
     print '(a)', '  -v, --version     print version information and exit'
     print '(a)', '  -h, --help        print usage information and exit'

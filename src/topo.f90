@@ -21,77 +21,77 @@ module topo
   implicit none
 
   ! constants
-  real, private, parameter                :: MODULE_VERSION = 5.7
-  character(*), private, parameter        :: MODULE_DATE = '2015-02-22'
+  real, private, parameter         :: MODULE_VERSION = 5.7
+  character(*), private, parameter :: MODULE_DATE = '2015-02-22'
 
-  integer, parameter                      :: nljtyp = 3      !TINY
-  integer, parameter                      :: max_nbr_range   = 25
+  integer, parameter               :: nljtyp = 3      !TINY
+  integer, parameter               :: max_nbr_range   = 25
 
   ! types
-  type BOND_TYPE
-     integer(AI)                          :: i, j
-     integer(SHRT)                        :: cod
-  end type BOND_TYPE
+  type bond_type
+    integer(ai)                    :: i, j
+    integer(shrt)                  :: cod
+  end type bond_type
 
-  type ANG_TYPE
-     integer(AI)                          :: i, j, k
-     integer(SHRT)                        :: cod
-  end type ANG_TYPE
+  type ang_type
+    integer(ai)                    :: i, j, k
+    integer(shrt)                  :: cod
+  end type ang_type
 
-  type BONDLIB_TYPE
-     real(8)                                 ::      fk, bnd0
-  end type BONDLIB_TYPE
+  type bondlib_type
+    real(8)                        :: fk, bnd0
+  end type bondlib_type
 
-  type ANGLIB_TYPE
-     real(8)                                 ::      fk, ang0
-     real(8)                                 ::      ureyfk, ureyr0
-  end type ANGLIB_TYPE
+  type anglib_type
+    real(8)                        :: fk, ang0
+    real(8)                        :: ureyfk, ureyr0
+  end type anglib_type
 
-  type TOR_TYPE
-     integer(AI)                             ::      i, j, k, l
-     integer(SHRT)                           ::      cod
-  end type TOR_TYPE
+  type tor_type
+    integer(ai)                    ::      i, j, k, l
+    integer(shrt)                  ::      cod
+  end type tor_type
 
-  type TORLIB_TYPE
-     real                                    ::      fk, rmult, deltor
-     real                                    ::      paths
-  end type TORLIB_TYPE
+  type torlib_type
+    real                           ::      fk, rmult, deltor
+    real                           ::      paths
+  end type torlib_type
 
-  type IMPLIB_TYPE
-     real                                    ::      fk, imp0
-  end type IMPLIB_TYPE
+  type implib_type
+    real                           ::      fk, imp0
+  end type implib_type
 
-  type CGP_TYPE
-     integer(AI)                             ::      iswitch !switching atom
-     integer(AI)                             ::      first   !index in cgpatom array for 1st member
-     integer(AI)                             ::      last    !index in cgpatom array for last member
-  end type CGP_TYPE
+  type cgp_type
+    integer(ai)                    ::      iswitch !switching atom
+    integer(ai)                    ::      first   !index in cgpatom array for 1st member
+    integer(ai)                    ::      last    !index in cgpatom array for last member
+  end type cgp_type
 
-  type IAC_TYPE
-     real(8)                                 ::      mass
-     real(8)                                 ::      avdw(nljtyp)
-     real(8)                                 ::      bvdw(nljtyp)
-  end type IAC_TYPE
+  type iac_type
+    real(8)                        ::      mass
+    real(8)                        ::      avdw(nljtyp)
+    real(8)                        ::      bvdw(nljtyp)
+  end type iac_type
 
-  type LJ2_TYPE
-     integer(TINY)                   ::      i, j
-  end type LJ2_TYPE
+  type lj2_type
+    integer(tiny)                  ::      i, j
+  end type lj2_type
 
-  type RESIDUE_TYPE
-     integer                                 ::      irc, start
-     character(4)                    ::      name
-  end type RESIDUE_TYPE
+  type residue_type
+    integer                        ::      irc, start
+    character(4)                    ::      name
+  end type residue_type
 
-  !       Memory management
+  !       memory management
   integer, private                        ::      alloc_status
   !private subroutine
   private                                         ::      topo_check_alloc 
 
   !topology information
-  real                                            ::      version
-  character(len=80)                       ::      title = ''
-  character(len=80)                       ::      forcefield = ''
-  character(len=8)                        ::      creation_date
+  real                                    ::      version
+  character(len=256)                      ::      title = ''
+  character(len=256)                      ::      forcefield = ''
+  character(len=256)                      ::      creation_date
   character(len=256)                      ::      pdb_file = ''
   character(len=256)                      ::      lib_files = ''
   character(len=256)                      ::      prm_file
@@ -100,11 +100,11 @@ module topo
   !nat_pro = total # of atoms in topology, nat_solute = # solute atoms (no water)
   integer                                                                                 ::      nat_pro, nat_solute, max_atom
   real(8), allocatable                            ::      xtop(:)                 ! topology/coordinates
-  integer(TINY), allocatable      ::      iac(:)                  ! integer atom codes
-  logical, allocatable                            ::      heavy(:)                ! boolean flag, true if atom >= He
+  integer(tiny), allocatable      ::      iac(:)                  ! integer atom codes
+  logical, allocatable                            ::      heavy(:)                ! boolean flag, true if atom >= he
   real, allocatable                                               ::      crg(:)                  ! charges
-  integer(AI), allocatable                ::      cgpatom(:)              ! charge groups
-  integer, parameter                                      ::      SOLVENT_SPC=0, SOLVENT_3ATOM=1, SOLVENT_GENERAL=2
+  integer(ai), allocatable                ::      cgpatom(:)              ! charge groups
+  integer, parameter                                      ::      solvent_spc=0, solvent_3atom=1, solvent_general=2
   integer                                                                                 ::      solvent_type
   integer,allocatable                                     ::      glb_cofactor(:) ! 0 = protein or ligand atom, 1,2,3...= cofactor 1, 2, 3...
 
@@ -125,55 +125,55 @@ module topo
   real(8)                                         ::      inv_boxl(3)  !inverse of the boxedges
 
   !flag indication if simulation sphere (.false.) or periodic box (.true.)is used. 
-  logical                                         ::      use_PBC = .false.
+  logical                                         ::      use_pbc = .false.
 
   !bond information
   integer                                                                                         ::      nbonds, nbonds_solute, max_bonds
-  type(BOND_TYPE), allocatable    ::      bnd(:)
+  type(bond_type), allocatable    ::      bnd(:)
 
   integer                                         ::      nbndcod, max_bondlib
-  type(BONDLIB_TYPE), allocatable:: bondlib(:)
-  character(len=3), allocatable:: SYBYL_bond_type(:)
+  type(bondlib_type), allocatable:: bondlib(:)
+  character(len=3), allocatable:: sybyl_bond_type(:)
 
   !angle information
   integer                                         ::      nangles, nangles_solute, max_angles
-  type(ANG_TYPE), allocatable     ::      ang(:)
+  type(ang_type), allocatable     ::      ang(:)
 
   integer                                         ::      nangcod, max_anglib
-  type(ANGLIB_TYPE), allocatable:: anglib(:)
+  type(anglib_type), allocatable:: anglib(:)
 
   !torsion information
   integer                                         ::      ntors, ntors_solute, ntorcod
   integer                                         ::      max_tors, max_torlib
   integer                                         ::      nimps, nimps_solute, nimpcod
   integer                                         ::      max_imps, max_implib, imp_type
-  type(TOR_TYPE),target,allocatable:: tor(:)
-  type(TOR_TYPE), target,allocatable:: imp(:)
-  type(TORLIB_TYPE), target,allocatable:: torlib(:)
-  type(IMPLIB_TYPE), target, allocatable:: implib(:)
+  type(tor_type),target,allocatable:: tor(:)
+  type(tor_type), target,allocatable:: imp(:)
+  type(torlib_type), target,allocatable:: torlib(:)
+  type(implib_type), target, allocatable:: implib(:)
 
   !charge group information
   integer                                         ::      ncgp, ncgp_solute, max_cgp
-  type(CGP_TYPE), allocatable     ::      cgp(:)
+  type(cgp_type), allocatable     ::      cgp(:)
 
   !atom type information
   integer                                                                                         ::      natyps, max_atyps
   integer                                                                                         ::      nlj2, max_lj2
-  type(IAC_TYPE),allocatable              ::      iaclib(:)
-  character(len=5),allocatable    ::      SYBYL_atom_type(:)
+  type(iac_type),allocatable              ::      iaclib(:)
+  character(len=5),allocatable    ::      sybyl_atom_type(:)
   character(len=8), allocatable ::        tac(:) !text atom codes
-  type(LJ2_TYPE), allocatable             ::      lj2(:)
+  type(lj2_type), allocatable             ::      lj2(:)
 
   !force field options
   integer                                         ::      ivdw_rule !combination rule
-  integer, parameter                      ::      VDW_GEOMETRIC=1, VDW_ARITHMETIC=2
+  integer, parameter                      ::      vdw_geometric=1, vdw_arithmetic=2
   real(8)                                         ::      el14_scale !scaling of 1-4 electrostatics
   integer                                         ::      iuse_switch_atom !switching atoms in charge group
-  real(8)                                         ::      coulomb_constant !constant in Coulombs law
-  !type of forcefield, one of FF_GROMOS, FF_AMBER, FF_CHARMM
+  real(8)                                         ::      coulomb_constant !constant in coulombs law
+  !type of forcefield, one of ff_gromos, ff_amber, ff_charmm
   !this only (right now) affects how improper parameters are assigned
   integer                                         ::      ff_type
-  integer, parameter                      ::      FF_GROMOS=1, FF_AMBER=2, FF_CHARMM=3
+  integer, parameter                      ::      ff_gromos=1, ff_amber=2, ff_charmm=3
 
   !neighbour lists
   integer                                         ::      n14nbrs
@@ -182,18 +182,18 @@ module topo
   integer                                         ::      nexlong, max_exlong
   logical, allocatable            ::      list14(:,:)
   logical, allocatable            ::      listex(:,:)
-  integer(AI), allocatable        ::      list14long(:,:)
+  integer(ai), allocatable        ::      list14long(:,:)
   !listexlong may be reallocated to include special exclusions
-  integer(AI), pointer            ::      listexlong(:,:)
+  integer(ai), pointer            ::      listexlong(:,:)
 
-  !Residue and molecule bookkeeping information 
-  INTEGER                                         ::      nres, nres_solute, max_res
-  type(RESIDUE_TYPE), allocatable ::      res(:)
+  !residue and molecule bookkeeping information 
+  integer                                         ::      nres, nres_solute, max_res
+  type(residue_type), allocatable ::      res(:)
 
-  INTEGER                                         ::      nmol, max_mol
-  INTEGER, allocatable            ::      istart_mol(:)
+  integer                                         ::      nmol, max_mol
+  integer, allocatable            ::      istart_mol(:)
 
-contains
+  contains
 
   !----------------------------------------------------------------------
 
@@ -494,104 +494,104 @@ contains
 
   end function topo_open
 
-  !----------------------------------------------------------------------
-  logical function topo_read(u, require_version, extrabonds)
-    ! arguments
-    integer                                         ::      u
-    real, intent(in)                        ::      require_version
-    integer, optional,intent(in)::  extrabonds
+!------------------------------------------------------------------------------
+logical function topo_read(u, require_version, extrabonds)
+  ! arguments
+  integer                      :: u
+  real, intent(in)             :: require_version
+  integer, optional,intent(in) :: extrabonds
 
-    ! local variables
-    integer                     :: rd
-    integer                                         :: nat3, nwat
-    integer                                         :: i,j,k,n, si
-    integer                                         :: nhyds
-    integer                                         :: paths
-    character(len=256)                      :: line, restofline
-    character(len=10)                       :: key, boundary_type !PWadded
-    integer                                         :: filestat
-    integer(1), allocatable         :: temp_list(:,:)
-    integer                                         :: extra
-    real(8)                                         :: deprecated
+  ! local variables
+  integer                      :: rd
+  integer                      :: nat3, nwat
+  integer                      :: i,j,k,n, si
+  integer                      :: nhyds
+  integer                      :: paths
+  character(len=256)           :: line, restofline
+  character(len=10)            :: key, boundary_type !PWadded
+  integer                      :: filestat
+  integer(1), allocatable      :: temp_list(:,:)
+  integer                      :: extra
+  real(8)                      :: deprecated
 
-    topo_read = .false.
-    ! get rid of old topology
-    call topo_deallocate    
+  topo_read = .false.
+  ! get rid of old topology
+  call topo_deallocate    
 
-    !       This is the default / cutoffs based on switching atoms
-    iuse_switch_atom = 1
+  !       This is the default / cutoffs based on switching atoms
+  iuse_switch_atom = 1
 
-    !       read topology file
-    call centered_heading('Reading topology file', '-')
+  !       read topology file
+  call centered_heading('Reading topology file', '-')
 
-    !handle extra bonds etc
-    if(present(extrabonds)) then
-       extra = extrabonds
-    else
-       extra = 0
-    end if
+  !handle extra bonds etc
+  if(present(extrabonds)) then
+     extra = extrabonds
+  else
+     extra = 0
+  end if
 
-    !     read topology file
+  !     read topology file
 
-    ! --> 1. header or title row
-    ! ==========================
+  ! --> 1. header or title row
+  ! ==========================
 
-    !clear header information
-    pdb_file = ''
-    prm_file = ''
-    lib_files = ''
-    forcefield = ''
-    ff_type = FF_GROMOS !this is the default
+  !clear header information
+  pdb_file = ''
+  prm_file = ''
+  lib_files = ''
+  forcefield = ''
+  ff_type = FF_GROMOS !this is the default
 
-    read (u, '(a80)', err=1000) title
-    if(title == 'Q topology file') then !it's a file with header
-       do 
-          read(u,'(a256)') line
-          read(line,*) key
-          !workaround to allow / in strings
-          restofline = adjustl(line(len_trim(key)+1:len(line)))
-          call upcase(key)
-          select case (key)
-          case ('TITLE')
-             title = restofline
-          case ('DATE')
-             creation_date = restofline
-          case ('VERSION')
-             read(restofline, *) version
-          case ('PDB_FILE')
-             pdb_file = restofline
-          case ('LIB_FILES')
-             lib_files = restofline
-          case ('FORCEFIELD')
-             forcefield = restofline
-          case ('FF_TYPE')
-             read(restofline, *) ff_type
-          case ('PRM_FILE')
-             prm_file = restofline
-          case ('END')
-             exit
-          case default
-             write(*,'(a,a)') '>>>WARNING: Unrecognised key in header: ', key
-          end select
-       end do
-    else
-       version = 2
-    end if
-    write (*,'(a80,/)') title
+  read (u, '(a80)', err=1000) title
+  if(title == 'Q topology file') then !it's a file with header
+     do 
+        read(u,'(a256)') line
+        read(line,*) key
+        !workaround to allow / in strings
+        restofline = adjustl(line(len_trim(key)+1:len(line)))
+        call upcase(key)
+        select case (key)
+        case ('TITLE')
+           title = restofline
+        case ('DATE')
+           creation_date = restofline
+        case ('VERSION')
+           read(restofline, *) version
+        case ('PDB_FILE')
+           pdb_file = restofline
+        case ('LIB_FILES')
+           lib_files = restofline
+        case ('FORCEFIELD')
+           forcefield = restofline
+        case ('FF_TYPE')
+           read(restofline, *) ff_type
+        case ('PRM_FILE')
+           prm_file = restofline
+        case ('END')
+           exit
+        case default
+           write(*,'(a,a)') '>>>WARNING: Unrecognized key in header: ', key
+        end select
+     end do
+  else
+     version = 2
+  end if
+  write (*,'(a80,/)') title
 
-    if(version < require_version) goto 1100
+  if(version < require_version) goto 1100
 
-    ! --> 2. nat_pro (no. of atoms in topology)
-    ! =========================================   
-    read (u, '(a)', err=1000) line
-    read (line,*,err=1000) nat_pro !first read what must be there
+  ! --> 2. nat_pro (no. of atoms in topology)
+  ! =========================================   
+  read (u, '(a)', err=1000) line
+  read (line,*,err=1000) nat_pro !first read what must be there
 
-    read (line,*,iostat=filestat) nat_pro, nat_solute !then try to read optional things too
-    if (filestat .ne. 0) then
-       nat_solute = nat_pro !default is nat_solute = nat_pro
-    end if
+  read (line,*,iostat=filestat) nat_pro, nat_solute !then try to read optional things too
+  if (filestat .ne. 0) then
+     nat_solute = nat_pro !default is nat_solute = nat_pro
+  end if
 
-    write (*,20) nat_solute, nat_pro-nat_solute
+  write (*,20) nat_solute, nat_pro-nat_solute
 20  format ('No. of solute atoms     = ',i10,/,&
          'No. of solvent atoms    = ',i10)
     max_atom = nat_pro
@@ -753,7 +753,7 @@ contains
 130 format ('No. of atomic charges   = ',i10)
 
 
-    ! --> 10. charge groups                                     ---->     cgp
+    ! --> 10. charge groups                             ---->     cgp
     ! =====================
     read(u,'(a)',err=1000) line
     read(line,*,err=1000) ncgp !first read what must be there

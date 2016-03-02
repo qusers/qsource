@@ -23,7 +23,7 @@ module trj
   character(*), private, parameter :: MODULE_DATE = '2015-02-22'
 
   type, private :: REC1
-     sequence
+    sequence
      character(len=4) :: trj_type
      integer(4)       :: n_frames, n_steps_before, interval, n_steps
      integer(4)       :: interval_velcheck, unused6, unused7, n_degf
@@ -198,7 +198,7 @@ contains
 
 
   !******************************************************
-  !Write real(4) coords to trajectory. Writes only 
+  ! Write real(4) coords to trajectory. Writes only 
   ! atoms in current mask.
   !******************************************************
   logical function trj_write(x)

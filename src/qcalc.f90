@@ -17,19 +17,19 @@
 program qcalc
   use version
   use trj
-  use calc_BASE
-  use calc_RMS
-  use calc_FIT
-  use calc_GEOM
-  use calc_ENTROPY
-  use calc_NB                             
-  use calc_CHEMSCORE
-  use calc_XSCORE
-  use calc_PMF
-  use calc_RDF
-  use calc_RMSF
-  use calc_COM_KE
-  use calc_COM
+  use calc_base
+  use calc_rms
+  use calc_fit
+  use calc_geom
+  use calc_entropy
+  use calc_nb                             
+  use calc_chemscore
+  use calc_xscore
+  use calc_pmf
+  use calc_rdf
+  use calc_rmsf
+  use calc_com_ke
+  use calc_com
   !add more calculation kind modules here...
 
   implicit none
@@ -43,21 +43,21 @@ program qcalc
   integer, parameter                      ::      MAX_CALC_KINDS = 99
   
   !data types  
-  type CALC_TYPE
+  type calc_type
           character(len=60)               ::      desc
           integer                                 ::      i
           integer                                 ::      typ
-  end type CALC_TYPE
+  end type calc_type
 
-  type CALC_KIND_TYPE
+  type calc_kind_type
           character(len=40)               ::      desc
           character(len=14)               ::      key
           logical                                 ::      output
-  end type CALC_KIND_TYPE                         
+  end type calc_kind_type                         
 
-  integer                                         ::      Nkinds = 0, Ncalcs = 0
-  type(CALC_KIND_TYPE)            ::      cdef(MAX_CALC_KINDS)
-  type(CALC_TYPE)                         ::      calcs(MAX_CALCS)
+  integer                                         ::      nkinds = 0, ncalcs = 0
+  type(calc_kind_type)            ::      cdef(max_calc_kinds)
+  type(calc_type)                         ::      calcs(max_calcs)
 
 
   !register the calculation kinds
