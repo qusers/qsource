@@ -87,10 +87,10 @@
 
 \vspace{8.0cm}
 \Huge{Version 5.7}\\
-\Huge{November 5, 2015}\\
+\Huge{March 8, 2016}\\
 %\footnotesize{February 6, 2015}\\
 \vspace{0.8cm}
-\large{\url{http://xray.bmc.uu.se/~aqwww/q}}
+\large{\url{http://qdyn.no-ip.org/}}
 \end{center}
 
 
@@ -108,27 +108,38 @@
 % Preface
 %===============================================================================
 \section{PREFACE}
-Q started its development sometime in the nineteen nineties originally
+\textbf{Q} started its development sometime in the nineteen nineties originally
 by  Johan \AA  qvist,  and since  then a  list  of collaborators  have
 contributed to  the code, among  them: John Marelius,  Karin Kolmodin,
 Isabella Feierberg, Martin Alml\"of, Martin Ander, Jens Carlson, Peter
 Hanspers, Anders Kaplan, Kajsa  Ljunjberg, Martin Nervall, Johan Sund,
-Paul Bauer, Alexandre Barrozo, Masoud  Karemi, Irek Szeler, and \AA ke
-Sandgren.   The code  is in  active development  and new  features are
-being  implemented  mainly  following   the  fortran  2003  standard.
-Additionally the  MPI implementation has  been updated to  enhance the
-speed   of  running   parallel  jobs   and  provide   a  more   robust
+Alexandre Barrozo, Masoud Karemi, Mauricio Esguerra, Irek Szeler, Miha
+Purg and  \AA ke Sandgren. The  code is in active  development and new
+features  are  being implemented  mainly  following  the fortran  2003
+standard.   Additionally the  MPI implementation  has been  updated to
+enhance the speed  of running parallel jobs and provide  a more robust
 parallelization across  different cluster architectures.   The program
 code is  hosted online  thanks to a  generous github  academic account
 granted to the program developers at Uppsala University.  Instructions
 on  how to  obtain the  code  can be  found online  at the  Q-website:
-\url{http://xray.bmc.uu.se/~aqwww/q/}.
-%History of logo and the many possible identities of what Q stands for.
-% Q stands for partition function
-% Q stands for heat
-% Q stands for waiting in Queue
-% Q for Quantum? maybe NOT
-% 
+\url{http://qdyn.no-ip.org/}.
+
+Regarding the  name of the program  there are many conjectures  as the
+original reason seems to be lost.  Maybe \textbf{Q} stands for
+the commonly used letter to  describe partition functions, or maybe it
+stands  for  the  letter  denoting  heat,  or  maybe  for  waiting  in
+\textbf{Q}ueue of  maybe for \textbf{Q}uantum,  but we would be  a bit
+hesitant about that last one.
+
+The  molecule in  the  \textbf{Q}  logo is  that  of  a derivative  of
+2,4-quinazolinediamine, to  be more  precise, its  full IUPAC  name is
+6-[(N-methylanilino)methyl]quinazoline-2,4-diamine and  its pubchem id
+is  CHEMBL78578. The  interest in  this molecule  comes from  it being
+related to small molecules similar to quinine. Quinine was perhaps the
+first effective  treatment against  malaria and it's  derivatives have
+been researched  in the  pharmaceutical industry extensively  and have
+also been part of the  research efforts\cite{Marelius:1998} at the \AA
+qvist lab.
 
 
 %===============================================================================
@@ -3691,14 +3702,14 @@ on page \pageref{tab:FEP_file_f_p_t_r}.
 
 The output from the \textbf{qdyn} simulation is gathered in a log
 file. This log file is divided into two parts, one showing the
-initialisation of the simulations and the other showing different
-energies form all the steps of the simulation. The units used in
+initialization of the simulations and the other showing different
+energies from all the steps of the simulation. The units used in
 the log files are the basic units in table \ref{tab:units} on page
 \pageref{tab:units} and appropriate combinations thereof.
 
-\textbf{Initialisation phase}\\*[0.25cm] In this part of the log
-file, all input data from input, topology and FEP files are read
-and the simulation is initialised.
+\textbf{Initialization phase}\\*[0.25cm] In this part of the log
+file all data from the input, topology, and FEP files are read
+and the simulation is initialized.
 
 \textbf{Reading input from eq1.inp}
 
@@ -4451,77 +4462,114 @@ See section \ref{subsection:scoring} on page \pageref{subsection:scoring} for mo
 \newpage
 
 \begin{thebibliography}{2}
+\bibitem{Marelius:1998}Marelius J., Graffner-Nordberg M., Hansson T.,
+  Hallberg A., Aqvist J., Computation    of    affinity     and
+  selectivity:    binding    of 2,4-diaminopteridine   and
+  2,4-diaminoquinazoline   inhibitors   to dihydrofolate reductases,
+  J. Comput. Aided Mol. Des. 12, J. Comput. Aided Mol. Des. 12,
+  119-131, 1998
+  
 \bibitem{Marelius:1999}Marelius, J., Kolmodin, K., Feierberg, I. and Åqvist, J. Q: An MD
 program for free energy calculations and empirical valence bond
 simulations in biomolecular systems, J. Mol. Graphics Mod. 1999,
 16, 213-225.
+
 \bibitem{Kollman:1993}Kollman, P.A., Free Energy Calculations:
 Applications to Chemical and Biochemical Phenomena. Chem. Rev.
 1993, 2395-2417.
+
 \bibitem{Beveridge:1989}Beveridge, D.L. and DiCapua, F.M., Free energy via molecular simulation:
 applications to chemical and biomolecular systems. Annu. Rev.
 Biophys. Biophys. Chem. 1989, 431-492.
+
 \bibitem{Warshel:1988}Warshel, A., Computer modeling of Chemical reactions in Enzymes
 and Solutions. Wiley, New York, 1988.
+
 \bibitem{Aaqvist:1993}Åqvist, J. and Warshel, A., Simulation of Enzyme Reactions Using Valence Bond Force Fields
 and Other Hybrid Quantum/Classical Approaches. Chem. Rev.
 1993,93,2523-2544.
+
 \bibitem{Aaqvist:1994}Åqvist, J., Medina, C. and Samuelsson, J.E., A new method for predicting binding
 affinity in computer-aided drug design., Protein Engng. 1994, 7,
 385-391.
+
 \bibitem{Jones-Hertzog:1997}Jones-Hertzog, D.K. and Jorgensen, W.L., Binding Affinities for Sulfonamide
 Inhibitors with Human Thrombin Using Monte Carlo Simulations with
 a Linear Response Method. J. Med. Chem. 1997, 40, 1539-1550.
+
 \bibitem{Hansson:1998}Hansson, T., Marelius, J. and Åqvist, J., Ligand Binding Affinity
 Prediction by Linear Interaction Energy Methods, J. Comput.-Aided
 Mol. Des. 1998, 12, 27-35.
+
 \bibitem{Warshel:1978}Warshel, A., A microscopic
 model for calculations of chemical processes in aqueous solution,
 Chem. Phys. Lett. 1978, 55, 454-458.
+
 \bibitem{Berkowitz:1982}Berkowitz, M. and McCammon, J.A., Molecular Dynamics with Stochastic Boundary Conditions,
 Chem. Phys. Lett. 1982, 90, 215-217.
+
 \bibitem{Brunger:1984}Brünger, A. T., Brooks, C.L. III. and Karplus, M., Stochastic Boundary Conditions for
 Molecular Dynamics Simulations of ST2 Water, Chem. Phys. Lett.
 1984, 105, 495-500.
+
 \bibitem{pdb}See $e.g.$ http://www.rcsb.org/pdb/docs/format/pdbguide2.2/guide2.2\_frame.html.
+
 \bibitem{Berendsen:1981}Berendsen, H.J.C., Postma, J.P.M., van Gunsteren, W.F. and Hermans, J., Interaction
 models for water in relation to protein hydration, In
 Intermolcular Forces, Pullman, B. (ed.). Riedel, Dordrect, 1981,
 pp 331-342.
+
 \bibitem{Jorgensen:1983}Jorgensen, W.L., Chandrasekhar, J., Madura, J.D., Impey, R.W. and Klein, M.L., Comparison
 of Simple Potential Functions for Simulating Liquid Water. J.
 Chem. Phys. 1983, 79, 926-935.
+
 \bibitem{Kolmodin:}Kolmodin, K. and Åqvist, J, PTP proton transfer...
+
 \bibitem{Aaqvist:1991}Åqvist, J., Free Energy Perturbation Study of Metal Ion Catalyzed Proton Transfer in Water. J. Phys. Chem. 1991, 95,
 4587-4590.
+
 \bibitem{Wennerstroem} http://www.ibg.uu.se/upload/PetraW.pdf Wennerström, P. (valid link
 2003-06).
+
 \bibitem{VMD} Humphrey, W., Dalke, A. and Schulten, K., VMD -Visual Molecular Dynamics, J. Mol. Graph., 1996, 14,
 33-38.
+
 \bibitem{VMD_homepage} VMD home page:http://www.ks.uiuc.edu/Research/vmd/ Laaksonen, L., A (valid link
 2003-06).
+
 \bibitem{gOM} graphics program for the analysis and display of moleculardynamics trajectories, J. Mol. Graph. 1992, 10, 33.
+
 \bibitem{gOM_homepage} gOpenMol home page: http://www.csc.fi/~laaksone/gopenmol/gopenmol.html valid link (2003-06).
+
 \bibitem{Cornell:1995} Cornell, W.D., Cieplak, P., Bayly, C.I., Gould, I.R., Merz, K.M. Jr., Ferguson,D.M., Spellmeyer, D.C., Fox, T., Caldwell, J.W. and Kollman, P.A., A second generation force field for the simulation of proteins and nucleic acids. J. Am. Chem. Soc. 1995, 117,
 5179-5197.
+
 \bibitem{Jorgensen:1988} Jorgensen, W.L. and Tirado-Rives, J., The OPLS Potential Functions for Proteins.Energy Minimizations for Crystals of Cyclic Peptides and Crambin. J. Am. Chem. Soc. 1988, 110,
 1657-1666.
+
 \bibitem{Brooks:1993} Brooks, B.R., Bruccoleri, R.E., Olafson, B.D., States, D.J., Swaminathan, S. and Karplus, M., CHARMM: A Program for Macromolecular Energy, Minimization, and Dynamics Calculations. J. Comp. Chem. 1993, 4,
 187-217.
+
 \bibitem{Gunsteren:1987} van Gunsteren, W.F. and Berendsen, H.J.C., Groningen Molecular Simulation (GROMOS) Library Manual. Biomos B.V., Groningen,
 1987.
+
 \bibitem{Gunsteren:mod} van Gunsteren, W. F., [GROMOS87
 modification].
+
 \bibitem{Gunsteren:1996} van Gunsteren, W.F., Billeter, S.R., Eising, A.A., Hünenberger, P.H., Krüger, P., Mark, A.E. and Tironi, I.G., Biomolecular Simulation: The GROMOS96 Manual and User Guide. Hochschulverlag AG an der ETH Zürich,
 1996.
+
 \bibitem{Jorgensen:1996} Jorgensen W.L., Maxwell D.S., Tirado-Rives J., Development and Testing of the OPLS All-Atom Force Field on
 Conformational Energetics and Properties of Organic Liquids.
 J.Am.Chem. Soc. 1996, 118, 11225-11236.
+
 \bibitem{Essex:1995}Essex, J.W. and Jorgensen, W.L., An Empirical Boundary Potential for Water Droplet Simulations. J. Comp. Chem. 1995, 16, 951-972
+
 \bibitem{Berendsen:1984}Berendsen, H.J.C, Postna, J.P.M., van
 Gunsteren, W.F., di Nola, A. and Haak, J.R., Molecular dynamics
 with coupling to an external bath, J. Chem. Phus. 1984, 81,
 3684-3690.
+
 \bibitem{Zacharias:1994} Zacharias M., Straatsma T.P., McCammon J.A., Separation-shifted scaling, a new scaling method for Lennard-Jones
 interactions in thermodynamic integration. J.Chem.Phys. 1994, 100,
 9025-9031.
