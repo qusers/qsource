@@ -325,8 +325,9 @@ subroutine angle_calc(i)
 	elseif (geom(i)%is_fep) then !calc q energy
 		do states = 1 , nstates
                         if(geom(i)%qcod(states)>0) then
-                        V = V + (lamda(states) * &
-                                0.5*qanglib(geom(i)%qcod(states))%fk*(a-qanglib(geom(i)%qcod(states))%ang0))
+                        V = V + lamda(states) * &
+                                (0.5*qanglib(geom(i)%qcod(states))%fk * &
+                                (a-qanglib(geom(i)%qcod(states))%ang0)**2)
                         end if
                 end do
 		write(*,100, advance='no') V
@@ -392,9 +393,9 @@ end subroutine torsion_calc
 subroutine dist_heading(i)
 	integer						::	i
 	
-	write(*,'(a)', advance='no') 'dist(Å)'
+	write(*,'(a)', advance='no') 'dist(Ang)'
 
-	if(geom(i)%cod > 0) then
+	if((geom(i)%cod > 0).or.(any(geom(i)%qcod(:).gt.0))) then
 		write(*,'(a8)', advance='no') 'V_bond'
 	end if
 end subroutine dist_heading
@@ -403,9 +404,9 @@ end subroutine dist_heading
 subroutine angle_heading(i)
 	integer						::	i
 	
-	write(*,'(a)', advance='no') 'angle(°)'
+	write(*,'(a)', advance='no') 'angle(Deg)'
 
-	if(geom(i)%cod > 0) then
+	if((geom(i)%cod > 0).or.(any(geom(i)%qcod(:).gt.0))) then
 		write(*,'(a8)', advance='no') 'V_angle'
 	end if
 end subroutine angle_heading
@@ -414,9 +415,9 @@ end subroutine angle_heading
 subroutine torsion_heading(i)
 	integer						::	i
 	
-	write(*,'(a)', advance='no') 'tors(°)'
+	write(*,'(a)', advance='no') 'tors(Deg)'
 
-	if(geom(i)%cod > 0) then
+	if((geom(i)%cod > 0).or.(any(geom(i)%qcod(:).gt.0))) then
 		write(*,'(a8)', advance='no') 'V_tors'
 	end if
 end subroutine torsion_heading

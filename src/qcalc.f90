@@ -112,6 +112,7 @@ subroutine startup
 	call version_check(PROGRAM_NAME, PROGRAM_VERSION, PROGRAM_DATE, PROGRAM_SUFFIX) ! print version and chack for flags
 	
 	call mask_startup	! mask_startup calls topo_startup, which is empty
+	call qatom_startup
 	write(*,*)
 	
 	call calc_help		! outputs help to screen
