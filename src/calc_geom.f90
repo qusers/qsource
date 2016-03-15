@@ -12,7 +12,7 @@ module CALC_GEOM
 	integer, parameter			::	MAX_MEASUREMENTS = 99
 
 !module variables
-	real(8)						::	pi
+	real(8)						:: pi,deg2rad,rad2deg
 	integer, private			::	Nmeas = 0
 	type GEOM_TYPE
 		integer					::	i, j, k, l, cod, qcod(max_states)
@@ -24,6 +24,8 @@ contains
 
 subroutine geom_initialize
 	pi = 4 * atan(1.)
+    deg2rad = pi/180.
+    rad2deg = 1./deg2rad
 end subroutine geom_initialize
 
 subroutine geom_finalize
@@ -282,13 +284,14 @@ subroutine dist_calc(i)
 	if(geom(i)%cod > 0) then !calc energy
 		V = 0.5 * bondlib(geom(i)%cod)%fk * (r - bondlib(geom(i)%cod)%bnd0)**2
 		write(*,110, advance='no') V
-	elseif (geom(i)%is_fep) then !calc q energy
+        end if
+	if (geom(i)%is_fep) then !calc q energy
 		do states = 1 , nstates
 			if(geom(i)%qcod(states)>0) then
-			fexp = exp(-qbondlib(geom(i)%qcod(states))%amz*(r-qbondlib(geom(i)%qcod(states))%r0))
-			V = V + (lamda(states) * &
-				qbondlib(geom(i)%qcod(states))%Dmz*(fexp*fexp-2.*fexp) + &
-				0.5*qbondlib(geom(i)%qcod(states))%fk*(r-qbondlib(geom(i)%qcod(states))%r0)**2)
+			        fexp = exp(-qbondlib(geom(i)%qcod(states))%amz*(r-qbondlib(geom(i)%qcod(states))%r0))
+			        V = V + (lamda(states) &
+				      * qbondlib(geom(i)%qcod(states))%Dmz*(fexp*fexp-2.*fexp) &
+				      + 0.5*qbondlib(geom(i)%qcod(states))%fk*(r-qbondlib(geom(i)%qcod(states))%r0)**2)
 			end if
 		end do
 		write(*,110, advance='no') V
@@ -315,19 +318,22 @@ subroutine angle_calc(i)
 	IF(scp>1.) scp = 1.
 	IF(scp< -1.) scp = -1.
 	a = acos(scp)
-	write(*,100, advance='no') a*180/pi
+	write(*,100, advance='no') a*rad2deg
 100	format(f11.2)
 
 	if(geom(i)%cod > 0) then !calc energy
 		V = 0.5 * anglib(geom(i)%cod)%fk &
-			*(a-anglib(geom(i)%cod)%ang0*pi/180.)**2
+			*(a-anglib(geom(i)%cod)%ang0*deg2rad)**2
 		write(*,110, advance='no') V
-	elseif (geom(i)%is_fep) then !calc q energy
+        end if
+	if (geom(i)%is_fep) then !calc q energy
 		do states = 1 , nstates
                         if(geom(i)%qcod(states)>0) then
-                        V = V + lamda(states) * &
-                                (0.5*qanglib(geom(i)%qcod(states))%fk * &
-                                (a-qanglib(geom(i)%qcod(states))%ang0)**2)
+                                V = V + ( lamda(states) &
+                                      *   (0.5*qanglib(geom(i)%qcod(states))%fk &
+                                      *   (a-qanglib(geom(i)%qcod(states))%ang0)**2) )
+! no conversion factor here because qangles are already converted in
+! qatom_load_fep
                         end if
                 end do
 		write(*,100, advance='no') V
@@ -375,12 +381,13 @@ subroutine torsion_calc(i)
 		arg = torlib(ic)%rmult * phi - torlib(ic)%deltor * pi / 180.
 		V = torlib(ic)%fk *(1.0 + cos(arg) ) / real(torlib(ic)%paths )
 		write(*,110, advance='no') V
-        elseif (geom(i)%is_fep) then !calc q energy
+        end if
+        if (geom(i)%is_fep) then !calc q energy
                 do states = 1 , nstates
                         if(geom(i)%qcod(states)>0) then
-			arg = qtorlib(ic)%rmult*phi-qtorlib(ic)%deltor
-                        V = V + (lamda(states) * &
-                                qtorlib(ic)%fk*(1.0+cos(arg)))
+			        arg = qtorlib(ic)%rmult*phi-qtorlib(ic)%deltor
+                                V = V + ( lamda(states) &
+                                      * qtorlib(ic)%fk*(1.0+cos(arg)) )
                         end if
                 end do
                 write(*,100, advance='no') V
