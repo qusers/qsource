@@ -81,13 +81,18 @@ echo $path | grep qsource
 
 /Users/johndoe/software/qsource
 
-qprep5
+qprep
 
 ###############################################################################
 Welcome to Qprep version 5.06
 
 Qprep> 
 ```
+
+
+## Troubleshooting
+
+If you receive error messages during compilation please report them to Christoffer Lind ( christoffer.lind at icm.uu.se ) including the compiler used (e.g. intel fortran), the compiler version, and the error message.
 
 
 
