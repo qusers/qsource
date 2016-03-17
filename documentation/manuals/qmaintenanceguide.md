@@ -284,6 +284,13 @@ Where      versioning      is       being      used      from      the
 https://github.com/qusers/qwebsite repository.
 
 
+## Troubleshooting
+
+If you receive error messages during compilation please report them to 
+Christoffer Lind ( christoffer.lind at icm.uu.se ) including the compiler 
+used (e.g. intel fortran), the compiler version, and the error message.
+
+
 ##The E-mail list
 
 The       home      page      of       the      list       is      at:
