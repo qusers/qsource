@@ -88,11 +88,12 @@ Benchmarks
 TODO
 --------------------------------------------------------------------------------
 
-The following to-do list highlights what needs to be done for expanding the benchmark into
-something userful.
+The following to-do list highlights what needs to be done for
+expanding the benchmark
 
-- [ ] Make a script that will send runs of 1, 2, 3, 4, 5ns runs to different cluster nodes
-      at the same time.
+- [ ] Make a script that will send runs of 1, 2, 3, 4, 5ns runs to
+      different cluster nodes at the same time.
 - [ ] Make number of processors gradient script.
 - [x] Make a markdown document describing the test.
-- [ ] Make a general R script for plotting and making statistics with the benchmarks.
+- [ ] Make a general R script for plotting and making statistics with
+      the benchmarks.

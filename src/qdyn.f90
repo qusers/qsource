@@ -1,20 +1,18 @@
 !------------------------------------------------------------------------------!
-!  Q v.5.7 makefile                                                            !
+!  Q version 5.7                                                               !
 !  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
-!  Kajsa Ljunjberg, John Marelius, Martin Nervall                              !
-!  Maintainers: Beat Amrein, Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, !
-!  Irek Szeler                                                                 !
-!  latest update: july 13, 2015                                                !
+!  Kajsa Ljunjberg, John Marelius, Martin Nervall Beat Amrein, Miha Purg,      !
+!  Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, Irek Szeler               !
+!  latest update: October 14, 2015                                             !
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
-!  (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
-!  qdyn.f90
-!  by Johan Aqvist, John Marelius, Anders Kaplan & Martin Nervall
-!  Qdyn molecular dynamics main program
+!>  (c) 2015 Uppsala Molekylmekaniska HB, Uppsala, Sweden
+!>  program: qdyn
+!>  by Johan Aqvist, John Marelius, Anders Kaplan & Martin Nervall
+!>  qdyn molecular dynamics main program
 !------------------------------------------------------------------------------!
-
 program qdyn
   use md
   use mpiglob

@@ -23,12 +23,6 @@ module md
   use qatom
   use version
 
-  ! use profiling
-#if defined (_DF_VERSION_)
-  use dfport
-  use dflib
-#endif
-
   implicit none
 
 #if defined (USE_MPI)

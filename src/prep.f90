@@ -1,15 +1,14 @@
 !------------------------------------------------------------------------------!
-!  Q v.5.7 makefile                                                            !
+!  Q version 5.7                                                               !
 !  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
-!  Kajsa Ljunjberg, John Marelius, Martin Nervall                              !
-!  Maintainers: Beat Amrein, Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, !
-!  Irek Szeler                                                                 !
-!  latest update: july 13, 2015                                                !
+!  Kajsa Ljunjberg, John Marelius, Martin Nervall Beat Amrein, Miha Purg,      !
+!  Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, Irek Szeler               !
+!  latest update: October 14, 2015                                             !
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
-!>  (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
+!>  (c) 2015 Uppsala Molekylmekaniska HB, Uppsala, Sweden
 !>  module: prep.f90
 !>  by Johan Aqvist & John Marelius
 !>  topology preparation, solvation, validation and PDB I/O
@@ -27,6 +26,7 @@ module prep
   !constants
   character(*), private, parameter :: MODULE_VERSION = '5.7'
   character(*), private, parameter :: MODULE_DATE = '2015-02-22'
+  integer,parameter,public :: CDK = selected_char_kind('DEFAULT')
 
   !library
   !max number of library entries
@@ -178,30 +178,30 @@ module prep
 
 !     things needed for topology generation 
 !-----------------------------------------------------------------------
-  logical, allocatable            ::      makeh(:)
-  integer, allocatable            ::      nconn(:)
+  logical, allocatable            :: makeh(:)
+  integer, allocatable            :: nconn(:)
 
-  integer, allocatable            ::      iconn(:,:)
+  integer, allocatable            :: iconn(:,:)
 
-  real(8)                         ::      pi, deg2rad
+  real(8)                         :: pi, deg2rad
   !temporary storage for solvent coordinates
-  real(8), allocatable            ::      xw(:,:,:) !solvent coordinates zyx,atom,molecule
+  real(8), allocatable            :: xw(:,:,:) !solvent coordinates zyx,atom,molecule
   !flag for solvent molecules not clashing with any solute heavy atom
-  logical, allocatable            ::      keep(:)
+  logical, allocatable            :: keep(:)
   !residue code for solvent
-  integer                         ::      irc_solvent
+  integer                         :: irc_solvent
   !residue name for solvent
-  character(len=4)                ::      solvent_name
+  character(len=4)                :: solvent_name
 
 
 ! --- flag to keep track of missing parameters without bailing out
-  logical                         ::      topo_ok = .false.
-  logical                         ::      ff_ok = .false.
+  logical                         :: topo_ok = .false.
+  logical                         :: ff_ok = .false.
 
 !       memory management
-  integer, private              ::      alloc_status
+  integer, private                :: alloc_status
   !private subroutine
-  private                       ::      check_alloc 
+  private                         :: check_alloc 
 
 
 
@@ -304,10 +304,10 @@ end subroutine check_alloc
 !------------------------------------------------------------------------------!
 subroutine addbond
 ! *** local variables
-        integer                                         ::      ia, ja
-        real(8)                                         ::      bond_dist, rij(3)
-        character(len=80)                       ::      reply
-        integer                                         ::      readstat
+        integer                   :: ia, ja
+        real(8)                   :: bond_dist, rij(3)
+        character(len=80)         :: reply
+        integer                   :: readstat
 
         call get_string_arg(reply, &
                 '-----> First atom (number or residue:atom_name): ')
@@ -2670,98 +2670,101 @@ end subroutine oldreadlib
 
 
 subroutine readlib(file)
-!arguments
+! arguments
   character(*), optional           :: file
+!  character(len=*), optional       :: file
 ! *** local variables
   character                        :: line*200, filnam*200
+!  character(kind=CDK,len=*), parameter                 :: line='*'
+!  character(kind=CDK,len=*), parameter                 :: filnam='*'
   integer                          :: irec, i, iat, ires, j, igp, ntot
   real                             :: qtot, qgrp, qtot_grp
   character(len=80)                :: resnam
   integer                          :: res_count
   logical                          :: prm_res
   integer                          :: cgp_read(max_atcgplib)
-        
-        !some extra arrays used only for allocation. This circumvents 
-        !an unaligned access error on Digital UNIX 4.0 / Digital FORTRAN
-        !(Compiler bug?)
-        
-        character(len=KEYLENGTH), pointer::     tac_lib(:)
-        character(len=4), pointer       ::      atnam(:)
-        real, pointer                           ::      crg_lib(:)
-        integer(AI), pointer            ::      natcgp(:), switch(:)
-        integer(AI), pointer            ::      atcgp(:,:)      
-        type(LIB_BOND_TYPE), pointer::  bnd(:)
-        type(LIB_IMP_TYPE), pointer     ::      imp(:)
-        logical                                         ::      lib_exists
-        character(len=8)                        ::      atnam1, atnam2, atnam3, atnam4
-        integer                                         ::      atno1, atno2, atno3, atno4
-        logical                                         ::      yes
-        integer                                         ::      atoms_in_rule, readstat
 
-1       format(10a7)
-2       format(a4)
-3       format(i7)
-4       format(f7.2)
-7       format(4x,a)
+  ! some extra arrays used only for allocation. This circumvents 
+  ! an unaligned access error on Digital UNIX 4.0 / Digital FORTRAN
+  !(Compiler bug?)
+  
+  character(len=KEYLENGTH), pointer :: tac_lib(:)
+  character(len=4), pointer        :: atnam(:)
+  real, pointer                    :: crg_lib(:)
+  integer(AI), pointer             :: natcgp(:), switch(:)
+  integer(AI), pointer             :: atcgp(:,:)      
+  type(LIB_BOND_TYPE), pointer     :: bnd(:)
+  type(LIB_IMP_TYPE), pointer      :: imp(:)
+  logical                          :: lib_exists
+  character(len=8)                 :: atnam1, atnam2, atnam3, atnam4
+  integer                          :: atno1, atno2, atno3, atno4
+  logical                          :: yes
+  integer                          :: atoms_in_rule, readstat
+
+1  format(10a7)
+2  format(a4)
+3  format(i7)
+4  format(f7.2)
+7  format(4x,a)
 !.......................................................................
 
-        res_count = 0
-        if(present(file)) then
-                filnam = file
-        else
-                call get_string_arg(filnam, '-----> Name of molecular library: ')
-        end if
-        inquire(file=filnam, exist=lib_exists)
-        if(.not. lib_exists) then
-                write(*,10) trim(filnam)
-                return
-        end if
-        
-        if(lib_files == '') then
-                lib_files = filnam
-        elseif(len_trim(lib_files) < 200-len_trim(filnam)) then
-                lib_files = trim(lib_files) // ";" // trim(filnam)
-        end if
+  res_count = 0
+  if(present(file)) then
+          filnam = file
+  else
+          call get_string_arg(filnam, '-----> Name of molecular library: ')
+  end if
+  inquire(file=filnam, exist=lib_exists)
+  if(.not. lib_exists) then
+          write(*,10) trim(filnam)
+          return
+  end if
+  
+  if(lib_files == '') then
+          lib_files = filnam
+  elseif(len_trim(lib_files) < 200-len_trim(filnam)) then
+          lib_files = trim(lib_files) // ";" // trim(filnam)
+  end if
 
-        if(.not. prm_open(filnam)) then
-                !if reading fails try old format
-                write(*,'(a)') '>>>>>WARNING: Attempting to read old-style library file.'
-                call oldreadlib(filnam)
-                return
-        end if
+  if(.not. prm_open(filnam)) then
+          !if reading fails try old format
+          write(*,'(a)') '>>>>>WARNING: Attempting to read old-style library file.'
+          call oldreadlib(filnam)
+          return
+  end if
 
-10      format('>>>>> ERROR: ',a,' does not exist.')
+10  format('>>>>> ERROR: ',a,' does not exist.')
 
-        write( * , '(/,a,a,/)') 'Reading molecular library ',trim(filnam)
-        write(*,2, advance='no') 'name'
-        write(*,1) 'atoms','net Q', 'bonds', 'rules', 'imps', 'Q-grps'
-        !loop over all titles in file
-        do while(prm_get_next_title(resnam))
-                call check_overload(resnam)
-                nlibres = nlibres + 1
-                res_count = res_count + 1
-                lib(nlibres)%nam = resnam(1:len(lib(nlibres)%nam)) !copy name
-                write( *, 2, advance='no') lib(nlibres)%nam
-                lib(nlibres)%SYBYLTYPE = '****'
-                lib(nlibres)%HETATM = .false.
-                lib(nlibres)%solvent = .false.
-                if(prm_open_section('info')) then !read info
-                        if(prm_get_string_by_key('SYBYLTYPE', line)) then
-                                lib(nlibres)%SYBYLTYPE = line(1:len(lib(nlibres)%SYBYLTYPE))
-                        end if
-                        yes=prm_get_string_by_key('PDBTYPE', line, 'ATOM')
-                        call upcase(line)
-                        if(trim(line) == 'HETATM') then
-                                lib(nlibres)%HETATM = .true.
-                        elseif(trim(line) /= 'ATOM') then
-                                write(*,'(a,a)') '>>>>>WARNING: Unknown PBBtype ',trim(line)
-                        end if
-                        yes=prm_get_logical_by_key('solvent',lib(nlibres)%solvent,.false.)
-                        if(lib(nlibres)%solvent) then
-                                solvent_names = trim(solvent_names)//lib(nlibres)%nam//','
-                        end if
-                        yes=prm_get_real_by_key('density',lib(nlibres)%density,0.)
-                end if
+  write( * , '(/,a,a,/)') 'Reading molecular library ',trim(filnam)
+  write(*,2, advance='no') 'name'
+  write(*,1) 'atoms','net Q', 'bonds', 'rules', 'imps', 'Q-grps'
+  !loop over all titles in file
+  do while(prm_get_next_title(resnam))
+          call check_overload(resnam)
+          nlibres = nlibres + 1
+          res_count = res_count + 1
+          lib(nlibres)%nam = resnam(1:len(lib(nlibres)%nam)) !copy name
+          write( *, 2, advance='no') lib(nlibres)%nam
+          lib(nlibres)%SYBYLTYPE = '****'
+          lib(nlibres)%HETATM = .false.
+          lib(nlibres)%solvent = .false.
+          if(prm_open_section('info')) then !read info
+                  if(prm_get_string_by_key('SYBYLTYPE', line)) then
+                          lib(nlibres)%SYBYLTYPE = line(1:len(lib(nlibres)%SYBYLTYPE))
+                  end if
+                  yes=prm_get_string_by_key('PDBTYPE', line, 'ATOM')
+                  call upcase(line)
+                  if(trim(line) == 'HETATM') then
+                          lib(nlibres)%HETATM = .true.
+                  elseif(trim(line) /= 'ATOM') then
+                          write(*,'(a,a)') '>>>>>WARNING: Unknown PBBtype ',trim(line)
+                  end if
+                  yes=prm_get_logical_by_key('solvent',lib(nlibres)%solvent,.false.)
+                  if(lib(nlibres)%solvent) then
+                          solvent_names = trim(solvent_names)//lib(nlibres)%nam//','
+                  end if
+                  yes=prm_get_real_by_key('density',lib(nlibres)%density,0.)
+          end if
 
 ! ---      Read no. of atoms, at. no., name, iac, charge
                 lib(nlibres)%nat = prm_count('atoms')
@@ -2997,18 +3000,18 @@ ruleloop: do i = 1, lib(nlibres)%nrules
 
         write( *, 110) nlibres
 
-110 FORMAT(/,'Accumulated no. of library entries loaded =',i4,/)
-119     format('>>> ERROR: Atom',i3,' has erraneos atom number.')
-120     format('>>> ERROR: Atom',i3,' has duplicated or invalid name ',a)
-121     format('>>> ERROR: Atom',i3,' has duplicated or invalid number.')
-125     format('>>> ERROR: First atom named ',a,' in bond ',i3,' not found')
-126     format('>>> ERROR: Second atom named ',a,' in bond ',i3,' not found')
-127     format('>>> ERROR: Head atom named ',a,' not found')
-128     format('>>> ERROR: Tail atom named ',a,' not found')
+110 format(/,'Accumulated no. of library entries loaded =',i4,/)
+119 format('>>> ERROR: Atom',i3,' has wrong atom number.')
+120 format('>>> ERROR: Atom',i3,' has duplicated or invalid name ',a)
+121 format('>>> ERROR: Atom',i3,' has duplicated or invalid number.')
+125 format('>>> ERROR: First atom named ',a,' in bond ',i3,' not found')
+126 format('>>> ERROR: Second atom named ',a,' in bond ',i3,' not found')
+127 format('>>> ERROR: Head atom named ',a,' not found')
+128 format('>>> ERROR: Tail atom named ',a,' not found')
 130 format('>>> Warning: fractional charge = ',f8.5, ' on group no.',i3)
-131     format('>>>>> ERROR: Atom',i3,' named ',a,' of charge group',i3,' not found.')
-150     format('>>> ERROR: charge group atom count does not match total atom count!')
-160     format('>>> ERROR: Sum of charge group charges not equal to sum of all charges!')
+131 format('>>>>> ERROR: Atom',i3,' named ',a,' of charge group',i3,' not found.')
+150 format('>>> ERROR: charge group atom count does not match total atom count!')
+160 format('>>> ERROR: Sum of charge group charges not equal to sum of all charges!')
 
 end subroutine readlib
 
@@ -4820,12 +4823,12 @@ subroutine solvate_box_grid
 
         !locals
 
-        real(8)                                         ::      xmin, xmax, ymin, ymax, zmin, zmax
-        real(8)                                         ::      xgrid, ygrid, zgrid
-        integer                                         ::      max_wat !max number of molecules
-        integer                                         ::      waters_in_box
-        real(8)                                         ::      radius2, solvent_grid
-        character(len=200)                      ::      solvent
+        real(8)              ::      xmin, xmax, ymin, ymax, zmin, zmax
+        real(8)              ::      xgrid, ygrid, zgrid
+        integer              ::      max_wat !max number of molecules
+        integer              ::      waters_in_box
+        real(8)              ::      radius2, solvent_grid
+        character(len=200)   ::      solvent
 
         !set water residue name
         call get_string_arg(solvent, &
@@ -5137,8 +5140,6 @@ subroutine solvate_sphere
       return
   end select
 end subroutine solvate_sphere
-
-
 
 
 logical function set_solvent_sphere()        

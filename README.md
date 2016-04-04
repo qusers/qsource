@@ -9,7 +9,7 @@ We are documenting the code using doxygen. To generate the doxygen
 documentation do:  
 
     cd documentation/manuals/developers
-	doxygen DoxygenConfigFortran
+    doxygen DoxygenConfigFortran
 
 
 Some basic development rules taken from the **gromacs** developers team follow.

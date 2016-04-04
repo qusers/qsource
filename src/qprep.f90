@@ -1,11 +1,10 @@
 !------------------------------------------------------------------------------!
-!  Q v.5.7 makefile                                                            !
+!  Q version 5.7                                                               !
 !  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
-!  Kajsa Ljunjberg, John Marelius, Martin Nervall                              !
-!  Maintainers: Beat Amrein, Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, !
-!  Irek Szeler                                                                 !
-!  latest update: october 14, 2015                                             !
+!  Kajsa Ljunjberg, John Marelius, Martin Nervall Beat Amrein, Miha Purg,      !
+!  Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, Irek Szeler               !
+!  latest update: October 14, 2015                                             !
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
@@ -27,7 +26,7 @@ program qprep
   character(*), parameter :: PROGRAM_SUFFIX  = ''
   character(*), parameter :: options = compiler_options()
   logical                 :: use_inputfile
-  character(200)          :: fileName        = ''
+  character(200)          :: fileName = ''
   character(len=32)       :: arg
   integer                 :: i
 
@@ -84,6 +83,7 @@ contains
 
 
   !----------------------------------------------------------------------------!
+  !>  subroutine: qprep_from_commandline
   !>  Read input from command line and execute commands
   !----------------------------------------------------------------------------!
   subroutine qprep_from_commandline
@@ -105,6 +105,7 @@ contains
 
 
   !----------------------------------------------------------------------------!
+  !>  subroutine: parse_command(command)
   !>  Parse a command and call corresponding subroutine
   !----------------------------------------------------------------------------!
   subroutine parse_command(command)
@@ -182,7 +183,8 @@ contains
 
 
   !----------------------------------------------------------------------------!
-  !> Give help on commands
+  !>  subroutine: help
+  !>  Give help on commands
   !----------------------------------------------------------------------------!
   subroutine help
   write( *, * )
@@ -278,7 +280,8 @@ contains
 
 
   !----------------------------------------------------------------------------!
-  !> Startup subroutine
+  !>  subroutine: startup
+  !>  Startup
   !----------------------------------------------------------------------------!
 subroutine startup
 !    call version_check(PROGRAM_NAME, PROGRAM_VERSION, PROGRAM_DATE, PROGRAM_SUFFIX)
@@ -304,7 +307,8 @@ end subroutine startup
 
 
   !----------------------------------------------------------------------------!
-  !> Shutdown subroutine
+  !>  subroutine: shutdown
+  !>  Shutdown call
   !----------------------------------------------------------------------------!
   subroutine shutdown
     call prep_shutdown
@@ -313,7 +317,7 @@ end subroutine startup
 
   
   !----------------------------------------------------------------------------!
-  !> subroutine: commandlineoptions
+  !>  subroutine: commandlineoptions
   !----------------------------------------------------------------------------!
   subroutine commandlineoptions
   do i = 1, command_argument_count()
@@ -334,7 +338,7 @@ end subroutine startup
   end subroutine commandlineoptions
 
   !----------------------------------------------------------------------------!
-  !> subroutine: print_help
+  !>  subroutine: print_help
   !----------------------------------------------------------------------------!
   subroutine print_help()
     print '(a)', 'usage:'

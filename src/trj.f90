@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------------!
-!  Q v.5.7 makefile                                                            !
+!  Q v.5.7                                                                     !
 !  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
 !  Kajsa Ljunjberg, John Marelius, Martin Nervall                              !
@@ -9,10 +9,10 @@
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
-!  (c) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden                       !
-!  trj.f90                                                                     !
-!  by John Marelius                                                            !
-!  Q trajectory data, access and DCD format I/O                                !
+!>  (c) 2015 Uppsala Molekylmekaniska HB, Uppsala, Sweden
+!>  trj.f90                                                                     !
+!>  by John Marelius                                                            !
+!>  Q trajectory data, access and DCD format I/O                                !
 !------------------------------------------------------------------------------!
 module trj
   use atom_mask
@@ -94,7 +94,7 @@ contains
 
   integer function trj_add(line)
     !arguments
-    character(*)                            ::      line
+    character(*)         :: line
 
     if(lun /= 0) then
        !file open - can't add now
@@ -114,7 +114,7 @@ contains
 
   logical function trj_store_mask(line)
     !arguments
-    character(*)                            ::      line
+    character(*)         :: line
 
     if(mask_rows < max_mask_rows) then
        mask_rows = mask_rows + 1

@@ -1,18 +1,17 @@
 !------------------------------------------------------------------------------!
-!  Q v.5.7 makefile                                                            !
+!  Q version 5.7                                                               !
 !  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
-!  Kajsa Ljunjberg, John Marelius, Martin Nervall                              !
-!  Maintainers: Beat Amrein, Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, !
-!  Irek Szeler                                                                 !
-!  latest update: july 13, 2015                                                !
+!  Kajsa Ljunjberg, John Marelius, Martin Nervall Beat Amrein, Miha Purg,      !
+!  Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, Irek Szeler               !
+!  latest update: October 14, 2015                                             !
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
-!  (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
-!  qcalc.f90
-!  by John Marelius
-!  qcalc trajectory analysis main program
+!>  (c) 2015 Uppsala Molekylmekaniska HB, Uppsala, Sweden
+!>  program: qcalc
+!>  by John Marelius
+!>  qcalc trajectory analysis main program
 !------------------------------------------------------------------------------!
 program qcalc
   use version
@@ -22,7 +21,7 @@ program qcalc
   use calc_fit
   use calc_geom
   use calc_entropy
-  use calc_nb                             
+  use calc_nb
   use calc_chemscore
   use calc_xscore
   use calc_pmf

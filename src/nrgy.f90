@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------------!
-!  Q v.5.7 makefile                                                            !
+!  Q v.5.7                                                                     !
 !  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
 !  Kajsa Ljunjberg, John Marelius, Martin Nervall                              !
@@ -19,31 +19,31 @@ module nrgy
 
   implicit none
 
-  character(*), parameter ::      NRGY_VERSION = '5.7'
-  character(*), parameter ::      NRGY_DATE = '2015-02-22'
+  character(*), parameter    :: NRGY_VERSION = '5.7'
+  character(*), parameter    :: NRGY_DATE = '2015-02-22'
 
   type BONDED_ENERGIES
      sequence
-     real(8)                                 :: bond, angle, torsion, improper
+     real(8)                 :: bond, angle, torsion, improper
   end type BONDED_ENERGIES
 
   type NB_ENERGIES
      sequence
-     real(8)                                 :: el, vdw
+     real(8)                 :: el, vdw
   end type NB_ENERGIES
 
   type RESTRAINT_ENERGIES
      sequence
-     real(8)                                 :: total, fix, shell, protein
-     real(8)                                 :: solvent_radial, water_pol
+     real(8)                 :: total, fix, shell, protein
+     real(8)                 :: solvent_radial, water_pol
   end type RESTRAINT_ENERGIES
 
   type ENERGIES
-     sequence
-     real(8)                                 :: potential, kinetic, LRF
-     type(BONDED_ENERGIES)                   :: p, w, q
-     type(NB_ENERGIES)                       :: pp, pw, ww, qx
-     type(RESTRAINT_ENERGIES)                :: restraint
+    sequence
+    real(8)                  :: potential, kinetic, LRF
+    type(BONDED_ENERGIES)    :: p, w, q
+    type(NB_ENERGIES)        :: pp, pw, ww, qx
+    type(RESTRAINT_ENERGIES) :: restraint
   end type ENERGIES
 
   type Q_ENERGIES
@@ -74,11 +74,12 @@ module nrgy
   interface operator(*)
      module procedure scale_ene
   end interface operator(*)
-contains
 
+
+contains
   !----------------------------------------------------------------------
     subroutine nrgy_startup
-      
+
     end subroutine nrgy_startup
   !----------------------------------------------------------------------
 
