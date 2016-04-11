@@ -44,6 +44,8 @@ code.
   coding, reading.  
 * No trailing whitespaces. They are not seen by default in most
   editors but still count as changes in git.  
+* Column 36 for : on variable declaration.  
+  
 
 
 2. **Code constructs**  

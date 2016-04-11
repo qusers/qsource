@@ -1,18 +1,18 @@
 !------------------------------------------------------------------------------!
-!  Q v.5.7                                                                     !
+!  Q version 5.7                                                               !
 !  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
-!  Kajsa Ljunjberg, John Marelius, Martin Nervall                              !
-!  Maintainers: Beat Amrein, Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, !
+!  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
+!  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Karemi, Miha Purg,      !
 !  Irek Szeler                                                                 !
-!  latest update: july 13, 2015                                                !
+!  latest update: October 14, 2015                                             !
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
 !>  (c) 2015 Uppsala Molekylmekaniska HB, Uppsala, Sweden
-!>  trj.f90                                                                     !
-!>  by John Marelius                                                            !
-!>  Q trajectory data, access and DCD format I/O                                !
+!>  trj.f90                                                                    !
+!>  by John Marelius                                                           !
+!>  Q trajectory data, access and DCD format I/O                               !
 !------------------------------------------------------------------------------!
 module trj
   use atom_mask
@@ -130,7 +130,7 @@ contains
 
   integer function trj_commit_mask()
     !locals
-    integer                                         ::      row
+    integer                           :: row
 
     if(lun /= 0) then
        !file open - can't add now
@@ -203,7 +203,7 @@ contains
   !******************************************************
   logical function trj_write(x)
     !arguments
-    real(8)                                         ::      x(:)
+    real(8)                           :: x(:)
 
     !extract coordinates
     call mask_get(mask, x, xmasked)
@@ -228,7 +228,7 @@ contains
   !******************************************************
   logical function trj_read(x)
     !arguments
-    real(8)                                         ::      x(:)
+    real(8)                           :: x(:)
     !read x record to temp variable xmasked
     read(lun, err=900, end=900) xmasked(1:ncoords:3)
     !read y record
@@ -256,7 +256,7 @@ contains
   !******************************************************
   logical function trj_read_masked(x)
     !arguments
-    real(4)                                         ::      x(:)
+    real(4)                           :: x(:)
     !read x record to temp variable xmasked
     read(lun, err=900, end=900) x(1:ncoords:3)
     !read y record
@@ -278,9 +278,9 @@ contains
 
   logical function trj_seek(frame)
     !arguments
-    integer                                         ::      frame
+    integer                           :: frame
     !locals
-    integer                                         ::      i
+    integer                           :: i
 
     !optionally fast-forward to selected frame
     if(frame > r1%N_FRAMES .or. frame < 1) then
@@ -321,7 +321,7 @@ contains
 
   subroutine trj_close
     !locals
-    logical                                         ::      is_open
+    logical                           :: is_open
     inquire(lun, opened=is_open)
     if(is_open) close(lun)
     lun = 0
@@ -335,12 +335,12 @@ contains
 
   logical function trj_open(filename)
     !arguments
-    character(*)                            ::      filename
+    character(*)                      :: filename
 
     !locals
-    character(len=80)                       ::      titlerow
-    integer                                         ::      atoms
-    integer                                         ::      i
+    character(len=80)                 :: titlerow
+    integer                           :: atoms
+    integer                           :: i
 
     !open file
     lun=freefile()
@@ -417,14 +417,14 @@ contains
 
   integer function trj_intersection(m)
     !arguments
-    type(MASK_TYPE)                         ::      m
+    type(MASK_TYPE) :: m
     trj_intersection = count(m%mask .and. mask%mask)
   end function trj_intersection
 
 
   subroutine trj_clone_mask(m)
     !arguments
-    type(MASK_TYPE)                         ::      m
+    type(MASK_TYPE) :: m
     if(size(m%mask) == size(mask%mask)) then
        m = mask
     end if

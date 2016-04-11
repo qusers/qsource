@@ -1,11 +1,11 @@
 !------------------------------------------------------------------------------!
-!  Q v.5.7 makefile                                                            !
+!  Q version 5.7                                                               !
 !  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
-!  Kajsa Ljunjberg, John Marelius, Martin Nervall                              !
-!  Maintainers: Beat Amrein, Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, !
+!  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
+!  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Karemi, Miha Purg,      !
 !  Irek Szeler                                                                 !
-!  latest update: july 13, 2015                                                !
+!  latest update: October 14, 2015                                             !
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
@@ -48,65 +48,65 @@ module topo
   end type anglib_type
 
   type tor_type
-    integer(ai)                    ::      i, j, k, l
-    integer(shrt)                  ::      cod
+    integer(ai)                    :: i, j, k, l
+    integer(shrt)                  :: cod
   end type tor_type
 
   type torlib_type
-    real                           ::      fk, rmult, deltor
-    real                           ::      paths
+    real                           :: fk, rmult, deltor
+    real                           :: paths
   end type torlib_type
 
   type implib_type
-    real                           ::      fk, imp0
+    real                           :: fk, imp0
   end type implib_type
 
   type cgp_type
-    integer(ai)                    ::      iswitch !switching atom
-    integer(ai)                    ::      first   !index in cgpatom array for 1st member
-    integer(ai)                    ::      last    !index in cgpatom array for last member
+    integer(ai)                    :: iswitch !switching atom
+    integer(ai)                    :: first   !index in cgpatom array for 1st member
+    integer(ai)                    :: last    !index in cgpatom array for last member
   end type cgp_type
 
   type iac_type
-    real(8)                        ::      mass
-    real(8)                        ::      avdw(nljtyp)
-    real(8)                        ::      bvdw(nljtyp)
+    real(8)                        :: mass
+    real(8)                        :: avdw(nljtyp)
+    real(8)                        :: bvdw(nljtyp)
   end type iac_type
 
   type lj2_type
-    integer(tiny)                  ::      i, j
+    integer(tiny)                  :: i, j
   end type lj2_type
 
   type residue_type
-    integer                        ::      irc, start
-    character(4)                    ::      name
+    integer                        :: irc, start
+    character(4)                   :: name
   end type residue_type
 
   !       memory management
-  integer, private                        ::      alloc_status
+  integer, private                 :: alloc_status
   !private subroutine
-  private                                         ::      topo_check_alloc 
+  private                          :: topo_check_alloc 
 
   !topology information
-  real                                    ::      version
-  character(len=256)                      ::      title = ''
-  character(len=256)                      ::      forcefield = ''
-  character(len=256)                      ::      creation_date
-  character(len=256)                      ::      pdb_file = ''
-  character(len=256)                      ::      lib_files = ''
-  character(len=256)                      ::      prm_file
+  real                             :: version
+  character(len=256)               :: title = ''
+  character(len=256)               :: forcefield = ''
+  character(len=256)               :: creation_date
+  character(len=256)               :: pdb_file = ''
+  character(len=256)               :: lib_files = ''
+  character(len=256)               :: prm_file
 
   !atom information
   !nat_pro = total # of atoms in topology, nat_solute = # solute atoms (no water)
-  integer                                                                                 ::      nat_pro, nat_solute, max_atom
-  real(8), allocatable                            ::      xtop(:)                 ! topology/coordinates
-  integer(tiny), allocatable      ::      iac(:)                  ! integer atom codes
-  logical, allocatable                            ::      heavy(:)                ! boolean flag, true if atom >= he
-  real, allocatable                                               ::      crg(:)                  ! charges
-  integer(ai), allocatable                ::      cgpatom(:)              ! charge groups
-  integer, parameter                                      ::      solvent_spc=0, solvent_3atom=1, solvent_general=2
-  integer                                                                                 ::      solvent_type
-  integer,allocatable                                     ::      glb_cofactor(:) ! 0 = protein or ligand atom, 1,2,3...= cofactor 1, 2, 3...
+  integer                          ::      nat_pro, nat_solute, max_atom
+  real(8), allocatable             ::      xtop(:)                 ! topology/coordinates
+  integer(tiny), allocatable       ::      iac(:)                  ! integer atom codes
+  logical, allocatable             ::      heavy(:)                ! boolean flag, true if atom >= he
+  real, allocatable                ::      crg(:)                  ! charges
+  integer(ai), allocatable         ::      cgpatom(:)              ! charge groups
+  integer, parameter               ::      solvent_spc=0, solvent_3atom=1, solvent_general=2
+  integer                          ::      solvent_type
+  integer,allocatable              ::      glb_cofactor(:) ! 0 = protein or ligand atom, 1,2,3...= cofactor 1, 2, 3...
 
   integer, public :: ligand_offset ! topology index offset for ligand. xtop(1:ligand_offset) = protein
 

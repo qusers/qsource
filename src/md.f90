@@ -1,11 +1,11 @@
 !------------------------------------------------------------------------------!
-!  Q v.5.7 makefile                                                            !
+!  Q version 5.7                                                               !
 !  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
-!  Kajsa Ljunjberg, John Marelius, Martin Nervall                              !
-!  Maintainers: Beat Amrein, Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, !
+!  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
+!  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Karemi, Miha Purg,      !
 !  Irek Szeler                                                                 !
-!  latest update: july 13, 2015                                                !
+!  latest update: October 14, 2015                                             !
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
@@ -122,14 +122,14 @@ module md
   real(8),  allocatable     :: theta(:), theta0(:), tdum(:)
   integer                   :: nwpolr_shell, n_max_insh
 
-  type SHELL_TYPE
+  type shell_type
     real                   :: rout, dr, cstb
     real                   :: avtheta, avn_insh, theta_corr
     integer                :: n_insh
-  end type SHELL_TYPE
+  end type shell_type
 
 
-  type(SHELL_TYPE), allocatable:: wshell(:)
+  type(shell_type), allocatable:: wshell(:)
 
 
   ! constants & default values
@@ -262,78 +262,78 @@ end type RSTRANG_TYPE
      real(8)                 :: el_scale !scale factor for electostatic interactions in qq-pairs
   end type NBQ_TYPE
 
-  integer                   :: nbpp_pair !current no solute-solute pairs
+  integer                    :: nbpp_pair !current no solute-solute pairs
   type(NB_TYPE), allocatable, target::nbpp(:)
 
-  integer                   :: nbww_pair,nbww_true_pair !current no solvent-solvent pairs, implicit and explicit
+  integer                    :: nbww_pair,nbww_true_pair !current no solvent-solvent pairs, implicit and explicit
   integer(AI), allocatable, target::nbww(:)
 
-  integer                   :: nbpw_pair !current no solute-solvent pairs
+  integer                    :: nbpw_pair !current no solute-solvent pairs
   type(NB_TYPE), allocatable, target::nbpw(:)
 
-  integer                   :: nbqq_max !max number of q-q pairs in any state
-  integer(TINY), allocatable   ::      qconn(:,:,:) !Q-atom connectivity list
+  integer                    :: nbqq_max !max number of q-q pairs in any state
+  integer(TINY), allocatable ::      qconn(:,:,:) !Q-atom connectivity list
 
-  integer                   ::      nbqq_pair(max_states)
+  integer                    ::      nbqq_pair(max_states)
   type(NBQ_TYPE), allocatable ::nbqq(:,:)
 
-  integer                                         ::      nbqp_pair !current no of qatom-solute pairs
+  integer                          :: nbqp_pair !current no of qatom-solute pairs
   type(NBQP_TYPE), allocatable, target::nbqp(:)
 
-  integer                                         ::      nbqw_pair !current no of q-atom-water mol. pairs
-  integer(AI), allocatable        ::      nbqw(:)
+  integer                          :: nbqw_pair !current no of q-atom-water mol. pairs
+  integer(AI), allocatable         :: nbqw(:)
 
 
   !these three used only under periodic conditions
-  integer                                         :: nbpp_cgp_pair !number of solute-solute chargegroups interacting
-  type(CGP_PAIR_TYPE), allocatable:: nbpp_cgp(:)
-  integer                                         :: nbpw_cgp_pair
+  integer                          :: nbpp_cgp_pair !number of solute-solute chargegroups interacting
+  type(CGP_PAIR_TYPE), allocatable :: nbpp_cgp(:)
+  integer                          :: nbpw_cgp_pair
   type(CGP_PAIR_TYPE), allocatable :: nbpw_cgp(:)
-  integer                                         ::      nbqp_cgp_pair
+  integer                          :: nbqp_cgp_pair
   type(CGP_PAIR_TYPE), allocatable :: nbqp_cgp(:)
 
   !special monitoring of pairs
   integer (TINY),allocatable  :: special_LJcod(:,:,:,:)
 
   ! LRF related variables
-  integer(AI), allocatable        ::      iwhich_cgp(:)
+  integer(AI), allocatable         :: iwhich_cgp(:)
 
 
   type LRF_TYPE
-     real(8)                                 ::      cgp_cent(3)
-     real(8)                                 ::      phi0
-     real(8)                                 ::      phi1(3)
-     real(8)                                 ::      phi2(9)
-     real(8)                                 ::      phi3(27)
+     real(8)                       :: cgp_cent(3)
+     real(8)                       :: phi0
+     real(8)                       :: phi1(3)
+     real(8)                       :: phi2(9)
+     real(8)                       :: phi3(27)
   end type LRF_TYPE
 
-  type(LRF_TYPE), allocatable     ::      lrf(:)
-  type(LRF_TYPE), allocatable     ::      old_lrf(:)  !for constant pressure: MC_volume routine
+  type(LRF_TYPE), allocatable      :: lrf(:)
+  type(LRF_TYPE), allocatable      :: old_lrf(:)  !for constant pressure: MC_volume routine
 
 
-  type(node_assignment_type)      :: calculation_assignment
+  type(node_assignment_type)       :: calculation_assignment
 
 
   !shake types & variables
   !convergence criterion (fraction of distance)
-  real(8), parameter                      ::      SHAKE_TOL = 0.0001
-  integer, parameter                      ::      SHAKE_MAX_ITER = 1000
+  real(8), parameter               :: SHAKE_TOL = 0.0001
+  integer, parameter               :: SHAKE_MAX_ITER = 1000
 
 
   type SHAKE_BOND_TYPE
-     integer(AI)                             ::      i,j
-     real(8)                                 ::      dist2
-     logical                                 ::      ready
+     integer(AI)                   :: i,j
+     real(8)                       :: dist2
+     logical                       :: ready
   end type SHAKE_BOND_TYPE
 
 
   type SHAKE_MOL_TYPE
-     integer                                 ::      nconstraints
+     integer                       :: nconstraints
      type(SHAKE_BOND_TYPE), pointer :: bond(:)
   end type SHAKE_MOL_TYPE
 
 
-  integer                                         ::      shake_constraints, shake_molecules
+  integer                          :: shake_constraints, shake_molecules
   type(SHAKE_MOL_TYPE), allocatable :: shake_mol(:)
 
   !-----------------------------------------------------------------------
@@ -908,15 +908,15 @@ contains
   !-----------------------------------------------------------------------
   real(8) function urey_bradley(istart, iend)
     ! *** arguments
-    integer                                         ::      istart, iend
+    integer                        :: istart, iend
 
     ! *** local variables
-    integer                                         ::      i,j,k,ia,ic,i3,j3,k3
-    real(8)                                         ::      bjiinv, bjkinv, bji2inv, bjk2inv
-    real(8)                                         ::      scp,angv,da,dv,f1
-    real(8)                                         ::  rji(3),rjk(3),di(3),dk(3) 
-    real(8)                                         ::      rik(3), dik, ru, du 
-    real(8)                                         ::      Eurey
+    integer                        :: i,j,k,ia,ic,i3,j3,k3
+    real(8)                        :: bjiinv, bjkinv, bji2inv, bjk2inv
+    real(8)                        :: scp,angv,da,dv,f1
+    real(8)                        :: rji(3),rjk(3),di(3),dk(3) 
+    real(8)                        :: rik(3), dik, ru, du 
+    real(8)                        :: Eurey
 
     ! global variables used:
     ! ang, x, anglib, d
@@ -3813,11 +3813,11 @@ end do
   subroutine temperature(Temp,Tscale_solute,Tscale_solvent,Ekinmax)
     ! calculate the temperature
     !arguments
-    real(8)                                         :: Temp,Tscale_solute,Tscale_solvent,Ekinmax
+    real(8)                        :: Temp,Tscale_solute,Tscale_solvent,Ekinmax
 
     !locals
-    integer                                         ::      i, i3
-    real(8)                                         ::      Ekin
+    integer                        :: i, i3
+    real(8)                        :: Ekin
 
     Temp = 0.
     Temp_solute = 0.
@@ -3905,14 +3905,15 @@ end do
 
   !-----------------------------------------------------------------------
   !******PWchanged 2002-10-01
+  !-----------------------------------------------------------------------
   subroutine md_run
 
     ! local variables
     integer                         :: i,j,k,niter
     integer                         :: i3
     real(8)                         :: Temp,Tlast
-    real(8)                         ::Ekinmax
-    real(8)                         ::Tscale_solute,Tscale_solvent
+    real(8)                         :: Ekinmax
+    real(8)                         :: Tscale_solute,Tscale_solvent
     real(8)                         :: time0, time1, time_per_step, startloop
     integer(4)                      :: time_completion
 
@@ -3993,7 +3994,7 @@ end do
 
           ! every NBcycle steps:
 
-          !Put molecules back in box for nice visualisation, needs to be here to prevent problems with LRF
+          !Put molecules back in box for nice visualization, needs to be here to prevent problems with LRF
           !Update cgp_centers for LRF
           !only call put_back_in_box if using PBC and either solute or solvent should be put back in box
           if( use_PBC .and. (put_solute_back_in_box .or. put_solvent_back_in_box) ) then 

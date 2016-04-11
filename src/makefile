@@ -2,10 +2,10 @@
 #  Q V.5.7 Makefile                                                            #
 #  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      #
 #  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          #
-#  Kajsa Ljunjberg, John Marelius, Martin Nervall                              #
-#  Maintainers: Beat Amrein, Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, #
+#  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          #
+#  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Karemi, Miha Purg,      #
 #  Irek Szeler                                                                 #
-#  Latest update: October 15, 2015                                             #
+#  Latest update: October 14, 2015                                             #
 #  make [option] [COMP=compiler]                                               #
 ################################################################################
 
@@ -39,8 +39,8 @@ else ifeq ($(COMP),osx)
 	FC=             gfortran
 	FC_OPT=         -O3
 	FFLAGS=         -ffree-line-length-none -fcray-pointer \
-	                -fall-intrinsics -std=legacy -Wall -Wtabs \
-	                -fstack-protector ${FC_OPT} -DG95=1
+	                -static-libgfortran -fall-intrinsics -std=legacy \
+	                -Wall -Wtabs -fstack-protector ${FC_OPT} -DG95=1
 
 	FPP_FLG=        -cpp
 
@@ -49,8 +49,8 @@ else ifeq ($(COMP),osx)
 	OMPI_FCFLAGS=   ${FFLAGS}
 	MPI=            ${OMPI_FCFLAGS}
 
-	DEBUG=          -debug -g ${FC_OPT}
-	DEBUGMPI=       -debug -g ${FC_OPT}
+	DEBUG=          -fbacktrace -g ${FC_OPT}
+	DEBUGMPI=       -fbacktrace -g ${FC_OPT}
 
 
 ################################################################################
@@ -93,8 +93,8 @@ else ifeq ($(COMP),gcc)
 	OMPI_FCFLAGS=   ${FFLAGS}
 	MPI=            ${OMPI_FCFLAGS}
 
-	DEBUG=          -debug -fbacktrace -g ${FC_OPT}	
-	DEBUGMPI=       -debug -fbacktrace -g ${FC_OPT}
+	DEBUG=          -fbacktrace -g ${FC_OPT}	
+	DEBUGMPI=       -fbacktrace -g ${FC_OPT}
 
 
 ################################################################################

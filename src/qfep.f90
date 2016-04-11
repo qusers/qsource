@@ -2,8 +2,9 @@
 !  Q version 5.7                                                               !
 !  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
-!  Kajsa Ljunjberg, John Marelius, Martin Nervall Beat Amrein, Miha Purg,      !
-!  Alexandre Barrozo, Paul Bauer, Mauricio Esguerra, Irek Szeler               !
+!  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
+!  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Karemi, Miha Purg,      !
+!  Irek Szeler                                                                 !
 !  latest update: October 14, 2015                                             !
 !------------------------------------------------------------------------------!
 
