@@ -174,8 +174,8 @@ module prep
   type(mask_type)                  :: mask
 
 ! --- extra bonds(s-s bridges etc.)
-  integer                                 ::      nextrabnd
-  type(bond_type)                         ::      extrabnd(max_extrabnd)
+  integer                          :: nextrabnd
+  type(bond_type)                  :: extrabnd(max_extrabnd)
 
 !     things needed for topology generation 
 !-----------------------------------------------------------------------

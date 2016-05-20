@@ -2551,10 +2551,9 @@ contains
     !  Temp0, tau_T, iseed, Tmaxw
     !  use_LRF, NBcycle, Rcpp, Rcww, Rcpw, Rcq
     !  shake_solute, shake_solvent, shake_hydrogens
-    ! fk_pshell
+    !  fk_pshell
     !  fk_wsphere=-1, wpol_restr, wpol_born
-    !  fkwpol=-1, Dwmz=-1 (values  ized to -1 will
-    !    be set in water_sphere, once target radius is known)
+    !  fkwpol=-1, Dwmz=-1 (values  ized to -1 will be set in water_sphere, once target radius is known)
     !  top_file
     !  restart, [restart_file]
     !  xfin_file

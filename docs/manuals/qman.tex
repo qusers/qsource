@@ -794,7 +794,7 @@ simulations. The contents may often be as simple as:
 \begin{tabularx}{\textwidth}{|l l X|}
   \hline
   [solvent]    &    & \\
-  polarisation & on & !Enable solvent polarisation restraints \\ \hline
+  polarization & on & !Enable solvent polarization restraints \\ \hline
 \end{tabularx}
 \end{center}
 
@@ -1047,8 +1047,8 @@ information about the data in each section is found in the section
   \hline shell{\_}force           & 10.0         & Restraining force constant in shell (kcal$\cdot $mol$^{-1}\cdot ${\AA}$^{-2}$) \\
   \hline [solvent]                &              & Solvent boundary settings \\
   \hline radial{\_}force          & 60.0         & Force constant for radial restraining (kcal$\cdot $mol$^{-1}\cdot ${\AA}$^{-2}$) \\
-  \hline polarisation             & on           & Use polarisation restraints (this is the default) \\
-  \hline polarisation{\_}force    & 20.0         & Force constant for polarisation restraining (kcal$\cdot$ mol$^{-1}$$\cdot$rad$^{-2}$) \\
+  \hline polarization             & on           & Use polarization restraints (this is the default) \\
+  \hline polarization{\_}force    & 20.0         & Force constant for polarization restraining (kcal$\cdot$ mol$^{-1}$$\cdot$rad$^{-2}$) \\
   \hline [intervals]              &              & Intervals for saving data \\
   \hline non{\_}bond              & 25           & Interval for generation of non-bond lists (steps) \\
   \hline output                   & 5            & Interval for energy summary in output \\
@@ -2989,15 +2989,15 @@ Polar solvent molecules near boundary will not be randomly
 oriented like in bulk solvent and a restraining force is required
 to make the surface solvent molecules follow the probability
 distribution of angles between radial axis and dipole vector found
-in the bulk solvent. When a net charge in the Q-atoms polarises
+in the bulk solvent. When a net charge in the Q-atoms polarizes
 the solvent, the distribution of solvent molecule dipole angles
-changes. This correction of the average polarisation given by
+changes. This correction of the average polarization given by
 Born's formula is taken into account unless disabled by setting
-charge\_correction to off in the input file. The polarisation
+charge\_correction to off in the input file. The polarization
 distribution restraints are applied in three thin shells to
-minimise the radial dependence of the polarisation which occurs in
+minimise the radial dependence of the polarization which occurs in
 a single, thicker shell. The outermost shell is 0.5 Å thick, the
-second 1.0 Å, the third 1.5 Å, so the polarisation is restrained
+second 1.0 Å, the third 1.5 Å, so the polarization is restrained
 in the outermost 3 Å of the simulation sphere.
 
 The restraining works by sorting the molecules of each shell
@@ -3005,10 +3005,10 @@ according to the angle between dipole vector and radial axis and
 applying a force to each molecule i to adjust the angle towards
 the angle of molecule i in a sorted sequence of molecules that
 follow the target distribution. The potential can be written
-$V_{polarisation} \left(\Theta _i \right) = \frac{1}{2} \cdot
+$V_{polarization} \left(\Theta _i \right) = \frac{1}{2} \cdot
 K_{pol} \cdot \left( \Theta _i - \Theta _i^{target} \right)^2$
 where K$_{pol}$ is the force constant. K$_{pol}$ can be set in the
-input file (keyword polarisation\_force in section water), the
+input file (keyword polarization\_force in section water), the
 default value is 20 kcal$\cdot$mol$^{-1}\cdot$rad$^{-2}$.
 
 \subsubsection{Periodic boundary conditions}
@@ -3327,9 +3327,9 @@ output from \textbf{qdyn}. Sections with no required entries are optional.
 \multicolumn{3}{p{394pt}}{[\textbf{solvent}]: Boundary conditions of solvent sphere. Optional, can be omitted in vacuum simulations and must be omitted in PBC simulations.}\\
 \hline radius & Target solvent radius. &  Optional. Use this only to override the calculated target radius from the topology.\\
 \hline radial\_force & Force constant (kcal$\cdot$mol$^{-1}\cdot$Å$^{-2}$) for half-harmonic radial restraint at boundary. & Optional, default 60 kcal$\cdot$mol$^{-1}\cdot$Å$^{-2}$.\\
-\hline polarisation & Polarisation restraints in outer solvent shell on or off. & Optional, default on.\\
-\hline charge\_correction &  Enable (on) or disable (off) correction of solvent polarisation restraints for total charge of Q-atoms by Born's formula. & Optional, default on.\\
-\hline polarisation\_force & Force constant (kcal$\cdot$mol$^{-1}\cdot$rad$^{-2}$) for solvent polarisation restraints. & Optional, default = 20 kcal$\cdot$mol$^{-1}\cdot$rad$^{-2}$.\\
+\hline polarization & Polarization restraints in outer solvent shell on or off. & Optional, default on.\\
+\hline charge\_correction &  Enable (on) or disable (off) correction of solvent polarization restraints for total charge of Q-atoms by Born's formula. & Optional, default on.\\
+\hline polarization\_force & Force constant (kcal$\cdot$mol$^{-1}\cdot$rad$^{-2}$) for solvent polarization restraints. & Optional, default = 20 kcal$\cdot$mol$^{-1}\cdot$rad$^{-2}$.\\
 \hline morse\_depth & Depth (dissociation energy, kcal$\cdot$mol$^{-1}$) of Morse-type boundary attraction potential. & Optional, default is a function of water radius.\\
 \hline
 \multicolumn{3}{p{394pt}}{}\\
@@ -3726,7 +3726,7 @@ and the simulation is initialized.
 \hline Nonbonded method   = LRF Taylor expansion outside cut-off & Local reaction field approximation applied beyond cut-off.\\
 \hline Cut-off radii for non-bonded interactions:\newline \begin{tabular}{ll}Solute-solute:&10.00\\Solvent-solvent:&10.00\\Solute-solvent:&10.00\\Q-atom-non-Q-atom:&99.00\\LRF:&99.00 \end{tabular} & \\
 \hline \begin{tabular}{lll}Shell restraint force constant    &     =  & 50.00 \end{tabular} & Heavy solute atoms in the shell region defined in the topology will be restrained to their initial positions by harmonic potentials with force constant 50 kcal$\cdot$mol$^{-1}\cdot$Å$^{-2}$.\\
-\hline Water polarisation force constant set to default & \\
+\hline Water polarization force constant set to default & \\
 \hline \begin{tabular}{p{101.5pt}p{101.5pt}}Non-bonded pair list update interval =& 25 \end{tabular}& \\
 \hline \begin{tabular}{p{117pt}ll}Energy summary print-out interval & = & 10\end{tabular}\newline\begin{tabular}{p{117pt}ll}Temperature print-out interval & = & 1\\Trajectory write interval& = & 5\\Energy file write interval & = & 5 \end{tabular}&Energy summary will be written to log file every 10 steps, Temperature every step, a trajectory frame every 10 steps, and an energy file record every 5 steps.\\
 \hline \begin{tabular}{lll}Topology file & = & cdc25v4.top \end{tabular} & \\
@@ -3816,8 +3816,8 @@ and the simulation is initialized.
 \hline \begin{tabular}{lrr}Total charge of non-Q atoms & = & 1.00\\Total charge of system & = & -1.00\\&&\end{tabular} & \multirow{-1}{203pt}[1\baselineskip]{The sum of the partial charges of all non-Q atoms is 1.00. Including also the effective charge of the Q atoms gives the total charge -1.00 for the whole system.}\\
 \hline \begin{tabular}{lrr}Target water sphere radius & = & 15.92\end{tabular} & This radius is calculated from the number of water molecules and solute atoms and the average number densities, to ensure correct density of the water.\\
 \hline \begin{tabular}{lrr}Surface inward harmonic force constant & = & 60.00\\Surface attraction well depth & = & 0.96\\Surface attraction well width & = & 0.49\\&&\end{tabular} & \multirow{-1}{203pt}[1.5\baselineskip]{Force constant in the radial half-harmonic potential acting on water molecules outside the target water sphere radius and parameters for the boundary attraction potential. These are normally calculated by the program, based on the radius.}\\
-\hline Water polarisation restraints : ON, Born correction enabled\newline Radial polarisation force constant =  20.00 & Water polarisation restraints in the boundary region are enabled and the polarisation will be corrected for the net charge of the system.\\
-\hline Setting up 3 water shells for polarisation restraints.\newline \begin{tabular}{rrr}Shell \# & outer radius & inner radius \\ 1 & 15.92 & 15.42 \\ 2 & 15.42 & 14.42 \\ 3 & 14.42 & 12.92\end{tabular} & The polarisation restraints are applied in three sub-shells.\\
+\hline Water polarization restraints : ON, Born correction enabled\newline Radial polarization force constant =  20.00 & Water polarization restraints in the boundary region are enabled and the polarization will be corrected for the net charge of the system.\\
+\hline Setting up 3 water shells for polarization restraints.\newline \begin{tabular}{rrr}Shell \# & outer radius & inner radius \\ 1 & 15.92 & 15.42 \\ 2 & 15.42 & 14.42 \\ 3 & 14.42 & 12.92\end{tabular} & The polarization restraints are applied in three sub-shells.\\
 \hline Coordinates for 472 atoms will be written to the trajectory. & The atom mask specification in the trajectory\_atoms section of the input file matched 472 atoms.\\
 \hline \begin{tabular}{lrr}Number of shake constraints & = & 2552\\No. molecules with shake constraints & = & 296\end{tabular}\newline Initial x-shaking required 3 interations per molecule on average.\newline Initial v-shaking required 8 interations per molecule on average. & \multirow{-1}{203pt}[0.5\baselineskip]{Initial positions and velocities are shaken.}\\
 \hline \end{longtable}
@@ -3850,7 +3850,7 @@ energy summaries.
 \tiny
 \vspace{-1\baselineskip}
 \begin{longtable}{|p{295pt}|p{111pt}|}
-\hline \begin{tabular}{lrrrrrr} & el & vdW & bond & angle & torsion & improper\\solute & -560.13 & -182.55 & 0.00 & 0.00 & 309.92 & 96.67\\solvent & -3402.39 & 549.41 & 0.00 & 0.00 & 0.00 & 0.00\\solute-solvent & -494.15 & 383.01&&&&\\LRF & 40.70&&&&&\\Q-atom & -420.84 & 78.87 & -190.09 & 3.43 & 1.89 & 0.00 \\& total & fix & water\_rad & water\_pol & shell & solute\\restraints & 46.05 & 0.00 & 4.36 & 19.06 & 0.00 & 22.63 \\ & total & potential & kinetic&&&\\SUM & -3065.30 & -3075.23 & 9.93&&&\\&&&&&&\\&&&&&&\\&&&&&&\\&&&&&&\end{tabular} & \multirow{-1}{111pt}[6.5\baselineskip]{Bond and angle energies are zero due to shake.The Q-atom line lists the effective, $i.e.$ $\lambda$-weighted Q-atom energies. The total restraint energy is a sum of terms from fixing excluded atoms, the radial water restraints, the water polarisation restraints, restraining of solute atoms in the shell near the boundary and solute restraints specified in the input file.The total energy of the system is the sum of potential and kinetic energy.}\\
+\hline \begin{tabular}{lrrrrrr} & el & vdW & bond & angle & torsion & improper\\solute & -560.13 & -182.55 & 0.00 & 0.00 & 309.92 & 96.67\\solvent & -3402.39 & 549.41 & 0.00 & 0.00 & 0.00 & 0.00\\solute-solvent & -494.15 & 383.01&&&&\\LRF & 40.70&&&&&\\Q-atom & -420.84 & 78.87 & -190.09 & 3.43 & 1.89 & 0.00 \\& total & fix & water\_rad & water\_pol & shell & solute\\restraints & 46.05 & 0.00 & 4.36 & 19.06 & 0.00 & 22.63 \\ & total & potential & kinetic&&&\\SUM & -3065.30 & -3075.23 & 9.93&&&\\&&&&&&\\&&&&&&\\&&&&&&\\&&&&&&\end{tabular} & \multirow{-1}{111pt}[6.5\baselineskip]{Bond and angle energies are zero due to shake.The Q-atom line lists the effective, $i.e.$ $\lambda$-weighted Q-atom energies. The total restraint energy is a sum of terms from fixing excluded atoms, the radial water restraints, the water polarization restraints, restraining of solute atoms in the shell near the boundary and solute restraints specified in the input file.The total energy of the system is the sum of potential and kinetic energy.}\\
 \hline
 \end{longtable}
 \normalsize
