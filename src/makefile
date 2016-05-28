@@ -82,10 +82,11 @@ else ifeq ($(COMP),ibm)
 ################################################################################
 else ifeq ($(COMP),gcc)
 	FC=             gfortran
-	FC_OPT=         -O3 -funroll-loops -static-libgfortran \
-	                -ffree-line-length-none -fcray-pointer \
-	                -fall-intrinsics -std=legacy -Wall
-	FFLAGS=         -fstack-protector ${FC_OPT} -DG95=1
+	FC_OPT=         -O3
+	FFLAGS=         -funroll-loops -ffree-line-length-none -fcray-pointer \
+	                -static-libgfortran -fall-intrinsics -std=legacy \
+	                -Wall -Wtabs -fstack-protector ${FC_OPT} -DG95=1
+
 	FPP_FLG=        -cpp
 
 	MPIFC=          mpif90
@@ -104,8 +105,8 @@ else
 	FC=             gfortran
 	FC_OPT=         -O3
 	FFLAGS=         -ffree-line-length-none -fcray-pointer \
-	                -fall-intrinsics -std=legacy -Wall -Wtabs \
-	                -fstack-protector ${FC_OPT} -DG95=1
+	                -fall-intrinsics -std=legacy -Wall \
+	                ${FC_OPT} -DG95=1
 
 	FPP_FLG=        -cpp
 
