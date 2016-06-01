@@ -2674,8 +2674,18 @@ subroutine readlib(file)
 ! arguments
   character(*), optional           :: file
 !  character(len=*), optional       :: file
+
 ! *** local variables
-  character                        :: line*200, filnam*200
+! In the topology file output the fields LIB_FILES and PRM_FILE will be
+! truncated after 256 characters. This is due to the declare statements
+! which follow. This needs to be fixed or rethought without breaking
+! compatibility.  
+  character                        :: line*200
+  character                        :: filnam*200
+!  character(len=*) line(*)
+!  character(len=*) filnam(*)  
+!  character(len=*), parameter      :: line = ' '
+!  character(len=*), parameter      :: filnam  = ' '
 !  character(kind=CDK,len=*), parameter                 :: line='*'
 !  character(kind=CDK,len=*), parameter                 :: filnam='*'
   integer                          :: irec, i, iat, ires, j, igp, ntot
@@ -2687,7 +2697,7 @@ subroutine readlib(file)
 
   ! some extra arrays used only for allocation. This circumvents 
   ! an unaligned access error on Digital UNIX 4.0 / Digital FORTRAN
-  !(Compiler bug?)
+  ! (Compiler bug?)
   
   character(len=KEYLENGTH), pointer :: tac_lib(:)
   character(len=4), pointer        :: atnam(:)

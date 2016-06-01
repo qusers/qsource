@@ -14,40 +14,39 @@
 !  by John Marelius
 !  command parser 
 !------------------------------------------------------------------------------!
-module PARSE
-        use MISC
-        implicit none
+module parse
+  use misc
+  implicit none
 
 !constants
-        character(*), private, parameter        ::      MODULE_VERSION = '5.7'
-        character(*), private, parameter        ::      MODULE_DATE = '2015-02-22'
+  character(*), private, parameter  :: MODULE_VERSION = '5.7'
+  character(*), private, parameter  :: MODULE_DATE = '2015-02-22'
+  integer, parameter                :: MAX_ARGS = 10
 
-        integer, parameter                      ::      MAX_ARGS = 10
+  type substring
+          integer                   :: istart, iend
+  end type substring
 
-        type substring
-                integer                                 ::      istart, iend
-        end type substring
-
-        character(200)                          ::      inbuf
-        type(substring)                         ::      argv(0:MAX_ARGS)
-        integer                                         ::      argc = 0, argp = 1
-        
-        logical,private                                         :: read_from_file = .false.  !Enables input from file
-        integer,private                                         :: INFILE = 0
+  character(200)                    :: inbuf
+  type(substring)                   :: argv(0:MAX_ARGS)
+  integer                           :: argc = 0, argp = 1
+  
+  logical,private                   :: read_from_file = .false.  !Enables input from file
+  integer,private                   :: INFILE = 0
 
 
 contains
 
 subroutine parse_startup()
-        argc = 0
-        argp = 1
+  argc = 0
+  argp = 1
 end subroutine parse_startup
 
 !--------------------------------------------------------------------------
 
 logical function parse_open_file(filename)
 character(*)    :: filename
-integer                 :: stat
+integer         :: stat
 
 
         parse_open_file = .false.
@@ -270,4 +269,4 @@ end function get_real_arg
 
 !--------------------------------------------------------------------------
 
-end module PARSE
+end module parse

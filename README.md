@@ -12,7 +12,8 @@ documentation do:
 	doxygen DoxygenConfigFortran
 
 
-Some basic development rules taken from the **gromacs** developers team follow.
+Some basic development rules somewhat similar to those of the
+**gromacs** developers team follow.
 
 
 Coding Standards
@@ -42,8 +43,8 @@ code.
 * No tabs, spaces only.  
 * Two spaces for indentation of each level.  
 * No more than 80 characters to allow for easy code visualization
-  across editors and screens, specially important for easy cellphone
-  coding, reading.  
+  across editors and screens. Specially important for easy mobile
+  device coding, reading.  
 * No trailing whitespaces. They are not seen by default in most
   editors but still count as changes in git.  
 * Column 36 for : on variable declaration.  
@@ -56,7 +57,23 @@ code.
 5. **Compilation**  
 --------------------------------------------------------------------------------
 
-## gfortran from gcc
-A relatively new version of gfortran is recommended, at least gfortran
-4.8 The  ideas is  to use new  features of gfortran  to make  the code
-advance accordingly
+5.1  gfortran from gcc
+----------------------
+At the moment Q doesn't include any of the features of the fortran
+2008 standard. The fortran 2008 standard is the latest fortran
+standard. Work is being done on the fortran 2015 standard but it is
+not yet released. Many features of fortran 2008 are already included
+in the GNU-Compiler-Collection gfortran.
+
+- For compiling Q a relatively new version of gfortran is recommended,
+at least  gfortran 4.8. The  idea is  to make Q  an example of  a code
+which integrates the latest niceties of modern *FORTRAN*.
+
+- **Fortran 2008**(New Features)  
+Coarrays for parallel computing.  
+Possibility to use submodules, and submodules of submodules. Of help
+for very large programs.  
+*do concurrent*  
+
+
+
