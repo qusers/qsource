@@ -9850,7 +9850,8 @@ end if
 end if
 
 ! skip if outside cutoff
-if ( ( r2 .gt. rcut2 ) .or. (use_PBC.and.(Rcq.gt.zero))) cycle igloop
+if ( ( ( use_PBC ) .and. (r2 .gt. rcut2) .and. (Rcq .gt. zero ) ) .or. &
+        ( ( r2 .gt. rcut2 ) ) ) cycle igloop
 
 ialoop: do ia = cgp(ig)%first, cgp(ig)%last
   i = cgpatom(ia)
