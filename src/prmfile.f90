@@ -69,42 +69,42 @@ module prmfile
   use misc
   implicit none
   !constants
-  character(*), private, parameter        :: MODULE_VERSION = '5.7'
-  character(*), private, parameter        :: MODULE_DATE = '2015-02-22'
+  character(*), private, parameter  :: MODULE_VERSION = '5.7'
+  character(*), private, parameter  :: MODULE_DATE = '2015-02-22'
 
   !types, NOTE: maximum length of 500 chars per line
-  type LINE_TYPE
-     character(len=900)                      :: text
-     type(LINE_TYPE), pointer                :: next
-  end type LINE_TYPE
+  type line_type
+     character(len=900)             :: text
+     type(line_type), pointer       :: next
+  end type line_type
 
-  type SECTION_TYPE
-     character(len=80)                       :: name
-     type(SECTION_TYPE), pointer             :: next
-     type(LINE_TYPE), pointer                :: lp
-     integer                                 :: count, max_enum
-  end type SECTION_TYPE
+  type section_type
+     character(len=80)              :: name
+     type(section_type), pointer    :: next
+     type(line_type), pointer       :: lp
+     integer                        :: count, max_enum
+  end type section_type
 
   !module variables
-  type(SECTION_TYPE), pointer             ::      first_sec, current_sec
-  type(LINE_TYPE), pointer                ::      current_lp
-  integer                                 ::      section_count
+  type(section_type), pointer      :: first_sec, current_sec
+  type(line_type), pointer         :: current_lp
+  integer                          :: section_count
 
-  character(len=80)                       :: current_title, next_title
-  integer, private                        :: PRM_U = 0
-  character(200), private                 :: PRM_FN
-  integer, private                        :: stat
+  character(len=80)                :: current_title, next_title
+  integer, private                 :: PRM_U = 0
+  character(200), private          :: PRM_FN
+  integer, private                 :: stat
 
-  private                                                 :: find_section
-  private                                                 :: split
-  private                                                 :: splitone
-  private                                                 :: get_strings
-  private                                                 ::      load
+  private                          :: find_section
+  private                          :: split
+  private                          :: splitone
+  private                          :: get_strings
+  private                          :: load
 contains
 
-  subroutine prmfile_startup
+!  subroutine prmfile_startup
 
-  end subroutine prmfile_startup
+!  end subroutine prmfile_startup
 
 
 !-------------------------------------------------------------------------------

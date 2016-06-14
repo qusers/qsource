@@ -28,18 +28,16 @@ contains
 
   subroutine centered_heading(msg, fill)
     character(*) :: msg
-    character :: fill
-
-    integer :: n, i 
+    character    :: fill
+    integer      :: n, i 
 
     n = (78 - len(msg)) / 2
     write(*,'(80a)') (fill, i=1,n), ' ', msg, ' ', (fill, i=1,n-1)
   end subroutine centered_heading
 
   integer function freefile()
-
-    integer                                 ::      u
-    logical                                 ::      used
+    integer                         :: u
+    logical                         :: used
 
     do u = 20, 999          
        inquire(unit=u, opened=used)

@@ -8849,9 +8849,9 @@ subroutine nonbond_monitor
  integer  :: i,j,istate,LJ_code,par
  integer  :: grpi,grpj,atomi,atomj,qatomi,qatomj,qq_pair, iaci,iacj
  real(8)  :: aLJi,bLJi,aLJj,bLJj,qi,qj, Vel,Vvdw,Vwel,Vwvdw,Vwsum
- real(8)  :: r6_hc    !  softcore variables
+ real(8)  :: r6_hc         !  softcore variables
  integer  :: sc_1,sc_2     !  softcore variables, sc_1 is the first index in sc_lookup (the qatom)
- logical  :: do_sc    !  softcore variables,   do_sc is a boolean to determine if softcore should be done
+ logical  :: do_sc         !  softcore variables,   do_sc is a boolean to determine if softcore should be done
  ! do_sc is true when atom i or j is a qatom  (and qvdw is true)
 
 

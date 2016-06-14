@@ -181,9 +181,7 @@ module prep
 !-----------------------------------------------------------------------
   logical, allocatable            :: makeh(:)
   integer, allocatable            :: nconn(:)
-
   integer, allocatable            :: iconn(:,:)
-
   real(8)                         :: pi, deg2rad
   !temporary storage for solvent coordinates
   real(8), allocatable            :: xw(:,:,:) !solvent coordinates zyx,atom,molecule
@@ -444,7 +442,7 @@ subroutine angle_ene(emax, nlarge, av_ene)
 
         if(nangles/=0) av_ene = av_ene / real(nangles)
 
-!.......................................................................
+
 end subroutine angle_ene
 
 
@@ -2474,13 +2472,8 @@ end subroutine maketors
 subroutine prompt(outtxt)
 ! *** local variables
         CHARACTER( * ) outtxt
-
-!.......................................................................
-
         write( * , '(a,$)') outtxt
-
         return
-!.......................................................................
 end subroutine prompt
 
 
@@ -3221,13 +3214,17 @@ subroutine oldreadparm(flag)
  1050 write( * , 120) 'LJ type 2 pair', i
         flag = .false.
         return
-!.......................................................................
+
 end subroutine oldreadparm
 
 
 
+!------------------------------------------------------------------------------!
+!>  subroutine: readff
+!
+!------------------------------------------------------------------------------!
 subroutine readff
-        !read parameters
+  !read parameters
         if(.not.have_prm_file_name) then
                 call get_string_arg(prm_file, '-----> Name of FF parameter file: ')
                 have_prm_file_name = .true.
@@ -3251,29 +3248,32 @@ subroutine readff
 end subroutine readff
 
 
-
+!------------------------------------------------------------------------------!
+!>  subroutine: readparm
+!
+!------------------------------------------------------------------------------!
 subroutine readparm(filnam) 
-!       arguments
-        character(*)                            ::      filnam
+! arguments
+  character(*)                      :: filnam
 
 ! *** local variables
-        integer                                         ::      i, ityp, j
-        character(len=200)                      ::      line, restofline
-        real                                            ::      rdummy
-        logical                                         ::      ldummy
-        character(len=KEYLENGTH)        ::      taci, tacj, tack, tacl
-        integer                                         ::      iaci, iacj, iack, iacl
-        character(len=80)                       ::      section
-        logical                                         ::      SYBYL_warn = .false.
-        integer                                         ::      naliases
-        type(BOND_PRM_TYPE)                     ::      bnd_prm_tmp
-        type(ANGLIB_TYPE)                       ::      ang_prm_tmp
-        type(TORLIB_TYPE)                       ::      tor_prm_tmp
+  integer                           :: i, ityp, j
+  character(len=200)                :: line, restofline
+  real                              :: rdummy
+  logical                           :: ldummy
+  character(len=KEYLENGTH)          :: taci, tacj, tack, tacl
+  integer                           :: iaci, iacj, iack, iacl
+  character(len=80)                 :: section
+  logical                           :: SYBYL_warn = .false.
+  integer                           :: naliases
+  type(BOND_PRM_TYPE)               :: bnd_prm_tmp
+  type(ANGLIB_TYPE)                 :: ang_prm_tmp
+  type(TORLIB_TYPE)                 :: tor_prm_tmp
 !.......................................................................
-        ff_ok = .false.
+  ff_ok = .false.
         
-        write(*,10) 
-10      format(/,'Reading force field parameter file.')
+    write(*,10) 
+10  format(/,'Reading force field parameter file.')
 !parameter file is opened by maketop 
         if(.not. prm_open_section('options')) then
                 write(*,*) '>>> WARNING: Options section not found in parameter file.'
@@ -3737,13 +3737,15 @@ torloop: do i = 1, ntor_types
 1060 write( * , 120) trim(section), i
         call prm_close()
         return
-!.......................................................................
+
 end subroutine readparm
 
 
-
+!------------------------------------------------------------------------------!
+!>  subroutine: clearpdb
+!
+!------------------------------------------------------------------------------!
 subroutine clearpdb
-
         nres = 0
         nres_solute = 0
         nmol = 0
@@ -3755,7 +3757,6 @@ subroutine clearpdb
         if(allocated(xtop)) deallocate(xtop)
         if(allocated(res)) deallocate(res)
         if(allocated(istart_mol)) deallocate(istart_mol)
-
 end subroutine clearpdb
 
 
