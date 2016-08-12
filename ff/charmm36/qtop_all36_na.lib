@@ -1,0 +1,420 @@
+*-------------------------------------------------------------------------------
+* Q fragment library file extracted from:
+*    CHARMM36 All-Hydrogen Nucleic Acid Topology File 
+* Converted with charmm2q.py (Geir V. Isaksen, 2016)* with tiny changes by
+* Mauricio Esguerra and Christoffer Lind
+*
+**  ADE ,  CYT ,  GUA ,  THY ,  URA ,
+** -1.00  -1.00  -1.00  -1.00  -1.00 
+*-------------------------------------------------------------------------------
+{ADE}            !charge: -1.00 || 
+    [atoms]
+         1 P      P            1.50  !             H61  H62!
+         2 O1P    ON3         -0.78  !               \  /
+         3 O2P    ON3         -0.78  !                N6
+         4 O5'    ON2         -0.57  !                |
+         5 C5'    CN8B        -0.08  !                C6
+         6 H5'    HN8          0.09  !              //  \
+         7 H5''   HN8          0.09  !              N1   C5--N7\\
+         8 C4'    CN7          0.16  !              |    ||     C8-H8
+         9 H4'    HN7          0.09  !              C2   C4--N9/
+        10 O4'    ON6B        -0.50  !             / \\ /     \
+        11 C1'    CN7B         0.16  !           H2   N3       \
+        12 H1'    HN7          0.09  !                          \
+        13 N9     NN2         -0.05  !                           \
+        14 C5     CN5          0.28  !                            \
+        15 N7     NN4         -0.71  !        O1P    H5' H4'  O4'  \
+        16 C8     CN4          0.34  !         |      |    \ /   \  \
+        17 H8     HN3          0.12  !        -P-O5'-C5'---C4'    C1'
+        18 N1     NN3A        -0.74  !         |      |     \     / \
+        19 C2     CN4          0.50  !        O2P    H5''   C3'--C2' H1'
+        20 H2     HN3          0.13  !                     / \   / \
+        21 N3     NN3A        -0.75  !                  O3' H3' O2' H2''
+        22 C4     CN5          0.43  !                   |       |
+        23 C6     CN2          0.46  !                          H2'
+        24 N6     NN1         -0.77
+        25 H61    HN1          0.38
+        26 H62    HN1          0.38
+        27 C2'    CN7B         0.14
+        28 H2''   HN7          0.09
+        29 O2'    ON5         -0.66
+        30 H2'    HN5          0.43
+        31 C3'    CN7          0.01
+        32 H3'    HN7          0.09
+        33 O3'    ON2         -0.57
+    [bonds]         
+       P      O1P   
+       P      O2P   
+       P      O5'   
+       O5'    C5'   
+       C5'    C4'   
+       C4'    O4'   
+       C4'    C3'   
+       O4'    C1'   
+       C1'    N9    
+       C1'    C2'   
+       N9     C4    
+       N9     C8    
+       C4     N3    
+       C2     N1    
+       C6     N6    
+       N6     H61   
+       N6     H62   
+       C6     C5    
+       C5     N7    
+       C2'    C3'   
+       C2'    O2'   
+       O2'    H2'   
+       C3'    O3'   
+       C1'    H1'   
+       C2'    H2''  
+       C3'    H3'   
+       C4'    H4'   
+       C5'    H5'   
+       C5'    H5''  
+       C8     H8    
+       C2     H2    
+       N1     C6    
+       C2     N3    
+       C4     C5    
+       N7     C8    
+    [connections]
+        head P     
+        tail O3'   
+    [impropers]
+         N6     C6     H61    H62   
+         C6     N1     C5     N6    
+    [charge_groups]
+        P     O1P   O2P   O5'   C5'   H5'   H5''  
+        C4'   H4'   O4'   C1'   H1'   
+        N9    C5    N7    C8    H8    N1    C2    H2    N3    C4    C6    N6    H61   H62   
+        C2'   H2''  O2'   H2'   
+        C3'   H3'   O3'   
+*------------------------------------------------------------------
+{CYT}            !charge: -1.00 ||  
+    [atoms]
+         1 P      P            1.50  !                      H42  H41
+         2 O1P    ON3         -0.78  !                        \  /    
+         3 O2P    ON3         -0.78  !                         N4
+         4 O5'    ON2         -0.57  !                         |
+         5 C5'    CN8B        -0.08  !                         C4
+         6 H5'    HN8          0.09  !                        /  \\
+         7 H5''   HN8          0.09  !                    H5-C5   N3
+         8 C4'    CN7          0.16  !                       ||   |
+         9 H4'    HN7          0.09  !                    H6-C6   C2
+        10 O4'    ON6B        -0.50  !                        \  / \\
+        11 C1'    CN7B         0.16  !                         N1   O2
+        12 H1'    HN7          0.09  !                          \
+        13 N1     NN2         -0.13  !                           \
+        14 C6     CN3          0.05  !                            \ 
+        15 H6     HN3          0.17  !        O1P    H5' H4'  O4'  \
+        16 C5     CN3         -0.13  !         |      |    \ /   \  \
+        17 H5     HN3          0.07  !        -P-O5'-C5'---C4'    C1'
+        18 C2     CN1          0.52  !         |      |     \     / \
+        19 O2     ON1C        -0.49  !        O2P    H5''   C3'--C2' H1'
+        20 N3     NN3         -0.66  !                     / \   / \ 
+        21 C4     CN2          0.65  !                  O3' H3' O2' H2''
+        22 N4     NN1         -0.75  !                   |       |
+        23 H41    HN1          0.37  !                          H2'
+        24 H42    HN1          0.33
+        25 C2'    CN7B         0.14
+        26 H2''   HN7          0.09
+        27 O2'    ON5         -0.66
+        28 H2'    HN5          0.43
+        29 C3'    CN7          0.01
+        30 H3'    HN7          0.09
+        31 O3'    ON2         -0.57
+    [bonds]
+       P      O1P   
+       P      O2P   
+       P      O5'   
+       O5'    C5'   
+       C5'    C4'   
+       C4'    O4'   
+       C4'    C3'   
+       O4'    C1'   
+       C1'    N1    
+       C1'    C2'   
+       N1     C2    
+       N1     C6    
+       C2     N3    
+       C4     N4    
+       N4     H41   
+       N4     H42   
+       C4     C5    
+       C2'    C3'   
+       C3'    O3'   
+       C2'    O2'   
+       O2'    H2'   
+       C1'    H1'   
+       C2'    H2''  
+       C3'    H3'   
+       C4'    H4'   
+       C5'    H5'   
+       C5'    H5''  
+       C5     H5    
+       C6     H6    
+       C2     O2    
+       C5     C6    
+       N3     C4    
+    [connections]
+        head P     
+        tail O3'   
+    [impropers]
+         C2     N1     N3     O2    
+         C4     N3     C5     N4    
+         N4     C4     H41    H42   
+    [charge_groups]
+        P     O1P   O2P   O5'   C5'   H5'   H5''  
+        C4'   H4'   O4'   C1'   H1'   
+        N1    C6    H6    C5    H5    C2    O2    N3    C4    N4    H41   H42   
+        C2'   H2''  O2'   H2'   
+        C3'   H3'   O3'   
+*------------------------------------------------------------------
+{GUA}            !charge: -1.00 ||
+    [atoms]
+         1 P      P            1.50  !               O6
+         2 O1P    ON3         -0.78  !               ||   
+         3 O2P    ON3         -0.78  !               C6    
+         4 O5'    ON2         -0.57  !              /  \  
+         5 C5'    CN8B        -0.08  !          H1-N1   C5--N7\\
+         6 H5'    HN8          0.09  !             |    ||     C8-H8
+         7 H5''   HN8          0.09  !             C2   C4--N9/
+         8 C4'    CN7          0.16  !            / \\ /      \
+         9 H4'    HN7          0.09  !      H21-N2   N3        \
+        10 O4'    ON6B        -0.50  !          |               \
+        11 C1'    CN7B         0.16  !         H22               \
+        12 H1'    HN7          0.09  !                            \
+        13 N9     NN2B        -0.02  !        O1P    H5' H4'  O4'  \
+        14 C4     CN5          0.26  !         |      |    \ /   \  \
+        15 N2     NN1         -0.68  !        -P-O5'-C5'---C4'    C1'
+        16 H21    HN1          0.32  !         |      |     \     / \
+        17 H22    HN1          0.35  !        O2P    H5''   C3'--C2' H1'
+        18 N3     NN3G        -0.74  !                     / \   / \
+        19 C2     CN2          0.75  !                  O3' H3' O2' H2''
+        20 N1     NN2G        -0.34  !                   |       |
+        21 H1     HN2          0.26  !                          H2'
+        22 C6     CN1          0.54
+        23 O6     ON1         -0.51
+        24 C5     CN5G         0.00
+        25 N7     NN4         -0.60
+        26 C8     CN4          0.25
+        27 H8     HN3          0.16
+        28 C2'    CN7B         0.14
+        29 H2''   HN7          0.09
+        30 O2'    ON5         -0.66
+        31 H2'    HN5          0.43
+        32 C3'    CN7          0.01
+        33 H3'    HN7          0.09
+        34 O3'    ON2         -0.57
+    [bonds]
+       P      O1P   
+       P      O2P   
+       P      O5'   
+       O5'    C5'   
+       C5'    C4'   
+       C4'    O4'   
+       C4'    C3'   
+       O4'    C1'   
+       C1'    N9    
+       C1'    C2'   
+       N9     C4    
+       N9     C8    
+       C4     N3    
+       C2     N2    
+       C2     N1    
+       N2     H21   
+       N2     H22   
+       N1     H1    
+       N1     C6    
+       C6     C5    
+       C5     N7    
+       C2'    C3'   
+       C3'    O3'   
+       C2'    O2'   
+       O2'    H2'   
+       C1'    H1'   
+       C2'    H2''  
+       C3'    H3'   
+       C4'    H4'   
+       C5'    H5'   
+       C5'    H5''  
+       C8     H8    
+       C2     N3    
+       C4     C5    
+       N7     C8    
+       C6     O6    
+    [connections]
+        head P     
+        tail O3'   
+    [impropers]
+         C2     N3     N1     N2    
+         C6     N1     C5     O6    
+         N2     H21    C2     H22   
+    [charge_groups]
+        P     O1P   O2P   O5'   C5'   H5'   H5''  
+        C4'   H4'   O4'   C1'   H1'   
+        N9    C4    N2    H21   H22   N3    C2    N1    H1    C6    O6    C5    N7    C8    H8    
+        C2'   H2''  O2'   H2'   
+        C3'   H3'   O3'   
+*------------------------------------------------------------------
+{THY}            !charge: -1.00 ||                   H51    O4
+    [atoms]
+         1 P      P            1.50  !                  H51    O4
+         2 O1P    ON3         -0.78  !                   |     ||
+         3 O2P    ON3         -0.78  !               H52-C5M   C4    H3
+         4 O5'    ON2         -0.57  !                   |  \ /  \  /
+         5 C5'    CN8B        -0.08  !                  H53  C5   N3
+         6 H5'    HN8          0.09  !                       ||   |
+         7 H5''   HN8          0.09  !                    H6-C6   C2
+         8 C4'    CN7          0.16  !                        \  / \\  
+         9 H4'    HN7          0.09  !                         N1   O2
+        10 O4'    ON6B        -0.50  !                          \
+        11 C1'    CN7B         0.16  !                           \
+        12 H1'    HN7          0.09  !                            \ 
+        13 N1     NN2B        -0.34  !        O1P    H5' H4'  O4'  \
+        14 C6     CN3          0.17  !         |      |    \ /   \  \
+        15 H6     HN3          0.17  !        -P-O5'-C5'---C4'    C1'
+        16 C2     CN1T         0.51  !         |      |     \     / \
+        17 O2     ON1         -0.41  !        O2P    H5''   C3'--C2' H1'
+        18 N3     NN2U        -0.46  !                     / \   / \
+        19 H3     HN2          0.36  !                  O3' H3' O2' H2''
+        20 C4     CN1          0.50  !                   |       | 
+        21 O4     ON1         -0.45  !                          H2'
+        22 C5     CN3T        -0.15  !
+        23 C5M    CN9         -0.11  !
+        24 H51    HN9          0.07  !
+        25 H52    HN9          0.07
+        26 H53    HN9          0.07
+        27 C2'    CN7B         0.14
+        28 H2''   HN7          0.09
+        29 O2'    ON5         -0.66
+        30 H2'    HN5          0.43
+        31 C3'    CN7          0.01
+        32 H3'    HN7          0.09
+        33 O3'    ON2         -0.57
+    [bonds]
+       P      O1P   
+       P      O2P   
+       P      O5'   
+       O5'    C5'   
+       C5'    C4'   
+       C4'    O4'   
+       C4'    C3'   
+       O4'    C1'   
+       C1'    N1    
+       C1'    C2'   
+       N1     C2    
+       N1     C6    
+       C2     N3    
+       N3     H3    
+       N3     C4    
+       C4     C5    
+       C5     C5M   
+       C2'    C3'   
+       C3'    O3'   
+       C2'    O2'   
+       O2'    H2'   
+       C1'    H1'   
+       C2'    H2''  
+       C3'    H3'   
+       C4'    H4'   
+       C5'    H5'   
+       C5'    H5''  
+       C6     H6    
+       C5M    H51   
+       C5M    H52   
+       C5M    H53   
+       C2     O2    
+       C4     O4    
+       C5     C6    
+    [connections]
+        head P     
+        tail O3'   
+    [impropers]
+         C2     N1     N3     O2    
+         C4     N3     C5     O4    
+         C5     C4     C6     C5M   
+    [charge_groups]
+        P     O1P   O2P   O5'   C5'   H5'   H5''  
+        C4'   H4'   O4'   C1'   H1'   
+        N1    C6    H6    C2    O2    N3    H3    C4    O4    C5    C5M   H51   H52   H53   
+        C2'   H2''  O2'   H2'   
+        C3'   H3'   O3'   
+*------------------------------------------------------------------
+{URA}            !charge: -1.00 ||                
+    [atoms]
+         1 P      P            1.50  !                         O4
+         2 O1P    ON3         -0.78  !                         ||
+         3 O2P    ON3         -0.78  !                         C4    H3
+         4 O5'    ON2         -0.57  !                        /  \  /
+         5 C5'    CN8B        -0.08  !                    H5-C5   N3
+         6 H5'    HN8          0.09  !                       ||   |
+         7 H5''   HN8          0.09  !                    H6-C6   C2
+         8 C4'    CN7          0.16  !                        \  / \\
+         9 H4'    HN7          0.09  !                         N1   O2
+        10 O4'    ON6B        -0.50  !                          \
+        11 C1'    CN7B         0.16  !                           \
+        12 H1'    HN7          0.09  !                            \ 
+        13 N1     NN2B        -0.34  !        O1P    H5' H4'  O4'  \
+        14 C6     CN3          0.20  !         |      |    \ /   \  \
+        15 H6     HN3          0.14  !        -P-O5'-C5'---C4'    C1'
+        16 C2     CN1T         0.55  !         |      |     \     / \
+        17 O2     ON1         -0.45  !        O2P    H5''   C3'--C2' H1'
+        18 N3     NN2U        -0.46  !                     / \   / \
+        19 H3     HN2          0.36  !                   O3' H3' O2' H2''
+        20 C4     CN1          0.53  !                    |       | 
+        21 O4     ON1         -0.48  !                           H2' 
+        22 C5     CN3         -0.15
+        23 H5     HN3          0.10
+        24 C2'    CN7B         0.14
+        25 H2''   HN7          0.09
+        26 O2'    ON5         -0.66
+        27 H2'    HN5          0.43
+        28 C3'    CN7          0.01
+        29 H3'    HN7          0.09
+        30 O3'    ON2         -0.57
+    [bonds]
+       P      O1P   
+       P      O2P   
+       P      O5'   
+       O5'    C5'   
+       C5'    C4'   
+       C4'    O4'   
+       C4'    C3'   
+       O4'    C1'   
+       C1'    N1    
+       C1'    C2'   
+       N1     C2    
+       N1     C6    
+       C2     N3    
+       N3     H3    
+       N3     C4    
+       C4     C5    
+       C2'    C3'   
+       C3'    O3'   
+       C2'    O2'   
+       O2'    H2'   
+       C1'    H1'   
+       C2'    H2''  
+       C3'    H3'   
+       C4'    H4'   
+       C5'    H5'   
+       C5'    H5''  
+       C5     H5    
+       C6     H6    
+       C2     O2    
+       C4     O4    
+       C5     C6    
+    [connections]
+        head P     
+        tail O3'   
+    [impropers]
+         C2     N1     N3     O2
+         C4     N3     C5     O4
+    [charge_groups]
+        P     O1P   O2P   O5'   C5'   H5'   H5''  
+        C4'   H4'   O4'   C1'   H1'   
+        N1    C6    H6    C2    O2    N3    H3    C4    O4    C5    H5    
+        C2'   H2''  O2'   H2'   
+        C3'   H3'   O3'   

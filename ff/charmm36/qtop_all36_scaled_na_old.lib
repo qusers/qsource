@@ -1,0 +1,1094 @@
+!--------------------------------------------------------------!
+! Qcharmm36_na.lib	Scaled charges for -1 nucleic acids        !
+! Based on residues in Qcharmm22_pt.lib   					   !
+! added by Christoffer Lind mar-16                             !
+! additional NA's needed for complete list                     ! 
+!--------------------------------------------------------------!
+! name		5' type		3' type		net charge !
+! **0		 0.00		 0.00		 0.00      !
+! **1		 terminal	-0.45		-0.45      !
+! **2		 terminal	 0.00		 0.00      !
+! **3		-0.53		 0.00		-0.53      !
+! **5		 0.00		-0.47		-0.47      !
+! **6		-0.53		 terminal	-0.53      !
+! **7		 0.00		 terminal	 0.00      !
+!--------------------------------------------------------------!
+! ADE/URA/CYA/GUA (with net charge -1.00) are in               !  
+! Qtop_all36_na.lib                                            !
+!--------------------------------------------------------------!
+!--------------------------------------------------------------!
+!--------------------------------------------------------------!
+
+{AD0}                 !neutral 5', neutral 3', net charge 0.00
+    [info]
+        SYBYLtype  RESIDUE     !SYBYL substructure type
+    [atoms]
+         1 P      P            1.08 ! scaled from 1.50
+         2 O1P    ON3         -0.36 ! scaled from -0.78
+         3 O2P    ON3         -0.36 ! scaled from -0.78
+         4 O5'    ON2         -0.36 ! scaled from -0.57
+         5 C5'    CN8B        -0.18 ! scaled from -0.08
+         6 H5'    HN8          0.09
+         7 H5''   HN8          0.09
+         8 C4'    CN7          0.16
+         9 H4'    HN7          0.09
+        10 O4'    ON6B        -0.50
+        11 C1'    CN7B         0.16
+        12 H1'    HN7          0.09
+        13 N9     NN2         -0.05
+        14 C5     CN5          0.28
+        15 N7     NN4         -0.71
+        16 C8     CN4          0.34
+        17 H8     HN3          0.12
+        18 N1     NN3A        -0.74
+        19 C2     CN4          0.50
+        20 H2     HN3          0.13
+        21 N3     NN3A        -0.75
+        22 C4     CN5          0.43
+        23 C6     CN2          0.46
+        24 N6     NN1         -0.77
+        25 H61    HN1          0.38
+        26 H62    HN1          0.38
+        27 C2'    CN7B         0.14
+        28 H2''   HN7          0.09
+        29 O2'    ON5         -0.66
+        30 H2'    HN5          0.43
+        31 C3'    CN7          0.27 ! scaled from 0.01
+        32 H3'    HN7          0.09	 
+        33 O3'    ON2         -0.36 ! scaled from -0.57
+    [bonds]
+       P      O1P   
+       P      O2P   
+       P      O5'   
+       O5'    C5'   
+       C5'    C4'   
+       C4'    O4'   
+       C4'    C3'   
+       O4'    C1'   
+       C1'    N9    
+       C1'    C2'   
+       N9     C4    
+       N9     C8    
+       C4     N3    
+       C2     N1    
+       C6     N6    
+       N6     H61   
+       N6     H62   
+       C6     C5    
+       C5     N7    
+       C2'    C3'   
+       C2'    O2'   
+       O2'    H2'   
+       C3'    O3'        
+       C1'    H1'   
+       C2'    H2''  
+       C3'    H3'   
+       C4'    H4'   
+       C5'    H5'   
+       C5'    H5''  
+       C8     H8    
+       C2     H2    
+       N1     C6    
+       C2     N3    
+       C4     C5    
+       N7     C8    
+    [connections]
+        head P     
+        tail O3'   
+    [impropers]
+         N6     C6     H61    H62   
+         C6     N1     C5     N6    
+    [charge_groups]
+        P     O1P   O2P   O5'   C5'   H5'   H5''  
+        C4'   H4'   O4'   C1'   H1'   
+        N9    C5    N7    C8    H8    N1    C2    H2    N3    C4    C6    N6    H61   H62   
+        C2'   H2''  O2'   H2'   
+        C3'   H3'   O3'   
+*------------------------------------------------------------------
+{AD5}            !! neutral 5', -0.47 3', net charge -0.47
+    [atoms]
+         1 P      P            1.08 ! scaled from 1.50
+         2 O1P    ON3         -0.36 ! scaled from -0.78
+         3 O2P    ON3         -0.36 ! scaled from -0.78
+         4 O5'    ON2         -0.36 ! scaled from -0.57
+         5 C5'    CN8B        -0.18 ! scaled from -0.08
+         6 H5'    HN8          0.09
+         7 H5''   HN8          0.09
+         8 C4'    CN7          0.16
+         9 H4'    HN7          0.09
+        10 O4'    ON6B        -0.50
+        11 C1'    CN7B         0.16
+        12 H1'    HN7          0.09
+        13 N9     NN2         -0.05
+        14 C5     CN5          0.28
+        15 N7     NN4         -0.71
+        16 C8     CN4          0.34
+        17 H8     HN3          0.12
+        18 N1     NN3A        -0.74
+        19 C2     CN4          0.50
+        20 H2     HN3          0.13
+        21 N3     NN3A        -0.75
+        22 C4     CN5          0.43
+        23 C6     CN2          0.46
+        24 N6     NN1         -0.77
+        25 H61    HN1          0.38
+        26 H62    HN1          0.38
+        27 C2'    CN7B         0.14
+        28 H2''   HN7          0.09
+        29 O2'    ON5         -0.66
+        30 H2'    HN5          0.43
+        31 C3'    CN7          0.01
+        32 H3'    HN7          0.09
+        33 O3'    ON2         -0.57
+    [bonds]
+       P      O1P   
+       P      O2P   
+       P      O5'   
+       O5'    C5'   
+       C5'    C4'   
+       C4'    O4'   
+       C4'    C3'   
+       O4'    C1'   
+       C1'    N9    
+       C1'    C2'   
+       N9     C4    
+       N9     C8    
+       C4     N3    
+       C2     N1    
+       C6     N6    
+       N6     H61   
+       N6     H62   
+       C6     C5    
+       C5     N7    
+       C2'    C3'   
+       C2'    O2'   
+       O2'    H2'   
+       C3'    O3'     
+       C1'    H1'   
+       C2'    H2''  
+       C3'    H3'   
+       C4'    H4'   
+       C5'    H5'   
+       C5'    H5''  
+       C8     H8    
+       C2     H2    
+       N1     C6    
+       C2     N3    
+       C4     C5    
+       N7     C8    
+    [connections]
+        head P     
+        tail O3'   
+    [impropers]
+         N6     C6     H61    H62   
+         C6     N1     C5     N6    
+    [charge_groups]
+        P     O1P   O2P   O5'   C5'   H5'   H5''  
+        C4'   H4'   O4'   C1'   H1'   
+        N9    C5    N7    C8    H8    N1    C2    H2    N3    C4    C6    N6    H61   H62   
+        C2'   H2''  O2'   H2'   
+        C3'   H3'   O3'   
+*------------------------------------------------------------------
+{AD3}            !! -0.53 5', neutral 3', net charge -0.53
+    [atoms]
+         1 P      P            1.50
+         2 O1P    ON3         -0.78
+         3 O2P    ON3         -0.78
+         4 O5'    ON2         -0.57
+         5 C5'    CN8B        -0.08
+         6 H5'    HN8          0.09
+         7 H5''   HN8          0.09
+         8 C4'    CN7          0.16
+         9 H4'    HN7          0.09
+        10 O4'    ON6B        -0.50
+        11 C1'    CN7B         0.16
+        12 H1'    HN7          0.09
+        13 N9     NN2         -0.05
+        14 C5     CN5          0.28
+        15 N7     NN4         -0.71
+        16 C8     CN4          0.34
+        17 H8     HN3          0.12
+        18 N1     NN3A        -0.74
+        19 C2     CN4          0.50
+        20 H2     HN3          0.13
+        21 N3     NN3A        -0.75
+        22 C4     CN5          0.43
+        23 C6     CN2          0.46
+        24 N6     NN1         -0.77
+        25 H61    HN1          0.38
+        26 H62    HN1          0.38
+        27 C2'    CN7B         0.14
+        28 H2''   HN7          0.09
+        29 O2'    ON5         -0.66
+        30 H2'    HN5          0.43
+        31 C3'    CN7          0.27 ! scaled from 0.01
+        32 H3'    HN7          0.09	
+        33 O3'    ON2         -0.36 ! scaled from -0.57
+    [bonds]
+       P      O1P   
+       P      O2P   
+       P      O5'   
+       O5'    C5'   
+       C5'    C4'   
+       C4'    O4'   
+       C4'    C3'   
+       O4'    C1'   
+       C1'    N9    
+       C1'    C2'   
+       N9     C4    
+       N9     C8    
+       C4     N3    
+       C2     N1    
+       C6     N6    
+       N6     H61   
+       N6     H62   
+       C6     C5    
+       C5     N7    
+       C2'    C3'   
+       C2'    O2'   
+       O2'    H2'   
+       C3'    O3'     
+       C1'    H1'   
+       C2'    H2''  
+       C3'    H3'   
+       C4'    H4'   
+       C5'    H5'   
+       C5'    H5''  
+       C8     H8    
+       C2     H2    
+       N1     C6    
+       C2     N3    
+       C4     C5    
+       N7     C8    
+    [connections]
+        head P     
+        tail O3'   
+    [impropers]
+         N6     C6     H61    H62   
+         C6     N1     C5     N6    
+    [charge_groups]
+        P     O1P   O2P   O5'   C5'   H5'   H5''  
+        C4'   H4'   O4'   C1'   H1'   
+        N9    C5    N7    C8    H8    N1    C2    H2    N3    C4    C6    N6    H61   H62   
+        C2'   H2''  O2'   H2'   
+        C3'   H3'   O3'   
+*------------------------------------------------------------------
+{AD6}            ! -0.53 5', terminal 3', net charge -0.53
+    [atoms]
+         1 P      P            1.50
+         2 O1P    ON3         -0.78
+         3 O2P    ON3         -0.78
+         4 O5'    ON2         -0.57
+         5 C5'    CN8B        -0.08
+         6 H5'    HN8          0.09
+         7 H5''   HN8          0.09
+         8 C4'    CN7          0.16
+         9 H4'    HN7          0.09
+        10 O4'    ON6B        -0.50
+        11 C1'    CN7B         0.16
+        12 H1'    HN7          0.09
+        13 N9     NN2         -0.05
+        14 C5     CN5          0.28
+        15 N7     NN4         -0.71
+        16 C8     CN4          0.34
+        17 H8     HN3          0.12
+        18 N1     NN3A        -0.74
+        19 C2     CN4          0.50
+        20 H2     HN3          0.13
+        21 N3     NN3A        -0.75
+        22 C4     CN5          0.43
+        23 C6     CN2          0.46
+        24 N6     NN1         -0.77
+        25 H61    HN1          0.38
+        26 H62    HN1          0.38
+        27 C2'    CN7B         0.14
+        28 H2''   HN7          0.09
+        29 O2'    ON5         -0.66
+        30 H2'    HN5          0.43
+        31 C3'    CN7          0.11 ! scaled from 0.01
+        32 H3''   HN7          0.09
+        33 O3'    ON5         -0.60 ! scaled from -0.57 changed from ON2
+        34 H3'    HN5          0.40 ! added for terminal CL
+    [bonds]
+       P      O1P   
+       P      O2P   
+       P      O5'   
+       O5'    C5'   
+       C5'    C4'   
+       C4'    O4'   
+       C4'    C3'   
+       O4'    C1'   
+       C1'    N9    
+       C1'    C2'   
+       N9     C4    
+       N9     C8    
+       C4     N3    
+       C2     N1    
+       C6     N6    
+       N6     H61   
+       N6     H62   
+       C6     C5    
+       C5     N7    
+       C2'    C3'   
+       C2'    O2'   
+       O2'    H2'   
+       C3'    O3'     
+       C1'    H1'   
+       C2'    H2''  
+       C3'    H3'' 
+       O3'    H3'   	!added for terminal residue  
+       C4'    H4'   
+       C5'    H5'   
+       C5'    H5''  
+       C8     H8    
+       C2     H2    
+       N1     C6    
+       C2     N3    
+       C4     C5    
+       N7     C8    
+    [connections]
+        head P     
+!        tail O3'   
+    [impropers]
+         N6     C6     H61    H62   
+         C6     N1     C5     N6    
+    [charge_groups]
+        P     O1P   O2P   O5'   C5'   H5'   H5''  
+        C4'   H4'   O4'   C1'   H1'   
+        N9    C5    N7    C8    H8    N1    C2    H2    N3    C4    C6    N6    H61   H62   
+        C2'   H2''  O2'   H2'   
+        C3'   H3''   O3'   H3' 
+*------------------------------------------------------------------
+{GU0}            !neutral 5', neutral 3', net charge 0.00
+    [atoms]
+         1 P      P            1.08  ! scaled from 1.50
+         2 O1P    ON3         -0.36  ! scaled from -0.78
+         3 O2P    ON3         -0.36  ! scaled from -0.78
+         4 O5'    ON2         -0.36  ! scaled from -0.57
+         5 C5'    CN8B        -0.18  ! scaled from -0.08
+         6 H5'    HN8          0.09
+         7 H5''   HN8          0.09
+         8 C4'    CN7          0.16
+         9 H4'    HN7          0.09
+        10 O4'    ON6B        -0.50
+        11 C1'    CN7B         0.16
+        12 H1'    HN7          0.09
+        13 N9     NN2B        -0.02
+        14 C4     CN5          0.26
+        15 N2     NN1         -0.68
+        16 H21    HN1          0.32
+        17 H22    HN1          0.35
+        18 N3     NN3G        -0.74
+        19 C2     CN2          0.75
+        20 N1     NN2G        -0.34
+        21 H1     HN2          0.26
+        22 C6     CN1          0.54
+        23 O6     ON1         -0.51
+        24 C5     CN5G         0.00
+        25 N7     NN4         -0.60
+        26 C8     CN4          0.25
+        27 H8     HN3          0.16
+        28 C2'    CN7B         0.14
+        29 H2''   HN7          0.09
+        30 O2'    ON5         -0.66
+        31 H2'    HN5          0.43
+        32 C3'    CN7          0.27 ! scaled from 0.01
+        33 H3'    HN7          0.09 
+        34 O3'    ON2         -0.36 ! scaled from -0.57
+    [bonds]
+       P      O1P   
+       P      O2P   
+       P      O5'   
+       O5'    C5'   
+       C5'    C4'   
+       C4'    O4'   
+       C4'    C3'   
+       O4'    C1'   
+       C1'    N9    
+       C1'    C2'   
+       N9     C4    
+       N9     C8    
+       C4     N3    
+       C2     N2    
+       C2     N1    
+       N2     H21   
+       N2     H22   
+       N1     H1    
+       N1     C6    
+       C6     C5    
+       C5     N7    
+       C2'    C3'   
+       C3'    O3'     
+       C2'    O2'   
+       O2'    H2'   
+       C1'    H1'   
+       C2'    H2''  
+       C3'    H3'   
+       C4'    H4'   
+       C5'    H5'   
+       C5'    H5''  
+       C8     H8    
+       C2     N3    
+       C4     C5    
+       N7     C8    
+       C6     O6    
+    [connections]
+        head P     
+        tail O3'   
+    [impropers]
+         C2     N3     N1     N2    
+         C6     N1     C5     O6    
+         N2     H21    C2     H22   
+    [charge_groups]
+        P     O1P   O2P   O5'   C5'   H5'   H5''  
+        C4'   H4'   O4'   C1'   H1'   
+        N9    C4    N2    H21   H22   N3    C2    N1    H1    C6    O6    C5    N7    C8    H8    
+        C2'   H2''  O2'   H2'   
+        C3'   H3'   O3'   
+*------------------------------------------------------------------
+{GU5}            ! neutral 5', -0.47 3', net charge -0.47
+    [atoms]
+         1 P      P            1.08 ! scaled from 1.50
+         2 O1P    ON3         -0.36 ! scaled from -0.78
+         3 O2P    ON3         -0.36 ! scaled from -0.78
+         4 O5'    ON2         -0.36 ! scaled from -0.57
+         5 C5'    CN8B        -0.18 ! scaled from -0.08
+         6 H5'    HN8          0.09
+         7 H5''   HN8          0.09
+         8 C4'    CN7          0.16
+         9 H4'    HN7          0.09
+        10 O4'    ON6B        -0.50
+        11 C1'    CN7B         0.16
+        12 H1'    HN7          0.09
+        13 N9     NN2B        -0.02
+        14 C4     CN5          0.26
+        15 N2     NN1         -0.68
+        16 H21    HN1          0.32
+        17 H22    HN1          0.35
+        18 N3     NN3G        -0.74
+        19 C2     CN2          0.75
+        20 N1     NN2G        -0.34
+        21 H1     HN2          0.26
+        22 C6     CN1          0.54
+        23 O6     ON1         -0.51
+        24 C5     CN5G         0.00
+        25 N7     NN4         -0.60
+        26 C8     CN4          0.25
+        27 H8     HN3          0.16
+        28 C2'    CN7B         0.14
+        29 H2''   HN7          0.09
+        30 O2'    ON5         -0.66
+        31 H2'    HN5          0.43
+        32 C3'    CN7          0.01
+        33 H3'    HN7          0.09
+        34 O3'    ON2         -0.57
+        
+    [bonds]
+       P      O1P   
+       P      O2P   
+       P      O5'   
+       O5'    C5'   
+       C5'    C4'   
+       C4'    O4'   
+       C4'    C3'   
+       O4'    C1'   
+       C1'    N9    
+       C1'    C2'   
+       N9     C4    
+       N9     C8    
+       C4     N3    
+       C2     N2    
+       C2     N1    
+       N2     H21   
+       N2     H22   
+       N1     H1    
+       N1     C6    
+       C6     C5    
+       C5     N7    
+       C2'    C3'   
+       C3'    O3'     
+       C2'    O2'   
+       O2'    H2'   
+       C1'    H1'   
+       C2'    H2''  
+       C3'    H3'   
+       C4'    H4'   
+       C5'    H5'   
+       C5'    H5''  
+       C8     H8    
+       C2     N3    
+       C4     C5    
+       N7     C8    
+       C6     O6    
+    [connections]
+        head P     
+        tail O3'   
+    [impropers]
+         C2     N3     N1     N2    
+         C6     N1     C5     O6    
+         N2     H21    C2     H22   
+    [charge_groups]
+        P     O1P   O2P   O5'   C5'   H5'   H5''  
+        C4'   H4'   O4'   C1'   H1'   
+        N9    C4    N2    H21   H22   N3    C2    N1    H1    C6    O6    C5    N7    C8    H8    
+        C2'   H2''  O2'   H2'   
+        C3'   H3'   O3'   
+*------------------------------------------------------------------
+{GU3}            ! -0.53 5', neutral 3', net charge -0.53
+    [atoms]
+         1 P      P            1.50
+         2 O1P    ON3         -0.78
+         3 O2P    ON3         -0.78
+         4 O5'    ON2         -0.57
+         5 C5'    CN8B        -0.08
+         6 H5'    HN8          0.09
+         7 H5''   HN8          0.09
+         8 C4'    CN7          0.16
+         9 H4'    HN7          0.09
+        10 O4'    ON6B        -0.50
+        11 C1'    CN7B         0.16
+        12 H1'    HN7          0.09
+        13 N9     NN2B        -0.02
+        14 C4     CN5          0.26
+        15 N2     NN1         -0.68
+        16 H21    HN1          0.32
+        17 H22    HN1          0.35
+        18 N3     NN3G        -0.74
+        19 C2     CN2          0.75
+        20 N1     NN2G        -0.34
+        21 H1     HN2          0.26
+        22 C6     CN1          0.54
+        23 O6     ON1         -0.51
+        24 C5     CN5G         0.00
+        25 N7     NN4         -0.60
+        26 C8     CN4          0.25
+        27 H8     HN3          0.16
+        28 C2'    CN7B         0.14
+        29 H2''   HN7          0.09
+        30 O2'    ON5         -0.66
+        31 H2'    HN5          0.43
+        32 C3'    CN7          0.27 ! scaled from 0.01
+        33 H3'    HN7          0.09	
+        34 O3'    ON2         -0.36 ! scaled from -0.57
+    [bonds]
+       P      O1P   
+       P      O2P   
+       P      O5'   
+       O5'    C5'   
+       C5'    C4'   
+       C4'    O4'   
+       C4'    C3'   
+       O4'    C1'   
+       C1'    N9    
+       C1'    C2'   
+       N9     C4    
+       N9     C8    
+       C4     N3    
+       C2     N2    
+       C2     N1    
+       N2     H21   
+       N2     H22   
+       N1     H1    
+       N1     C6    
+       C6     C5    
+       C5     N7    
+       C2'    C3'   
+       C3'    O3'     
+       C2'    O2'   
+       O2'    H2'   
+       C1'    H1'   
+       C2'    H2''  
+       C3'    H3'   
+       C4'    H4'   
+       C5'    H5'   
+       C5'    H5''  
+       C8     H8    
+       C2     N3    
+       C4     C5    
+       N7     C8    
+       C6     O6    
+    [connections]
+        head P     
+        tail O3'   
+    [impropers]
+         C2     N3     N1     N2    
+         C6     N1     C5     O6    
+         N2     H21    C2     H22   
+    [charge_groups]
+        P     O1P   O2P   O5'   C5'   H5'   H5''  
+        C4'   H4'   O4'   C1'   H1'   
+        N9    C4    N2    H21   H22   N3    C2    N1    H1    C6    O6    C5    N7    C8    H8    
+        C2'   H2''  O2'   H2'   
+        C3'   H3'   O3'   
+*------------------------------------------------------------------
+{UR0}            !neutral 5', neutral 3', net charge 0.00                               
+    [atoms]
+         1 P      P            1.08 ! scaled from 1.50
+         2 O1P    ON3         -0.36 ! scaled from -0.78
+         3 O2P    ON3         -0.36 ! scaled from -0.78
+         4 O5'    ON2         -0.36 ! scaled from -0.57
+         5 C5'    CN8B        -0.18 ! scaled from -0.08
+         6 H5'    HN8          0.09
+         7 H5''   HN8          0.09
+         8 C4'    CN7          0.16
+         9 H4'    HN7          0.09
+        10 O4'    ON6B        -0.50
+        11 C1'    CN7B         0.16
+        12 H1'    HN7          0.09
+        13 N1     NN2B        -0.34
+        14 C6     CN3          0.20
+        15 H6     HN3          0.14
+        16 C2     CN1T         0.55
+        17 O2     ON1         -0.45
+        18 N3     NN2U        -0.46
+        19 H3     HN2          0.36
+        20 C4     CN1          0.53
+        21 O4     ON1         -0.48
+        22 C5     CN3         -0.15
+        23 H5     HN3          0.10
+        24 C2'    CN7B         0.14
+        25 H2''   HN7          0.09
+        26 O2'    ON5         -0.66
+        27 H2'    HN5          0.43
+        28 C3'    CN7          0.27 ! scaled from 0.01
+        29 H3'    HN7          0.09	 
+        30 O3'    ON2         -0.36 ! scaled from -0.57
+    [bonds]
+       P      O1P   
+       P      O2P   
+       P      O5'   
+       O5'    C5'   
+       C5'    C4'   
+       C4'    O4'   
+       C4'    C3'   
+       O4'    C1'   
+       C1'    N1    
+       C1'    C2'   
+       N1     C2    
+       N1     C6    
+       C2     N3    
+       N3     H3    
+       N3     C4    
+       C4     C5    
+       C2'    C3'   
+       C3'    O3'     
+       C2'    O2'   
+       O2'    H2'   
+       C1'    H1'   
+       C2'    H2''  
+       C3'    H3'   
+       C4'    H4'   
+       C5'    H5'   
+       C5'    H5''  
+       C5     H5    
+       C6     H6    
+       C2     O2    
+       C4     O4    
+       C5     C6    
+    [connections]
+        head P     
+        tail O3'   
+    [impropers]
+         C2     N1     N3     O2    
+         C4     N3     C5     O4    
+    [charge_groups]
+        P     O1P   O2P   O5'   C5'   H5'   H5''  
+        C4'   H4'   O4'   C1'   H1'   
+        N1    C6    H6    C2    O2    N3    H3    C4    O4    C5    H5    
+        C2'   H2''  O2'   H2'   
+        C3'   H3'   O3'  
+*------------------------------------------------------------------ 
+{UR5}            !neutral 5', -0.47 3', net charge -0.47                             
+    [atoms]
+         1 P      P            1.08 ! scaled from 1.50
+         2 O1P    ON3         -0.36 ! scaled from -0.78
+         3 O2P    ON3         -0.36 ! scaled from -0.78
+         4 O5'    ON2         -0.36 ! scaled from -0.57
+         5 C5'    CN8B        -0.18 ! scaled from -0.08
+         6 H5'    HN8          0.09
+         7 H5''   HN8          0.09
+         8 C4'    CN7          0.16
+         9 H4'    HN7          0.09
+        10 O4'    ON6B        -0.50
+        11 C1'    CN7B         0.16
+        12 H1'    HN7          0.09
+        13 N1     NN2B        -0.34
+        14 C6     CN3          0.20
+        15 H6     HN3          0.14
+        16 C2     CN1T         0.55
+        17 O2     ON1         -0.45
+        18 N3     NN2U        -0.46
+        19 H3     HN2          0.36
+        20 C4     CN1          0.53
+        21 O4     ON1         -0.48
+        22 C5     CN3         -0.15
+        23 H5     HN3          0.10
+        24 C2'    CN7B         0.14
+        25 H2''   HN7          0.09
+        26 O2'    ON5         -0.66
+        27 H2'    HN5          0.43
+        28 C3'    CN7          0.01
+        29 H3'    HN7          0.09
+        30 O3'    ON2         -0.57
+    [bonds]
+       P      O1P   
+       P      O2P   
+       P      O5'   
+       O5'    C5'   
+       C5'    C4'   
+       C4'    O4'   
+       C4'    C3'   
+       O4'    C1'   
+       C1'    N1    
+       C1'    C2'   
+       N1     C2    
+       N1     C6    
+       C2     N3    
+       N3     H3    
+       N3     C4    
+       C4     C5    
+       C2'    C3'   
+       C3'    O3'     
+       C2'    O2'   
+       O2'    H2'   
+       C1'    H1'   
+       C2'    H2''  
+       C3'    H3'   
+       C4'    H4'   
+       C5'    H5'   
+       C5'    H5''  
+       C5     H5    
+       C6     H6    
+       C2     O2    
+       C4     O4    
+       C5     C6    
+    [connections]
+        head P     
+        tail O3'   
+    [impropers]
+         C2     N1     N3     O2    
+         C4     N3     C5     O4    
+    [charge_groups]
+        P     O1P   O2P   O5'   C5'   H5'   H5''  
+        C4'   H4'   O4'   C1'   H1'   
+        N1    C6    H6    C2    O2    N3    H3    C4    O4    C5    H5    
+        C2'   H2''  O2'   H2'   
+        C3'   H3'   O3'   
+*------------------------------------------------------------------
+{UR3}            !-0.53 5', neutral 3', net charge -0.53                               
+    [atoms]
+         1 P      P            1.50
+         2 O1P    ON3         -0.78
+         3 O2P    ON3         -0.78
+         4 O5'    ON2         -0.57
+         5 C5'    CN8B        -0.08
+         6 H5'    HN8          0.09
+         7 H5''   HN8          0.09
+         8 C4'    CN7          0.16
+         9 H4'    HN7          0.09
+        10 O4'    ON6B        -0.50
+        11 C1'    CN7B         0.16
+        12 H1'    HN7          0.09
+        13 N1     NN2B        -0.34
+        14 C6     CN3          0.20
+        15 H6     HN3          0.14
+        16 C2     CN1T         0.55
+        17 O2     ON1         -0.45
+        18 N3     NN2U        -0.46
+        19 H3     HN2          0.36
+        20 C4     CN1          0.53
+        21 O4     ON1         -0.48
+        22 C5     CN3         -0.15
+        23 H5     HN3          0.10
+        24 C2'    CN7B         0.14
+        25 H2''   HN7          0.09
+        26 O2'    ON5         -0.66
+        27 H2'    HN5          0.43
+        28 C3'    CN7          0.27 ! scaled from 0.01
+        29 H3'    HN7          0.09	
+        30 O3'    ON2         -0.36 ! scaled from -0.57
+    [bonds]
+       P      O1P   
+       P      O2P   
+       P      O5'   
+       O5'    C5'   
+       C5'    C4'   
+       C4'    O4'   
+       C4'    C3'   
+       O4'    C1'   
+       C1'    N1    
+       C1'    C2'   
+       N1     C2    
+       N1     C6    
+       C2     N3    
+       N3     H3    
+       N3     C4    
+       C4     C5    
+       C2'    C3'   
+       C3'    O3'     
+       C2'    O2'   
+       O2'    H2'   
+       C1'    H1'   
+       C2'    H2''  
+       C3'    H3'   
+       C4'    H4'   
+       C5'    H5'   
+       C5'    H5''  
+       C5     H5    
+       C6     H6    
+       C2     O2    
+       C4     O4    
+       C5     C6    
+    [connections]
+        head P     
+        tail O3'   
+    [impropers]
+         C2     N1     N3     O2    
+         C4     N3     C5     O4    
+    [charge_groups]
+        P     O1P   O2P   O5'   C5'   H5'   H5''  
+        C4'   H4'   O4'   C1'   H1'   
+        N1    C6    H6    C2    O2    N3    H3    C4    O4    C5    H5    
+        C2'   H2''  O2'   H2'   
+        C3'   H3'   O3'   
+*------------------------------------------------------------------
+{CY0}            !neutral 5', neutral 3', net charge 0.00  
+    [atoms]
+         1 P      P            1.08 ! scaled from 1.50
+         2 O1P    ON3         -0.36 ! scaled from -0.78
+         3 O2P    ON3         -0.36 ! scaled from -0.78
+         4 O5'    ON2         -0.36 ! scaled from -0.57
+         5 C5'    CN8B        -0.18 ! scaled from -0.08
+         6 H5'    HN8          0.09
+         7 H5''   HN8          0.09
+         8 C4'    CN7          0.16
+         9 H4'    HN7          0.09
+        10 O4'    ON6B        -0.50
+        11 C1'    CN7B         0.16
+        12 H1'    HN7          0.09
+        13 N1     NN2         -0.13
+        14 C6     CN3          0.05
+        15 H6     HN3          0.17
+        16 C5     CN3         -0.13
+        17 H5     HN3          0.07
+        18 C2     CN1          0.52
+        19 O2     ON1C        -0.49
+        20 N3     NN3         -0.66
+        21 C4     CN2          0.65
+        22 N4     NN1         -0.75
+        23 H41    HN1          0.37
+        24 H42    HN1          0.33
+        25 C2'    CN7B         0.14
+        26 H2''   HN7          0.09
+        27 O2'    ON5         -0.66
+        28 H2'    HN5          0.43
+        29 C3'    CN7          0.27 ! scaled from 0.01
+        30 H3'    HN7          0.09	 
+        31 O3'    ON2         -0.36 ! scaled from -0.57
+    [bonds]
+       P      O1P   
+       P      O2P   
+       P      O5'   
+       O5'    C5'   
+       C5'    C4'   
+       C4'    O4'   
+       C4'    C3'   
+       O4'    C1'   
+       C1'    N1    
+       C1'    C2'   
+       N1     C2    
+       N1     C6    
+       C2     N3    
+       C4     N4    
+       N4     H41   
+       N4     H42   
+       C4     C5    
+       C2'    C3'   
+       C3'    O3'     
+       C2'    O2'   
+       O2'    H2'   
+       C1'    H1'   
+       C2'    H2''  
+       C3'    H3'   
+       C4'    H4'   
+       C5'    H5'   
+       C5'    H5''  
+       C5     H5    
+       C6     H6    
+       C2     O2    
+       C5     C6    
+       N3     C4    
+    [connections]
+        head P     
+        tail O3'   
+    [impropers]
+         C2     N1     N3     O2    
+         C4     N3     C5     N4    
+         N4     C4     H41    H42   
+    [charge_groups]
+        P     O1P   O2P   O5'   C5'   H5'   H5''  
+        C4'   H4'   O4'   C1'   H1'   
+        N1    C6    H6    C5    H5    C2    O2    N3    C4    N4    H41   H42   
+        C2'   H2''  O2'   H2'   
+        C3'   H3'   O3'   
+*------------------------------------------------------------------
+{CY5}            !neutral 5', -0.47 3', net charge -0.47  
+    [atoms]
+         1 P      P            1.08 ! scaled from 1.50
+         2 O1P    ON3         -0.36 ! scaled from -0.78
+         3 O2P    ON3         -0.36 ! scaled from -0.78
+         4 O5'    ON2         -0.36 ! scaled from -0.57
+         5 C5'    CN8B        -0.18 ! scaled from -0.08
+         6 H5'    HN8          0.09
+         7 H5''   HN8          0.09
+         8 C4'    CN7          0.16
+         9 H4'    HN7          0.09
+        10 O4'    ON6B        -0.50
+        11 C1'    CN7B         0.16
+        12 H1'    HN7          0.09
+        13 N1     NN2         -0.13
+        14 C6     CN3          0.05
+        15 H6     HN3          0.17
+        16 C5     CN3         -0.13
+        17 H5     HN3          0.07
+        18 C2     CN1          0.52
+        19 O2     ON1C        -0.49
+        20 N3     NN3         -0.66
+        21 C4     CN2          0.65
+        22 N4     NN1         -0.75
+        23 H41    HN1          0.37
+        24 H42    HN1          0.33
+        25 C2'    CN7B         0.14
+        26 H2''   HN7          0.09
+        27 O2'    ON5         -0.66
+        28 H2'    HN5          0.43
+        29 C3'    CN7          0.01
+        30 H3'    HN7          0.09
+        31 O3'    ON2         -0.57
+    [bonds]
+       P      O1P   
+       P      O2P   
+       P      O5'   
+       O5'    C5'   
+       C5'    C4'   
+       C4'    O4'   
+       C4'    C3'   
+       O4'    C1'   
+       C1'    N1    
+       C1'    C2'   
+       N1     C2    
+       N1     C6    
+       C2     N3    
+       C4     N4    
+       N4     H41   
+       N4     H42   
+       C4     C5    
+       C2'    C3'   
+       C3'    O3'     
+       C2'    O2'   
+       O2'    H2'   
+       C1'    H1'   
+       C2'    H2''  
+       C3'    H3'   
+       C4'    H4'   
+       C5'    H5'   
+       C5'    H5''  
+       C5     H5    
+       C6     H6    
+       C2     O2    
+       C5     C6    
+       N3     C4    
+    [connections]
+        head P     
+        tail O3'   
+    [impropers]
+         C2     N1     N3     O2    
+         C4     N3     C5     N4    
+         N4     C4     H41    H42   
+    [charge_groups]
+        P     O1P   O2P   O5'   C5'   H5'   H5''  
+        C4'   H4'   O4'   C1'   H1'   
+        N1    C6    H6    C5    H5    C2    O2    N3    C4    N4    H41   H42   
+        C2'   H2''  O2'   H2'   
+        C3'   H3'   O3'   
+*------------------------------------------------------------------
+{CY3}            !-0.53 5', neutral 3', net charge -0.53  
+    [atoms]
+         1 P      P            1.50
+         2 O1P    ON3         -0.78
+         3 O2P    ON3         -0.78
+         4 O5'    ON2         -0.57
+         5 C5'    CN8B        -0.08
+         6 H5'    HN8          0.09
+         7 H5''   HN8          0.09
+         8 C4'    CN7          0.16
+         9 H4'    HN7          0.09
+        10 O4'    ON6B        -0.50
+        11 C1'    CN7B         0.16
+        12 H1'    HN7          0.09
+        13 N1     NN2         -0.13
+        14 C6     CN3          0.05
+        15 H6     HN3          0.17
+        16 C5     CN3         -0.13
+        17 H5     HN3          0.07
+        18 C2     CN1          0.52
+        19 O2     ON1C        -0.49
+        20 N3     NN3         -0.66
+        21 C4     CN2          0.65
+        22 N4     NN1         -0.75
+        23 H41    HN1          0.37
+        24 H42    HN1          0.33
+        25 C2'    CN7B         0.14
+        26 H2''   HN7          0.09
+        27 O2'    ON5         -0.66
+        28 H2'    HN5          0.43
+        29 C3'    CN7          0.27 ! scaled from 0.01
+        30 H3'    HN7          0.09	
+        31 O3'    ON2         -0.36 ! scaled from -0.57
+    [bonds]
+       P      O1P   
+       P      O2P   
+       P      O5'   
+       O5'    C5'   
+       C5'    C4'   
+       C4'    O4'   
+       C4'    C3'   
+       O4'    C1'   
+       C1'    N1    
+       C1'    C2'   
+       N1     C2    
+       N1     C6    
+       C2     N3    
+       C4     N4    
+       N4     H41   
+       N4     H42   
+       C4     C5    
+       C2'    C3'   
+       C3'    O3'     
+       C2'    O2'   
+       O2'    H2'   
+       C1'    H1'   
+       C2'    H2''  
+       C3'    H3'   
+       C4'    H4'   
+       C5'    H5'   
+       C5'    H5''  
+       C5     H5    
+       C6     H6    
+       C2     O2    
+       C5     C6    
+       N3     C4    
+    [connections]
+        head P     
+        tail O3'   
+    [impropers]
+         C2     N1     N3     O2    
+         C4     N3     C5     N4    
+         N4     C4     H41    H42   
+    [charge_groups]
+        P     O1P   O2P   O5'   C5'   H5'   H5''  
+        C4'   H4'   O4'   C1'   H1'   
+        N1    C6    H6    C5    H5    C2    O2    N3    C4    N4    H41   H42   
+        C2'   H2''  O2'   H2'   
+        C3'   H3'   O3'   
+*------------------------------------------------------------------
