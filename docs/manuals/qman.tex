@@ -242,8 +242,9 @@ The following components, available from the \textbf{Q} web site
 \item Or source code (to compile on your own system).
 \item Force field parameter and library files.
 \end{enumerate}
-Make a directory such as $\sim$/Q, /usr/local/Q or C:$\backslash$Q
-and download the files to this directory.
+Create a folder (mkdir) such as $\sim$/software/q,  or C:$\backslash$q
+and download the files to this directory, or clone them from the
+github repository.
 
 \subsubsection{Installing executable images}
 \textbf{Windows 7}
@@ -3138,128 +3139,151 @@ velocities of particles at the same time.
 This is scheme is prone to less error, as it computes positions and velocities 
 at the same time interval. However, the computational cost becomes slightly higher.
 
-\subsubsection{Constant temperature algorithms}
-Q comes with the option of choosing the thermostat which the user
-judges appropriate. The three thermostats present are
-Berendsen\cite{Berendsen:1984}, Nos\'e-Hoover chains\cite{Tuckerman:1992}
- and Langevin\cite{Schneider:1978}. One can change the thermostat
-by inserting the keyword thermostat in the section [\textbf{MD}]
-in the input file, followed by "berendsen", "nose-hoover" or "langevin".
-Every thermostat has its own setup parameters, which will be described
-briefly below.
+\subsubsection{Constant temperature algorithms (Thermostats)}
+In   Q    the   thermostat   in    use   at   the   moment    is   the
+Berendsen\cite{Berendsen:1984}   thermostat,  implementation   of  the
+Langevin thermostat and perhaps other thermostats is underway.
+
+%In  Q  thermostat  (temperature-control) algorithms  can  be  selected
+%according to  the users  criteria and best  judgment. There  are three
+%thermostats     implemented     in     the    code,     these     are,
+%Berendsen\cite{Berendsen:1984},                          Nos\'e-Hoover
+%chains\cite{Tuckerman:1992} and Langevin\cite{Schneider:1978}. One can
+%choose a  thermostat by using  the \textit{thermostat} keyword  in the
+%[\textbf{MD}] section of the input file, followed by "berendsen",
+%"nose-hoover"  or  "langevin".  Every  thermostat  has  its own  setup
+%parameters, which are briefly described below.
 
 \paragraph{Berendsen thermostat:}
+Thermostats are  used to  rescale velocities in  order to  control the
+kinetic energy of a system.  In the Berendsen algorithm every particle
+is coupled to a heat bath  which in turn, increases or decreases their
+velocities.  We set the thermostat temperature $T_{REF}$, as well as a
+$\tau_{T}$ parameter to  set the strength of the coupling,  that is, a
+relaxation time towards the target temperature.  This parameter can be
+modified by the  user to change its default value  of 10 seconds using
+the \textbf{\textit{bath\_coupling}} keyword.
 
-The idea of this thermostat is to rescale the velocities in order
-to control the kinetic energies in the system. In this algorithm,
-every particle is coupled to a heat bath, which will, in turn,
-increase or decrease the velocities of them. We set the thermostat
-temperature $T_{0}$, as well as the bath coupling time $\tau$,
-which will give the interval of time where the rescaling of the
-temperature (and consequently velocities) will take place. After every
-bath coupling time interval, the temperature is measured and rescaled
-according to:
 
-\begin {equation}
- \frac{dT}{dt} = \frac{T_{0}-T}{\tau}
-\end{equation}
-
-The velocities are then rescaled in order to reproduce the new
-temperature.
-
-\paragraph{Nos\'e-Hoover chain thermostat:}
-
-The Nos\'e-Hoover thermostat also employs the idea of a rescaling
-factor. It inserts an extra particle that will interact
-with the whole system in a specific way in a different set of
-generalized coordinates from the original system. The idea is
-to solve this system with this extra particle as if we are
-performing a standard MD simulation, and the averages performed
-for the particles in your system will correspond to the ones from
-the canonical ensemble. The Hamiltonian of a N-particle system looks
-like this:
-
-\begin {equation}
- \mathcal{H}_{Nos\acute{e}}(\textbf{p},\textbf{r},p_{s},s) = \sum\limits_{i=1}^N
-\frac{\textbf{p}_{i}^2}{2m_{i}s^2} + V(\textbf{r}^N) + \frac{p_{s}^2}{2Q}
-+ gk_{B}T\ln(s),
-\end{equation}
-
-where $s$ and $p_{s}$ refer to the new generalized coordinate and momentum
-for the thermostat particle, $Q$ is the mass of this particle, and $g$ is
-the total number of degrees of freedom of the system. The equations of
-motion will be:
-
-\begin{align}
- \frac{d\textbf{r}_{i}}{dt} &= \frac{\textbf{p}_{i}}{m_{i}s^2} \\
- \frac{d\textbf{p}_{i}}{dt} &= \textbf{F}_{i} \\
- \frac{ds}{dt} &= \frac{p_{s}}{Q} \\
- s\frac{dp_{s}}{dt} &= \left(\sum_{i=1}^N \frac{\textbf{p}_{i}^2}{m_{i}s^2}
-  -gk_{B}T \right)
-\end{align}
-
-Now, if we call $\textbf{p'} = \textbf{p}/s$, and define a new Hamiltonian as
-
-\begin {equation}
- \mathcal{H}(\textbf{p'},\textbf{r}) = \sum\limits_{i=1}^N
-\frac{\textbf{p'}_{i}^2}{2m_{i}} + V(\textbf{r}^N),
-\end{equation}
-
-it is possible to show that the average of any observable is (see \cite{Frenkelbook} for more details):
+%% Check  Merrink2010 main  and supplementary  and also  the code  and
+%% rewrite. As far as Mauricio  Esguerra understands it, the Berendsen
+%% thermostat in Q  has been implemented in the same  way as it's done
+%% in GROMACS, that is, we couple to TempKE and report TempKE.
 
 \begin{equation}
- \langle A(\textbf{p}/s,\textbf{r}) \rangle_{NVE} = \langle A(\textbf{p'},\textbf{r}) \rangle_{NVT}
-\end{equation}
+\lambda = \left[ 1 + \frac{\Delta t}{\tau_{T}} \left\{ \frac{T_{REF}}{T(t-\Delta t/2)} -1 \right\} \right]^{\frac{1}{2}}
+\end{equation}  
 
-Thus, by running standard MD simulations with this new particle interacting
-with the whole system will sample the same conformations of the system without
-this particle at the canonical ensemble. Nevertheless, it has been shown that a
-single particle Nos\'e-Hoover particle was not able to sample properly
-the canonical ensemble in some cases. The solution to the problem was
-to create additional particles that would interact with each other in a
-chain-like way \cite{Tuckerman:1992}. If we apply the Nos\'e-Hoover
-thermostat in a chain way $C$ times, the new equations of motion become:
+%which give the interval of  time where
+%the rescaling  of the  temperature (and consequently  velocities) will
+%take place.
 
-\begin{align}
- \frac{d\textbf{r}_{i}}{dt} &= \frac{\textbf{p}_{i}}{m_{i}} \\
- \frac{d\textbf{p}_{i}}{dt} &= \textbf{F}_{i} -  \frac{p_{{s}_{1}}}{Q_{1}}
- \textbf{p}_{i} \\
- \frac{ds_{j}}{dt} &= \frac{p_{{s}_{j}}}{Q_{j}} \\
- s_{1}\frac{dp_{{s}_{1}}}{dt} &= \left(\sum_{i=1}^N \frac{\textbf{p}_{i}^2}{m_{i}}
-  -gk_{B}T \right) - \frac{p_{{s}_{2}}}{Q_{2}}p_{{s}_{1}} \\
- s_{j}\frac{dp_{{s}_{j}}}{dt} &= \left(\frac{\textbf{p}_{s_{j-1}}^2}{m_{j-1}}
-  -k_{B}T \right) - \frac{p_{{s}_{j+1}}}{Q_{j+1}}p_{{s}_{j}} \\
- s_{C}\frac{dp_{{s}_{C}}}{dt} &= \left(\frac{\textbf{p}_{s_{C-1}}^2}{m_{C-1}}
-  -k_{B}T \right)
-\end{align}
 
-In Q, one can control the mass of the thermostat particles. The larger the mass,
-the larger the coupling with the thermostat, and less temperature oscilation will
-occur. The standard value is set to XXX.
+%After every bath  coupling time interval, the temperature
+%is measured and rescaled according to:
 
-\paragraph{Langevin thermostat:}
+%\begin {equation}
+% \frac{dT}{dt} = \frac{T_{0}-T}{\tau}
+%\end{equation}
 
-While both thermostats above have a deterministic behavior, the Langevin
- thermostat has a stochastic character. The interaction between the heat
-bath and the system is characterized by two forces: a drag force, which will
-act against the movement of the particles, in order to remove excess of
-kinectic energy; a random force, which will give random impulses to every
-particle. The equation of motion becomes
+%The velocities are then rescaled in order to reproduce the new
+%temperature.
 
-\begin{equation}
- \frac{d\textbf{p}_{i}}{dt} = \textbf{F}_{i} - \gamma\textbf{p}_{i} + \sqrt{\frac{2\gamma k_{B}T}{m_{i}}}\Gamma,
-\end{equation}
 
-where $\gamma$ is the friction coefficient and $\Gamma$ is a white noise
-random force with zero mean. The idea of using a Langevin equation as a
-mean of maintaining constant temperature comes from the fact that such
-equation is related to the Fokker-Planck equation. Due to the noise, the
-momentum becomes a stochastic variable, and, in this very case, the
-probabilities of finding a particle with a given value of momentum is
-described by the Fokker-Planck equation. The solution for this
-Fokker-Planck equation formed from variables generated by the equation
-(27) is exactly the Maxwell-Boltzmann distribution. Thus, the Langevin
-equation enables the canonical ensemble sampling.
+
+%\paragraph{Nos\'e-Hoover chain thermostat:}
+
+%The Nos\'e-Hoover thermostat also employs the idea of a rescaling
+%factor. It inserts an extra particle that will interact
+%with the whole system in a specific way in a different set of
+%generalized coordinates from the original system. The idea is
+%to solve this system with this extra particle as if we are
+%performing a standard MD simulation, and the averages performed
+%for the particles in your system will correspond to the ones from
+%the canonical ensemble. The Hamiltonian of a N-particle system looks
+%like this:
+
+%\begin {equation}
+% \mathcal{H}_{Nos\acute{e}}(\textbf{p},\textbf{r},p_{s},s) = \sum\limits_{i=1}^N
+%\frac{\textbf{p}_{i}^2}{2m_{i}s^2} + V(\textbf{r}^N) + \frac{p_{s}^2}{2Q}
+%+ gk_{B}T\ln(s),
+%\end{equation}
+
+%where $s$ and $p_{s}$ refer to the new generalized coordinate and momentum
+%for the thermostat particle, $Q$ is the mass of this particle, and $g$ is
+%the total number of degrees of freedom of the system. The equations of
+%motion will be:
+
+%\begin{align}
+% \frac{d\textbf{r}_{i}}{dt} &= \frac{\textbf{p}_{i}}{m_{i}s^2} \\
+% \frac{d\textbf{p}_{i}}{dt} &= \textbf{F}_{i} \\
+% \frac{ds}{dt} &= \frac{p_{s}}{Q} \\
+% s\frac{dp_{s}}{dt} &= \left(\sum_{i=1}^N \frac{\textbf{p}_{i}^2}{m_{i}s^2}
+%  -gk_{B}T \right)
+%\end{align}
+
+%Now, if we call $\textbf{p'} = \textbf{p}/s$, and define a new Hamiltonian as
+
+%\begin {equation}
+% \mathcal{H}(\textbf{p'},\textbf{r}) = \sum\limits_{i=1}^N
+%\frac{\textbf{p'}_{i}^2}{2m_{i}} + V(\textbf{r}^N),
+%\end{equation}
+
+%it is possible to show that the average of any observable is (see \cite{Frenkelbook} for more details):
+
+%\begin{equation}
+% \langle A(\textbf{p}/s,\textbf{r}) \rangle_{NVE} = \langle A(\textbf{p'},\textbf{r}) \rangle_{NVT}
+%\end{equation}
+
+%Thus, by running standard MD simulations with this new particle interacting
+%with the whole system will sample the same conformations of the system without
+%this particle at the canonical ensemble. Nevertheless, it has been shown that a
+%single particle Nos\'e-Hoover particle was not able to sample properly
+%the canonical ensemble in some cases. The solution to the problem was
+%to create additional particles that would interact with each other in a
+%chain-like way \cite{Tuckerman:1992}. If we apply the Nos\'e-Hoover
+%thermostat in a chain way $C$ times, the new equations of motion become:
+
+%\begin{align}
+% \frac{d\textbf{r}_{i}}{dt} &= \frac{\textbf{p}_{i}}{m_{i}} \\
+% \frac{d\textbf{p}_{i}}{dt} &= \textbf{F}_{i} -  \frac{p_{{s}_{1}}}{Q_{1}}
+% \textbf{p}_{i} \\
+% \frac{ds_{j}}{dt} &= \frac{p_{{s}_{j}}}{Q_{j}} \\
+% s_{1}\frac{dp_{{s}_{1}}}{dt} &= \left(\sum_{i=1}^N \frac{\textbf{p}_{i}^2}{m_{i}}
+%  -gk_{B}T \right) - \frac{p_{{s}_{2}}}{Q_{2}}p_{{s}_{1}} \\
+% s_{j}\frac{dp_{{s}_{j}}}{dt} &= \left(\frac{\textbf{p}_{s_{j-1}}^2}{m_{j-1}}
+%  -k_{B}T \right) - \frac{p_{{s}_{j+1}}}{Q_{j+1}}p_{{s}_{j}} \\
+% s_{C}\frac{dp_{{s}_{C}}}{dt} &= \left(\frac{\textbf{p}_{s_{C-1}}^2}{m_{C-1}}
+%  -k_{B}T \right)
+%\end{align}
+
+%In Q, one can control the mass of the thermostat particles. The larger the mass,
+%the larger the coupling with the thermostat, and less temperature oscilation will
+%occur. The standard value is set to XXX.
+
+%\paragraph{Langevin thermostat:}
+
+%While both thermostats above have a deterministic behavior, the Langevin
+% thermostat has a stochastic character. The interaction between the heat
+%bath and the system is characterized by two forces: a drag force, which will
+%act against the movement of the particles, in order to remove excess of
+%kinectic energy; a random force, which will give random impulses to every
+%particle. The equation of motion becomes
+
+%\begin{equation}
+% \frac{d\textbf{p}_{i}}{dt} = \textbf{F}_{i} - \gamma\textbf{p}_{i} + \sqrt{\frac{2\gamma %k_{B}T}{m_{i}}}\Gamma,
+%\end{equation}
+
+%where $\gamma$ is the friction coefficient and $\Gamma$ is a white noise
+%random force with zero mean. The idea of using a Langevin equation as a
+%mean of maintaining constant temperature comes from the fact that such
+%equation is related to the Fokker-Planck equation. Due to the noise, the
+%momentum becomes a stochastic variable, and, in this very case, the
+%probabilities of finding a particle with a given value of momentum is
+%described by the Fokker-Planck equation. The solution for this
+%Fokker-Planck equation formed from variables generated by the equation
+%(27) is exactly the Maxwell-Boltzmann distribution. Thus, the Langevin
+%equation enables the canonical ensemble sampling.
 
 \subsection{File and format descriptions}
 \subsubsection{\textbf{qdyn} input file format}\label{subsubsec:qdyn_inp_file_form}
@@ -4465,40 +4489,54 @@ See section \ref{subsection:scoring} on page \pageref{subsection:scoring} for mo
 \newpage
 
 \begin{thebibliography}{2}
-\bibitem{Marelius:1998}Marelius J., Graffner-Nordberg M., Hansson T.,
-  Hallberg A., Aqvist J., Computation    of    affinity     and
-  selectivity:    binding    of 2,4-diaminopteridine   and
-  2,4-diaminoquinazoline   inhibitors   to dihydrofolate reductases,
-  J. Comput. Aided Mol. Des. 12, J. Comput. Aided Mol. Des. 12,
-  119-131, 1998
+% NOTE: The bibliography follows a style similar to the one
+% in the Journal of the American Chemical Society, with the
+% difference that we use the whole title of the article.  
+% The reference then goes as authors first, then title, 
+% then journal name in italics then year in boldface, then
+% volume in italics and finally the page numbers range.
+
   
-\bibitem{Marelius:1999}Marelius, J., Kolmodin, K., Feierberg, I. and 흎vist, J. Q: An MD
-program for free energy calculations and empirical valence bond
-simulations in biomolecular systems, J. Mol. Graphics Mod. 1999,
-16, 213-225.
+\bibitem{Marelius:1998}
+Marelius J., Graffner-Nordberg M., Hansson T., Hallberg A., \AA qvist J.,
+Computation of affinity and selectivity: binding of 2,4-diaminopteridine and
+2,4-diaminoquinazoline inhibitors to dihydrofolate reductases,
+\textit{J. Comput. Aided Mol. Des.} \textbf{1998}, \textit{12}, 119-131.
+  
+\bibitem{Marelius:1999}Marelius, J.,  Kolmodin, K., Feierberg,  I. and
+\AA qvist,  J.,
+Q: An  MD  program  for  free energy  calculations  and
+empirical   valence  bond   simulations  in   biomolecular  systems,
+\textit{J. Mol. Graphics Mod.} \textbf{1999}, \textit{16}, 213-225.
 
-\bibitem{Kollman:1993}Kollman, P.A., Free Energy Calculations:
-Applications to Chemical and Biochemical Phenomena. Chem. Rev.
-1993, 2395-2417.
+\bibitem{Kollman:1993}Kollman, P.A.,
+Free Energy Calculations: Applications to Chemical and Biochemical
+Phenomena.
+\textit{Chem. Rev.} \textbf{1993}, 2395-2417.
 
-\bibitem{Beveridge:1989}Beveridge, D.L. and DiCapua, F.M., Free energy via molecular simulation:
-applications to chemical and biomolecular systems. Annu. Rev.
-Biophys. Biophys. Chem. 1989, 431-492.
+\bibitem{Beveridge:1989}Beveridge, D.L. and DiCapua, F.M.,
+Free energy via molecular simulation: applications to chemical and
+biomolecular systems.
+\textit{Annu. Rev. Biophys. Biophys. Chem.} \textbf{1989}, 431-492.
 
-\bibitem{Warshel:1988}Warshel, A., Computer modeling of Chemical reactions in Enzymes
-and Solutions. Wiley, New York, 1988.
+\bibitem{Warshel:1988}Warshel, A.,
+Computer modeling of Chemical reactions in Enzymes and Solutions.
+\textit{Wiley, New York}, \textbf{1988}.
 
-\bibitem{Aaqvist:1993}흎vist, J. and Warshel, A., Simulation of Enzyme Reactions Using Valence Bond Force Fields
-and Other Hybrid Quantum/Classical Approaches. Chem. Rev.
-1993,93,2523-2544.
+\bibitem{Aaqvist:1993}\AA qvist, J. and Warshel, A.,
+Simulation of Enzyme Reactions Using Valence Bond Force Fields
+and Other Hybrid Quantum/Classical Approaches.
+\textit{Chem. Rev.} \textbf{1993}, \textit{93}, 2523-2544.
 
-\bibitem{Aaqvist:1994}흎vist, J., Medina, C. and Samuelsson, J.E., A new method for predicting binding
-affinity in computer-aided drug design., Protein Engng. 1994, 7,
-385-391.
+\bibitem{Aaqvist:1994}\AA qvist, J., Medina, C. and Samuelsson, J.E.,
+A new method for predicting binding affinity in computer-aided drug
+design.,
+\textit{Protein Engng.} \textbf{1994}, \textit{7}, 385-391.
 
-\bibitem{Jones-Hertzog:1997}Jones-Hertzog, D.K. and Jorgensen, W.L., Binding Affinities for Sulfonamide
-Inhibitors with Human Thrombin Using Monte Carlo Simulations with
-a Linear Response Method. J. Med. Chem. 1997, 40, 1539-1550.
+\bibitem{Jones-Hertzog:1997}Jones-Hertzog, D.K. and Jorgensen, W.L.,
+Binding Affinities for Sulfonamide Inhibitors with Human Thrombin
+Using Monte Carlo Simulations with a Linear Response Method.
+\textit{J. Med. Chem.} \textbf{1997}, \textit{40}, 1539-1550.
 
 \bibitem{Hansson:1998}Hansson, T., Marelius, J. and 흎vist, J., Ligand Binding Affinity
 Prediction by Linear Interaction Energy Methods, J. Comput.-Aided

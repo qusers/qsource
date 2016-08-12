@@ -19,20 +19,21 @@ module indexer
   implicit none
 
   !constants
-  character(*), private, parameter        ::      MODULE_VERSION = '5.7'
-  character(*), private, parameter        ::      MODULE_DATE = '2015-02-22'
+  character(*), private, parameter :: MODULE_VERSION = '5.7'
+  character(*), private, parameter :: MODULE_DATE = '2015-02-22'
 
-  integer, private ::                             count = 0, top = 0
-  integer, parameter ::   KEYLENGTH = 8
-  integer, parameter, private     ::      RESIZE_INCREMENT = 10
+  integer, private                 :: count = 0, top = 0
+  integer, parameter               :: KEYLENGTH = 8
+  integer, parameter, private      :: RESIZE_INCREMENT = 10
+
   type indexentry
-     character(len=KEYLENGTH)::      key
-     integer                                 ::      ndx
+     character(len=KEYLENGTH)      :: key
+     integer                       :: ndx
   end type indexentry
 
   type(indexentry), pointer, private :: ndx(:)
 
-  integer, private                                ::      memstat
+  integer, private                 :: memstat
 
   !declare private procedures
   private grow
@@ -40,7 +41,7 @@ module indexer
 contains
   subroutine index_create(size)
     !arguments
-    integer, optional                       ::      size
+    integer, optional              :: size
     !locals
 
     call index_clear
@@ -71,10 +72,10 @@ contains
 
   subroutine index_resize(size)
     !arguments
-    integer                                         ::      size
+    integer                        :: size
     !locals
-    integer                                         ::      mintop
-    type(indexentry), pointer :: new_ndx(:)
+    integer                        :: mintop
+    type(indexentry), pointer      :: new_ndx(:)
 
     if(size <= 0) then
        call index_clear

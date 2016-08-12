@@ -9,11 +9,11 @@
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
-!  (C) 2004 Uppsala Molekylmekaniska HB, Uppsala, Sweden
-!  avetr.f90
-!  average coordinates from Qdyn trajectory files and write pdb-structure
-!  Added to Qprep March 2004 by Martin Nervall
-!  Tested to reproduce average structures from vmd
+!>  (c) 2004 Uppsala Molekylmekaniska HB, Uppsala, Sweden
+!>  module: avetr.f90
+!>  average coordinates from Qdyn trajectory files and write pdb-structure
+!>  Added to Qprep March 2004 by Martin Nervall
+!>  Tested to reproduce average structures from vmd
 !------------------------------------------------------------------------------!
 module avetr
   use prep

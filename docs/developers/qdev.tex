@@ -139,10 +139,12 @@ Its  initial   development  was   in  \textbf{FORTRAN}  90,   but  the
 incorporation    of   object    oriented    paradigms   into    modern
 \textbf{FORTRAN} have  seen the code  evolve to take advantage  of the
 evolution  of the  language.   Currently  the program  incorporporates
-elements of  the \textbf{FORTRAN} 2008  standard and it's developing
-the  use  of  the  OpenMP 4.0  standard\footnote{which  is  now  fully
-implemented   into    gnu   Fortran    version   5.1}    for   in-node
-parallelization.\\
+elements of  the \textbf{FORTRAN}  2008 standard.  For parallelization
+\textbf{Q}  uses  the  MPI2  standard  and  follows  a  point-to-point
+communication  approach. This  is advantageous  in that  it can  avoid
+overhead which often happens  in one-sided communication, specially if
+one does not  develop according to the system specifics,  like type of
+processors, OS, number of processors, etc.
 
 
 \subsection{Makefile}
@@ -192,7 +194,7 @@ passes an input file to qprep.
 \fvset{frame=single, fontfamily=courier, fontsize=\small}
 %\fvset{frame=single, fontfamily=courier}
 \begin{Verbatim}
-qprep generate.inp >& generate.out &
+qprep < generate.inp >& generate.log &
 \end{Verbatim}
 
 \subsection{qprep.f90}
@@ -202,7 +204,7 @@ the main  code which resides  mainly in the  \textbf{prep.f90} module.
 It's composed of six subroutines.\\
 
 \textbf{Modules: }\\
-\textit{version}\\
+\textit{iso\_fortran\_env}\\
 \textit{prep}\\
 \textit{avetr}\\
 
@@ -212,6 +214,12 @@ It's composed of six subroutines.\\
 
 \subsubsection{version} 
 \subsubsection{prep}
+\textbf{Modules: }\\
+\textit{}
+
+%%qprep.o prefs.o prep.o avetr.o nrgy.o
+
+
 \begin{Verbatim}
 subroutine prep_startup
 subroutine allocate_for_pdb(atoms, residues, molecules)

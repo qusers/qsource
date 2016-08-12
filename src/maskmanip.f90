@@ -14,10 +14,10 @@
 !  by John Marelius
 !  atom mask manipulation functions
 !------------------------------------------------------------------------------!
-module MASKMANIP
-        use ATOM_MASK
-        use MISC
-        use PARSE
+module maskmanip
+        use atom_mask
+        use misc
+        use parse
         implicit none
 
 contains
@@ -132,4 +132,4 @@ end subroutine maskmanip_help_pretop
 
 !*******************************************************
 
-end module MASKMANIP
+end module maskmanip

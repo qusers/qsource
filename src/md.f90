@@ -3807,10 +3807,8 @@ end do
 
   !-----------------------------------------------------------------------
 
-
-
   subroutine temperature(Temp,Tscale_solute,Tscale_solvent,Ekinmax)
-    ! calculate the temperature
+    ! Compute the temperature
     !arguments
     real(8)                        :: Temp,Tscale_solute,Tscale_solvent,Ekinmax
 
@@ -3881,7 +3879,7 @@ end do
        if ( Ndegf_solute .ne. Ndegfree_solute) Texcl_solute = 2.0*Texcl_solute/Boltz/real(Ndegf_solute - Ndegfree_solute)
 
        Temp_solvent  = 2.0*Temp_solvent /Boltz/real(Ndegf_solvent)
-       Tfree_solvent = 2.0*Tfree_solvent/Boltz/real(Ndegfree_solvent)
+       Tfree_solvent = 2.0*Tfree_solvent/Boltz/real(Ndegfree_solvent) ! Eq. S2 Marrink2010
        if ( Ndegf_solvent .ne. Ndegfree_solvent) Texcl_solvent = 2.0*Texcl_solvent/Boltz/real(Ndegf_solvent - Ndegfree_solvent)
     end if
 
