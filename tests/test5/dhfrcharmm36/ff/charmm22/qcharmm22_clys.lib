@@ -1,0 +1,65 @@
+{CLY}                 !C terminal Lysine
+      [info]
+        SYBYLtype  RESIDUE
+    [atoms]
+         1 N      NH1         -0.470
+         2 HN     H            0.310
+         3 CA     CT1          0.070
+         4 HA     HB           0.090
+         5 CB     CT2         -0.180
+         6 HB1    HA           0.090
+         7 HB2    HA           0.090
+         8 CG     CT2         -0.180
+         9 HG1    HA           0.090
+        10 HG2    HA           0.090
+        11 CD     CT2         -0.180
+        12 HD1    HA           0.090
+        13 HD2    HA           0.090
+        14 CE     CT2          0.210
+        15 HE1    HA           0.050
+        16 HE2    HA           0.050
+        17 NZ     NH3         -0.300
+        18 HZ1    HC           0.330
+        19 HZ2    HC           0.330
+        20 HZ3    HC           0.330
+        21 C      CC           0.340
+        22 OT1    OC          -0.670
+        23 OT2    OC          -0.670
+    [bonds]
+       CB   CA
+       CG   CB
+       CD   CG
+       CE   CD
+       NZ   CE
+       N    HN
+       N    CA
+       CA   HA
+       CB   HB1
+       CB   HB2
+       CG   HG1
+       CG   HG2
+       CD   HD1
+       CD   HD2
+       CE   HE1
+       CE   HE2
+       NZ   HZ1
+       NZ   HZ2
+       NZ   HZ3
+       CA   C
+       C    OT1
+       C    OT2
+    [connections]
+        head     N
+        tail     C
+    [impropers]
+         N     -C     CA     HN
+       OT1     CA    OT2      C
+    [charge_groups]
+        N    HN   CA   HA
+        CB   HB1  HB2
+        CG   HG1  HG2
+        CD   HD1  HD2
+        CE   HE1  HE2  NZ   HZ1  HZ2  HZ3
+        C    OT1  OT2
+*-------------------------------------------------------------
+*

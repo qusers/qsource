@@ -1,0 +1,30 @@
+*------------------------------------------------
+*
+*Q-FF parameters: CHARMM22 parameters 
+*
+*------------------------------------------------
+*Qcharmm22 parameters from both nucleic acids and amino acids (S.Trobro 030224)
+*________________________________________________
+[options] force-field options
+name		Q-charmm22 nucleic acids
+vdw_rule    arithmetic   ! vdW combination rule (geometric or arithmetic )
+scale_14	 1.0         ! electrostatic 1-4 scaling factor
+switch_atoms  off       ! on = use switch atom; off = use charge group
+improper_definition explicit ! improper representation by 2 or four atoms
+improper_potential	harmonic
+coulomb_constant 332.0716    ! Constant in electrostatic energy calculation; default = 332.
+force_field charmm           ! Force Field Type (GROMOS (default), AMBER or CHARMM)
+
+[atom_types] atom type definitions
+*-iac------Avdw1------Avdw2-----Bvdw1------Avdw3-----Bvdw2&3----mass---SYBYL-name-old-comment ! Ska vara R och E (030513/StT)
+S          2.0000     2.0000    0.4500     2.0000    0.4500    32.060  1 !  sulphur
+CN4        1.8000     1.8000    0.1200     1.8000    0.1200    12.011  1 !  Nucleic acid purine C8 and ADE C2
+NN1        1.8500     1.8500    0.2000     1.8500    0.2000    14.007  1 !  Nucleic acid amide nitrogen (amine?)
+CT2        2.1750     2.1750    0.0550     1.9000    0.0100    12.011  1 !  aliphatic sp3 C for CH2
+
+[bonds] types definitions
+*iaci iacj   force.c.  dist.
+*------------------------------------------------
+S     CN4        604.000   1.425
+NN1   CT2        604.000   1.360
+

@@ -1,0 +1,94 @@
+* URA and CYT mixed lib file 
+*-------------------------------------------------------------
+{C2U}                 !
+    [info]
+        SYBYLtype  RESIDUE     !SYBYL substructure type
+    [atoms]
+         1 P      P            1.500 !At. no., name, iac, charge
+         2 O1P    ON3         -0.800 !At. no., name, iac, charge
+         3 O2P    ON3         -0.800 !At. no., name, iac, charge
+         4 O5'    ON2         -0.550 !At. no., name, iac, charge
+         5 C5'    CN8         -0.080 !At. no., name, iac, charge
+         6 H5'    HN7          0.090 !At. no., name, iac, charge
+         7 H5''   HN7          0.090 !At. no., name, iac, charge
+         8 C4'    CN6          0.110 !At. no., name, iac, charge
+         9 H4'    HN6          0.090 !At. no., name, iac, charge
+        10 O4'    ON6         -0.400 !At. no., name, iac, charge
+        11 C1'    CN6B         0.110 !At. no., name, iac, charge
+        12 H1'    HN6          0.090 !At. no., name, iac, charge
+
+        13 N1     NN2         -0.300 !At. no., name, iac, charge
+        14 C6     CN3          0.170 !At. no., name, iac, charge
+        15 H6     HN3          0.130 !At. no., name, iac, charge
+        16 C2     CN1          0.570 !At. no., name, iac, charge
+        17 O2     ON1C        -0.470 !At. no., name, iac, charge
+        18 N3     NN3         -0.460 !At. no., name, iac, charge
+        19 H3     HN2          0.360 ! from URA 
+        20 C4     CN2          0.540 !At. no., name, iac, charge
+        21 N4     NN1         -0.490 !At. no., name, iac, charge, URA O4 
+        22 H41    HN1          0.000 !At. no., name, iac, charge, URA DUH
+        23 H42    HN1          0.000 !At. no., name, iac, charge, URA DUH
+        24 C5     CN3         -0.150 !At. no., name, iac, charge
+        25 H5     HN3          0.100 !At. no., name, iac, charge  
+      
+        26 C2'    CN6          0.110 !At. no., name, iac, charge
+        27 H2''   HN6          0.090 !At. no., name, iac, charge
+        28 O2'    ON5         -0.600 !At. no., name, iac, charge
+        29 H2'    HN5          0.400 !At. no., name, iac, charge
+        30 C3'    CN6          0.010 !At. no., name, iac, charge
+        31 H3'    HN6          0.090 !At. no., name, iac, charge
+        32 O3'    ON2         -0.550 !At. no., name, iac, charge
+    [bonds]
+       P    O1P               !connect i -- j
+       P    O2P               !connect i -- j
+       P    O5'               !connect i -- j
+       O5'  C5'               !connect i -- j
+       C5'  C4'               !connect i -- j
+       C4'  O4'               !connect i -- j
+       C4'  C3'               !connect i -- j
+       O4'  C1'               !connect i -- j
+       C1'  N1                !connect i -- j
+       C1'  C2'               !connect i -- j
+       N1   C2                !connect i -- j
+       N1   C6                !connect i -- j
+       C2   O2                !connect i -- j
+       C2   N3                !connect i -- j
+       N3   C4                !connect i -- j
+       C4   N4                !connect i -- j
+       N4   H41               !connect i -- j
+       N4   H42               !connect i -- j
+       C4   C5                !connect i -- j
+       C5   C6                !connect i -- j
+       C2'  C3'               !connect i -- j
+       C3'  O3'               !connect i -- j
+       C2'  O2'               !connect i -- j
+       O2'  H2'               !connect i -- j
+       C1'  H1'               !connect i -- j
+       C2'  H2''               !connect i -- j
+       C3'  H3'               !connect i -- j
+       C4'  H4'               !connect i -- j
+       C5'  H5'               !connect i -- j
+       C5'  H5''               !connect i -- j
+       C5   H5                !connect i -- j
+       C6   H6                !connect i -- j
+       N3   H3                ! from URA
+    [connections]   !how to bond to previous and next
+        head     P  
+        tail     O3'
+    [impropers]
+        O2     N1     N3     C2
+        N4     N3     C5     C4
+        H5     C4     C6     C5
+        H6     C5     N1     C6
+       H42     C4    H41     N4
+        H3     C2     C4     N3  ! from URA
+    [charge_groups] !charge groups, with switch atom first
+        P    O1P  O2P  O5'  C5'  H5'  H5''
+        C4'  H4'  O4'  C1'  H1'
+        N1   C6   H6 
+        C2   O2   N3   H3 C4  ! H3 added for URA 
+        N4   H41  H42
+        C5   H5 
+        C2'  H2''  O2'  H2'
+        C3'  H3'  O3'
+*-------------------------------------------------------------

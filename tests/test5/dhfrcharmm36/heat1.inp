@@ -1,0 +1,49 @@
+[MD]
+steps                     10000
+stepsize                  1
+temperature               50.0
+bath_coupling             1
+!random_seed               666
+initial_temperature       0.1
+shake_solvent             on
+shake_hydrogens           off
+shake_solute              off
+lrf                       on
+
+[cut_offs]
+solute_solute             10.0
+solute_solvent            99.0
+solvent_solvent           99.0
+q_atom                    99.0
+lrf                       99.0
+
+[sphere]
+shell_force               10
+shell_radius              0.8
+
+[solvent]
+radial_force              60.0
+polarisation              on
+polarisation_force        20.0
+
+[intervals]
+non_bond                  50
+output                    50
+energy                    0
+trajectory                500
+
+[files]
+topology                  init.top
+fep                       lig.fep
+restart                   start.re
+final                     heat1.re
+trajectory                heat1.dcd
+
+![trajectory_atoms]
+!not excluded
+
+![lambdas]
+!1.000 0.000
+
+[sequence_restraints]
+1 2846 10.0 0 1

@@ -1,0 +1,138 @@
+*------------------------------------------------------------------
+*
+* Q residue library file: CHARMM22 nucleic acid library
+*
+*------------------------------------------------------------------
+
+{MIA}                 !
+    [info]
+        SYBYLtype  RESIDUE     !ADHOC STRUCTURE
+    [atoms]
+         1 P      P            1.500 !At. no., name, iac, charge
+         2 O1P    ON3         -0.800 !At. no., name, iac, charge
+         3 O2P    ON3         -0.800 !At. no., name, iac, charge
+         4 O5'    ON2         -0.550 !At. no., name, iac, charge
+         5 C5'    CN8         -0.080 !At. no., name, iac, charge
+         6 H5'    HN7          0.090 !At. no., name, iac, charge
+         7 H5''   HN7          0.090 !At. no., name, iac, charge
+         8 C4'    CN6          0.110 !At. no., name, iac, charge
+         9 H4'    HN6          0.090 !At. no., name, iac, charge
+        10 O4'    ON6         -0.400 !At. no., name, iac, charge
+        11 C1'    CN6B         0.110 !At. no., name, iac, charge
+        12 H1'    HN6          0.090 !At. no., name, iac, charge
+        13 C5     CN5          0.230 !At. no., name, iac, charge
+        14 N7     NN4         -0.630 !At. no., name, iac, charge
+        15 C8     CN4          0.380 !At. no., name, iac, charge
+        16 H8     HN3          0.180 !At. no., name, iac, charge
+        17 N9     NN2         -0.160 !At. no., name, iac, charge
+        18 N1     NN3A        -0.740 !At. no., name, iac, charge
+        19 C2     CN4          0.530 !At. no., name, iac, charge
+       ! 20 H2     HN3          0.160 ! I NEED TO CHANGE THIS
+        20 S10    S           -0.050 ! Adhoc from MET+0.04
+        21 C11    CT3         -0.180 ! Adhoc from MET+0.04
+        22 H111   HA           0.130 ! Adhoc from MET+0.04
+        23 H112   HA           0.130 ! Adhoc from MET+0.04
+        24 H113   HA           0.130 ! Adhoc from MET+0.04
+        25 N3     NN3A        -0.690 !At. no., name, iac, charge
+        26 C4     CN5          0.310 !At. no., name, iac, charge
+        27 C6     CN2          0.430 !At. no., name, iac, charge
+        28 N6     NN1         -0.800 !At. no., name, iac, charge
+       ! 25 H61    HN1          0.400 !I NEED TO CHANGE THIS
+        29 C12    CT2         -0.155 ! adhoc mixung LEU and LYS+0.025 
+        30 H121   HA           0.115 ! adhoc mixung LEU and LYS+0.025
+        31 H122   HA           0.115 ! adhoc mixung LEU and LYS+0.025
+        32 C13    CT2         -0.155 ! adhoc mixung LEU and LYS+0.025
+        33 H131   HA           0.115 ! adhoc mixung LEU and LYS+0.025
+        34 H132   HA           0.115 ! adhoc mixung LEU and LYS+0.025
+        35 C14    CT1         -0.065 ! adhoc mixung LEU and LYS+0.025
+        36 H14    HA           0.115 ! adhoc mixung LEU and LYS+0.025
+        37 C16    CT3         -0.245 ! adhoc mixung LEU and LYS+0.025
+        38 H161   HA           0.115 ! adhoc mixung LEU and LYS+0.025
+        39 H162   HA           0.115 ! adhoc mixung LEU and LYS+0.025
+        40 H163   HA           0.115 ! adhoc mixung LEU and LYS+0.025 
+        41 C15    CT3         -0.245 ! adhoc mixung LEU and LYS+0.025
+        42 H151   HA           0.115 ! adhoc mixung LEU and LYS+0.025
+        43 H152   HA           0.115 ! adhoc mixung LEU and LYS+0.025
+        44 H153   HA           0.115 ! adhoc mixung LEU and LYS+0.025
+        45 H62    HN1          0.400 !At. no., name, iac, charge
+        46 C2'    CN6          0.110 !At. no., name, iac, charge
+        47 H2''   HN6          0.090 !At. no., name, iac, charge
+        48 O2'    ON5         -0.600 !At. no., name, iac, charge
+        49 H2'    HN5          0.400 !At. no., name, iac, charge
+        50 C3'    CN6          0.010 !At. no., name, iac, charge
+        51 H3'    HN6          0.090 !At. no., name, iac, charge
+        52 O3'    ON2         -0.550 !At. no., name, iac, charge
+    [bonds]
+       P    O1P               !connect i -- j
+       P    O2P               !connect i -- j
+       P    O5'               !connect i -- j
+       O5'  C5'               !connect i -- j
+       C5'  C4'               !connect i -- j
+       C4'  O4'               !connect i -- j
+       C4'  C3'               !connect i -- j
+       O4'  C1'               !connect i -- j
+       C1'  N9                !connect i -- j
+       C1'  C2'               !connect i -- j
+       N9   C4                !connect i -- j
+       N9   C8                !connect i -- j
+       C4   N3                !connect i -- j
+       C4   C5                !connect i -- j
+       N3   C2                !connect i -- j
+       C2   N1                !connect i -- j
+       N1   C6                !connect i -- j
+       C6   N6                !connect i -- j
+       #N6   H61               !connect i -- j xxxx
+       N6   H62               !connect i -- j
+       C6   C5                !connect i -- j
+       C5   N7                !connect i -- j
+       N7   C8                !connect i -- j
+       C2'  C3'               !connect i -- j
+       C2'  O2'               !connect i -- j
+       O2'  H2'               !connect i -- j
+       C3'  O3'               !connect i -- j
+       C1'  H1'               !connect i -- j
+       C2'  H2''               !connect i -- j
+       C3'  H3'               !connect i -- j
+       C4'  H4'               !connect i -- j
+       C5'  H5'               !connect i -- j
+       C5'  H5''               !connect i -- j
+       C8   H8                !connect i -- j
+       #C2   H2                !connect i -- j xxxxxx
+       S10  C2
+       C11  S10
+       C11  H111
+       C11  H112
+       C11  H113
+       N6   C12
+       C12  H121
+       C12  H122
+       C12  C13
+       C13  H131
+       C13  H132
+       C13  C14
+       C14  H14
+       C14  C15
+       C15  H151
+       C15  H152
+       C15  H153
+       C14  C16
+       C16  H161
+       C16  H162
+       C16  H163
+    [connections]   !how to bond to previous and next
+        head     P
+        tail     O3'
+    [impropers]
+       H62     C6    C12     N6
+        N6     N1     C5     C6
+       S10     N1     N3     C2
+        H8     N7     N9     C8
+    [charge_groups] !charge groups, with switch atom first
+        P    O1P  O2P  O5'  C5'  H5'  H5''
+        C4'  H4'  O4'  C1'  H1'
+        C5   N7   C8   H8   N9
+        N1   C2   S10  C11  H111 H112 H113   N3   C4   C6
+        N6   C12  H121 H122 C13  H131 H132 C14 H14 C15 H151 H152 H153 C16 H161 H162 H163  H62
+        C2'  H2''  O2'  H2'
+        C3'  H3'  O3'
+

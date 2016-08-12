@@ -1,0 +1,4093 @@
+*-------------------------------------------------------------------------------
+* Q fragment library file extracted from:
+*  development of the CHARMM carbohydrate  force field
+*  Converted with charmm2q.py (Geir V. Isaksen, 2016)* with tiny changes by
+*  Mauricio Esguerra and Christoffer Lind
+*
+**
+**
+*-------------------------------------------------------------------------------
+{AALL}            !charge: 0.000 ||  4C1 alpha-D-allose
+    [atoms]
+         1 C1     CC3162      0.340
+         2 H1     HCA1        0.090
+         3 O1     OC311      -0.650
+         4 HO1    HCP1        0.420
+         5 C5     CC3163      0.110
+         6 H5     HCA1        0.090
+         7 O5     OC3C61     -0.400
+         8 C2     CC3161      0.140
+         9 H2     HCA1        0.090
+        10 O2     OC311      -0.650
+        11 HO2    HCP1        0.420
+        12 C3     CC3161      0.140
+        13 H3     HCA1        0.090
+        14 O3     OC311      -0.650
+        15 HO3    HCP1        0.420
+        16 C4     CC3161      0.140
+        17 H4     HCA1        0.090
+        18 O4     OC311      -0.650
+        19 HO4    HCP1        0.420
+        20 C6     CC321       0.050
+        21 H61    HCA2        0.090
+        22 H62    HCA2        0.090
+        23 O6     OC311      -0.650
+        24 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H1    
+       O1     HO1   
+       C1     O5    
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+    [charge_groups]
+        C1    H1    O1    HO1   C5    H5    O5    C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C6    H61   H62   O6    HO6   
+*------------------------------------------------------------------
+{AALT}            !charge: 0.000 ||  4C1 alpha-D-altrose
+    [atoms]
+         1 C1     CC3162      0.340
+         2 H1     HCA1        0.090
+         3 O1     OC311      -0.650
+         4 HO1    HCP1        0.420
+         5 C5     CC3163      0.110
+         6 H5     HCA1        0.090
+         7 O5     OC3C61     -0.400
+         8 C2     CC3161      0.140
+         9 H2     HCA1        0.090
+        10 O2     OC311      -0.650
+        11 HO2    HCP1        0.420
+        12 C3     CC3161      0.140
+        13 H3     HCA1        0.090
+        14 O3     OC311      -0.650
+        15 HO3    HCP1        0.420
+        16 C4     CC3161      0.140
+        17 H4     HCA1        0.090
+        18 O4     OC311      -0.650
+        19 HO4    HCP1        0.420
+        20 C6     CC321       0.050
+        21 H61    HCA2        0.090
+        22 H62    HCA2        0.090
+        23 O6     OC311      -0.650
+        24 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H1    
+       O1     HO1   
+       C1     O5    
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+    [charge_groups]
+        C1    H1    O1    HO1   C5    H5    O5    C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C6    H61   H62   O6    HO6   
+*------------------------------------------------------------------
+{AARB}            !charge: 0.00 ||   alpha-Arabinose
+    [atoms]
+         1 O4     OC3C51      -0.40
+         2 C1     CC3152       0.34
+         3 H1     HCA1         0.09
+         4 O1     OC311       -0.65
+         5 HO1    HCP1         0.42
+         6 C4     CC3153       0.11
+         7 H4     HCA1         0.09
+         8 C5     CC321        0.05
+         9 H51    HCA2         0.09
+        10 H52    HCA2         0.09
+        11 O5     OC311       -0.65
+        12 HO5    HCP1         0.42
+        13 C2     CC3151       0.14
+        14 H2     HCA1         0.09
+        15 O2     OC311       -0.65
+        16 HO2    HCP1         0.42
+        17 C3     CC3151       0.14
+        18 H3     HCA1         0.09
+        19 O3     OC311       -0.65
+        20 HO3    HCP1         0.42
+    [bonds]
+       O4     C1    
+       C1     H1    
+       C1     O1    
+       O1     HO1   
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     C5    
+       C4     O4    
+       C5     H51   
+       C5     H52   
+       C5     O5    
+       O5     HO5   
+    [charge_groups]
+        O4    C1    H1    O1    HO1   C4    H4    
+        C5    H51   H52   O5    HO5   
+        C2    H2    O2    HO2   
+        C3    H3    O3    HO3   
+*------------------------------------------------------------------
+{ABEQ}            !charge: 0.000 ||  abequose, 3,6-didexoxy-alpha-D-xylo-hexose
+    [atoms]
+         1 C1     CC3162      0.340
+         2 H1     HCA1        0.090
+         3 O1     OC311      -0.650
+         4 HO1    HCP1        0.420
+         5 C5     CC3163      0.110
+         6 H5     HCA1        0.090
+         7 O5     OC3C61     -0.400
+         8 C2     CC3161      0.140
+         9 H2     HCA1        0.090
+        10 O2     OC311      -0.650
+        11 HO2    HCP1        0.420
+        12 C3     CC3261     -0.180
+        13 H31    HCA2        0.090
+        14 H32    HCA2        0.090
+        15 C4     CC3161      0.140
+        16 H4     HCA1        0.090
+        17 O4     OC311      -0.650
+        18 HO4    HCP1        0.420
+        19 C6     CC331      -0.270
+        20 H61    HCA3        0.090
+        21 H62    HCA3        0.090
+        22 H63    HCA3        0.090
+    [bonds]
+       C1     O1    
+       C1     H1    
+       O1     HO1   
+       C1     O5    
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H31   
+       C3     H32   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     H63   
+       C5     O5    
+    [charge_groups]
+        C1    H1    O1    HO1   C5    H5    O5    C2    H2    O2    HO2   C3    H31   H32   C4    H4    O4    HO4   C6    H61   H62   H63   
+*------------------------------------------------------------------
+{ADEO}            !charge: 0.00 ||   alpha-Deoxy-Ribose
+    [atoms]
+         1 O4     OC3C51      -0.40
+         2 C1     CC3152       0.34
+         3 H1     HCA1         0.09
+         4 O1     OC311       -0.65
+         5 HO1    HCP1         0.42
+         6 C4     CC3153       0.11
+         7 H4     HCA1         0.09
+         8 C5     CC321        0.05
+         9 H51    HCA2         0.09
+        10 H52    HCA2         0.09
+        11 O5     OC311       -0.65
+        12 HO5    HCP1         0.42
+        13 C2     CC3251      -0.18
+        14 H21    HCA2         0.09
+        15 H22    HCA2         0.09
+        16 C3     CC3151       0.14
+        17 H3     HCA1         0.09
+        18 O3     OC311       -0.65
+        19 HO3    HCP1         0.42
+    [bonds]
+       O4     C1    
+       C1     H1    
+       C1     O1    
+       O1     HO1   
+       C1     C2    
+       C2     H21   
+       C2     H22   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       C4     C5    
+       C5     H51   
+       C5     H52   
+       C5     O5    
+       O5     HO5   
+    [charge_groups]
+        O4    C1    H1    O1    HO1   C4    H4    
+        C5    H51   H52   O5    HO5   
+        C2    H21   H22   
+        C3    H3    O3    HO3   
+*------------------------------------------------------------------
+{AFRU}            !charge: 0.00 ||   alpha-Fructofuranose
+    [atoms]
+         1 O5     OC3C51      -0.40
+         2 C2     CC3051       0.43
+         3 O2     OC311       -0.65
+         4 HO2    HCP1         0.42
+         5 C5     CC3153       0.11
+         6 H5     HCA1         0.09
+         7 C6     CC321        0.05
+         8 H61    HCA2         0.09
+         9 H62    HCA2         0.09
+        10 O6     OC311       -0.65
+        11 HO6    HCP1         0.42
+        12 C1     CC321        0.05
+        13 H11    HCA2         0.09
+        14 H12    HCA2         0.09
+        15 O1     OC311       -0.65
+        16 HO1    HCP1         0.42
+        17 C3     CC3151       0.14
+        18 H3     HCA1         0.09
+        19 O3     OC311       -0.65
+        20 HO3    HCP1         0.42
+        21 C4     CC3151       0.14
+        22 H4     HCA1         0.09
+        23 O4     OC311       -0.65
+        24 HO4    HCP1         0.42
+    [bonds]
+       O5     C2    
+       C2     C1    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C5     O5    
+       C6     H61   
+       C6     H62   
+       C6     O6    
+       O6     HO6   
+       C1     H11   
+       C1     H12   
+       C1     O1    
+       O1     HO1   
+    [charge_groups]
+        O5    C2    O2    HO2   C5    H5    
+        C6    H61   H62   O6    HO6   
+        C1    H11   H12   O1    HO1   
+        C3    H3    O3    HO3   
+        C4    H4    O4    HO4   
+*------------------------------------------------------------------
+{AFUC}            !charge: 0.000 ||  alpha-L-fucose
+    [atoms]
+         1 C1     CC3162      0.340
+         2 H1     HCA1        0.090
+         3 O1     OC311      -0.650
+         4 HO1    HCP1        0.420
+         5 C5     CC3163      0.110
+         6 H5     HCA1        0.090
+         7 O5     OC3C61     -0.400
+         8 C2     CC3161      0.140
+         9 H2     HCA1        0.090
+        10 O2     OC311      -0.650
+        11 HO2    HCP1        0.420
+        12 C3     CC3161      0.140
+        13 H3     HCA1        0.090
+        14 O3     OC311      -0.650
+        15 HO3    HCP1        0.420
+        16 C4     CC3161      0.140
+        17 H4     HCA1        0.090
+        18 O4     OC311      -0.650
+        19 HO4    HCP1        0.420
+        20 C6     CC331      -0.270
+        21 H61    HCA3        0.090
+        22 H62    HCA3        0.090
+        23 H63    HCA3        0.090
+    [bonds]
+       C1     O1    
+       C1     H1    
+       O1     HO1   
+       C1     O5    
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     H63   
+       C5     O5    
+    [charge_groups]
+        C1    H1    O1    HO1   C5    H5    O5    C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C6    H61   H62   H63   
+*------------------------------------------------------------------
+{AGAL}            !charge: 0.000 ||  4C1 alpha-D-galactose
+    [atoms]
+         1 C1     CC3162      0.340
+         2 H1     HCA1        0.090
+         3 O1     OC311      -0.650
+         4 HO1    HCP1        0.420
+         5 C5     CC3163      0.110
+         6 H5     HCA1        0.090
+         7 O5     OC3C61     -0.400
+         8 C2     CC3161      0.140
+         9 H2     HCA1        0.090
+        10 O2     OC311      -0.650
+        11 HO2    HCP1        0.420
+        12 C3     CC3161      0.140
+        13 H3     HCA1        0.090
+        14 O3     OC311      -0.650
+        15 HO3    HCP1        0.420
+        16 C4     CC3161      0.140
+        17 H4     HCA1        0.090
+        18 O4     OC311      -0.650
+        19 HO4    HCP1        0.420
+        20 C6     CC321       0.050
+        21 H61    HCA2        0.090
+        22 H62    HCA2        0.090
+        23 O6     OC311      -0.650
+        24 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H1    
+       O1     HO1   
+       C1     O5    
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+    [charge_groups]
+        C1    H1    O1    HO1   C5    H5    O5    C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C6    H61   H62   O6    HO6   
+*------------------------------------------------------------------
+{AGALNA}            !charge: 0.000 ||  2-acetyl-2-deoxy-alpha-D-galactosamine
+    [atoms]
+         1 C1     CC3162      0.340
+         2 H1     HCA1        0.090
+         3 O1     OC311      -0.650
+         4 HO1    HCP1        0.420
+         5 C5     CC3163      0.110
+         6 H5     HCA1        0.090
+         7 O5     OC3C61     -0.400
+         8 C2     CC3161      0.070
+         9 H2     HCA1        0.090
+        10 N      NC2D1      -0.470
+        11 HN     HCP1        0.310
+        12 C      CC2O1       0.510
+        13 O      OC2D1      -0.510
+        14 CT     CC331      -0.270
+        15 HT1    HCA3        0.090
+        16 HT2    HCA3        0.090
+        17 HT3    HCA3        0.090
+        18 C3     CC3161      0.140
+        19 H3     HCA1        0.090
+        20 O3     OC311      -0.650
+        21 HO3    HCP1        0.420
+        22 C4     CC3161      0.140
+        23 H4     HCA1        0.090
+        24 O4     OC311      -0.650
+        25 HO4    HCP1        0.420
+        26 C6     CC321       0.050
+        27 H61    HCA2        0.090
+        28 H62    HCA2        0.090
+        29 O6     OC311      -0.650
+        30 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H1    
+       O1     HO1   
+       C1     O5    
+       C1     C2    
+       C2     H2    
+       C2     N     
+       N      HN    
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+       N      C     
+       C      O     
+       C      CT    
+       CT     HT1   
+       CT     HT2   
+       CT     HT3   
+    [impropers]
+         C      CT     N      O     
+         N      C      C2     HN    
+    [charge_groups]
+        C1    H1    O1    HO1   C5    H5    O5    C2    H2    N     HN    C     O     CT    HT1   HT2   HT3   C3    H3    O3    HO3   C4    H4    O4    HO4   C6    H61   H62   O6    HO6   
+*------------------------------------------------------------------
+{AGLC}            !charge: 0.000 ||  4C1 alpha-D-glucose
+    [atoms]
+         1 C1     CC3162      0.340
+         2 H1     HCA1        0.090
+         3 O1     OC311      -0.650
+         4 HO1    HCP1        0.420
+         5 C5     CC3163      0.110
+         6 H5     HCA1        0.090
+         7 O5     OC3C61     -0.400
+         8 C2     CC3161      0.140
+         9 H2     HCA1        0.090
+        10 O2     OC311      -0.650
+        11 HO2    HCP1        0.420
+        12 C3     CC3161      0.140
+        13 H3     HCA1        0.090
+        14 O3     OC311      -0.650
+        15 HO3    HCP1        0.420
+        16 C4     CC3161      0.140
+        17 H4     HCA1        0.090
+        18 O4     OC311      -0.650
+        19 HO4    HCP1        0.420
+        20 C6     CC321       0.050
+        21 H61    HCA2        0.090
+        22 H62    HCA2        0.090
+        23 O6     OC311      -0.650
+        24 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H1    
+       O1     HO1   
+       C1     O5    
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+    [charge_groups]
+        C1    H1    O1    HO1   C5    H5    O5    C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C6    H61   H62   O6    HO6   
+*------------------------------------------------------------------
+{AGLCA}            !charge: -1.000 ||  4C1 alpha-D-glucoronic acid
+    [atoms]
+         1 C1     CC3162      0.340
+         2 H1     HCA1        0.090
+         3 O1     OC311      -0.650
+         4 HO1    HCP1        0.420
+         5 C5     CC3163      0.110
+         6 H5     HCA1        0.090
+         7 O5     OC3C61     -0.400
+         8 C2     CC3161      0.140
+         9 H2     HCA1        0.090
+        10 O2     OC311      -0.650
+        11 HO2    HCP1        0.420
+        12 C3     CC3161      0.140
+        13 H3     HCA1        0.090
+        14 O3     OC311      -0.650
+        15 HO3    HCP1        0.420
+        16 C4     CC3161      0.140
+        17 H4     HCA1        0.090
+        18 O4     OC311      -0.650
+        19 HO4    HCP1        0.420
+        20 C6     CC2O2       0.520
+        21 O61    OC2D2      -0.760
+        22 O62    OC2D2      -0.760
+    [bonds]
+       C1     O1    
+       C1     H1    
+       O1     HO1   
+       C1     O5    
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     O61   
+       C6     O62   
+       C5     O5    
+    [impropers]
+         C6     C5     O62    O61   
+    [charge_groups]
+        C1    H1    O1    HO1   C5    H5    O5    C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C6    O61   O62   
+*------------------------------------------------------------------
+{AGLCNA}            !charge: 0.000 ||  2-acetyl-2-deoxy-alpha-D-glucosamine
+    [atoms]
+         1 C1     CC3162      0.340
+         2 H1     HCA1        0.090
+         3 O1     OC311      -0.650
+         4 HO1    HCP1        0.420
+         5 C5     CC3163      0.110
+         6 H5     HCA1        0.090
+         7 O5     OC3C61     -0.400
+         8 C2     CC3161      0.070
+         9 H2     HCA1        0.090
+        10 N      NC2D1      -0.470
+        11 HN     HCP1        0.310
+        12 C      CC2O1       0.510
+        13 O      OC2D1      -0.510
+        14 CT     CC331      -0.270
+        15 HT1    HCA3        0.090
+        16 HT2    HCA3        0.090
+        17 HT3    HCA3        0.090
+        18 C3     CC3161      0.140
+        19 H3     HCA1        0.090
+        20 O3     OC311      -0.650
+        21 HO3    HCP1        0.420
+        22 C4     CC3161      0.140
+        23 H4     HCA1        0.090
+        24 O4     OC311      -0.650
+        25 HO4    HCP1        0.420
+        26 C6     CC321       0.050
+        27 H61    HCA2        0.090
+        28 H62    HCA2        0.090
+        29 O6     OC311      -0.650
+        30 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H1    
+       O1     HO1   
+       C1     O5    
+       C1     C2    
+       C2     H2    
+       C2     N     
+       N      HN    
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+       N      C     
+       C      O     
+       C      CT    
+       CT     HT1   
+       CT     HT2   
+       CT     HT3   
+    [impropers]
+         C      CT     N      O     
+         N      C      C2     HN    
+    [charge_groups]
+        C1    H1    O1    HO1   C5    H5    O5    C2    H2    N     HN    C     O     CT    HT1   HT2   HT3   C3    H3    O3    HO3   C4    H4    O4    HO4   C6    H61   H62   O6    HO6   
+*------------------------------------------------------------------
+{AGUL}            !charge: 0.000 ||  4C1 alpha-D-gulose
+    [atoms]
+         1 C1     CC3162      0.340
+         2 H1     HCA1        0.090
+         3 O1     OC311      -0.650
+         4 HO1    HCP1        0.420
+         5 C5     CC3163      0.110
+         6 H5     HCA1        0.090
+         7 O5     OC3C61     -0.400
+         8 C2     CC3161      0.140
+         9 H2     HCA1        0.090
+        10 O2     OC311      -0.650
+        11 HO2    HCP1        0.420
+        12 C3     CC3161      0.140
+        13 H3     HCA1        0.090
+        14 O3     OC311      -0.650
+        15 HO3    HCP1        0.420
+        16 C4     CC3161      0.140
+        17 H4     HCA1        0.090
+        18 O4     OC311      -0.650
+        19 HO4    HCP1        0.420
+        20 C6     CC321       0.050
+        21 H61    HCA2        0.090
+        22 H62    HCA2        0.090
+        23 O6     OC311      -0.650
+        24 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H1    
+       O1     HO1   
+       C1     O5    
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+    [charge_groups]
+        C1    H1    O1    HO1   C5    H5    O5    C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C6    H61   H62   O6    HO6   
+*------------------------------------------------------------------
+{AIDO}            !charge: 0.000 ||  4C1 alpha-D-idose
+    [atoms]
+         1 C1     CC3162      0.340
+         2 H1     HCA1        0.090
+         3 O1     OC311      -0.650
+         4 HO1    HCP1        0.420
+         5 C5     CC3163      0.110
+         6 H5     HCA1        0.090
+         7 O5     OC3C61     -0.400
+         8 C2     CC3161      0.140
+         9 H2     HCA1        0.090
+        10 O2     OC311      -0.650
+        11 HO2    HCP1        0.420
+        12 C3     CC3161      0.140
+        13 H3     HCA1        0.090
+        14 O3     OC311      -0.650
+        15 HO3    HCP1        0.420
+        16 C4     CC3161      0.140
+        17 H4     HCA1        0.090
+        18 O4     OC311      -0.650
+        19 HO4    HCP1        0.420
+        20 C6     CC321       0.050
+        21 H61    HCA2        0.090
+        22 H62    HCA2        0.090
+        23 O6     OC311      -0.650
+        24 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H1    
+       O1     HO1   
+       C1     O5    
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+    [charge_groups]
+        C1    H1    O1    HO1   C5    H5    O5    C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C6    H61   H62   O6    HO6   
+*------------------------------------------------------------------
+{AIDOA}            !charge: -1.000 ||      alpha-L-iduronic acid
+    [atoms]
+         1 C1     CC3162      0.340
+         2 H1     HCA1        0.090
+         3 O1     OC311      -0.650
+         4 HO1    HCP1        0.420
+         5 C5     CC3163      0.110
+         6 H5     HCA1        0.090
+         7 O5     OC3C61     -0.400
+         8 C2     CC3161      0.140
+         9 H2     HCA1        0.090
+        10 O2     OC311      -0.650
+        11 HO2    HCP1        0.420
+        12 C3     CC3161      0.140
+        13 H3     HCA1        0.090
+        14 O3     OC311      -0.650
+        15 HO3    HCP1        0.420
+        16 C4     CC3161      0.140
+        17 H4     HCA1        0.090
+        18 O4     OC311      -0.650
+        19 HO4    HCP1        0.420
+        20 C6     CC2O2       0.520
+        21 O61    OC2D2      -0.760
+        22 O62    OC2D2      -0.760
+    [bonds]
+       C1     O1    
+       C1     H1    
+       O1     HO1   
+       C1     O5    
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     O61   
+       C6     O62   
+       C5     O5    
+    [impropers]
+         C6     C5     O62    O61   
+    [charge_groups]
+        C1    H1    O1    HO1   C5    H5    O5    C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C6    O61   O62   
+*------------------------------------------------------------------
+{ALLOSE}            !charge: 0.000 ||  D-Allose, open, free aldehdye
+    [atoms]
+         1 C1     CC2O4       0.200
+         2 O1     OC2D4      -0.400
+         3 H1     HCR1        0.060
+         4 C2     CC312       0.280
+         5 H2     HCA1        0.090
+         6 O2     OC311      -0.650
+         7 HO2    HCP1        0.420
+         8 C3     CC312       0.140
+         9 H3     HCA1        0.090
+        10 O3     OC311      -0.650
+        11 HO3    HCP1        0.420
+        12 C4     CC312       0.140
+        13 H4     HCA1        0.090
+        14 O4     OC311      -0.650
+        15 HO4    HCP1        0.420
+        16 C5     CC312       0.140
+        17 H5     HCA1        0.090
+        18 O5     OC311      -0.650
+        19 HO5    HCP1        0.420
+        20 C6     CC322       0.050
+        21 H61    HCA2        0.090
+        22 H62    HCA2        0.090
+        23 O6     OC311      -0.650
+        24 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H1    
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+       O5     HO5   
+    [impropers]
+         C1     C2     O1     H1    
+    [charge_groups]
+        C1    O1    H1    C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C5    H5    O5    HO5   C6    H61   H62   O6    HO6   
+*------------------------------------------------------------------
+{ALYF}            !charge: 0.00 ||   alpha-Lyxofuranose
+    [atoms]
+         1 O4     OC3C51      -0.40
+         2 C1     CC3152       0.34
+         3 H1     HCA1         0.09
+         4 O1     OC311       -0.65
+         5 HO1    HCP1         0.42
+         6 C4     CC3153       0.11
+         7 H4     HCA1         0.09
+         8 C5     CC321        0.05
+         9 H51    HCA2         0.09
+        10 H52    HCA2         0.09
+        11 O5     OC311       -0.65
+        12 HO5    HCP1         0.42
+        13 C2     CC3151       0.14
+        14 H2     HCA1         0.09
+        15 O2     OC311       -0.65
+        16 HO2    HCP1         0.42
+        17 C3     CC3151       0.14
+        18 H3     HCA1         0.09
+        19 O3     OC311       -0.65
+        20 HO3    HCP1         0.42
+    [bonds]
+       O4     C1    
+       C1     H1    
+       C1     O1    
+       O1     HO1   
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     C5    
+       C4     O4    
+       C5     H51   
+       C5     H52   
+       C5     O5    
+       O5     HO5   
+    [charge_groups]
+        O4    C1    H1    O1    HO1   C4    H4    
+        C5    H51   H52   O5    HO5   
+        C2    H2    O2    HO2   
+        C3    H3    O3    HO3   
+*------------------------------------------------------------------
+{AMAN}            !charge: 0.000 ||  4C1 alpha-D-mannose
+    [atoms]
+         1 C1     CC3162      0.340
+         2 H1     HCA1        0.090
+         3 O1     OC311      -0.650
+         4 HO1    HCP1        0.420
+         5 C5     CC3163      0.110
+         6 H5     HCA1        0.090
+         7 O5     OC3C61     -0.400
+         8 C2     CC3161      0.140
+         9 H2     HCA1        0.090
+        10 O2     OC311      -0.650
+        11 HO2    HCP1        0.420
+        12 C3     CC3161      0.140
+        13 H3     HCA1        0.090
+        14 O3     OC311      -0.650
+        15 HO3    HCP1        0.420
+        16 C4     CC3161      0.140
+        17 H4     HCA1        0.090
+        18 O4     OC311      -0.650
+        19 HO4    HCP1        0.420
+        20 C6     CC321       0.050
+        21 H61    HCA2        0.090
+        22 H62    HCA2        0.090
+        23 O6     OC311      -0.650
+        24 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H1    
+       O1     HO1   
+       C1     O5    
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+    [charge_groups]
+        C1    H1    O1    HO1   C5    H5    O5    C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C6    H61   H62   O6    HO6   
+*------------------------------------------------------------------
+{ANE5AC}            !charge: -1.000 ||   alpha-Neu5Ac (N-acetyl-alpha-D-neuraminic acid)
+    [atoms]
+         1 C1     CC2O2       0.300
+         2 O11    OC2D2      -0.600
+         3 O12    OC2D2      -0.600
+         4 C2     CC3062      0.330
+         5 O2     OC311      -0.650
+         6 HO2    HCP1        0.420
+         7 C6     CC3163      0.110
+         8 H6     HCA1        0.090
+         9 O6     OC3C61     -0.400
+        10 C3     CC3261     -0.180
+        11 H31    HCA2        0.090
+        12 H32    HCA2        0.090
+        13 C4     CC3161      0.140
+        14 H4     HCA1        0.090
+        15 O4     OC311      -0.650
+        16 HO4    HCP1        0.420
+        17 C5     CC3161      0.070
+        18 H5     HCA1        0.090
+        19 N      NC2D1      -0.470
+        20 HN     HCP1        0.310
+        21 C      CC2O1       0.510
+        22 O      OC2D1      -0.510
+        23 CT     CC331      -0.270
+        24 HT1    HCA3        0.090
+        25 HT2    HCA3        0.090
+        26 HT3    HCA3        0.090
+        27 C7     CC312        0.14
+        28 H7     HCA1         0.09
+        29 O7     OC311       -0.65
+        30 HO7    HCP1         0.42
+        31 C8     CC312        0.14
+        32 H8     HCA1         0.09
+        33 O8     OC311       -0.65
+        34 HO8    HCP1         0.42
+        35 C9     CC322        0.05
+        36 H91    HCA2         0.09
+        37 H92    HCA2         0.09
+        38 O9     OC311       -0.65
+        39 HO9    HCP1         0.42
+    [bonds]
+       C1     O11   
+       C1     O12   
+       C2     O2    
+       C2     C1    
+       O2     HO2   
+       C2     O6    
+       C2     C3    
+       C3     H31   
+       C3     H32   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     N     
+       N      HN    
+       N      C     
+       C      O     
+       C      CT    
+       CT     HT1   
+       CT     HT2   
+       CT     HT3   
+       C5     C6    
+       C6     H6    
+       C6     C7    
+       C7     O7    
+       C7     H7    
+       C6     O6    
+       O7     HO7   
+       C7     C8    
+       C8     H8    
+       C8     O8    
+       O8     HO8   
+       C8     C9    
+       C9     H91   
+       C9     H92   
+       C9     O9    
+       O9     HO9   
+    [impropers]
+         C      CT     N      O     
+         N      C      C5     HN    
+         C1     C2     O12    O11   
+    [charge_groups]
+        C1    O11   O12   C2    O2    HO2   C6    H6    O6    C3    H31   H32   C4    H4    O4    HO4   C5    H5    N     HN    C     O     CT    HT1   HT2   HT3   C7    H7    O7    HO7   C8    H8    O8    HO8   C9    H91   H92   O9    HO9   
+*------------------------------------------------------------------
+{ARHM}            !charge: 0.000 ||  alpha-L-rhamnose
+    [atoms]
+         1 C1     CC3162      0.340
+         2 H1     HCA1        0.090
+         3 O1     OC311      -0.650
+         4 HO1    HCP1        0.420
+         5 C5     CC3163      0.110
+         6 H5     HCA1        0.090
+         7 O5     OC3C61     -0.400
+         8 C2     CC3161      0.140
+         9 H2     HCA1        0.090
+        10 O2     OC311      -0.650
+        11 HO2    HCP1        0.420
+        12 C3     CC3161      0.140
+        13 H3     HCA1        0.090
+        14 O3     OC311      -0.650
+        15 HO3    HCP1        0.420
+        16 C4     CC3161      0.140
+        17 H4     HCA1        0.090
+        18 O4     OC311      -0.650
+        19 HO4    HCP1        0.420
+        20 C6     CC331      -0.270
+        21 H61    HCA3        0.090
+        22 H62    HCA3        0.090
+        23 H63    HCA3        0.090
+    [bonds]
+       C1     O1    
+       C1     H1    
+       O1     HO1   
+       C1     O5    
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     H63   
+       C5     O5    
+    [charge_groups]
+        C1    H1    O1    HO1   C5    H5    O5    C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C6    H61   H62   H63   
+*------------------------------------------------------------------
+{ARHMOA}            !charge: 0.000 ||  2-O-Acetyl-alpha-L-rhamnose (alpha-6-Deoxy-L-mannose)
+    [atoms]
+         1 C1     CC3162      0.340
+         2 H1     HCA1        0.090
+         3 O1     OC311      -0.650
+         4 HO1    HCP1        0.420
+         5 C5     CC3163      0.110
+         6 H5     HCA1        0.090
+         7 O5     OC3C61     -0.400
+         8 C2     CC3161      0.170
+         9 H2     HCA1        0.090
+        10 O2     OC301      -0.490
+        11 CA2    CC2O5       0.900
+        12 OA2    OC2D1      -0.630
+        13 CB2    CC331      -0.310
+        14 HB1    HCA3        0.090
+        15 HB2    HCA3        0.090
+        16 HB3    HCA3        0.090
+        17 C3     CC3161      0.140
+        18 H3     HCA1        0.090
+        19 O3     OC311      -0.650
+        20 HO3    HCP1        0.420
+        21 C4     CC3161      0.140
+        22 H4     HCA1        0.090
+        23 O4     OC311      -0.650
+        24 HO4    HCP1        0.420
+        25 C6     CC331      -0.270
+        26 H61    HCA3        0.090
+        27 H62    HCA3        0.090
+        28 H63    HCA3        0.090
+    [bonds]
+       C1     O1    
+       C1     H1    
+       O1     HO1   
+       C1     O5    
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     H63   
+       C5     O5    
+       O2     CA2   
+       CA2    OA2   
+       CA2    CB2   
+       CB2    HB1   
+       CB2    HB2   
+       CB2    HB3   
+    [charge_groups]
+        C1    H1    O1    HO1   C5    H5    O5    C2    H2    O2    CA2   OA2   CB2   HB1   HB2   HB3   C3    H3    O3    HO3   C4    H4    O4    HO4   C6    H61   H62   H63   
+*------------------------------------------------------------------
+{ARIB}            !charge: 0.00 ||   alpha-Ribose
+    [atoms]
+         1 O4     OC3C51      -0.40
+         2 C1     CC3152       0.34
+         3 H1     HCA1         0.09
+         4 O1     OC311       -0.65
+         5 HO1    HCP1         0.42
+         6 C4     CC3153       0.11
+         7 H4     HCA1         0.09
+         8 C5     CC321        0.05
+         9 H51    HCA2         0.09
+        10 H52    HCA2         0.09
+        11 O5     OC311       -0.65
+        12 HO5    HCP1         0.42
+        13 C2     CC3151       0.14
+        14 H2     HCA1         0.09
+        15 O2     OC311       -0.65
+        16 HO2    HCP1         0.42
+        17 C3     CC3151       0.14
+        18 H3     HCA1         0.09
+        19 O3     OC311       -0.65
+        20 HO3    HCP1         0.42
+    [bonds]
+       O4     C1    
+       C1     H1    
+       C1     O1    
+       O1     HO1   
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     C5    
+       C4     O4    
+       C5     H51   
+       C5     H52   
+       C5     O5    
+       O5     HO5   
+    [charge_groups]
+        O4    C1    H1    O1    HO1   C4    H4    
+        C5    H51   H52   O5    HO5   
+        C2    H2    O2    HO2   
+        C3    H3    O3    HO3   
+*------------------------------------------------------------------
+{ATAL}            !charge: 0.000 ||  4C1 alpha-D-talose
+    [atoms]
+         1 C1     CC3162      0.340
+         2 H1     HCA1        0.090
+         3 O1     OC311      -0.650
+         4 HO1    HCP1        0.420
+         5 C5     CC3163      0.110
+         6 H5     HCA1        0.090
+         7 O5     OC3C61     -0.400
+         8 C2     CC3161      0.140
+         9 H2     HCA1        0.090
+        10 O2     OC311      -0.650
+        11 HO2    HCP1        0.420
+        12 C3     CC3161      0.140
+        13 H3     HCA1        0.090
+        14 O3     OC311      -0.650
+        15 HO3    HCP1        0.420
+        16 C4     CC3161      0.140
+        17 H4     HCA1        0.090
+        18 O4     OC311      -0.650
+        19 HO4    HCP1        0.420
+        20 C6     CC321       0.050
+        21 H61    HCA2        0.090
+        22 H62    HCA2        0.090
+        23 O6     OC311      -0.650
+        24 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H1    
+       O1     HO1   
+       C1     O5    
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+    [charge_groups]
+        C1    H1    O1    HO1   C5    H5    O5    C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C6    H61   H62   O6    HO6   
+*------------------------------------------------------------------
+{AXYF}            !charge: 0.00 ||   alpha-Xylofuranose
+    [atoms]
+         1 O4     OC3C51      -0.40
+         2 C1     CC3152       0.34
+         3 H1     HCA1         0.09
+         4 O1     OC311       -0.65
+         5 HO1    HCP1         0.42
+         6 C4     CC3153       0.11
+         7 H4     HCA1         0.09
+         8 C5     CC321        0.05
+         9 H51    HCA2         0.09
+        10 H52    HCA2         0.09
+        11 O5     OC311       -0.65
+        12 HO5    HCP1         0.42
+        13 C2     CC3151       0.14
+        14 H2     HCA1         0.09
+        15 O2     OC311       -0.65
+        16 HO2    HCP1         0.42
+        17 C3     CC3151       0.14
+        18 H3     HCA1         0.09
+        19 O3     OC311       -0.65
+        20 HO3    HCP1         0.42
+    [bonds]
+       O4     C1    
+       C1     H1    
+       C1     O1    
+       O1     HO1   
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     C5    
+       C4     O4    
+       C5     H51   
+       C5     H52   
+       C5     O5    
+       O5     HO5   
+    [charge_groups]
+        O4    C1    H1    O1    HO1   C4    H4    
+        C5    H51   H52   O5    HO5   
+        C2    H2    O2    HO2   
+        C3    H3    O3    HO3   
+*------------------------------------------------------------------
+{AXYL}            !charge: 0.000 ||  alpha-D-xylose (a-glucose w/o exocyclic moiety) og
+    [atoms]
+         1 C1     CC3162      0.340
+         2 H1     HCA1        0.090
+         3 O1     OC311      -0.650
+         4 HO1    HCP1        0.420
+         5 C5     CC3263      0.020
+         6 H51    HCA2        0.090
+         7 H52    HCA2        0.090
+         8 O5     OC3C61     -0.400
+         9 C2     CC3161      0.140
+        10 H2     HCA1        0.090
+        11 O2     OC311      -0.650
+        12 HO2    HCP1        0.420
+        13 C3     CC3161      0.140
+        14 H3     HCA1        0.090
+        15 O3     OC311      -0.650
+        16 HO3    HCP1        0.420
+        17 C4     CC3161      0.140
+        18 H4     HCA1        0.090
+        19 O4     OC311      -0.650
+        20 HO4    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H1    
+       O1     HO1   
+       C1     O5    
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H51   
+       C5     H52   
+       C5     O5    
+    [charge_groups]
+        C1    H1    O1    HO1   C5    H51   H52   O5    C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   
+*------------------------------------------------------------------
+{BALL}            !charge: 0.000 ||  4C1 beta-D-allose
+    [atoms]
+         1 C1     CC3162      0.340
+         2 H1     HCA1        0.090
+         3 O1     OC311      -0.650
+         4 HO1    HCP1        0.420
+         5 C5     CC3163      0.110
+         6 H5     HCA1        0.090
+         7 O5     OC3C61     -0.400
+         8 C2     CC3161      0.140
+         9 H2     HCA1        0.090
+        10 O2     OC311      -0.650
+        11 HO2    HCP1        0.420
+        12 C3     CC3161      0.140
+        13 H3     HCA1        0.090
+        14 O3     OC311      -0.650
+        15 HO3    HCP1        0.420
+        16 C4     CC3161      0.140
+        17 H4     HCA1        0.090
+        18 O4     OC311      -0.650
+        19 HO4    HCP1        0.420
+        20 C6     CC321       0.050
+        21 H61    HCA2        0.090
+        22 H62    HCA2        0.090
+        23 O6     OC311      -0.650
+        24 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H1    
+       O1     HO1   
+       C1     O5    
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+    [charge_groups]
+        C1    H1    O1    HO1   C5    H5    O5    C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C6    H61   H62   O6    HO6   
+*------------------------------------------------------------------
+{BALT}            !charge: 0.000 ||  4C1 beta-D-altrose
+    [atoms]
+         1 C1     CC3162      0.340
+         2 H1     HCA1        0.090
+         3 O1     OC311      -0.650
+         4 HO1    HCP1        0.420
+         5 C5     CC3163      0.110
+         6 H5     HCA1        0.090
+         7 O5     OC3C61     -0.400
+         8 C2     CC3161      0.140
+         9 H2     HCA1        0.090
+        10 O2     OC311      -0.650
+        11 HO2    HCP1        0.420
+        12 C3     CC3161      0.140
+        13 H3     HCA1        0.090
+        14 O3     OC311      -0.650
+        15 HO3    HCP1        0.420
+        16 C4     CC3161      0.140
+        17 H4     HCA1        0.090
+        18 O4     OC311      -0.650
+        19 HO4    HCP1        0.420
+        20 C6     CC321       0.050
+        21 H61    HCA2        0.090
+        22 H62    HCA2        0.090
+        23 O6     OC311      -0.650
+        24 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H1    
+       O1     HO1   
+       C1     O5    
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+    [charge_groups]
+        C1    H1    O1    HO1   C5    H5    O5    C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C6    H61   H62   O6    HO6   
+*------------------------------------------------------------------
+{BARB}            !charge: 0.00 ||   beta-Arabinose
+    [atoms]
+         1 O4     OC3C51      -0.40
+         2 C1     CC3152       0.34
+         3 H1     HCA1         0.09
+         4 O1     OC311       -0.65
+         5 HO1    HCP1         0.42
+         6 C4     CC3153       0.11
+         7 H4     HCA1         0.09
+         8 C5     CC321        0.05
+         9 H51    HCA2         0.09
+        10 H52    HCA2         0.09
+        11 O5     OC311       -0.65
+        12 HO5    HCP1         0.42
+        13 C2     CC3151       0.14
+        14 H2     HCA1         0.09
+        15 O2     OC311       -0.65
+        16 HO2    HCP1         0.42
+        17 C3     CC3151       0.14
+        18 H3     HCA1         0.09
+        19 O3     OC311       -0.65
+        20 HO3    HCP1         0.42
+    [bonds]
+       O4     C1    
+       C1     H1    
+       C1     O1    
+       O1     HO1   
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     C5    
+       C4     O4    
+       C5     H51   
+       C5     H52   
+       C5     O5    
+       O5     HO5   
+    [charge_groups]
+        O4    C1    H1    O1    HO1   C4    H4    
+        C5    H51   H52   O5    HO5   
+        C2    H2    O2    HO2   
+        C3    H3    O3    HO3   
+*------------------------------------------------------------------
+{BDEO}            !charge: 0.00 ||   beta-Deoxy-Ribose
+    [atoms]
+         1 O4     OC3C51      -0.40
+         2 C1     CC3152       0.34
+         3 H1     HCA1         0.09
+         4 O1     OC311       -0.65
+         5 HO1    HCP1         0.42
+         6 C4     CC3153       0.11
+         7 H4     HCA1         0.09
+         8 C5     CC321        0.05
+         9 H51    HCA2         0.09
+        10 H52    HCA2         0.09
+        11 O5     OC311       -0.65
+        12 HO5    HCP1         0.42
+        13 C2     CC3251      -0.18
+        14 H21    HCA2         0.09
+        15 H22    HCA2         0.09
+        16 C3     CC3151       0.14
+        17 H3     HCA1         0.09
+        18 O3     OC311       -0.65
+        19 HO3    HCP1         0.42
+    [bonds]
+       O4     C1    
+       C1     H1    
+       C1     O1    
+       O1     HO1   
+       C1     C2    
+       C2     H21   
+       C2     H22   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       C4     C5    
+       C5     H51   
+       C5     H52   
+       C5     O5    
+       O5     HO5   
+    [charge_groups]
+        O4    C1    H1    O1    HO1   C4    H4    
+        C5    H51   H52   O5    HO5   
+        C2    H21   H22   
+        C3    H3    O3    HO3   
+*------------------------------------------------------------------
+{BFRU}            !charge: 0.00 ||   beta-Fructofuranose
+    [atoms]
+         1 O5     OC3C51      -0.40
+         2 C2     CC3051       0.43
+         3 O2     OC311       -0.65
+         4 HO2    HCP1         0.42
+         5 C5     CC3153       0.11
+         6 H5     HCA1         0.09
+         7 C6     CC321        0.05
+         8 H61    HCA2         0.09
+         9 H62    HCA2         0.09
+        10 O6     OC311       -0.65
+        11 HO6    HCP1         0.42
+        12 C1     CC321        0.05
+        13 H11    HCA2         0.09
+        14 H12    HCA2         0.09
+        15 O1     OC311       -0.65
+        16 HO1    HCP1         0.42
+        17 C3     CC3151       0.14
+        18 H3     HCA1         0.09
+        19 O3     OC311       -0.65
+        20 HO3    HCP1         0.42
+        21 C4     CC3151       0.14
+        22 H4     HCA1         0.09
+        23 O4     OC311       -0.65
+        24 HO4    HCP1         0.42
+    [bonds]
+       O5     C2    
+       C2     C1    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C5     O5    
+       C6     H61   
+       C6     H62   
+       C6     O6    
+       O6     HO6   
+       C1     H11   
+       C1     H12   
+       C1     O1    
+       O1     HO1   
+    [charge_groups]
+        O5    C2    O2    HO2   C5    H5    
+        C6    H61   H62   O6    HO6   
+        C1    H11   H12   O1    HO1   
+        C3    H3    O3    HO3   
+        C4    H4    O4    HO4   
+*------------------------------------------------------------------
+{BFUC}            !charge: 0.000 ||  beta-L-fucose
+    [atoms]
+         1 C1     CC3162      0.340
+         2 H1     HCA1        0.090
+         3 O1     OC311      -0.650
+         4 HO1    HCP1        0.420
+         5 C5     CC3163      0.110
+         6 H5     HCA1        0.090
+         7 O5     OC3C61     -0.400
+         8 C2     CC3161      0.140
+         9 H2     HCA1        0.090
+        10 O2     OC311      -0.650
+        11 HO2    HCP1        0.420
+        12 C3     CC3161      0.140
+        13 H3     HCA1        0.090
+        14 O3     OC311      -0.650
+        15 HO3    HCP1        0.420
+        16 C4     CC3161      0.140
+        17 H4     HCA1        0.090
+        18 O4     OC311      -0.650
+        19 HO4    HCP1        0.420
+        20 C6     CC331      -0.270
+        21 H61    HCA3        0.090
+        22 H62    HCA3        0.090
+        23 H63    HCA3        0.090
+    [bonds]
+       C1     O1    
+       C1     H1    
+       O1     HO1   
+       C1     O5    
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     H63   
+       C5     O5    
+    [charge_groups]
+        C1    H1    O1    HO1   C5    H5    O5    C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C6    H61   H62   H63   
+*------------------------------------------------------------------
+{BGAL}            !charge: 0.000 ||  4C1 beta-D-galactose
+    [atoms]
+         1 C1     CC3162      0.340
+         2 H1     HCA1        0.090
+         3 O1     OC311      -0.650
+         4 HO1    HCP1        0.420
+         5 C5     CC3163      0.110
+         6 H5     HCA1        0.090
+         7 O5     OC3C61     -0.400
+         8 C2     CC3161      0.140
+         9 H2     HCA1        0.090
+        10 O2     OC311      -0.650
+        11 HO2    HCP1        0.420
+        12 C3     CC3161      0.140
+        13 H3     HCA1        0.090
+        14 O3     OC311      -0.650
+        15 HO3    HCP1        0.420
+        16 C4     CC3161      0.140
+        17 H4     HCA1        0.090
+        18 O4     OC311      -0.650
+        19 HO4    HCP1        0.420
+        20 C6     CC321       0.050
+        21 H61    HCA2        0.090
+        22 H62    HCA2        0.090
+        23 O6     OC311      -0.650
+        24 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H1    
+       O1     HO1   
+       C1     O5    
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+    [charge_groups]
+        C1    H1    O1    HO1   C5    H5    O5    C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C6    H61   H62   O6    HO6   
+*------------------------------------------------------------------
+{BGALNA}            !charge: 0.000 ||  2-acetyl-2-deoxy-beta-D-galactosamine
+    [atoms]
+         1 C1     CC3162      0.340
+         2 H1     HCA1        0.090
+         3 O1     OC311      -0.650
+         4 HO1    HCP1        0.420
+         5 C5     CC3163      0.110
+         6 H5     HCA1        0.090
+         7 O5     OC3C61     -0.400
+         8 C2     CC3161      0.070
+         9 H2     HCA1        0.090
+        10 N      NC2D1      -0.470
+        11 HN     HCP1        0.310
+        12 C      CC2O1       0.510
+        13 O      OC2D1      -0.510
+        14 CT     CC331      -0.270
+        15 HT1    HCA3        0.090
+        16 HT2    HCA3        0.090
+        17 HT3    HCA3        0.090
+        18 C3     CC3161      0.140
+        19 H3     HCA1        0.090
+        20 O3     OC311      -0.650
+        21 HO3    HCP1        0.420
+        22 C4     CC3161      0.140
+        23 H4     HCA1        0.090
+        24 O4     OC311      -0.650
+        25 HO4    HCP1        0.420
+        26 C6     CC321       0.050
+        27 H61    HCA2        0.090
+        28 H62    HCA2        0.090
+        29 O6     OC311      -0.650
+        30 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H1    
+       O1     HO1   
+       C1     O5    
+       C1     C2    
+       C2     H2    
+       C2     N     
+       N      HN    
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+       N      C     
+       C      O     
+       C      CT    
+       CT     HT1   
+       CT     HT2   
+       CT     HT3   
+    [impropers]
+         C      CT     N      O     
+         N      C      C2     HN    
+    [charge_groups]
+        C1    H1    O1    HO1   C5    H5    O5    C2    H2    N     HN    C     O     CT    HT1   HT2   HT3   C3    H3    O3    HO3   C4    H4    O4    HO4   C6    H61   H62   O6    HO6   
+*------------------------------------------------------------------
+{BGLC}            !charge: 0.000 ||  4C1 beta-D-glucose
+    [atoms]
+         1 C1     CC3162      0.340
+         2 H1     HCA1        0.090
+         3 O1     OC311      -0.650
+         4 HO1    HCP1        0.420
+         5 C5     CC3163      0.110
+         6 H5     HCA1        0.090
+         7 O5     OC3C61     -0.400
+         8 C2     CC3161      0.140
+         9 H2     HCA1        0.090
+        10 O2     OC311      -0.650
+        11 HO2    HCP1        0.420
+        12 C3     CC3161      0.140
+        13 H3     HCA1        0.090
+        14 O3     OC311      -0.650
+        15 HO3    HCP1        0.420
+        16 C4     CC3161      0.140
+        17 H4     HCA1        0.090
+        18 O4     OC311      -0.650
+        19 HO4    HCP1        0.420
+        20 C6     CC321       0.050
+        21 H61    HCA2        0.090
+        22 H62    HCA2        0.090
+        23 O6     OC311      -0.650
+        24 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H1    
+       O1     HO1   
+       C1     O5    
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+    [charge_groups]
+        C1    H1    O1    HO1   C5    H5    O5    C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C6    H61   H62   O6    HO6   
+*------------------------------------------------------------------
+{BGLCA}            !charge: -1.000 ||  4C1 beta-D-glucoronic acid
+    [atoms]
+         1 C1     CC3162      0.340
+         2 H1     HCA1        0.090
+         3 O1     OC311      -0.650
+         4 HO1    HCP1        0.420
+         5 C5     CC3163      0.110
+         6 H5     HCA1        0.090
+         7 O5     OC3C61     -0.400
+         8 C2     CC3161      0.140
+         9 H2     HCA1        0.090
+        10 O2     OC311      -0.650
+        11 HO2    HCP1        0.420
+        12 C3     CC3161      0.140
+        13 H3     HCA1        0.090
+        14 O3     OC311      -0.650
+        15 HO3    HCP1        0.420
+        16 C4     CC3161      0.140
+        17 H4     HCA1        0.090
+        18 O4     OC311      -0.650
+        19 HO4    HCP1        0.420
+        20 C6     CC2O2       0.520
+        21 O61    OC2D2      -0.760
+        22 O62    OC2D2      -0.760
+    [bonds]
+       C1     O1    
+       C1     H1    
+       O1     HO1   
+       C1     O5    
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     O61   
+       C6     O62   
+       C5     O5    
+    [impropers]
+         C6     C5     O62    O61   
+    [charge_groups]
+        C1    H1    O1    HO1   C5    H5    O5    C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C6    O61   O62   
+*------------------------------------------------------------------
+{BGLCA0}            !charge: 0.000 ||  4C1 beta-D-glucoronic acid
+    [atoms]
+         1 C1     CC3162      0.340
+         2 H1     HCA1        0.090
+         3 O1     OC311      -0.650
+         4 HO1    HCP1        0.420
+         5 C5     CC3163      0.110
+         6 H5     HCA1        0.090
+         7 O5     OC3C61     -0.400
+         8 C2     CC3161      0.140
+         9 H2     HCA1        0.090
+        10 O2     OC311      -0.650
+        11 HO2    HCP1        0.420
+        12 C3     CC3161      0.140
+        13 H3     HCA1        0.090
+        14 O3     OC311      -0.650
+        15 HO3    HCP1        0.420
+        16 C4     CC3161      0.140
+        17 H4     HCA1        0.090
+        18 O4     OC311      -0.650
+        19 HO4    HCP1        0.420
+        20 C6     CC2O2         0.0
+        21 O61    OC2D2         0.0
+        22 O62    OC2D2         0.0
+    [bonds]
+       C1     O1    
+       C1     H1    
+       O1     HO1   
+       C1     O5    
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     O61   
+       C6     O62   
+       C5     O5    
+    [impropers]
+         C6     C5     O62    O61   
+    [charge_groups]
+        C1    H1    O1    HO1   C5    H5    O5    C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C6    O61   O62   
+*------------------------------------------------------------------
+{BGLCN0}            !charge: 0.000 ||  2-acetyl-2-deoxy-beta-D-glucosamine
+    [atoms]
+         1 C1     CC3162      0.340
+         2 H1     HCA1        0.090
+         3 O1     OC311      -0.650
+         4 HO1    HCP1        0.420
+         5 C5     CC3163      0.110
+         6 H5     HCA1        0.090
+         7 O5     OC3C61     -0.400
+         8 C2     CC3161     -0.090
+         9 H2     HCA1        0.090
+        10 N      NC2D1         0.0
+        11 HN     HCP1          0.0
+        12 C      CC2O1         0.0
+        13 O      OC2D1         0.0
+        14 CT     CC331      -0.270
+        15 HT1    HCA3        0.090
+        16 HT2    HCA3        0.090
+        17 HT3    HCA3        0.090
+        18 C3     CC3161      0.140
+        19 H3     HCA1        0.090
+        20 O3     OC311      -0.650
+        21 HO3    HCP1        0.420
+        22 C4     CC3161      0.140
+        23 H4     HCA1        0.090
+        24 O4     OC311      -0.650
+        25 HO4    HCP1        0.420
+        26 C6     CC321       0.050
+        27 H61    HCA2        0.090
+        28 H62    HCA2        0.090
+        29 O6     OC311      -0.650
+        30 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H1    
+       O1     HO1   
+       C1     O5    
+       C1     C2    
+       C2     H2    
+       C2     N     
+       N      HN    
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+       N      C     
+       C      O     
+       C      CT    
+       CT     HT1   
+       CT     HT2   
+       CT     HT3   
+    [impropers]
+         C      CT     N      O     
+         N      C      C2     HN    
+    [charge_groups]
+        C1    H1    O1    HO1   C5    H5    O5    C2    H2    N     HN    C     O     CT    HT1   HT2   HT3   C3    H3    O3    HO3   C4    H4    O4    HO4   C6    H61   H62   O6    HO6   
+*------------------------------------------------------------------
+{BGLCNA}            !charge: 0.000 ||  2-acetyl-2-deoxy-beta-D-glucosamine
+    [atoms]
+         1 C1     CC3162      0.340
+         2 H1     HCA1        0.090
+         3 O1     OC311      -0.650
+         4 HO1    HCP1        0.420
+         5 C5     CC3163      0.110
+         6 H5     HCA1        0.090
+         7 O5     OC3C61     -0.400
+         8 C2     CC3161      0.070
+         9 H2     HCA1        0.090
+        10 N      NC2D1      -0.470
+        11 HN     HCP1        0.310
+        12 C      CC2O1       0.510
+        13 O      OC2D1      -0.510
+        14 CT     CC331      -0.270
+        15 HT1    HCA3        0.090
+        16 HT2    HCA3        0.090
+        17 HT3    HCA3        0.090
+        18 C3     CC3161      0.140
+        19 H3     HCA1        0.090
+        20 O3     OC311      -0.650
+        21 HO3    HCP1        0.420
+        22 C4     CC3161      0.140
+        23 H4     HCA1        0.090
+        24 O4     OC311      -0.650
+        25 HO4    HCP1        0.420
+        26 C6     CC321       0.050
+        27 H61    HCA2        0.090
+        28 H62    HCA2        0.090
+        29 O6     OC311      -0.650
+        30 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H1    
+       O1     HO1   
+       C1     O5    
+       C1     C2    
+       C2     H2    
+       C2     N     
+       N      HN    
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+       N      C     
+       C      O     
+       C      CT    
+       CT     HT1   
+       CT     HT2   
+       CT     HT3   
+    [impropers]
+         C      CT     N      O     
+         N      C      C2     HN    
+    [charge_groups]
+        C1    H1    O1    HO1   C5    H5    O5    C2    H2    N     HN    C     O     CT    HT1   HT2   HT3   C3    H3    O3    HO3   C4    H4    O4    HO4   C6    H61   H62   O6    HO6   
+*------------------------------------------------------------------
+{BGUL}            !charge: 0.000 ||  4C1 beta-D-gulose
+    [atoms]
+         1 C1     CC3162      0.340
+         2 H1     HCA1        0.090
+         3 O1     OC311      -0.650
+         4 HO1    HCP1        0.420
+         5 C5     CC3163      0.110
+         6 H5     HCA1        0.090
+         7 O5     OC3C61     -0.400
+         8 C2     CC3161      0.140
+         9 H2     HCA1        0.090
+        10 O2     OC311      -0.650
+        11 HO2    HCP1        0.420
+        12 C3     CC3161      0.140
+        13 H3     HCA1        0.090
+        14 O3     OC311      -0.650
+        15 HO3    HCP1        0.420
+        16 C4     CC3161      0.140
+        17 H4     HCA1        0.090
+        18 O4     OC311      -0.650
+        19 HO4    HCP1        0.420
+        20 C6     CC321       0.050
+        21 H61    HCA2        0.090
+        22 H62    HCA2        0.090
+        23 O6     OC311      -0.650
+        24 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H1    
+       O1     HO1   
+       C1     O5    
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+    [charge_groups]
+        C1    H1    O1    HO1   C5    H5    O5    C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C6    H61   H62   O6    HO6   
+*------------------------------------------------------------------
+{BIDO}            !charge: 0.000 ||  4C1 beta-D-idose
+    [atoms]
+         1 C1     CC3162      0.340
+         2 H1     HCA1        0.090
+         3 O1     OC311      -0.650
+         4 HO1    HCP1        0.420
+         5 C5     CC3163      0.110
+         6 H5     HCA1        0.090
+         7 O5     OC3C61     -0.400
+         8 C2     CC3161      0.140
+         9 H2     HCA1        0.090
+        10 O2     OC311      -0.650
+        11 HO2    HCP1        0.420
+        12 C3     CC3161      0.140
+        13 H3     HCA1        0.090
+        14 O3     OC311      -0.650
+        15 HO3    HCP1        0.420
+        16 C4     CC3161      0.140
+        17 H4     HCA1        0.090
+        18 O4     OC311      -0.650
+        19 HO4    HCP1        0.420
+        20 C6     CC321       0.050
+        21 H61    HCA2        0.090
+        22 H62    HCA2        0.090
+        23 O6     OC311      -0.650
+        24 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H1    
+       O1     HO1   
+       C1     O5    
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+    [charge_groups]
+        C1    H1    O1    HO1   C5    H5    O5    C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C6    H61   H62   O6    HO6   
+*------------------------------------------------------------------
+{BIDOA}            !charge: -1.000 ||      beta-L-iduronic acid
+    [atoms]
+         1 C1     CC3162      0.340
+         2 H1     HCA1        0.090
+         3 O1     OC311      -0.650
+         4 HO1    HCP1        0.420
+         5 C5     CC3163      0.110
+         6 H5     HCA1        0.090
+         7 O5     OC3C61     -0.400
+         8 C2     CC3161      0.140
+         9 H2     HCA1        0.090
+        10 O2     OC311      -0.650
+        11 HO2    HCP1        0.420
+        12 C3     CC3161      0.140
+        13 H3     HCA1        0.090
+        14 O3     OC311      -0.650
+        15 HO3    HCP1        0.420
+        16 C4     CC3161      0.140
+        17 H4     HCA1        0.090
+        18 O4     OC311      -0.650
+        19 HO4    HCP1        0.420
+        20 C6     CC2O2       0.520
+        21 O61    OC2D2      -0.760
+        22 O62    OC2D2      -0.760
+    [bonds]
+       C1     O1    
+       C1     H1    
+       O1     HO1   
+       C1     O5    
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     O61   
+       C6     O62   
+       C5     O5    
+    [impropers]
+         C6     C5     O62    O61   
+    [charge_groups]
+        C1    H1    O1    HO1   C5    H5    O5    C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C6    O61   O62   
+*------------------------------------------------------------------
+{BLYF}            !charge: 0.00 ||   beta-Lyxofuranose
+    [atoms]
+         1 O4     OC3C51      -0.40
+         2 C1     CC3152       0.34
+         3 H1     HCA1         0.09
+         4 O1     OC311       -0.65
+         5 HO1    HCP1         0.42
+         6 C4     CC3153       0.11
+         7 H4     HCA1         0.09
+         8 C5     CC321        0.05
+         9 H51    HCA2         0.09
+        10 H52    HCA2         0.09
+        11 O5     OC311       -0.65
+        12 HO5    HCP1         0.42
+        13 C2     CC3151       0.14
+        14 H2     HCA1         0.09
+        15 O2     OC311       -0.65
+        16 HO2    HCP1         0.42
+        17 C3     CC3151       0.14
+        18 H3     HCA1         0.09
+        19 O3     OC311       -0.65
+        20 HO3    HCP1         0.42
+    [bonds]
+       O4     C1    
+       C1     H1    
+       C1     O1    
+       O1     HO1   
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     C5    
+       C4     O4    
+       C5     H51   
+       C5     H52   
+       C5     O5    
+       O5     HO5   
+    [charge_groups]
+        O4    C1    H1    O1    HO1   C4    H4    
+        C5    H51   H52   O5    HO5   
+        C2    H2    O2    HO2   
+        C3    H3    O3    HO3   
+*------------------------------------------------------------------
+{BMAN}            !charge: 0.000 ||  4C1 beta-D-mannose
+    [atoms]
+         1 C1     CC3162      0.340
+         2 H1     HCA1        0.090
+         3 O1     OC311      -0.650
+         4 HO1    HCP1        0.420
+         5 C5     CC3163      0.110
+         6 H5     HCA1        0.090
+         7 O5     OC3C61     -0.400
+         8 C2     CC3161      0.140
+         9 H2     HCA1        0.090
+        10 O2     OC311      -0.650
+        11 HO2    HCP1        0.420
+        12 C3     CC3161      0.140
+        13 H3     HCA1        0.090
+        14 O3     OC311      -0.650
+        15 HO3    HCP1        0.420
+        16 C4     CC3161      0.140
+        17 H4     HCA1        0.090
+        18 O4     OC311      -0.650
+        19 HO4    HCP1        0.420
+        20 C6     CC321       0.050
+        21 H61    HCA2        0.090
+        22 H62    HCA2        0.090
+        23 O6     OC311      -0.650
+        24 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H1    
+       O1     HO1   
+       C1     O5    
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+    [charge_groups]
+        C1    H1    O1    HO1   C5    H5    O5    C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C6    H61   H62   O6    HO6   
+*------------------------------------------------------------------
+{BNE5AC}            !charge: -1.000 ||   beta-Neu5Ac (N-acetyl-alpha-D-neuraminic acid)
+    [atoms]
+         1 C1     CC2O2       0.300
+         2 O11    OC2D2      -0.600
+         3 O12    OC2D2      -0.600
+         4 C2     CC3062      0.330
+         5 O2     OC311      -0.650
+         6 HO2    HCP1        0.420
+         7 C6     CC3163      0.110
+         8 H6     HCA1        0.090
+         9 O6     OC3C61     -0.400
+        10 C3     CC3261     -0.180
+        11 H31    HCA2        0.090
+        12 H32    HCA2        0.090
+        13 C4     CC3161      0.140
+        14 H4     HCA1        0.090
+        15 O4     OC311      -0.650
+        16 HO4    HCP1        0.420
+        17 C5     CC3161      0.070
+        18 H5     HCA1        0.090
+        19 N      NC2D1      -0.470
+        20 HN     HCP1        0.310
+        21 C      CC2O1       0.510
+        22 O      OC2D1      -0.510
+        23 CT     CC331      -0.270
+        24 HT1    HCA3        0.090
+        25 HT2    HCA3        0.090
+        26 HT3    HCA3        0.090
+        27 C7     CC312        0.14
+        28 H7     HCA1         0.09
+        29 O7     OC311       -0.65
+        30 HO7    HCP1         0.42
+        31 C8     CC312        0.14
+        32 H8     HCA1         0.09
+        33 O8     OC311       -0.65
+        34 HO8    HCP1         0.42
+        35 C9     CC322        0.05
+        36 H91    HCA2         0.09
+        37 H92    HCA2         0.09
+        38 O9     OC311       -0.65
+        39 HO9    HCP1         0.42
+    [bonds]
+       C1     O11   
+       C1     O12   
+       C2     O2    
+       C2     C1    
+       O2     HO2   
+       C2     O6    
+       C2     C3    
+       C3     H31   
+       C3     H32   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     N     
+       N      HN    
+       N      C     
+       C      O     
+       C      CT    
+       CT     HT1   
+       CT     HT2   
+       CT     HT3   
+       C5     C6    
+       C6     H6    
+       C6     C7    
+       C7     O7    
+       C7     H7    
+       C6     O6    
+       O7     HO7   
+       C7     C8    
+       C8     H8    
+       C8     O8    
+       O8     HO8   
+       C8     C9    
+       C9     H91   
+       C9     H92   
+       C9     O9    
+       O9     HO9   
+    [impropers]
+         C      CT     N      O     
+         N      C      C5     HN    
+         C1     C2     O12    O11   
+    [charge_groups]
+        C1    O11   O12   C2    O2    HO2   C6    H6    O6    C3    H31   H32   C4    H4    O4    HO4   C5    H5    N     HN    C     O     CT    HT1   HT2   HT3   C7    H7    O7    HO7   C8    H8    O8    HO8   C9    H91   H92   O9    HO9   
+*------------------------------------------------------------------
+{BRHM}            !charge: 0.000 ||  beta-L-rhamnose
+    [atoms]
+         1 C1     CC3162      0.340
+         2 H1     HCA1        0.090
+         3 O1     OC311      -0.650
+         4 HO1    HCP1        0.420
+         5 C5     CC3163      0.110
+         6 H5     HCA1        0.090
+         7 O5     OC3C61     -0.400
+         8 C2     CC3161      0.140
+         9 H2     HCA1        0.090
+        10 O2     OC311      -0.650
+        11 HO2    HCP1        0.420
+        12 C3     CC3161      0.140
+        13 H3     HCA1        0.090
+        14 O3     OC311      -0.650
+        15 HO3    HCP1        0.420
+        16 C4     CC3161      0.140
+        17 H4     HCA1        0.090
+        18 O4     OC311      -0.650
+        19 HO4    HCP1        0.420
+        20 C6     CC331      -0.270
+        21 H61    HCA3        0.090
+        22 H62    HCA3        0.090
+        23 H63    HCA3        0.090
+    [bonds]
+       C1     O1    
+       C1     H1    
+       O1     HO1   
+       C1     O5    
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     H63   
+       C5     O5    
+    [charge_groups]
+        C1    H1    O1    HO1   C5    H5    O5    C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C6    H61   H62   H63   
+*------------------------------------------------------------------
+{BRIB}            !charge: 0.00 ||   beta-Ribose
+    [atoms]
+         1 O4     OC3C51      -0.40
+         2 C1     CC3152       0.34
+         3 H1     HCA1         0.09
+         4 O1     OC311       -0.65
+         5 HO1    HCP1         0.42
+         6 C4     CC3153       0.11
+         7 H4     HCA1         0.09
+         8 C5     CC321        0.05
+         9 H51    HCA2         0.09
+        10 H52    HCA2         0.09
+        11 O5     OC311       -0.65
+        12 HO5    HCP1         0.42
+        13 C2     CC3151       0.14
+        14 H2     HCA1         0.09
+        15 O2     OC311       -0.65
+        16 HO2    HCP1         0.42
+        17 C3     CC3151       0.14
+        18 H3     HCA1         0.09
+        19 O3     OC311       -0.65
+        20 HO3    HCP1         0.42
+    [bonds]
+       O4     C1    
+       C1     H1    
+       C1     O1    
+       O1     HO1   
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     C5    
+       C4     O4    
+       C5     H51   
+       C5     H52   
+       C5     O5    
+       O5     HO5   
+    [charge_groups]
+        O4    C1    H1    O1    HO1   C4    H4    
+        C5    H51   H52   O5    HO5   
+        C2    H2    O2    HO2   
+        C3    H3    O3    HO3   
+*------------------------------------------------------------------
+{BTAL}            !charge: 0.000 ||  4C1 beta-D-talose
+    [atoms]
+         1 C1     CC3162      0.340
+         2 H1     HCA1        0.090
+         3 O1     OC311      -0.650
+         4 HO1    HCP1        0.420
+         5 C5     CC3163      0.110
+         6 H5     HCA1        0.090
+         7 O5     OC3C61     -0.400
+         8 C2     CC3161      0.140
+         9 H2     HCA1        0.090
+        10 O2     OC311      -0.650
+        11 HO2    HCP1        0.420
+        12 C3     CC3161      0.140
+        13 H3     HCA1        0.090
+        14 O3     OC311      -0.650
+        15 HO3    HCP1        0.420
+        16 C4     CC3161      0.140
+        17 H4     HCA1        0.090
+        18 O4     OC311      -0.650
+        19 HO4    HCP1        0.420
+        20 C6     CC321       0.050
+        21 H61    HCA2        0.090
+        22 H62    HCA2        0.090
+        23 O6     OC311      -0.650
+        24 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H1    
+       O1     HO1   
+       C1     O5    
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+    [charge_groups]
+        C1    H1    O1    HO1   C5    H5    O5    C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C6    H61   H62   O6    HO6   
+*------------------------------------------------------------------
+{BXYF}            !charge: 0.00 ||   beta-Xylofuranose
+    [atoms]
+         1 O4     OC3C51      -0.40
+         2 C1     CC3152       0.34
+         3 H1     HCA1         0.09
+         4 O1     OC311       -0.65
+         5 HO1    HCP1         0.42
+         6 C4     CC3153       0.11
+         7 H4     HCA1         0.09
+         8 C5     CC321        0.05
+         9 H51    HCA2         0.09
+        10 H52    HCA2         0.09
+        11 O5     OC311       -0.65
+        12 HO5    HCP1         0.42
+        13 C2     CC3151       0.14
+        14 H2     HCA1         0.09
+        15 O2     OC311       -0.65
+        16 HO2    HCP1         0.42
+        17 C3     CC3151       0.14
+        18 H3     HCA1         0.09
+        19 O3     OC311       -0.65
+        20 HO3    HCP1         0.42
+    [bonds]
+       O4     C1    
+       C1     H1    
+       C1     O1    
+       O1     HO1   
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     C5    
+       C4     O4    
+       C5     H51   
+       C5     H52   
+       C5     O5    
+       O5     HO5   
+    [charge_groups]
+        O4    C1    H1    O1    HO1   C4    H4    
+        C5    H51   H52   O5    HO5   
+        C2    H2    O2    HO2   
+        C3    H3    O3    HO3   
+*------------------------------------------------------------------
+{BXYL}            !charge: 0.000 ||  beta-D-xylose (b-glucose w/o exocyclic moiety) og
+    [atoms]
+         1 C1     CC3162      0.340
+         2 H1     HCA1        0.090
+         3 O1     OC311      -0.650
+         4 HO1    HCP1        0.420
+         5 C5     CC3263      0.020
+         6 H51    HCA2        0.090
+         7 H52    HCA2        0.090
+         8 O5     OC3C61     -0.400
+         9 C2     CC3161      0.140
+        10 H2     HCA1        0.090
+        11 O2     OC311      -0.650
+        12 HO2    HCP1        0.420
+        13 C3     CC3161      0.140
+        14 H3     HCA1        0.090
+        15 O3     OC311      -0.650
+        16 HO3    HCP1        0.420
+        17 C4     CC3161      0.140
+        18 H4     HCA1        0.090
+        19 O4     OC311      -0.650
+        20 HO4    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H1    
+       O1     HO1   
+       C1     O5    
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H51   
+       C5     H52   
+       C5     O5    
+    [charge_groups]
+        C1    H1    O1    HO1   C5    H51   H52   O5    C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   
+*------------------------------------------------------------------
+{DALTOL}            !charge: 0.000 ||  D-ALTritOL (same as talitol)
+    [atoms]
+         1 C1     CC322       0.050
+         2 H11    HCA2        0.090
+         3 H12    HCA2        0.090
+         4 O1     OC311      -0.650
+         5 HO1    HCP1        0.420
+         6 C2     CC312       0.140
+         7 H2     HCA1        0.090
+         8 O2     OC311      -0.650
+         9 HO2    HCP1        0.420
+        10 C3     CC312       0.140
+        11 H3     HCA1        0.090
+        12 O3     OC311      -0.650
+        13 HO3    HCP1        0.420
+        14 C4     CC312       0.140
+        15 H4     HCA1        0.090
+        16 O4     OC311      -0.650
+        17 HO4    HCP1        0.420
+        18 C5     CC312       0.140
+        19 H5     HCA1        0.090
+        20 O5     OC311      -0.650
+        21 HO5    HCP1        0.420
+        22 C6     CC322       0.050
+        23 H61    HCA2        0.090
+        24 H62    HCA2        0.090
+        25 O6     OC311      -0.650
+        26 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H11   
+       O1     HO1   
+       C1     H12   
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+       O5     HO5   
+    [charge_groups]
+        C1    H11   H12   O1    HO1   C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C5    H5    O5    HO5   C6    H61   H62   O6    HO6   
+*------------------------------------------------------------------
+{DARAOL}            !charge: 0.000 ||  D-ARAbitOL (same as lyxitol)
+    [atoms]
+         1 C1     CC322       0.050
+         2 H11    HCA2        0.090
+         3 H12    HCA2        0.090
+         4 O1     OC311      -0.650
+         5 HO1    HCP1        0.420
+         6 C2     CC312       0.140
+         7 H2     HCA1        0.090
+         8 O2     OC311      -0.650
+         9 HO2    HCP1        0.420
+        10 C3     CC312       0.140
+        11 H3     HCA1        0.090
+        12 O3     OC311      -0.650
+        13 HO3    HCP1        0.420
+        14 C4     CC312       0.140
+        15 H4     HCA1        0.090
+        16 O4     OC311      -0.650
+        17 HO4    HCP1        0.420
+        18 C5     CC322       0.050
+        19 H51    HCA2        0.090
+        20 H52    HCA2        0.090
+        21 O5     OC311      -0.650
+        22 HO5    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H11   
+       O1     HO1   
+       C1     H12   
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H51   
+       C5     O5    
+       O5     HO5   
+       C5     H52   
+    [charge_groups]
+        C1    H11   H12   O1    HO1   C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C5    H51   H52   O5    HO5   
+*------------------------------------------------------------------
+{DGLUOL}            !charge: 0.000 ||  D-GLUcitOL (sorbitol)
+    [atoms]
+         1 C1     CC322       0.050
+         2 H11    HCA2        0.090
+         3 H12    HCA2        0.090
+         4 O1     OC311      -0.650
+         5 HO1    HCP1        0.420
+         6 C2     CC312       0.140
+         7 H2     HCA1        0.090
+         8 O2     OC311      -0.650
+         9 HO2    HCP1        0.420
+        10 C3     CC312       0.140
+        11 H3     HCA1        0.090
+        12 O3     OC311      -0.650
+        13 HO3    HCP1        0.420
+        14 C4     CC312       0.140
+        15 H4     HCA1        0.090
+        16 O4     OC311      -0.650
+        17 HO4    HCP1        0.420
+        18 C5     CC312       0.140
+        19 H5     HCA1        0.090
+        20 O5     OC311      -0.650
+        21 HO5    HCP1        0.420
+        22 C6     CC322       0.050
+        23 H61    HCA2        0.090
+        24 H62    HCA2        0.090
+        25 O6     OC311      -0.650
+        26 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H11   
+       O1     HO1   
+       C1     H12   
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+       O5     HO5   
+    [charge_groups]
+        C1    H11   H12   O1    HO1   C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C5    H5    O5    HO5   C6    H61   H62   O6    HO6   
+*------------------------------------------------------------------
+{DGULOL}            !charge: 0.000 ||  D-GULitOL
+    [atoms]
+         1 C1     CC322       0.050
+         2 H11    HCA2        0.090
+         3 H12    HCA2        0.090
+         4 O1     OC311      -0.650
+         5 HO1    HCP1        0.420
+         6 C2     CC312       0.140
+         7 H2     HCA1        0.090
+         8 O2     OC311      -0.650
+         9 HO2    HCP1        0.420
+        10 C3     CC312       0.140
+        11 H3     HCA1        0.090
+        12 O3     OC311      -0.650
+        13 HO3    HCP1        0.420
+        14 C4     CC312       0.140
+        15 H4     HCA1        0.090
+        16 O4     OC311      -0.650
+        17 HO4    HCP1        0.420
+        18 C5     CC312       0.140
+        19 H5     HCA1        0.090
+        20 O5     OC311      -0.650
+        21 HO5    HCP1        0.420
+        22 C6     CC322       0.050
+        23 H61    HCA2        0.090
+        24 H62    HCA2        0.090
+        25 O6     OC311      -0.650
+        26 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H11   
+       O1     HO1   
+       C1     H12   
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+       O5     HO5   
+    [charge_groups]
+        C1    H11   H12   O1    HO1   C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C5    H5    O5    HO5   C6    H61   H62   O6    HO6   
+*------------------------------------------------------------------
+{DIDIOL}            !charge: 0.000 ||  D-IDItOL
+    [atoms]
+         1 C1     CC322       0.050
+         2 H11    HCA2        0.090
+         3 H12    HCA2        0.090
+         4 O1     OC311      -0.650
+         5 HO1    HCP1        0.420
+         6 C2     CC312       0.140
+         7 H2     HCA1        0.090
+         8 O2     OC311      -0.650
+         9 HO2    HCP1        0.420
+        10 C3     CC312       0.140
+        11 H3     HCA1        0.090
+        12 O3     OC311      -0.650
+        13 HO3    HCP1        0.420
+        14 C4     CC312       0.140
+        15 H4     HCA1        0.090
+        16 O4     OC311      -0.650
+        17 HO4    HCP1        0.420
+        18 C5     CC312       0.140
+        19 H5     HCA1        0.090
+        20 O5     OC311      -0.650
+        21 HO5    HCP1        0.420
+        22 C6     CC322       0.050
+        23 H61    HCA2        0.090
+        24 H62    HCA2        0.090
+        25 O6     OC311      -0.650
+        26 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H11   
+       O1     HO1   
+       C1     H12   
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+       O5     HO5   
+    [charge_groups]
+        C1    H11   H12   O1    HO1   C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C5    H5    O5    HO5   C6    H61   H62   O6    HO6   
+*------------------------------------------------------------------
+{DMANOL}            !charge: 0.000 ||  D-MANnitOL
+    [atoms]
+         1 C1     CC322       0.050
+         2 H11    HCA2        0.090
+         3 H12    HCA2        0.090
+         4 O1     OC311      -0.650
+         5 HO1    HCP1        0.420
+         6 C2     CC312       0.140
+         7 H2     HCA1        0.090
+         8 O2     OC311      -0.650
+         9 HO2    HCP1        0.420
+        10 C3     CC312       0.140
+        11 H3     HCA1        0.090
+        12 O3     OC311      -0.650
+        13 HO3    HCP1        0.420
+        14 C4     CC312       0.140
+        15 H4     HCA1        0.090
+        16 O4     OC311      -0.650
+        17 HO4    HCP1        0.420
+        18 C5     CC312       0.140
+        19 H5     HCA1        0.090
+        20 O5     OC311      -0.650
+        21 HO5    HCP1        0.420
+        22 C6     CC322       0.050
+        23 H61    HCA2        0.090
+        24 H62    HCA2        0.090
+        25 O6     OC311      -0.650
+        26 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H11   
+       O1     HO1   
+       C1     H12   
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+       O5     HO5   
+    [charge_groups]
+        C1    H11   H12   O1    HO1   C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C5    H5    O5    HO5   C6    H61   H62   O6    HO6   
+*------------------------------------------------------------------
+{DTHROL}            !charge: 0.000 ||  D-THReitOL
+    [atoms]
+         1 C1     CC322       0.050
+         2 H11    HCA2        0.090
+         3 H12    HCA2        0.090
+         4 O1     OC311      -0.650
+         5 HO1    HCP1        0.420
+         6 C2     CC312       0.140
+         7 H2     HCA1        0.090
+         8 O2     OC311      -0.650
+         9 HO2    HCP1        0.420
+        10 C3     CC312       0.140
+        11 H3     HCA1        0.090
+        12 O3     OC311      -0.650
+        13 HO3    HCP1        0.420
+        14 C4     CC322       0.050
+        15 H41    HCA2        0.090
+        16 H42    HCA2        0.090
+        17 O4     OC311      -0.650
+        18 HO4    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H11   
+       O1     HO1   
+       C1     H12   
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H41   
+       C4     O4    
+       O4     HO4   
+       C4     H42   
+    [charge_groups]
+        C1    H11   H12   O1    HO1   
+        C2    H2    O2    HO2   
+        C3    H3    O3    HO3   
+        C4    H41   H42   O4    HO4   
+*------------------------------------------------------------------
+{INI1}            !charge: 0.000 ||  cyclic  myi-inositol
+    [atoms]
+         1 C1     CC3161      0.140
+         2 H1     HCA1        0.090
+         3 O1     OC311      -0.650
+         4 HO1    HCP1        0.420
+         5 C2     CC3161      0.140
+         6 H2     HCA1        0.090
+         7 O2     OC311      -0.650
+         8 HO2    HCP1        0.420
+         9 C3     CC3161      0.140
+        10 H3     HCA1        0.090
+        11 O3     OC311      -0.650
+        12 HO3    HCP1        0.420
+        13 C4     CC3161      0.140
+        14 H4     HCA1        0.090
+        15 O4     OC311      -0.650
+        16 HO4    HCP1        0.420
+        17 C5     CC3161      0.140
+        18 H5     HCA1        0.090
+        19 O5     OC311      -0.650
+        20 HO5    HCP1        0.420
+        21 C6     CC3161      0.140
+        22 H6     HCA1        0.090
+        23 O6     OC311      -0.650
+        24 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H1    
+       O1     HO1   
+       C1     C6    
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H6    
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+       O5     HO5   
+    [charge_groups]
+        C1    H1    O1    HO1   C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C5    H5    O5    HO5   C6    H6    O6    HO6   
+*------------------------------------------------------------------
+{INI2}            !charge: 0.000 ||  cyclic  epi-inositol
+    [atoms]
+         1 C1     CC3161      0.140
+         2 H1     HCA1        0.090
+         3 O1     OC311      -0.650
+         4 HO1    HCP1        0.420
+         5 C5     CC3161      0.140
+         6 H5     HCA1        0.090
+         7 O5     OC311      -0.650
+         8 HO5    HCP1        0.420
+         9 C2     CC3161      0.140
+        10 H2     HCA1        0.090
+        11 O2     OC311      -0.650
+        12 HO2    HCP1        0.420
+        13 C3     CC3161      0.140
+        14 H3     HCA1        0.090
+        15 O3     OC311      -0.650
+        16 HO3    HCP1        0.420
+        17 C4     CC3161      0.140
+        18 H4     HCA1        0.090
+        19 O4     OC311      -0.650
+        20 HO4    HCP1        0.420
+        21 C6     CC3161      0.140
+        22 H6     HCA1        0.090
+        23 O6     OC311      -0.650
+        24 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H1    
+       O1     HO1   
+       C1     C6    
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H6    
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+       O5     HO5   
+    [charge_groups]
+        C1    H1    O1    HO1   C5    H5    O5    HO5   C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C6    H6    O6    HO6   
+*------------------------------------------------------------------
+{INI3}            !charge: 0.000 ||  cyclic  allo-inositol
+    [atoms]
+         1 C1     CC3161      0.140
+         2 H1     HCA1        0.090
+         3 O1     OC311      -0.650
+         4 HO1    HCP1        0.420
+         5 C5     CC3161      0.140
+         6 H5     HCA1        0.090
+         7 O5     OC311      -0.650
+         8 HO5    HCP1        0.420
+         9 C2     CC3161      0.140
+        10 H2     HCA1        0.090
+        11 O2     OC311      -0.650
+        12 HO2    HCP1        0.420
+        13 C3     CC3161      0.140
+        14 H3     HCA1        0.090
+        15 O3     OC311      -0.650
+        16 HO3    HCP1        0.420
+        17 C4     CC3161      0.140
+        18 H4     HCA1        0.090
+        19 O4     OC311      -0.650
+        20 HO4    HCP1        0.420
+        21 C6     CC3161      0.140
+        22 H6     HCA1        0.090
+        23 O6     OC311      -0.650
+        24 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H1    
+       O1     HO1   
+       C1     C6    
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H6    
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+       O5     HO5   
+    [charge_groups]
+        C1    H1    O1    HO1   C5    H5    O5    HO5   C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C6    H6    O6    HO6   
+*------------------------------------------------------------------
+{INI4}            !charge: 0.000 ||  cyclic  l-chiro-inositol
+    [atoms]
+         1 C1     CC3161      0.140
+         2 H1     HCA1        0.090
+         3 O1     OC311      -0.650
+         4 HO1    HCP1        0.420
+         5 C5     CC3161      0.140
+         6 H5     HCA1        0.090
+         7 O5     OC311      -0.650
+         8 HO5    HCP1        0.420
+         9 C2     CC3161      0.140
+        10 H2     HCA1        0.090
+        11 O2     OC311      -0.650
+        12 HO2    HCP1        0.420
+        13 C3     CC3161      0.140
+        14 H3     HCA1        0.090
+        15 O3     OC311      -0.650
+        16 HO3    HCP1        0.420
+        17 C4     CC3161      0.140
+        18 H4     HCA1        0.090
+        19 O4     OC311      -0.650
+        20 HO4    HCP1        0.420
+        21 C6     CC3161      0.140
+        22 H6     HCA1        0.090
+        23 O6     OC311      -0.650
+        24 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H1    
+       O1     HO1   
+       C1     C6    
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H6    
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+       O5     HO5   
+    [charge_groups]
+        C1    H1    O1    HO1   C5    H5    O5    HO5   C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C6    H6    O6    HO6   
+*------------------------------------------------------------------
+{INI5}            !charge: 0.000 ||  cyclic  muco-inositol
+    [atoms]
+         1 C1     CC3161      0.140
+         2 H1     HCA1        0.090
+         3 O1     OC311      -0.650
+         4 HO1    HCP1        0.420
+         5 C5     CC3161      0.140
+         6 H5     HCA1        0.090
+         7 O5     OC311      -0.650
+         8 HO5    HCP1        0.420
+         9 C2     CC3161      0.140
+        10 H2     HCA1        0.090
+        11 O2     OC311      -0.650
+        12 HO2    HCP1        0.420
+        13 C3     CC3161      0.140
+        14 H3     HCA1        0.090
+        15 O3     OC311      -0.650
+        16 HO3    HCP1        0.420
+        17 C4     CC3161      0.140
+        18 H4     HCA1        0.090
+        19 O4     OC311      -0.650
+        20 HO4    HCP1        0.420
+        21 C6     CC3161      0.140
+        22 H6     HCA1        0.090
+        23 O6     OC311      -0.650
+        24 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H1    
+       O1     HO1   
+       C1     C6    
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H6    
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+       O5     HO5   
+    [charge_groups]
+        C1    H1    O1    HO1   C5    H5    O5    HO5   C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C6    H6    O6    HO6   
+*------------------------------------------------------------------
+{LALTOL}            !charge: 0.000 ||  L-ALTritOL (same as talitol)
+    [atoms]
+         1 C1     CC322       0.050
+         2 H11    HCA2        0.090
+         3 H12    HCA2        0.090
+         4 O1     OC311      -0.650
+         5 HO1    HCP1        0.420
+         6 C2     CC312       0.140
+         7 H2     HCA1        0.090
+         8 O2     OC311      -0.650
+         9 HO2    HCP1        0.420
+        10 C3     CC312       0.140
+        11 H3     HCA1        0.090
+        12 O3     OC311      -0.650
+        13 HO3    HCP1        0.420
+        14 C4     CC312       0.140
+        15 H4     HCA1        0.090
+        16 O4     OC311      -0.650
+        17 HO4    HCP1        0.420
+        18 C5     CC312       0.140
+        19 H5     HCA1        0.090
+        20 O5     OC311      -0.650
+        21 HO5    HCP1        0.420
+        22 C6     CC322       0.050
+        23 H61    HCA2        0.090
+        24 H62    HCA2        0.090
+        25 O6     OC311      -0.650
+        26 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H11   
+       O1     HO1   
+       C1     H12   
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+       O5     HO5   
+    [charge_groups]
+        C1    H11   H12   O1    HO1   C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C5    H5    O5    HO5   C6    H61   H62   O6    HO6   
+*------------------------------------------------------------------
+{LARAOL}            !charge: 0.000 ||  L-ARAbitOL (same as lyxitol)
+    [atoms]
+         1 C1     CC322       0.050
+         2 H11    HCA2        0.090
+         3 H12    HCA2        0.090
+         4 O1     OC311      -0.650
+         5 HO1    HCP1        0.420
+         6 C2     CC312       0.140
+         7 H2     HCA1        0.090
+         8 O2     OC311      -0.650
+         9 HO2    HCP1        0.420
+        10 C3     CC312       0.140
+        11 H3     HCA1        0.090
+        12 O3     OC311      -0.650
+        13 HO3    HCP1        0.420
+        14 C4     CC312       0.140
+        15 H4     HCA1        0.090
+        16 O4     OC311      -0.650
+        17 HO4    HCP1        0.420
+        18 C5     CC322       0.050
+        19 H51    HCA2        0.090
+        20 H52    HCA2        0.090
+        21 O5     OC311      -0.650
+        22 HO5    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H11   
+       O1     HO1   
+       C1     H12   
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H51   
+       C5     O5    
+       O5     HO5   
+       C5     H52   
+    [charge_groups]
+        C1    H11   H12   O1    HO1   C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C5    H51   H52   O5    HO5   
+*------------------------------------------------------------------
+{LGLUOL}            !charge: 0.000 ||  L-GLUcitOL
+    [atoms]
+         1 C1     CC322       0.050
+         2 H11    HCA2        0.090
+         3 H12    HCA2        0.090
+         4 O1     OC311      -0.650
+         5 HO1    HCP1        0.420
+         6 C2     CC312       0.140
+         7 H2     HCA1        0.090
+         8 O2     OC311      -0.650
+         9 HO2    HCP1        0.420
+        10 C3     CC312       0.140
+        11 H3     HCA1        0.090
+        12 O3     OC311      -0.650
+        13 HO3    HCP1        0.420
+        14 C4     CC312       0.140
+        15 H4     HCA1        0.090
+        16 O4     OC311      -0.650
+        17 HO4    HCP1        0.420
+        18 C5     CC312       0.140
+        19 H5     HCA1        0.090
+        20 O5     OC311      -0.650
+        21 HO5    HCP1        0.420
+        22 C6     CC322       0.050
+        23 H61    HCA2        0.090
+        24 H62    HCA2        0.090
+        25 O6     OC311      -0.650
+        26 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H11   
+       O1     HO1   
+       C1     H12   
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+       O5     HO5   
+    [charge_groups]
+        C1    H11   H12   O1    HO1   C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C5    H5    O5    HO5   C6    H61   H62   O6    HO6   
+*------------------------------------------------------------------
+{LGULOL}            !charge: 0.000 ||  L-GULitOL
+    [atoms]
+         1 C1     CC322       0.050
+         2 H11    HCA2        0.090
+         3 H12    HCA2        0.090
+         4 O1     OC311      -0.650
+         5 HO1    HCP1        0.420
+         6 C2     CC312       0.140
+         7 H2     HCA1        0.090
+         8 O2     OC311      -0.650
+         9 HO2    HCP1        0.420
+        10 C3     CC312       0.140
+        11 H3     HCA1        0.090
+        12 O3     OC311      -0.650
+        13 HO3    HCP1        0.420
+        14 C4     CC312       0.140
+        15 H4     HCA1        0.090
+        16 O4     OC311      -0.650
+        17 HO4    HCP1        0.420
+        18 C5     CC312       0.140
+        19 H5     HCA1        0.090
+        20 O5     OC311      -0.650
+        21 HO5    HCP1        0.420
+        22 C6     CC322       0.050
+        23 H61    HCA2        0.090
+        24 H62    HCA2        0.090
+        25 O6     OC311      -0.650
+        26 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H11   
+       O1     HO1   
+       C1     H12   
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+       O5     HO5   
+    [charge_groups]
+        C1    H11   H12   O1    HO1   C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C5    H5    O5    HO5   C6    H61   H62   O6    HO6   
+*------------------------------------------------------------------
+{LIDIOL}            !charge: 0.000 ||  L-IDItOL
+    [atoms]
+         1 C1     CC322       0.050
+         2 H11    HCA2        0.090
+         3 H12    HCA2        0.090
+         4 O1     OC311      -0.650
+         5 HO1    HCP1        0.420
+         6 C2     CC312       0.140
+         7 H2     HCA1        0.090
+         8 O2     OC311      -0.650
+         9 HO2    HCP1        0.420
+        10 C3     CC312       0.140
+        11 H3     HCA1        0.090
+        12 O3     OC311      -0.650
+        13 HO3    HCP1        0.420
+        14 C4     CC312       0.140
+        15 H4     HCA1        0.090
+        16 O4     OC311      -0.650
+        17 HO4    HCP1        0.420
+        18 C5     CC312       0.140
+        19 H5     HCA1        0.090
+        20 O5     OC311      -0.650
+        21 HO5    HCP1        0.420
+        22 C6     CC322       0.050
+        23 H61    HCA2        0.090
+        24 H62    HCA2        0.090
+        25 O6     OC311      -0.650
+        26 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H11   
+       O1     HO1   
+       C1     H12   
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+       O5     HO5   
+    [charge_groups]
+        C1    H11   H12   O1    HO1   C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C5    H5    O5    HO5   C6    H61   H62   O6    HO6   
+*------------------------------------------------------------------
+{LMANOL}            !charge: 0.000 ||  L-MANnitOL
+    [atoms]
+         1 C1     CC322       0.050
+         2 H11    HCA2        0.090
+         3 H12    HCA2        0.090
+         4 O1     OC311      -0.650
+         5 HO1    HCP1        0.420
+         6 C2     CC312       0.140
+         7 H2     HCA1        0.090
+         8 O2     OC311      -0.650
+         9 HO2    HCP1        0.420
+        10 C3     CC312       0.140
+        11 H3     HCA1        0.090
+        12 O3     OC311      -0.650
+        13 HO3    HCP1        0.420
+        14 C4     CC312       0.140
+        15 H4     HCA1        0.090
+        16 O4     OC311      -0.650
+        17 HO4    HCP1        0.420
+        18 C5     CC312       0.140
+        19 H5     HCA1        0.090
+        20 O5     OC311      -0.650
+        21 HO5    HCP1        0.420
+        22 C6     CC322       0.050
+        23 H61    HCA2        0.090
+        24 H62    HCA2        0.090
+        25 O6     OC311      -0.650
+        26 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H11   
+       O1     HO1   
+       C1     H12   
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+       O5     HO5   
+    [charge_groups]
+        C1    H11   H12   O1    HO1   C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C5    H5    O5    HO5   C6    H61   H62   O6    HO6   
+*------------------------------------------------------------------
+{LTHROL}            !charge: 0.000 ||  L-THReitOL
+    [atoms]
+         1 C1     CC322       0.050
+         2 H11    HCA2        0.090
+         3 H12    HCA2        0.090
+         4 O1     OC311      -0.650
+         5 HO1    HCP1        0.420
+         6 C2     CC312       0.140
+         7 H2     HCA1        0.090
+         8 O2     OC311      -0.650
+         9 HO2    HCP1        0.420
+        10 C3     CC312       0.140
+        11 H3     HCA1        0.090
+        12 O3     OC311      -0.650
+        13 HO3    HCP1        0.420
+        14 C4     CC322       0.050
+        15 H41    HCA2        0.090
+        16 H42    HCA2        0.090
+        17 O4     OC311      -0.650
+        18 HO4    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H11   
+       O1     HO1   
+       C1     H12   
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H41   
+       C4     O4    
+       O4     HO4   
+       C4     H42   
+    [charge_groups]
+        C1    H11   H12   O1    HO1   
+        C2    H2    O2    HO2   
+        C3    H3    O3    HO3   
+        C4    H41   H42   O4    HO4   
+*------------------------------------------------------------------
+{MALLOL}            !charge: 0.000 ||  Meso-ALLitOL
+    [atoms]
+         1 C1     CC322       0.050
+         2 H11    HCA2        0.090
+         3 H12    HCA2        0.090
+         4 O1     OC311      -0.650
+         5 HO1    HCP1        0.420
+         6 C2     CC312       0.140
+         7 H2     HCA1        0.090
+         8 O2     OC311      -0.650
+         9 HO2    HCP1        0.420
+        10 C3     CC312       0.140
+        11 H3     HCA1        0.090
+        12 O3     OC311      -0.650
+        13 HO3    HCP1        0.420
+        14 C4     CC312       0.140
+        15 H4     HCA1        0.090
+        16 O4     OC311      -0.650
+        17 HO4    HCP1        0.420
+        18 C5     CC312       0.140
+        19 H5     HCA1        0.090
+        20 O5     OC311      -0.650
+        21 HO5    HCP1        0.420
+        22 C6     CC322       0.050
+        23 H61    HCA2        0.090
+        24 H62    HCA2        0.090
+        25 O6     OC311      -0.650
+        26 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H11   
+       O1     HO1   
+       C1     H12   
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+       O5     HO5   
+    [charge_groups]
+        C1    H11   H12   O1    HO1   C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C5    H5    O5    HO5   C6    H61   H62   O6    HO6   
+*------------------------------------------------------------------
+{MERYOL}            !charge: 0.000 ||  Meso-ERYthritOL (mertitol)
+    [atoms]
+         1 C1     CC322       0.050
+         2 H11    HCA2        0.090
+         3 H12    HCA2        0.090
+         4 O1     OC311      -0.650
+         5 HO1    HCP1        0.420
+         6 C2     CC312       0.140
+         7 H2     HCA1        0.090
+         8 O2     OC311      -0.650
+         9 HO2    HCP1        0.420
+        10 C3     CC312       0.140
+        11 H3     HCA1        0.090
+        12 O3     OC311      -0.650
+        13 HO3    HCP1        0.420
+        14 C4     CC322       0.050
+        15 H41    HCA2        0.090
+        16 H42    HCA2        0.090
+        17 O4     OC311      -0.650
+        18 HO4    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H11   
+       O1     HO1   
+       C1     H12   
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H41   
+       C4     O4    
+       O4     HO4   
+       C4     H42   
+    [charge_groups]
+        C1    H11   H12   O1    HO1   
+        C2    H2    O2    HO2   
+        C3    H3    O3    HO3   
+        C4    H41   H42   O4    HO4   
+*------------------------------------------------------------------
+{MGALOL}            !charge: 0.000 ||  Meso-GALacticOL
+    [atoms]
+         1 C1     CC322       0.050
+         2 H11    HCA2        0.090
+         3 H12    HCA2        0.090
+         4 O1     OC311      -0.650
+         5 HO1    HCP1        0.420
+         6 C2     CC312       0.140
+         7 H2     HCA1        0.090
+         8 O2     OC311      -0.650
+         9 HO2    HCP1        0.420
+        10 C3     CC312       0.140
+        11 H3     HCA1        0.090
+        12 O3     OC311      -0.650
+        13 HO3    HCP1        0.420
+        14 C4     CC312       0.140
+        15 H4     HCA1        0.090
+        16 O4     OC311      -0.650
+        17 HO4    HCP1        0.420
+        18 C5     CC312       0.140
+        19 H5     HCA1        0.090
+        20 O5     OC311      -0.650
+        21 HO5    HCP1        0.420
+        22 C6     CC322       0.050
+        23 H61    HCA2        0.090
+        24 H62    HCA2        0.090
+        25 O6     OC311      -0.650
+        26 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H11   
+       O1     HO1   
+       C1     H12   
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+       O5     HO5   
+    [charge_groups]
+        C1    H11   H12   O1    HO1   C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C5    H5    O5    HO5   C6    H61   H62   O6    HO6   
+*------------------------------------------------------------------
+{MGLYOL}            !charge: 0.000 ||  Meso-GLYcerOL
+    [atoms]
+         1 C1     CC322       0.050
+         2 H11    HCA2        0.090
+         3 H12    HCA2        0.090
+         4 O1     OC311      -0.650
+         5 HO1    HCP1        0.420
+         6 C2     CC312       0.140
+         7 H2     HCA1        0.090
+         8 O2     OC311      -0.650
+         9 HO2    HCP1        0.420
+        10 C3     CC322       0.050
+        11 H31    HCA2        0.090
+        12 H32    HCA2        0.090
+        13 O3     OC311      -0.650
+        14 HO3    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H11   
+       O1     HO1   
+       C1     H12   
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H31   
+       C3     O3    
+       O3     HO3   
+       C3     H32   
+    [charge_groups]
+        C1    H11   H12   O1    HO1   C2    H2    O2    HO2   C3    H31   H32   O3    HO3   
+*------------------------------------------------------------------
+{MRIBOL}            !charge: 0.000 ||  Meso-RIBitOL
+    [atoms]
+         1 C1     CC322       0.050
+         2 H11    HCA2        0.090
+         3 H12    HCA2        0.090
+         4 O1     OC311      -0.650
+         5 HO1    HCP1        0.420
+         6 C2     CC312       0.140
+         7 H2     HCA1        0.090
+         8 O2     OC311      -0.650
+         9 HO2    HCP1        0.420
+        10 C3     CC312       0.140
+        11 H3     HCA1        0.090
+        12 O3     OC311      -0.650
+        13 HO3    HCP1        0.420
+        14 C4     CC312       0.140
+        15 H4     HCA1        0.090
+        16 O4     OC311      -0.650
+        17 HO4    HCP1        0.420
+        18 C5     CC322       0.050
+        19 H51    HCA2        0.090
+        20 H52    HCA2        0.090
+        21 O5     OC311      -0.650
+        22 HO5    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H11   
+       O1     HO1   
+       C1     H12   
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H51   
+       C5     O5    
+       O5     HO5   
+       C5     H52   
+    [charge_groups]
+        C1    H11   H12   O1    HO1   C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C5    H51   H52   O5    HO5   
+*------------------------------------------------------------------
+{MXYLOL}            !charge: 0.000 ||  Meso-XYLitOL
+    [atoms]
+         1 C1     CC322       0.050
+         2 H11    HCA2        0.090
+         3 H12    HCA2        0.090
+         4 O1     OC311      -0.650
+         5 HO1    HCP1        0.420
+         6 C2     CC312       0.140
+         7 H2     HCA1        0.090
+         8 O2     OC311      -0.650
+         9 HO2    HCP1        0.420
+        10 C3     CC312       0.140
+        11 H3     HCA1        0.090
+        12 O3     OC311      -0.650
+        13 HO3    HCP1        0.420
+        14 C4     CC312       0.140
+        15 H4     HCA1        0.090
+        16 O4     OC311      -0.650
+        17 HO4    HCP1        0.420
+        18 C5     CC322       0.050
+        19 H51    HCA2        0.090
+        20 H52    HCA2        0.090
+        21 O5     OC311      -0.650
+        22 HO5    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H11   
+       O1     HO1   
+       C1     H12   
+       C1     C2    
+       C2     H2    
+       C2     O2    
+       O2     HO2   
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H51   
+       C5     O5    
+       O5     HO5   
+       C5     H52   
+    [charge_groups]
+        C1    H11   H12   O1    HO1   C2    H2    O2    HO2   C3    H3    O3    HO3   C4    H4    O4    HO4   C5    H51   H52   O5    HO5   
+*------------------------------------------------------------------
+{PSICOS}            !charge: 0.000 ||  D-Psicose, open, free ketose
+    [atoms]
+         1 C1     CC322       0.090
+         2 H11    HCA2        0.090
+         3 H12    HCA2        0.090
+         4 O1     OC311      -0.650
+         5 HO1    HCP1        0.420
+         6 C2     CC2O3       0.400
+         7 O2     OC2D3      -0.480
+         8 C3     CC312       0.180
+         9 H3     HCA1        0.090
+        10 O3     OC311      -0.650
+        11 HO3    HCP1        0.420
+        12 C4     CC312       0.140
+        13 H4     HCA1        0.090
+        14 O4     OC311      -0.650
+        15 HO4    HCP1        0.420
+        16 C5     CC312       0.140
+        17 H5     HCA1        0.090
+        18 O5     OC311      -0.650
+        19 HO5    HCP1        0.420
+        20 C6     CC322       0.050
+        21 H61    HCA2        0.090
+        22 H62    HCA2        0.090
+        23 O6     OC311      -0.650
+        24 HO6    HCP1        0.420
+    [bonds]
+       C1     O1    
+       C1     H11   
+       O1     HO1   
+       C1     H12   
+       C1     C2    
+       C2     O2    
+       C2     C3    
+       C3     H3    
+       C3     O3    
+       O3     HO3   
+       C3     C4    
+       C4     H4    
+       C4     O4    
+       O4     HO4   
+       C4     C5    
+       C5     H5    
+       C5     C6    
+       C6     H61   
+       C6     H62   
+       C6     O6    
+       O6     HO6   
+       C5     O5    
+       O5     HO5   
+    [impropers]
+         C2     C1     C3     O2    
+    [charge_groups]
+        C1    H11   H12   O1    HO1   C2    O2    C3    H3    O3    HO3   C4    H4    O4    HO4   C5    H5    O5    HO5   C6    H61   H62   O6    HO6   
+*------------------------------------------------------------------

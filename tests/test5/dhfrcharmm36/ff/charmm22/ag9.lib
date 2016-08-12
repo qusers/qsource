@@ -1,0 +1,148 @@
+* AGM lib file 
+*-------------------------------------------------------------
+{AG9}                 !
+    [info]
+        SYBYLtype  RESIDUE     !SYBYL substructure type
+    [atoms]
+         1 P      P            1.500 !At. no., name, iac, charge
+         2 O1P    ON3         -0.800 !At. no., name, iac, charge
+         3 O2P    ON3         -0.800 !At. no., name, iac, charge
+         4 O5'    ON2         -0.550 !At. no., name, iac, charge
+         5 C5'    CN8         -0.080 !At. no., name, iac, charge
+         6 H5'    HN7          0.090 !At. no., name, iac, charge
+         7 H5''   HN7          0.090 !At. no., name, iac, charge
+         8 C4'    CN6          0.110 !At. no., name, iac, charge
+         9 H4'    HN6          0.090 !At. no., name, iac, charge
+        10 O4'    ON6         -0.400 !At. no., name, iac, charge
+        11 C1'    CN6B         0.110 !At. no., name, iac, charge
+        12 H1'    HN6          0.090 !At. no., name, iac, charge
+
+        13 N1     NN2         -0.045 !from CYT +0.115
+        14 C6     CN3          0.110 !from CYT
+        15 H6     HN3          0.050 !from CYT
+        16 C2     CN1          0.530 !from CYT
+
+
+        17 N      NH1         -0.470 ! from Arg 
+        18 HN     H            0.310 ! from Arg
+        19 CA     CT1          0.040 ! from Arg 0.07-0.03
+        20 HA1    HB           0.060 ! from Arg HA 0.09-0.03
+        21 HA2    HB           0.060 ! extra H added with Arg
+        22 CB     CT2         -0.180 ! from Arg
+        23 HB1    HA           0.090 ! from Arg
+        24 HB2    HA           0.090 ! from Arg
+        25 CG     CT2         -0.180 ! from Arg
+        26 HG1    HA           0.090 ! from Arg
+        27 HG2    HA           0.090 ! from Arg
+        28 CD     CT2          0.200 ! from Arg
+        29 HD1    HA           0.090 ! from Arg
+        30 HD2    HA           0.090 ! from Arg
+        31 NE     NC2         -0.700 ! from Arg
+        32 HE     HC           0.440 ! from Arg
+        33 CZ     C            0.640 ! from Arg
+        34 NH1    NC2         -0.800 ! from Arg
+        35 HH11   HC           0.460 ! from Arg
+        36 HH12   HC           0.460 ! from Arg
+        37 NH2    NC2         -0.800 ! from Arg
+        38 HH21   HC           0.460 ! from Arg
+        39 HH22   HC           0.460 ! from Arg
+
+
+        40 N3     NN3         -0.355 ! from CYT + 0.115
+        41 H3     HN2          0.360 ! from URA for proto CYT 
+        42 C4     CN2          0.620 ! from CYT
+        43 N4     NN1         -0.580 ! from CYT
+        44 H41    HN1          0.310 ! from CYT
+        45 C5     CN3         -0.100 ! from CYT
+        46 H5     HN3          0.100 ! from CYT 
+      
+        47 C2'    CN6          0.110 !At. no., name, iac, charge
+        48 H2''   HN6          0.090 !At. no., name, iac, charge
+        49 O2'    ON5         -0.600 !At. no., name, iac, charge
+        50 H2'    HN5          0.400 !At. no., name, iac, charge
+        51 C3'    CN6          0.010 !At. no., name, iac, charge
+        52 H3'    HN6          0.090 !At. no., name, iac, charge
+        53 O3'    ON2         -0.550 !At. no., name, iac, charge
+    [bonds]
+       P    O1P               !connect i -- j
+       P    O2P               !connect i -- j
+       P    O5'               !connect i -- j
+       O5'  C5'               !connect i -- j
+       C5'  C4'               !connect i -- j
+       C4'  O4'               !connect i -- j
+       C4'  C3'               !connect i -- j
+       O4'  C1'               !connect i -- j
+       C1'  N1                !connect i -- j
+       C1'  C2'               !connect i -- j
+       N1   C2                !connect i -- j
+       N1   C6                !connect i -- j
+       C2   N                 ! new
+       N   HN                 ! new
+       N   CA                 ! new
+       CA  HA1                ! new
+       CA  HA2                ! new
+       CA  CB                 ! new
+       CB  HB1                ! new
+       CB  HB2                ! new
+       CB  CG                 ! new
+       CG  HG1                ! new
+       CG  HG2                ! new
+       CG  CD                 ! new 
+       CD  HD1                ! new
+       CD  HD2                ! new
+       CD  NE                 ! new
+       NE  HE                 ! new
+       NE  CZ                 ! new
+       CZ  NH1                ! new
+       NH1 HH11               ! new
+       NH1 HH12               ! new
+       CZ  NH2                ! new
+       NH2 HH21               ! new
+       NH2 HH22               ! new 
+       C2   N3                !connect i -- j
+       N3   C4                !connect i -- j
+       C4   N4                !connect i -- j
+       N4   H41               !connect i -- j
+       C4   C5                !connect i -- j
+       C5   C6                !connect i -- j
+       C2'  C3'               !connect i -- j
+       C3'  O3'               !connect i -- j
+       C2'  O2'               !connect i -- j
+       O2'  H2'               !connect i -- j
+       C1'  H1'               !connect i -- j
+       C2'  H2''               !connect i -- j
+       C3'  H3'               !connect i -- j
+       C4'  H4'               !connect i -- j
+       C5'  H5'               !connect i -- j
+       C5'  H5''               !connect i -- j
+       C5   H5                !connect i -- j
+       C6   H6                !connect i -- j
+       N3   H3                ! from URA
+   [build_rules]
+       torsion HH11 NH1  CZ   NE    0 ! from Arg
+       torsion HH21 NH2  CZ   NE    0 ! from Arg
+    [connections]   !how to bond to previous and next
+        head     P  
+        tail     O3'
+    [impropers]
+        N      N1     N3     C2  !for Agm
+        N4     N3     C5     C4
+        H5     C4     C6     C5
+        H6     C5     N1     C6
+       !H42     C4    H41     N4
+        H3     C2     C4     N3  ! from URA
+        CZ    NH1    NH2     NE  ! from Arg
+    [charge_groups] !charge groups, with switch atom first
+        P    O1P  O2P  O5'  C5'  H5'  H5''
+        C4'  H4'  O4'  C1'  H1'
+        N1   C6   H6 
+        C2   N3   H3 C4  ! H3 added for URA 
+        N4   H41  H42
+        C5   H5 
+        C2'  H2''  O2'  H2'
+        C3'  H3'  O3'
+        N    HN   CA   HA1 HA2  ! from Arg
+        CB   HB1  HB2           ! from Arg
+        CG   HG1  HG2           ! from Arg (next line too)
+        CD   HD1  HD2  NE   HE   CZ   NH1  HH11  HH12  NH2  HH21  HH22 
+*-------------------------------------------------------------
