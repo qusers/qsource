@@ -16813,12 +16813,15 @@ if (use_excluded_groups) then
 			case ('full')
 			ene_header%types(runvar)=FULL
 			ene_header%gcnum(runvar)=i
+                        ST_gc( ene_header%gcnum(runvar) )%caltype=FULL
 			case ('electro')
 			ene_header%types(runvar)=ELECTRO
 			ene_header%gcnum(runvar)=i
+                        ST_gc( ene_header%gcnum(runvar) )%caltype=ELECTRO
 			case ('vdw')
 			ene_header%types(runvar)=VDW
 			ene_header%gcnum(runvar)=i
+                        ST_gc( ene_header%gcnum(runvar) )%caltype=VDW
 			case ('all')
 !special case, do all the calculations together
 !needs reallocation of header arrays
@@ -16843,6 +16846,9 @@ if (use_excluded_groups) then
 			ene_header%gcnum(runvar)=i
 			ene_header%gcnum(runvar+1)=i
 			ene_header%gcnum(runvar+2)=i
+                        ST_gc( ene_header%gcnum(runvar) )%caltype=FULL
+                        ST_gc( ene_header%gcnum(runvar+1) )%caltype=ELECTRO
+                        ST_gc( ene_header%gcnum(runvar+2) )%caltype=VDW
 			ene_header%arrays=ene_header%arrays+2
 			runvar = runvar + 2
 			deallocate(tempheader%types,tempheader%numres,tempheader%gcnum)
