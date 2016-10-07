@@ -2755,11 +2755,6 @@ subroutine readlib(file)
 		enddo
 		write(*, 4, advance='no') qtot
 
-! if this is a solvent molecule, set solv_atoms variable
-                if(lib(nlibres)%solvent) then
-                        solv_atom = lib(nlibres)%nat
-                end if
-
 ! ---	   Read bond list
 		lib(nlibres)%nbnd = prm_count('bonds')
 		allocate(bnd(lib(nlibres)%nbnd), stat=alloc_status)
@@ -3824,8 +3819,8 @@ subroutine readpdb()
 	integer resnum_tmp, oldnum, irec, i, atom_id(max_atlib), j , oldnum2 , resnum_tmp2
 	real(kind=prec)				:: xtmp(3)
 	LOGICAL res_found, at_found
-	integer						::	first_res_of_mol
-	logical						::	last_line_was_gap
+	integer						::	first_res_of_mol, solvent
+	logical						::	last_line_was_gap, solvent_found
 	integer						::	atoms, residues, molecules
 	type(RETTYPE)					:: glob
 !.......................................................................
@@ -3878,7 +3873,8 @@ subroutine readpdb()
 		close(3)
 		return
 	end if
-
+        solvent_found = .false.
+		solvent = -1
 	CALL clearpdb !get rid of old PDB data.
 	call allocate_for_pdb(atoms, residues, molecules) !make space for new topology
 	!clear hydrogen make flags
@@ -3953,6 +3949,20 @@ subroutine readpdb()
 						res_found = .true.
 						res(nres)%name = lib(i)%nam
 						res(nres)%irc = i
+                                                if(index(solvent_names, trim(resnam_tmp)) .ne.0 ) then
+! we found a solvent molecule, make sure there is only one solvent type and set
+! the solv_atom flag. If this is not the first solvent molecule panic and stop
+                                                        if(solvent_found) then
+														if(resnam_tmp .ne. res(solvent)%name) then
+                                                        write(*,*) '>>>> ERROR: Found multiple different solvent molecules. Q can not handle this right now!'
+                                                        write(*,22)
+                                                        stop
+                                                        end if
+														end if
+                                                        solvent_found = .true.
+                                                        solv_atom = lib(res(nres)%irc)%nat
+														solvent = nres
+                                                end if
 						exit
 					endif
 				enddo
@@ -4062,8 +4072,11 @@ subroutine readpdb()
 			end if
 		enddo
 	end if
-
-	nwat = (nat_pro - nat_solute) / solv_atom
+        if (solvent_found) then
+	        nwat = (nat_pro - nat_solute) / solv_atom
+        else
+                nwat = 0
+        end if
 	write(*,110) nmol,nres, nres_solute, nat_pro, nat_solute
 110	format(/,'Successfully read PDB file with', i5,' molecules,',/,&
 		i5,' residues totally (',i5,' in solute).',/,&
@@ -4183,7 +4196,7 @@ subroutine readtop
 
 	coord_source = 'topology'
 	auto_name = filnam !for automatic naming of pdb and mol2 files
-	nwat = (nat_pro - nat_solute) / solv_atom
+!	nwat = (nat_pro - nat_solute) / solv_atom
 	!reset makeH - don't need to make any hydrogens
 	deallocate(makeH, stat=alloc_status)
 	allocate(makeH(nat_pro))
