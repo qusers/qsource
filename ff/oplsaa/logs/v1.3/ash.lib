@@ -1,0 +1,49 @@
+{ASH}
+# Generated with q_ffld2q.py (v0.1.11) from 'ash.ffld14' (Tue Oct 11 11:17:25 2016)
+
+[atoms]
+    1  N     ash_N             -0.94390
+    2  CA    ash_CA             0.16390
+    3  C     ash_C              0.52000
+    4  O     ash_O             -0.44000
+    5  CB    ash_CB            -0.12000
+    6  CG    ash_CG             0.52000
+    7  OD2   ash_OD2           -0.44000
+    8  OD1   ash_OD1           -0.53000
+    9  HA    ash_HA             0.06000
+   10  HB1   ash_HB1            0.06000
+   11  HB2   ash_HB2            0.06000
+   12  HD1   ash_HD1            0.45000
+   13  H     ash_H              0.36000
+   14  HN    ash_HN             0.36000
+   15  OXT   ash_OXT           -0.53000
+   16  HO    ash_HO             0.45000
+
+
+[bonds]
+N     CA   
+N     H    
+N     HN   
+CA    C    
+CA    CB   
+CA    HA   
+C     O    
+C     OXT  
+CB    CG   
+CB    HB1  
+CB    HB2  
+CG    OD2  
+CG    OD1  
+OD1   HD1  
+OXT   HO   
+
+
+[impropers]
+CA    C     OXT   O    
+CB    CG    OD2   OD1  
+
+
+[charge_groups]
+N CA C O CB CG OD2 OD1 HA HB1 HB2 HD1 H HN OXT HO
+
+

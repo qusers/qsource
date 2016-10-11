@@ -1,0 +1,123 @@
+# Generated with q_ffld2q.py (v0.1.11) from 'ash.ffld14' (Tue Oct 11 11:17:25 2016)
+
+
+[atom_types]
+ash_N            1064.9718  1064.9718    29.6344   753.0488    20.9547     14.007  ! high   NT    ! N primary aliphatic amines
+ash_CA            944.5180   944.5180    22.0296   667.8751    15.5773     12.011  ! high   CT1   ! CT1 in ASH 2003
+ash_C            1802.2385  1802.2385    34.1758  1274.3750    24.1659     12.011  ! high   C     ! CO in CC(=O)OH carboxylic acid
+ash_O             616.4387   616.4387    23.7692   435.8880    16.8074     15.999  ! high   O     ! Oc in CC(=O)OH neutral; use 135-140
+ash_CB            944.5180   944.5180    22.0296   667.8751    15.5773     12.011  ! high   CT    ! CG in ASH 2003
+ash_CG           1802.2385  1802.2385    34.1758  1274.3750    24.1659     12.011  ! high   C     ! CD in ASH 2003
+ash_OD2           616.4387   616.4387    23.7692   435.8880    16.8074     15.999  ! high   OC3   ! CG in ASH 2003
+ash_OD1           601.1488   601.1488    22.2648   425.0764    15.7436     15.999  ! high   OH    ! CG in ASH 2003
+ash_HA             59.8020    59.8020     3.8273    42.2864     2.7063     1.0079  ! high   HC    ! H(C)-N in glycin
+ash_HB1            84.5728    84.5728     5.4127    59.8020     3.8273     1.0079  ! high   HC    ! H on C-alpha in acid
+ash_HB2            84.5728    84.5728     5.4127    59.8020     3.8273     1.0079  ! high   HC    ! H on C-alpha in acid
+ash_HD1             0.0054     0.0054     0.0433     0.0038     0.0306     1.0079  ! high   HO    ! CG in ASH 2003
+ash_H               0.0054     0.0054     0.0433     0.0038     0.0306     1.0079  ! high   H     ! H on neutral N
+ash_HN              0.0054     0.0054     0.0433     0.0038     0.0306     1.0079  ! high   H     ! H on neutral N
+ash_OXT           601.1488   601.1488    22.2648   425.0764    15.7436     15.999  ! high   OH    ! OH in CC(=O)OH R in RC(=O)OH is
+ash_HO              0.0054     0.0054     0.0433     0.0038     0.0306     1.0079  ! high   HO    ! H(O): alcohols
+
+
+[bonds]
+ash_N           ash_CA              610.00     1.4570     ! high   ! 0 NT-CT1 ==> NT-CT1
+ash_N           ash_H               868.00     1.0100     ! high   ! 0 NT-H ==> NT-H
+ash_N           ash_HN              868.00     1.0100     ! high   ! 0 NT-H ==> NT-H
+ash_CA          ash_C               634.00     1.5220     ! high   ! 0 CT1-C ==> CT1-C
+ash_CA          ash_CB              536.00     1.5290     ! high   ! 0 CT1-CT ==> CT1-CT
+ash_CA          ash_HA              680.00     1.0900     ! high   ! 0 CT1-HC ==> HC-CT1
+ash_C           ash_O              1140.00     1.2290     ! high   ! 0 C-O ==> O-C
+ash_C           ash_OXT             900.00     1.3640     ! high   ! 0 C-OH ==> OH-C
+ash_CB          ash_CG              634.00     1.5220     ! high   ! 0 CT-C ==> CT-C
+ash_CB          ash_HB1             680.00     1.0900     ! high   ! 0 CT-HC ==> HC-CT
+ash_CB          ash_HB2             680.00     1.0900     ! high   ! 0 CT-HC ==> HC-CT
+ash_CG          ash_OD2            1140.00     1.2290     ! high   ! 0 C-OC3 ==> OC3-C
+ash_CG          ash_OD1             900.00     1.3640     ! high   ! 0 C-OH ==> OH-C
+ash_OD1         ash_HD1            1106.00     0.9450     ! high   ! 0 OH-HO ==> OH-HO
+ash_OXT         ash_HO             1106.00     0.9450     ! high   ! 0 OH-HO ==> OH-HO
+
+
+[angles]
+ash_CA          ash_N           ash_H               100.00   111.5530     ! high   ! ==> H-NT-CT1
+ash_CA          ash_N           ash_HN              100.00   111.5530     ! high   ! ==> H-NT-CT1
+ash_H           ash_N           ash_HN               87.20   106.4000     ! high   ! ==> H-NT-H
+ash_N           ash_CA          ash_C               150.00   111.5400     ! high   ! ==> NT-CT1-C
+ash_N           ash_CA          ash_CB              160.00   111.2200     ! high   ! ==> NT-CT1-CT
+ash_N           ash_CA          ash_HA              100.00   109.5500     ! high   ! ==> NT-CT1-HC
+ash_C           ash_CA          ash_CB              126.00   111.1000     ! high   ! ==> CT-CT1-C
+ash_C           ash_CA          ash_HA               70.00   109.5000     ! high   ! ==> HC-CT1-C
+ash_CB          ash_CA          ash_HA               75.00   110.7000     ! high   ! ==> HC-CT1-CT
+ash_CA          ash_C           ash_O               160.00   120.4000     ! high   ! ==> O-C-CT1
+ash_CA          ash_C           ash_OXT             160.00   116.8750     ! high   ! ==> OH-C-CT1
+ash_O           ash_C           ash_OXT             200.00   123.3200     ! high   ! ==> OH-C-O
+ash_CA          ash_CB          ash_CG              126.00   111.1000     ! high   ! ==> CT1-CT-C
+ash_CA          ash_CB          ash_HB1              75.00   110.7000     ! high   ! ==> HC-CT-CT1
+ash_CA          ash_CB          ash_HB2              75.00   110.7000     ! high   ! ==> HC-CT-CT1
+ash_CG          ash_CB          ash_HB1              70.00   109.5000     ! high   ! ==> HC-CT-C
+ash_CG          ash_CB          ash_HB2              70.00   109.5000     ! high   ! ==> HC-CT-C
+ash_HB1         ash_CB          ash_HB2              66.00   107.8000     ! high   ! ==> HC-CT-HC
+ash_CB          ash_CG          ash_OD2             160.00   120.4000     ! high   ! ==> OC3-C-CT
+ash_CB          ash_CG          ash_OD1             140.00   108.0000     ! high   ! ==> OH-C-CT
+ash_OD2         ash_CG          ash_OD1             160.00   121.0000     ! high   ! ==> OH-C-OC3
+ash_CG          ash_OD1         ash_HD1              70.00   113.0000     ! high   ! ==> HO-OH-C
+ash_C           ash_OXT         ash_HO               70.00   113.0000     ! high   ! ==> HO-OH-C
+
+
+[torsions]
+ash_H           ash_N           ash_CA          ash_C               0.2190    -1.0000     0.0000     1.0000  ! high   ! ==> H-NT-CT-C
+ash_H           ash_N           ash_CA          ash_C              -0.2490    -2.0000   180.0000     1.0000  ! high   ! ==> H-NT-CT-C
+ash_H           ash_N           ash_CA          ash_C               0.1520     3.0000     0.0000     1.0000  ! high   ! ==> H-NT-CT-C
+ash_H           ash_N           ash_CA          ash_CB             -0.0595    -1.0000     0.0000     1.0000  ! high   ! ==> H-NT-CT-CT
+ash_H           ash_N           ash_CA          ash_CB              0.0885    -2.0000   180.0000     1.0000  ! high   ! ==> H-NT-CT-CT
+ash_H           ash_N           ash_CA          ash_CB              0.1175     3.0000     0.0000     1.0000  ! high   ! ==> H-NT-CT-CT
+ash_H           ash_N           ash_CA          ash_HA              0.2000     3.0000     0.0000     1.0000  ! high   ! ==> H-NT-CT-HC
+ash_HN          ash_N           ash_CA          ash_C               0.2190    -1.0000     0.0000     1.0000  ! high   ! ==> H-NT-CT-C
+ash_HN          ash_N           ash_CA          ash_C              -0.2490    -2.0000   180.0000     1.0000  ! high   ! ==> H-NT-CT-C
+ash_HN          ash_N           ash_CA          ash_C               0.1520     3.0000     0.0000     1.0000  ! high   ! ==> H-NT-CT-C
+ash_HN          ash_N           ash_CA          ash_CB             -0.0595    -1.0000     0.0000     1.0000  ! high   ! ==> H-NT-CT-CT
+ash_HN          ash_N           ash_CA          ash_CB              0.0885    -2.0000   180.0000     1.0000  ! high   ! ==> H-NT-CT-CT
+ash_HN          ash_N           ash_CA          ash_CB              0.1175     3.0000     0.0000     1.0000  ! high   ! ==> H-NT-CT-CT
+ash_HN          ash_N           ash_CA          ash_HA              0.2000     3.0000     0.0000     1.0000  ! high   ! ==> H-NT-CT-HC
+ash_N           ash_CA          ash_C           ash_O               0.3015     2.0000   180.0000     1.0000  ! high   ! ==> ??-CT-C-O
+ash_N           ash_CA          ash_C           ash_OXT             0.4000     3.0000     0.0000     1.0000  ! med    ! ==> ??-CT-C-OS
+ash_CB          ash_CA          ash_C           ash_O               0.0000     1.0000     0.0000     1.0000  ! high   ! ==> CT-CT1-C-O
+ash_CB          ash_CA          ash_C           ash_OXT             0.5000    -1.0000     0.0000     1.0000  ! high   ! ==> CT-CT-C-OH
+ash_CB          ash_CA          ash_C           ash_OXT             0.2730    -2.0000   180.0000     1.0000  ! high   ! ==> CT-CT-C-OH
+ash_CB          ash_CA          ash_C           ash_OXT             0.2250     3.0000     0.0000     1.0000  ! high   ! ==> CT-CT-C-OH
+ash_HA          ash_CA          ash_C           ash_O               0.0000     1.0000     0.0000     1.0000  ! high   ! ==> HC-CT1-C-O
+ash_HA          ash_CA          ash_C           ash_OXT             0.0000     1.0000     0.0000     1.0000  ! high   ! ==> HC-CT-C-OH
+ash_N           ash_CA          ash_CB          ash_CG             -3.5655    -1.0000     0.0000     1.0000  ! high   ! ==> NT-CT-CT-C
+ash_N           ash_CA          ash_CB          ash_CG             -0.6750    -2.0000   180.0000     1.0000  ! high   ! ==> NT-CT-CT-C
+ash_N           ash_CA          ash_CB          ash_CG              1.1130     3.0000     0.0000     1.0000  ! high   ! ==> NT-CT-CT-C
+ash_N           ash_CA          ash_CB          ash_HB1             0.1500     3.0000     0.0000     1.0000  ! high   ! ==> HC-CT-CT-??
+ash_N           ash_CA          ash_CB          ash_HB2             0.1500     3.0000     0.0000     1.0000  ! high   ! ==> HC-CT-CT-??
+ash_C           ash_CA          ash_CB          ash_CG             -0.8485    -1.0000     0.0000     1.0000  ! high   ! ==> C-CT1-CT-C
+ash_C           ash_CA          ash_CB          ash_CG             -0.2280    -2.0000   180.0000     1.0000  ! high   ! ==> C-CT1-CT-C
+ash_C           ash_CA          ash_CB          ash_CG              0.2925     3.0000     0.0000     1.0000  ! high   ! ==> C-CT1-CT-C
+ash_C           ash_CA          ash_CB          ash_HB1            -0.0380     3.0000     0.0000     1.0000  ! high   ! ==> C-CT1-CT-HC
+ash_C           ash_CA          ash_CB          ash_HB2            -0.0380     3.0000     0.0000     1.0000  ! high   ! ==> C-CT1-CT-HC
+ash_HA          ash_CA          ash_CB          ash_CG             -0.0380     3.0000     0.0000     1.0000  ! high   ! ==> HC-CT1-CT-C
+ash_HA          ash_CA          ash_CB          ash_HB1             0.1500     3.0000     0.0000     1.0000  ! high   ! ==> HC-CT1-CT-HC
+ash_HA          ash_CA          ash_CB          ash_HB2             0.1500     3.0000     0.0000     1.0000  ! high   ! ==> HC-CT1-CT-HC
+ash_CA          ash_C           ash_OXT         ash_HO              1.5000    -1.0000     0.0000     1.0000  ! high   ! ==> HO-OH-C-CT
+ash_CA          ash_C           ash_OXT         ash_HO              2.4500     2.0000   180.0000     1.0000  ! high   ! ==> HO-OH-C-CT
+ash_O           ash_C           ash_OXT         ash_HO              0.9220    -1.0000     0.0000     1.0000  ! high   ! ==> HO-OH-C-O
+ash_O           ash_C           ash_OXT         ash_HO              3.7410     2.0000   180.0000     1.0000  ! high   ! ==> HO-OH-C-O
+ash_CA          ash_CB          ash_CG          ash_OD2             0.2730     2.0000   180.0000     1.0000  ! high   ! ==> CT1-CT-C-OC3
+ash_CA          ash_CB          ash_CG          ash_OD1             0.5000    -1.0000     0.0000     1.0000  ! high   ! ==> CT1-CT-C-OH
+ash_CA          ash_CB          ash_CG          ash_OD1             0.2730    -2.0000   180.0000     1.0000  ! high   ! ==> CT1-CT-C-OH
+ash_CA          ash_CB          ash_CG          ash_OD1             0.2250     3.0000     0.0000     1.0000  ! high   ! ==> CT1-CT-C-OH
+ash_HB1         ash_CB          ash_CG          ash_OD2             0.0000     1.0000     0.0000     1.0000  ! high   ! ==> HC-CT-C-OC3
+ash_HB1         ash_CB          ash_CG          ash_OD1             0.0000     1.0000     0.0000     1.0000  ! high   ! ==> HC-CT-C-OH
+ash_HB2         ash_CB          ash_CG          ash_OD2             0.0000     1.0000     0.0000     1.0000  ! high   ! ==> HC-CT-C-OC3
+ash_HB2         ash_CB          ash_CG          ash_OD1             0.0000     1.0000     0.0000     1.0000  ! high   ! ==> HC-CT-C-OH
+ash_CB          ash_CG          ash_OD1         ash_HD1             1.5000    -1.0000     0.0000     1.0000  ! high   ! ==> HO-OH-C-CT
+ash_CB          ash_CG          ash_OD1         ash_HD1             2.4500     2.0000   180.0000     1.0000  ! high   ! ==> HO-OH-C-CT
+ash_OD2         ash_CG          ash_OD1         ash_HD1             2.4500     2.0000   180.0000     1.0000  ! high   ! ==> HO-OH-C-OC3
+
+
+[impropers]
+ash_CA          ash_C           ash_OXT         ash_O              10.5000   180.0000  ! high   ! carbonyl and analogs
+ash_CB          ash_CG          ash_OD2         ash_OD1            10.5000   180.0000  ! high   ! carbonyl and analogs
+
