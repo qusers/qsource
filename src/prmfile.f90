@@ -19,38 +19,39 @@ module prmfile
   !This module reads files with the following format
   ![section_name]
   !key  value
-  !key                             value  !comment
+  !key  value  !comment
   !#comment
   !!comment
   !*comment
-
   !key value
+
   ![another_section]
-  !value value value value
-  !value value value value
-  !value value value value
+  !value value 
+  !value value 
+  !value value 
 
-  !section_name identifies a section in the file which can be opened with 
-  !prm_open_section. The name is not case-sensitive.
-  !Blank lines and lines starting with '!', '*' or '#' are ignored. 
-  !White spaces anywhere in key-value lines are ignored.
-  !Values may be followed by comments initated by '!', '*' or '#'
-  !Keys identify the values by a label. A key name may not contain white-space.
+  ! section_name identifies a section in the file which can be opened with 
+  ! prm_open_section. The name is not case-sensitive.
+  ! Blank lines and lines starting with '!', '*' or '#' are ignored. 
+  ! White spaces anywhere in key-value lines are ignored.
+  ! Values may be followed by comments initated by '!', '*' or '#'
+  ! Keys identify the values by a label. 
+  ! A key name may not contain white-space.
 
-  !The parameter file is opened by the function
-  !prm_open(file) where "file" is the file name. prm_open returns .true. on 
-  !success or .false. on failure (if the file does not exist or can't be opened)
+  ! The parameter file is opened by the function
+  ! prm_open(file) where "file" is the file name. prm_open returns .true. on 
+  ! success or .false. on failure (if the file does not exist or can't be opened)
 
-  !Data from the file is retrieved by calling the data retrieval functions 
-  !which all return .true. on success or .false. on failure
-  !Entire lines within a section are retrieved by prm_get_line(line) where 
-  !line is a string of suitable length to hold the expected data
+  ! Data from the file is retrieved by calling the data retrieval functions 
+  ! which all return .true. on success or .false. on failure
+  ! Entire lines within a section are retrieved by prm_get_line(line) where 
+  ! line is a string of suitable length to hold the expected data
 
-  !Key-value pairs can be retrieved by the following functions
-  !prm_get_value_by_key(key, value)
-  !       with the input argument "key" identifying the key and the
-  !       output argument "value" which is an integer, a real or a string
-  !       (different functions with same name for different data types)
+  ! Key-value pairs can be retrieved by the following functions
+  ! prm_get_value_by_key(key, value)
+  ! with the input argument "key" identifying the key and the
+  ! output argument "value" which is an integer, a real or a string
+  ! (different functions with same name for different data types)
 
   !prm_get_string_string(key, value) 
   !       key and value are both strings
@@ -103,7 +104,9 @@ module prmfile
 contains
 
 !  subroutine prmfile_startup
-
+!     At some point someone created this empty subroutine which used to be
+!     called in prep.f90 and qatom.f90. Mauricio Esguerra has commented out
+!     all this.
 !  end subroutine prmfile_startup
 
 

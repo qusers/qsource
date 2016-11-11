@@ -175,7 +175,7 @@ contains
 
   subroutine qatom_startup
     ! initialize used modules
-    call prmfile_startup
+!    call prmfile_startup
     call nrgy_startup
 
     ! initialize constants

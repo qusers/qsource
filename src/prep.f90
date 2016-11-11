@@ -178,7 +178,7 @@ module prep
   type(bond_type)                  :: extrabnd(max_extrabnd)
 
 !     things needed for topology generation 
-!-----------------------------------------------------------------------
+!-------------------------------------------------------------------------------
   logical, allocatable            :: makeh(:)
   integer, allocatable            :: nconn(:)
   integer, allocatable            :: iconn(:,:)
@@ -209,13 +209,13 @@ contains
 
 !------------------------------------------------------------------------------!
 !>  subroutine: prep_startup
-!
+!>
 !------------------------------------------------------------------------------!
 subroutine prep_startup
-  logical                   ::      l
+  logical                         :: l
   !initialize used modules
   call topo_startup               ! empty
-  call prmfile_startup            ! empty
+!  call prmfile_startup            ! empty
   call parse_startup              ! some code
   call index_startup              ! empty
 
@@ -244,7 +244,7 @@ end subroutine prep_startup
 !------------------------------------------------------------------------------!
 subroutine allocate_for_pdb(atoms, residues, molecules)
 !arguments
-  integer, intent(in) :: atoms, residues, molecules
+  integer, intent(in)             :: atoms, residues, molecules
   allocate(xtop(3*atoms), heavy(atoms), makeH(atoms), &
           res(residues), istart_mol(molecules), &
           stat=alloc_status)
@@ -262,11 +262,10 @@ end subroutine allocate_for_pdb
 !
 !------------------------------------------------------------------------------!
 subroutine prep_shutdown
-        call topo_deallocate
-
-        call index_shutdown
-        call mask_finalize(mask)
-        call trj_shutdown
+  call topo_deallocate
+  call index_shutdown
+  call mask_finalize(mask)
+  call trj_shutdown
 end subroutine prep_shutdown
 
 
@@ -275,8 +274,8 @@ end subroutine prep_shutdown
 !
 !------------------------------------------------------------------------------!
 subroutine clearlib
-        lib_files = ''
-        nlibres = 0
+  lib_files = ''
+  nlibres = 0
 end subroutine clearlib
 
 
@@ -298,165 +297,165 @@ end subroutine check_alloc
 
 
 !------------------------------------------------------------------------------!
-! subroutine: addbond
+!>  subroutine: addbond
 !
 !------------------------------------------------------------------------------!
 subroutine addbond
 ! *** local variables
-        integer                   :: ia, ja
-        real(8)                   :: bond_dist, rij(3)
-        character(len=80)         :: reply
-        integer                   :: readstat
+  integer                   :: ia, ja
+  real(8)                   :: bond_dist, rij(3)
+  character(len=80)         :: reply
+  integer                   :: readstat
 
-        call get_string_arg(reply, &
-                '-----> First atom (number or residue:atom_name): ')
-        if(scan(reply, ':') > 0) then !got res:at
-                ia=get_atom_from_descriptor(reply)
-                if(ia== 0) then
-                        write(*,910) trim(reply)
-910                     format('>>>>> ERROR: Could not find atom ',a)
-                        return
-                end if
-        else !got atom number
-                read(reply, *, iostat=readstat) ia
-                if(readstat /= 0) then
-                        write(*,910) trim(reply)
-                        return
-                end if
-        end if
-        if(ia > nat_pro .or. ia < 1) then
-                write(*,'(a)') 'Out of range!'
-                return
-        end if
-        call get_string_arg(reply, &
-                '-----> Second atom (number or residue:atom_name): ')
-        if(scan(reply, ':') > 0) then !got res:at
-                ja=get_atom_from_descriptor(reply)
-                if(ja== 0) then
-                        write(*,910) trim(reply)
-                        return
-                end if
-        else !got atom number
-                read(reply, *, iostat=readstat) ja
-                if(readstat /= 0) then
-                        write(*,910) trim(reply)
-                        return
-                end if
-        end if
-        if(ja > nat_pro .or. ja < 1) then
-                write(*,'(a)') 'Out of range!'
-                return
-        elseif(ja == ia) then
-                write(*,'(a)') 'First and second atom must be different!'
-                return
-        end if
-        rij(:) = xtop(3*ia-2:3*ia) - xtop(3*ja-2:3*ja)
-        bond_dist = sqrt(dot_product(rij,rij))
-        if(bond_dist >  max_xlink) then
-                write(*,100) bond_dist
+  call get_string_arg(reply, &
+          '-----> First atom (number or residue:atom_name): ')
+  if(scan(reply, ':') > 0) then !got res:at
+          ia=get_atom_from_descriptor(reply)
+          if(ia== 0) then
+                  write(*,910) trim(reply)
+910                 format('>>>>> ERROR: Could not find atom ',a)
+                  return
+          end if
+  else !got atom number
+          read(reply, *, iostat=readstat) ia
+          if(readstat /= 0) then
+                  write(*,910) trim(reply)
+                  return
+          end if
+  end if
+  if(ia > nat_pro .or. ia < 1) then
+          write(*,'(a)') 'Out of range!'
+          return
+  end if
+  call get_string_arg(reply, &
+          '-----> Second atom (number or residue:atom_name): ')
+  if(scan(reply, ':') > 0) then !got res:at
+          ja=get_atom_from_descriptor(reply)
+          if(ja== 0) then
+                  write(*,910) trim(reply)
+                  return
+          end if
+  else !got atom number
+          read(reply, *, iostat=readstat) ja
+          if(readstat /= 0) then
+                  write(*,910) trim(reply)
+                  return
+          end if
+  end if
+  if(ja > nat_pro .or. ja < 1) then
+          write(*,'(a)') 'Out of range!'
+          return
+  elseif(ja == ia) then
+          write(*,'(a)') 'First and second atom must be different!'
+          return
+  end if
+  rij(:) = xtop(3*ia-2:3*ia) - xtop(3*ja-2:3*ja)
+  bond_dist = sqrt(dot_product(rij,rij))
+  if(bond_dist >  max_xlink) then
+          write(*,100) bond_dist
 100             format('>>> WARNING: Bond distance is',f6.2,' A.')
                 call get_string_arg(reply, '-----> Make bond anyway (y/n)? ')
                 call upcase(reply)
                 if(reply /= 'Y' .and. reply /= 'YES') then
                         return
                 end if
-        end if
-        if(nextrabnd < max_extrabnd) then
-                nextrabnd = nextrabnd+1
-                extrabnd(nextrabnd)%i = ia
-                extrabnd(nextrabnd)%j = ja
-        else
-                write(*,900) max_extrabnd
+  end if
+  if(nextrabnd < max_extrabnd) then
+    nextrabnd = nextrabnd+1
+    extrabnd(nextrabnd)%i = ia
+    extrabnd(nextrabnd)%j = ja
+  else
+    write(*,900) max_extrabnd
 900             format('>>>>> ERROR: Too many extra bonds. (Max ',i5,')')
-        end if
+  end if
 
 end subroutine addbond
 
 
 
 !------------------------------------------------------------------------------!
-! subroutine: clearbond
+!>  subroutine: clearbond
 !
 !------------------------------------------------------------------------------!
 subroutine clearbond
-        !clear extra bonds
-        nextrabnd = 0
+  !clear extra bonds
+  nextrabnd = 0
 end subroutine clearbond
 
 
 
 !------------------------------------------------------------------------------!
-! subroutine: angle_ene
+!>  subroutine: angle_ene
 !
 !------------------------------------------------------------------------------!
 subroutine angle_ene(emax, nlarge, av_ene)
 ! *** local variables
-        integer i, j, k, ia, ic, istart, iend, i3, j3, k3, nlarge
-        real rji(3), rjk(3), bji, bjk, scp, angle, da, ae, dv, f1, di(3),&
-        dk(3)
-        real emax, av_ene
+  integer i, j, k, ia, ic, istart, iend, i3, j3, k3, nlarge
+  real rji(3), rjk(3), bji, bjk, scp, angle, da, ae, dv, f1, di(3),&
+  dk(3)
+  real emax, av_ene
 
 
-        istart = 1
-        iend = nangles
-        nlarge = 0
-        av_ene = 0
+  istart = 1
+  iend = nangles
+  nlarge = 0
+  av_ene = 0
 
-        do ia = istart, iend
+  do ia = istart, iend
 
-        i = ang(ia)%i
-        j = ang(ia)%j
-        k = ang(ia)%k
-        ic = ang(ia)%cod
-        if(ic == 0) then !missing parameter
-                write(*, '(4i5,1x,a)') ia, i, j, k, 'MISSING PARAMETERS'
-                cycle 
-        end if
-        i3 = i * 3 - 3
-        j3 = j * 3 - 3
-        k3 = k * 3 - 3
-        rji(1) = xtop(i3 + 1) - xtop(j3 + 1)
-        rji(2) = xtop(i3 + 2) - xtop(j3 + 2)
-        rji(3) = xtop(i3 + 3) - xtop(j3 + 3)
-        rjk(1) = xtop(k3 + 1) - xtop(j3 + 1)
-        rjk(2) = xtop(k3 + 2) - xtop(j3 + 2)
-        rjk(3) = xtop(k3 + 3) - xtop(j3 + 3)
-        bji = sqrt(rji(1) **2 + rji(2) **2 + rji(3) **2)
-        bjk = sqrt(rjk(1) **2 + rjk(2) **2 + rjk(3) **2)
-        scp =(rji(1) * rjk(1) + rji(2) * rjk(2) + rji(3) * rjk(3) )
-        scp = scp /(bji * bjk)
-        if(scp>1.0) scp = 1.0
-        if(scp< - 1.0) scp = - 1.0
-        angle = acos(scp)
-        da = angle - anglib(ic)%ang0 * pi / 180.
-        ae = 0.5 * anglib(ic)%fk * da**2
-        av_ene = av_ene+ae
+  i = ang(ia)%i
+  j = ang(ia)%j
+  k = ang(ia)%k
+  ic = ang(ia)%cod
+  if(ic == 0) then !missing parameter
+          write(*, '(4i5,1x,a)') ia, i, j, k, 'MISSING PARAMETERS'
+          cycle 
+  end if
+  i3 = i * 3 - 3
+  j3 = j * 3 - 3
+  k3 = k * 3 - 3
+  rji(1) = xtop(i3 + 1) - xtop(j3 + 1)
+  rji(2) = xtop(i3 + 2) - xtop(j3 + 2)
+  rji(3) = xtop(i3 + 3) - xtop(j3 + 3)
+  rjk(1) = xtop(k3 + 1) - xtop(j3 + 1)
+  rjk(2) = xtop(k3 + 2) - xtop(j3 + 2)
+  rjk(3) = xtop(k3 + 3) - xtop(j3 + 3)
+  bji = sqrt(rji(1) **2 + rji(2) **2 + rji(3) **2)
+  bjk = sqrt(rjk(1) **2 + rjk(2) **2 + rjk(3) **2)
+  scp =(rji(1) * rjk(1) + rji(2) * rjk(2) + rji(3) * rjk(3) )
+  scp = scp /(bji * bjk)
+  if(scp>1.0) scp = 1.0
+  if(scp< - 1.0) scp = - 1.0
+  angle = acos(scp)
+  da = angle - anglib(ic)%ang0 * pi / 180.
+  ae = 0.5 * anglib(ic)%fk * da**2
+  av_ene = av_ene+ae
 
-        if(ae>emax) then
-                nlarge = nlarge+1
-                write( * , '(5i5,4f8.2)') ia, i, j, k, ic, anglib(ic)%fk ,&
-                        anglib(ic)%ang0, angle * 180. / pi, ae
-        endif
+  if(ae>emax) then
+          nlarge = nlarge+1
+          write( * , '(5i5,4f8.2)') ia, i, j, k, ic, anglib(ic)%fk ,&
+                  anglib(ic)%ang0, angle * 180. / pi, ae
+  endif
 
-        enddo
+  enddo
 
-        if(nangles/=0) av_ene = av_ene / real(nangles)
-
+  if(nangles/=0) av_ene = av_ene / real(nangles)
 
 end subroutine angle_ene
 
 
 !------------------------------------------------------------------------------!
-! function: anglecode
+!>  function: anglecode
 !
 !------------------------------------------------------------------------------!
 integer function anglecode(taci, tacj, tack)
 !arguments
-        character(*), intent(in)                ::      taci, tacj, tack
-! *** local variables
-        integer i
+  character(*), intent(in)        :: taci, tacj, tack
 
-        character(len=KEYLENGTH)                ::      ti, tj, tk
+! *** local variables
+  integer i
+
+  character(len=KEYLENGTH)        :: ti, tj, tk
 
         ti = wildcard_tac(taci)
         tj = wildcard_tac(tacj)
@@ -4648,7 +4647,10 @@ logical function set_boundary_condition()
 end function set_boundary_condition
 
 
-
+!------------------------------------------------------------------------------!
+!>  subroutine: set_simulation_sphere
+!>
+!------------------------------------------------------------------------------!
 logical function set_simulation_sphere()
                 
         !get centre coordinates
@@ -4702,12 +4704,13 @@ logical function set_simulation_sphere()
 110 format('Simulation radius                       =   ',f8.3)
     set_simulation_sphere = .true.
 
-
-
 end function set_simulation_sphere
 
 
-
+!------------------------------------------------------------------------------!
+!>  subroutine: set_solvent_box
+!>
+!------------------------------------------------------------------------------!
 logical function set_solvent_box()
 
         !locals
@@ -4776,7 +4779,10 @@ logical function set_solvent_box()
 end function set_solvent_box
 
 
-
+!------------------------------------------------------------------------------!
+!>  subroutine: solvate
+!>
+!------------------------------------------------------------------------------!
 subroutine solvate
         ! Make sure boundary condition is set.
         if (.not. boundary_set) then
@@ -4794,7 +4800,10 @@ subroutine solvate
 end subroutine solvate
 
 
-
+!------------------------------------------------------------------------------!
+!>  subroutine: solvate_box
+!
+!------------------------------------------------------------------------------!
 subroutine solvate_box
         character(len=80)                       ::      solvate_mode
 
@@ -4828,13 +4837,12 @@ subroutine solvate_box
 end subroutine solvate_box
 
 
-
+!------------------------------------------------------------------------------!
+!>  subroutine: solvate_box_grid
+!>  solvate box using grid
+!------------------------------------------------------------------------------!
 subroutine solvate_box_grid
-
-!solvate sphere using grid
-
         !locals
-
         real(8)              ::      xmin, xmax, ymin, ymax, zmin, zmax
         real(8)              ::      xgrid, ygrid, zgrid
         integer              ::      max_wat !max number of molecules
@@ -4912,8 +4920,10 @@ subroutine solvate_box_grid
 end subroutine solvate_box_grid
 
 
-
-
+!------------------------------------------------------------------------------!
+!>  subroutine: solvate_box_file
+!
+!------------------------------------------------------------------------------!
 subroutine solvate_box_file
 !local variables
   character(len=80)                 :: xwat_file
@@ -5122,8 +5132,10 @@ subroutine solvate_box_file
 end subroutine solvate_box_file
 
 
-
-
+!------------------------------------------------------------------------------!
+!>  subroutine: solvate_sphere
+!
+!------------------------------------------------------------------------------!
 subroutine solvate_sphere        
   character(len=80)                 :: solvate_mode
         
@@ -5153,7 +5165,10 @@ subroutine solvate_sphere
   end select
 end subroutine solvate_sphere
 
-
+!------------------------------------------------------------------------------!
+!>  function: set_solvent_sphere
+!
+!------------------------------------------------------------------------------!
 logical function set_solvent_sphere()        
         !locals
         character(len=80)                       ::      line
@@ -5217,13 +5232,12 @@ logical function set_solvent_sphere()
 end function set_solvent_sphere
 
 
-
+!------------------------------------------------------------------------------!
+!>  subroutine: solvate_sphere_grid
+!>  solvate sphere using grid
+!------------------------------------------------------------------------------!
 subroutine solvate_sphere_grid
-
-!solvate sphere using grid
-
         !locals
-
         real(8)                                         ::      xmin, xmax, ymin, ymax, zmin, zmax
         real(8)                                         ::      xgrid, ygrid, zgrid
         integer                                         ::      max_wat !max number of molecules
@@ -5298,7 +5312,10 @@ end subroutine solvate_sphere_grid
 
 
 
-
+!------------------------------------------------------------------------------!
+!>  subroutine: solvate_sphere_file
+!
+!------------------------------------------------------------------------------!
 subroutine solvate_sphere_file(shift)
 ! parameters
         logical, intent(in), optional:: shift
@@ -5502,9 +5519,11 @@ subroutine solvate_sphere_file(shift)
 end subroutine solvate_sphere_file
 
 
-
+!------------------------------------------------------------------------------!
+!>  subroutine: solvate_restart
+!
+!------------------------------------------------------------------------------!
 subroutine solvate_restart
-
 !locals
         integer(4)                                      ::      natom, nat3, waters_added
         character(len=80)                       ::      xfile
@@ -5563,7 +5582,10 @@ subroutine solvate_restart
 end subroutine solvate_restart
 
 
-
+!------------------------------------------------------------------------------!
+!>  subroutine: add_solvent_to_topology
+!
+!------------------------------------------------------------------------------!
 subroutine add_solvent_to_topology(waters_in_sphere, max_waters, make_hydrogens, pack)
 !arguments
         integer                                         ::      waters_in_sphere
@@ -5694,7 +5716,10 @@ ploop:          do p_atom = 1, nat_pro !for each water check all other atoms
 end subroutine add_solvent_to_topology
 
 
-
+!------------------------------------------------------------------------------!
+!>  subroutine: grow_arrays_for_solvent
+!
+!------------------------------------------------------------------------------!
 subroutine grow_arrays_for_solvent(nmore, atoms_per_molecule)
 !make space for nmore more water molecules
 !arguments
@@ -5777,8 +5802,10 @@ subroutine grow_arrays_for_solvent(nmore, atoms_per_molecule)
 end subroutine grow_arrays_for_solvent
 
 
-
-
+!------------------------------------------------------------------------------!
+!>  function: rwat_eff
+!
+!------------------------------------------------------------------------------!
 real function rwat_eff()
   ! local variables
   integer                           :: i,kr,isort,bins
@@ -5831,8 +5858,10 @@ real function rwat_eff()
 end function rwat_eff
 
 
-
-
+!------------------------------------------------------------------------------!
+!>  function: torcode
+!
+!------------------------------------------------------------------------------!
 type(TOR_CODES) function torcode(taci, tacj, tack, tacl)
 !arguments
         character(KEYLENGTH)                    ::      taci, tacj, tack, tacl
@@ -5929,8 +5958,10 @@ type(TOR_CODES) function torcode(taci, tacj, tack, tacl)
 end function torcode
 
 
-
-
+!------------------------------------------------------------------------------!
+!>  subroutine: tors_ene
+!
+!------------------------------------------------------------------------------!
 subroutine tors_ene(emax, nlarge, av_ene)
 ! *** local variables
         integer i, j, k, l, ip, ic, i3, j3, k3, l3, nlarge
@@ -6006,8 +6037,10 @@ subroutine tors_ene(emax, nlarge, av_ene)
 end subroutine tors_ene
 
 
-
-
+!------------------------------------------------------------------------------!
+!>  function: check_residues
+!>
+!------------------------------------------------------------------------------!
 logical function check_residues()
 !locals
         integer                                         ::      i,j
@@ -6036,140 +6069,145 @@ libloop:do j = 1, nlibres
 end function check_residues
 
 
-
-
+!------------------------------------------------------------------------------!
+!>  subroutine: writepdb
+!>
+!------------------------------------------------------------------------------!
 subroutine writepdb
 ! *** local variables
-        CHARACTER(len=80)                       ::      filnam
-        character(len=1)                        ::      reply
-        character(*), parameter ::      gap = &
-                '                 GAP                                      '
-        character(*), parameter ::      ter = 'TER   '
-        integer                                         ::      i, j, k, l, imol
-        integer                                         ::      iat
-        integer                                         ::      iwrite_g
-        logical                                         ::      wrote_atom_in_molecule
-        character(len=6)                        ::      PDBtype
-        integer                                         ::      lig(4) !atoms connected to atom i
+  character(len=80)                :: filnam
+  character(len=1)                 :: reply
+  character(*), parameter          :: gap = &
+          '                 GAP                                      '
+  character(*), parameter          :: ter = 'TER   '
+  integer                          :: i, j, k, l, imol
+  integer                          :: iat
+  integer                          :: iwrite_g
+  logical                          :: wrote_atom_in_molecule
+  character(len=6)                 :: PDBtype
+  integer                          :: lig(4) !atoms connected to atom i
 
-        if(.not. check_residues()) then
-                call parse_reset()
-                return
-        end if
-        if(mask%included == 0) then
-                write(*,900)
-900             format('>>>>> ERROR: The mask is empty - no atoms to write!')
-                return
-        end if
+  if(.not. check_residues()) then
+    call parse_reset()
+    return
+  end if
+  if(mask%included == 0) then
+    write(*,900)
+900   format('>>>>> ERROR: The mask is empty - no atoms to write!')
+    return
+  end if
 
-        write( *, * )
-        call get_string_arg(filnam, '-----> Name of PBD file: ')
-        if(openit(3, filnam, 'unknown', 'formatted', 'write') /= 0) then
-                call parse_reset
-                return
-        end if
-        REWIND(3)
+  write( *, * )
+  call get_string_arg(filnam, '-----> Name of PBD file: ')
+  if(openit(3, filnam, 'unknown', 'formatted', 'write') /= 0) then
+    call parse_reset
+    return
+  end if
+  rewind(3)
 
 
-        CALL get_string_arg(reply, '-----> Write out TER cards [y/n] ? ')
-        select case(reply)
-        case('y', 'Y')
-                iwrite_g = 1
-        case default
-                iwrite_g = 0
-        end select      
+  call get_string_arg(reply, '-----> Write out TER cards [y/n] ? ')
+  select case(reply)
+  case('y', 'Y')
+          iwrite_g = 1
+  case default
+          iwrite_g = 0
+  end select      
 
-!PDB standard minus B-factors 10        format(a6,i5,1x,a4,a1,a3,1x,a1,i4,a1,3x,3f8.3)
-!See readpdb for specification of the format
-!Old format  10 format(a6,i5,2x,a4,a4,i5,4x,3f8.3)      
-!TODO: Fix writing of chainID, requires chain info in topology.
-   !(PDBtype,atomNr,atomName,resName,resNr,coords)
+! PDB standard minus B-factors 10
+! format(a6,i5,1x,a4,a1,a3,1x,a1,i4,a1,3x,3f8.3)
+! See the readpdb subroutine for specification of the format
+! Old format  10 format(a6,i5,2x,a4,a4,i5,4x,3f8.3)      
+! TODO: Fix writing of chainID, requires chain info in topology.
+! (PDBtype,atomNr,atomName,resName,resNr,coords)
 10      format(a6,i5,1x,a5,a3,2x,i4,4x,3f8.3)  
 11      format(a6,11x,a3,2x,i4) !For TER cards  
-        iat = 0
-        imol = 1
+  iat = 0
+  imol = 1
+  wrote_atom_in_molecule = .false.
+  do i = 1, nres
+    if(lib(res(i)%irc )%HETATM) then
+      PDBtype = 'HETATM'
+    else
+      PDBtype = 'ATOM  '
+    end if
+    do j = 1, lib(res(i)%irc)%nat
+      iat = iat + 1
+      !write only atoms in mask
+      if(mask%mask(iat)) then
+        write(3, 10) PDBtype, iat, lib(res(i)%irc )%atnam(j), res(i)%name,&
+          i,xtop(iat*3-2:iat*3)
+        wrote_atom_in_molecule = .true.
+      end if
+    enddo
+    if(i < nres_solute .and. imol < nmol) then
+      if(istart_mol(imol + 1) ==iat + 1) then
+        imol = imol + 1
+        if(iwrite_g>0 .and. wrote_atom_in_molecule) then
+          write(3, 11)  ter, res(i)%name, i
+        end if
         wrote_atom_in_molecule = .false.
-        do i = 1, nres
-                if(lib(res(i)%irc )%HETATM) then
-                        PDBtype = 'HETATM'
-                else
-                        PDBtype = 'ATOM  '
-                end if
-                do j = 1, lib(res(i)%irc)%nat
-                        iat = iat + 1
-                        !write only atoms in mask
-                        if(mask%mask(iat)) then
-                                write(3, 10) PDBtype, iat, lib(res(i)%irc )%atnam(j), res(i)%name,&
-                                        i,xtop(iat*3-2:iat*3)
-                                wrote_atom_in_molecule = .true.
-                        end if
-                enddo
-                if(i < nres_solute .and. imol < nmol) then
-                        if(istart_mol(imol + 1) ==iat + 1) then
-                                imol = imol + 1
-                                if(iwrite_g>0 .and. wrote_atom_in_molecule) then
-                                        write(3, 11)  ter, res(i)%name, i
-                                end if
-                                wrote_atom_in_molecule = .false.
-                        endif
-                end if
-        enddo
+      endif
+    end if
+  enddo
 
-        !now write connect records for HETATM groups
-        do i = 1, nres_solute !loop over all solute residues
-                if(lib(res(i)%irc)%HETATM) then !only for HETATM groups
-                        j = 1
-                        !work through all bonds
-                        do while(j <= lib(res(i)%irc)%nbnd) 
-                                !this is the first atom
-                                iat = res(i)%start - 1 + lib(res(i)%irc)%bnd(j)%i
-                                !find a set of up to four bonds from this atom
-                                l = 0
-                                do k = 1,4
-                                        lig(k) = res(i)%start - 1 + lib(res(i)%irc)%bnd(j)%j
-                                        j=j+1
-                                        !include only ligand atoms which are in the mask
-                                        if(mask%mask(lig(k))) l = l + 1
-                                        if(j>lib(res(i)%irc)%nbnd) exit
-                                        !stop if new bond has different i atom
-                                        if(res(i)%start - 1 + lib(res(i)%irc)%bnd(j)%i /= iat) exit
-                                end do
-                                if(mask%mask(iat) .and. l>0) write(3,20) iat, lig(1:l)
-                        end do
-                end if
+  !now write connect records for HETATM groups
+  do i = 1, nres_solute !loop over all solute residues
+    if(lib(res(i)%irc)%HETATM) then !only for HETATM groups
+      j = 1
+      !work through all bonds
+      do while(j <= lib(res(i)%irc)%nbnd) 
+        !this is the first atom
+        iat = res(i)%start - 1 + lib(res(i)%irc)%bnd(j)%i
+        !find a set of up to four bonds from this atom
+        l = 0
+        do k = 1,4
+          lig(k) = res(i)%start - 1 + lib(res(i)%irc)%bnd(j)%j
+          j=j+1
+          !include only ligand atoms which are in the mask
+          if(mask%mask(lig(k))) l = l + 1
+          if(j>lib(res(i)%irc)%nbnd) exit
+          !stop if new bond has different i atom
+          if(res(i)%start - 1 + lib(res(i)%irc)%bnd(j)%i /= iat) exit
         end do
-20      format('CONECT',5i5)
+        if(mask%mask(iat) .and. l>0) write(3,20) iat, lig(1:l)
+      end do
+    end if
+  end do
+20   format('CONECT',5i5)
 
-        write( * , '(/,a,/)') 'PDB file successfully written.'
+  write( * , '(/,a,/)') 'PDB file successfully written.'
 
-        close(3)
+  close(3)
 
 end subroutine writepdb
 
 
-
-
+!------------------------------------------------------------------------------!
+!>  subroutine: writemol2
+!>
+!------------------------------------------------------------------------------!
 subroutine writemol2
 ! *** local variables
-        CHARACTER filnam*80, reply*1
-        character                                       ::      mol_name*16, ti*1, tj*1
-        integer                                         ::      i, cnt, j, iat
-        integer                                         ::      u
-        integer                                         ::      mol, mol_start, mol_end, nat_mol, nbnd_mol
-        integer                                         ::      at_start, at_end, res_start, res_end
-        integer                                         ::      bnd_start, bnd_end, new_last, new_res
-        logical                                         ::      iwrite_h, iwrite_w
-        integer                                         ::      nres_mol,res_atoms(nres), new_num(nat_pro)
-        integer                                         ::      new_resnum(nres)
-        integer                                         ::      dict_type
+  character filnam*80, reply*1
+  character                        :: mol_name*16, ti*1, tj*1
+  integer                          :: i, cnt, j, iat
+  integer                          :: u
+  integer                          :: mol, mol_start, mol_end, nat_mol, nbnd_mol
+  integer                          :: at_start, at_end, res_start, res_end
+  integer                          :: bnd_start, bnd_end, new_last, new_res
+  logical                          :: iwrite_h, iwrite_w
+  integer                          :: nres_mol,res_atoms(nres), new_num(nat_pro)
+  integer                          :: new_resnum(nres)
+  integer                          :: dict_type
 
-        if(.not. check_residues()) then
-                call parse_reset()
-                return
-        end if
+  if(.not. check_residues()) then
+          call parse_reset()
+          return
+  end if
 
-        if(mask%included == 0) then
-                write(*,900)
+  if(mask%included == 0) then
+          write(*,900)
 900             format('>>>>> ERROR: The mask is empty - no atoms to write!')
                 return
         end if
@@ -6301,7 +6339,10 @@ end subroutine writemol2
 
 
 
-
+!------------------------------------------------------------------------------!
+!>  subroutine: writetop
+!
+!------------------------------------------------------------------------------!
 subroutine writetop
 ! *** local variables
         CHARACTER filnam * 80
@@ -6331,8 +6372,8 @@ end subroutine writetop
 
 
 !------------------------------------------------------------------------------!
-! subroutine: listprefs
-!
+!>  subroutine: listprefs
+!>
 !------------------------------------------------------------------------------!
 subroutine listprefs
         call pref_list('Preferences (use set command to change):')
@@ -6341,8 +6382,8 @@ end subroutine listprefs
 
 
 !------------------------------------------------------------------------------!
-! subroutine: set
-!
+!>  subroutine: set
+!>
 !------------------------------------------------------------------------------!
 subroutine set
   !locals
@@ -6357,11 +6398,11 @@ end subroutine set
 
 
 !------------------------------------------------------------------------------!
-! subroutine: make_shell2
+!>  subroutine: make_shell2
 !
-! Sort out atoms in restrained shell. Use protein center to calculate distance.
-! Use coordinates from topology unless 'implicit_rstr_from_file' is specified
-! Swiped from md.f90, needed when using atom masks "not restrained"
+!>  Sort out atoms in restrained shell. Use protein center to calculate distance.
+!>  Use coordinates from topology unless 'implicit_rstr_from_file' is specified
+!>  Swiped from md.f90, needed when using atom masks "not restrained"
 !------------------------------------------------------------------------------!
 subroutine make_shell2
 ! *** Local variables
@@ -6401,10 +6442,10 @@ end subroutine make_shell2
 
 
 !------------------------------------------------------------------------------!
-! function: get_centre_by_mass
+!>  function: get_centre_by_mass
 !
-! Returns true if centre of mass can be assigned
-! and returns centre of mass for a mask of atoms in the vector 'centre'
+!>  Returns true if centre of mass can be assigned
+!>  and returns centre of mass for a mask of atoms in the vector 'centre'
 !------------------------------------------------------------------------------!
 logical function get_centre_by_mass(centre)
   real(8), intent(out)             :: centre(3)

@@ -9,11 +9,11 @@
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
-!  (c) 2003 Uppsala Molekylmekaniska HB, Uppsala, Sweden                       !
-!  md.f90                                                                      !
-!  by Johan Aqvist, John Marelius, Anders Kaplan, Isabella Feierberg,          !
-!  Martin Nervall & Martin Almlof                                              !
-!  molecular dynamics                                                          !
+!>  (c) 2003 Uppsala Molekylmekaniska HB, Uppsala, Sweden                      !
+!>  md.f90                                                                     !
+!>  by Johan Aqvist, John Marelius, Anders Kaplan, Isabella Feierberg,         !
+!>  Martin Nervall & Martin Almlof                                             !
+!>  molecular dynamics                                                         !
 !------------------------------------------------------------------------------!
 module md
   ! load modules

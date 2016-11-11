@@ -57,7 +57,6 @@ contains
   !>  Read input from file and execute commands
   !----------------------------------------------------------------------------!
   subroutine qprep_from_inputfile(filename)
-
   character(200)  :: filename
   character(200)  :: command
   logical         :: readable
@@ -195,7 +194,7 @@ contains
   'addbond                          adds extra bonds(e.g. S-S)',&
   'average                          computes an average structure from a trajectory file',&
   'boundary    [boundary condition]  set boundary condition',&
-  '            [centre] ',&
+  '            [center] ',&
   '            (box) [boxlengths]',&
   '            (sphere) [radius]',&
   '            (sphere) [inner radius]',&
@@ -224,7 +223,7 @@ contains
   'readx       [restart_file]       reads coord. file',&
   'set                              set preferences',&
   'solvate(boundry=sphere)          solvate sphere with specified options',&      
-  '            [centre]',&
+  '            [center]',&
   '            [radius]',&
   '            [grid|file|restart] ',&
   '            [solvent name] ',&

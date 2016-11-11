@@ -15,7 +15,7 @@
 !>  qcalc trajectory analysis main program
 !------------------------------------------------------------------------------!
 program qcalc
-  use version
+!  use version
   use trj
   use calc_base
   use calc_rms
@@ -177,7 +177,7 @@ subroutine finalize
                         i = calcs(c)%i
                         select case(cdef(calcs(c)%typ)%key)
                         case('rmsd')
-                                call RMS_finalize(i)
+                                call rms_finalize(i)
                         case('fit')
                                 call fit_finalize(i)
                         case('entropy')
@@ -515,7 +515,7 @@ subroutine make_ref_all(x)
         do i = 1, Ncalcs
                 select case(cdef(calcs(i)%typ)%key)
                 case('rmsd')
-                        call RMS_make_ref(calcs(i)%i)
+                        call rms_make_ref(calcs(i)%i)
                 case('rmsf')
                         call RMSF_make_ref(calcs(i)%i)
                 case('fit')
@@ -606,7 +606,7 @@ subroutine print_headings
 100                     format(1x,i2,':')
                         select case(cdef(calcs(c)%typ)%key)
                         case('rmsd')
-                                call RMS_heading(i)
+                                call rms_heading(i)
                         case('rmsf')
                                 call RMSF_heading(i)
                         case('fit')
@@ -653,7 +653,7 @@ subroutine calc_all(frame)
                 end if
                 select case(cdef(calcs(c)%typ)%key)
                         case('rmsd')
-                                call RMS_calc(i)
+                                call rms_calc(i)
                         case('rmsf')
                                 call RMSF_calc(i)
                         case('fit')
