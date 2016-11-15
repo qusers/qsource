@@ -1667,9 +1667,17 @@ logical function qatom_load_fep(fep_file)
 544		format (/,'No. of angle-Morse couplings = ',i5)
 		write(*,543)
 		do i=1,nang_coupl
-			if(.not. prm_get_int_int(j, k)) goto 1000
-			iang_coupl(1,i) = j
-			iang_coupl(2,i) = k
+                        read(line,*, iostat=stat) j,k,l
+                        if(stat .eq. 0) then
+				iang_coupl(1,i) = j
+				iang_coupl(2,i) = k
+				iang_coupl(3,i) = l
+			else
+				read(line,*, err=1000) j, k
+				iang_coupl(1,i) = j
+				iang_coupl(2,i) = k
+				iang_coupl(3,i) = 0
+			end if
 			write (*,545) iang_coupl(:,i)
 			if(j < 1 .or. j > nqangle) then
 				write(*,546) 'q-angle', j
@@ -1695,9 +1703,17 @@ logical function qatom_load_fep(fep_file)
 548		format (/,'No. of torsion-Morse couplings = ',i5)
 		write(*,547)
 		do i=1,ntor_coupl
-			if(.not. prm_get_int_int(j, k)) goto 1000
-			itor_coupl(1,i) = j
-			itor_coupl(2,i) = k
+                        read(line,*, iostat=stat) j,k,l
+			if(stat .eq. 0) then
+				itor_coupl(1,i) = j
+				itor_coupl(2,i) = k
+				itor_coupl(3,i) = l
+			else
+				read(line,*, err=1000) j, k
+				itor_coupl(1,i) = j
+				itor_coupl(2,i) = k
+				itor_coupl(3,i) = 0
+			end if
 			write (*,549) itor_coupl(:,i)
 			if(itor_coupl(1,i) < 1 .or. itor_coupl(1,i) > nqtor) then
 				write(*,546) 'q-torsion', itor_coupl(1,i)

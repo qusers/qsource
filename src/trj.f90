@@ -386,8 +386,7 @@ logical function trj_open(filename)
 !		trj_open = .false.
 !		return
 	end if
-960	format('>>>>> ERROR: Different number of atoms in mask and trajectory',/,&
-			i6, ' atoms in trajectory,',i6,' atoms in mask.')
+960	format('>>>>> ERROR: Different number of atoms in mask and trajectory',/,i6, ' atoms in trajectory,',i6,' atoms in mask.')
 
 	!allocated masked coordinate array
 	ncoords = 3*atoms
