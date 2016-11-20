@@ -915,6 +915,9 @@ integer function nb_qp_add(desc)
 	call mask_finalize(masks(1))
 	call mask_finalize(masks(2))
 	nb_qp_add = 1
+
+	write(desc, 21) qp_calc%p_first, qp_calc%p_last
+21	format('nonbond monitor for residues ',i6,' to ',i6)
 end function nb_qp_add
 
 
