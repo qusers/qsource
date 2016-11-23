@@ -1,0 +1,47 @@
+[MD]
+steps                     500000
+stepsize                  2
+temperature               300.0
+bath_coupling             50
+!random_seed               1231
+!initial_temperature       300.0
+shake_solvent             on
+shake_hydrogens           on
+shake_solute              on
+lrf                       on
+
+[cut_offs]
+solute_solute             10.0
+solute_solvent            10.0
+solvent_solvent           10.0
+q_atom                    99.0
+lrf                       99.0
+
+[sphere]
+shell_force               10
+shell_radius              0.8
+
+[solvent]
+radial_force              60.0
+polarization              on
+polarization_force        20.0
+
+[intervals]
+non_bond                  20
+output                    5000
+energy                    5000
+trajectory                5000
+
+[files]
+topology                  init.top
+fep                       lig.fep
+restart                   relax6.re
+energy                    equi.en
+final                     equi.re
+trajectory                equi.dcd
+
+[sequence_restraints]
+1 4 0.0 0 1
+
+![wall_restraints]
+!1 2846 10 1.0 0 0 0

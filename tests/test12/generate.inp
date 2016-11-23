@@ -1,0 +1,53 @@
+set random_seed_solvent 9015
+!Read the topology (library) file/files
+rl ff/charmm36/qtop_all36_cgenff.lib
+
+!Read the parameter file (i.e. force-field specific)
+rff ff/charmm36/qcharmm36.prm
+
+!Read the starting, usually precleaned pdb file.
+rp start.pdb
+
+!list residues sequence
+ls
+
+!list atoms in residue
+lr 1
+
+!show a list of Q preferences
+prefs
+
+!sulfur-sulfur bridges need to be created by the user.
+!addbond atomnum atomnum y
+
+!Create water sphere
+boundary sphere  1.600 0.638 -0.801 16
+solvate          1.600 0.638 -0.801 16 1 HOH
+
+!Create initial topology
+mt init
+wt init.top
+
+!Punch to output unusually large energies
+checkbonds 6
+checkangs  6
+checktors  6
+checkimps  6
+
+!Write pdb file corresponding to the created topology.
+wp init.pdb
+y
+q
+
+
+
+
+!readlib /Users/esguerra/software/qsource/ff/oplsaa/qoplsaa.lib
+!readlib /Users/esguerra/qguitests/nbutane/LIG.lib
+!readprm /Users/esguerra/qguitests/nbutane/merged.prm
+!readpdb /Users/esguerra/qguitests/nbutane/nbutaneQ_new.pdb
+!maketop /Users/esguerra/qguitests/nbutane/nbutaneQ_new topology
+!writetop /Users/esguerra/qguitests/nbutane/nbutaneQ_new.top
+!writepdb /Users/esguerra/qguitests/nbutane/nbutaneQ_new_top.pdb
+!y
+!q

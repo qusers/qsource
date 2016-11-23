@@ -84,7 +84,7 @@ subroutine rms_calc(i)
   r = sqrt(  sum((coords(i)%x-coords(i)%x0)**2)/(masks(i)%included) )  ! removed 3 in front of mask(i)
   write(*,100, advance='no') r
   write(10, 100, advance='yes') r
-100 format(f6.3)
+100 format(f8.6)
 end subroutine rms_calc
 
 

@@ -1,0 +1,20 @@
+init.top
+
+1
+#!residue 1
+4
+7
+10
+14
+.
+go
+start.dcd
+heat1.dcd
+heat2.dcd
+heat2.dcd
+heat3.dcd
+heat4.dcd
+heat5.dcd
+equi.dcd
+.
+
