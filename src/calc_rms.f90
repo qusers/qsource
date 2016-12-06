@@ -20,6 +20,7 @@ module calc_rms
     real(kind=prec), pointer       :: x(:), x0(:)
   end type RMS_COORD_TYPE
   type(RMS_COORD_TYPE), private    :: coords(MAX_MASKS)
+  character(80)                    :: rms_basename(MAX_MASKS)
 contains
 
 subroutine rms_initialize
@@ -33,7 +34,7 @@ end subroutine rms_finalize
 integer function rms_add(desc)
   !arguments
   character(*)                    :: desc
-  integer                         :: ats
+  integer                         :: ats,fn
   if(Nmasks == MAX_MASKS) then
     write(*,10) MAX_MASKS
     return
@@ -55,6 +56,16 @@ integer function rms_add(desc)
 
   call rms_make_ref(Nmasks)
   RMS_add = Nmasks
+  ! get name for file print out
+  call getlin(rms_basename(Nmasks),'--> RMSD print out filename: ')
+  ! open and close file to overwrite current saved data
+  ! this needs to be changed
+  fn = freefile()
+  open(fn,file=rms_basename(Nmasks),status='replace',action='write')
+21      format('RMSD calculation ',i6)
+  write(fn,20) masks(Nmasks)%included
+  write(fn,21) Nmasks
+  close(fn)
   write(desc, 20) masks(Nmasks)%included
 20      format('Root Mean Square Deviation for ',i6,' atoms')
  end function rms_add
@@ -66,13 +77,16 @@ subroutine rms_calc(i)
 
   !locals
   real(kind=prec)                 :: r
+  integer                         :: fn
 
-  open(10, file='rmsd.dat')
+  fn = freefile()
   if(i < 1 .or. i > Nmasks) return
+  open(fn,file=rms_basename(i),status='old',action='write',position='append')
   call mask_get(masks(i), xin, coords(i)%x)                            
   r = sqrt(  sum((coords(i)%x-coords(i)%x0)**2)/(masks(i)%included) )  ! removed 3 in front of mask(i)
   write(*,100, advance='no') r
-  write(10, 100, advance='yes') r
+  write(fn, 100, advance='yes') r
+  close(fn)
 100 format(f8.6)
 end subroutine rms_calc
 
