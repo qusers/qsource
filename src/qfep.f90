@@ -179,7 +179,7 @@ end if
 		read (*,*) alfa(istate)
 		write (*,6) istate,alfa(istate)
 	end do
-6	format('# Alpha for state ',i2,'              =',f6.2)
+6	format('# Alpha for state ',i2,'              =',f9.2)
 7	format('--> Give alpha for state ',i2,':')
 
 	scale_Hij=0.0
