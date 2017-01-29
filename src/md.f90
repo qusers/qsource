@@ -1195,9 +1195,9 @@ dv = anglib(ic)%fk*da
 
         ! calculate f1
 f1 = sin ( angv ) 
-if ( abs(f1) .lt. 1.e-4_prec ) then	! E is for single precision adding _prec customise precision D for double but _prec addon could not work propielty.
+if ( abs(f1) .lt. 1.e-5_prec ) then	! E is for single precision adding _prec customise precision D for double but _prec addon could not work propielty.
           ! avoid division by zero
-          f1 = -1.e12_prec
+          f1 = -1.e5_prec
         else
   f1 =  -one / f1
         end if
@@ -3205,7 +3205,7 @@ dv  = lib%fk*arg
 ! ---       forces
 
 f1 = sin ( phi ) 
-if ( abs(f1) .lt. 1.e-4_prec ) f1 = 1.e-4_prec
+if ( abs(f1) .lt. 1.e-5_prec ) f1 = 1.e-5_prec
 f1 =  -one / f1
 di(1) = f1 * ( rnk(1)*bjinv*bkinv - scp*rnj(1)*bj2inv )
 di(2) = f1 * ( rnk(2)*bjinv*bkinv - scp*rnj(2)*bj2inv )
@@ -3347,7 +3347,7 @@ dv  = -2*lib%fk * sin(arg)
 ! ---       forces
 
 f1 = sin ( phi ) 
-if ( abs(f1) .lt. 1.e-4_prec ) f1 = 1.e-4_prec
+if ( abs(f1) .lt. 1.e-5_prec ) f1 = 1.e-5_prec
 f1 =  -one / f1
 di(1) = f1 * ( rnk(1)*bjinv*bkinv - scp*rnj(1)*bj2inv )
 di(2) = f1 * ( rnk(2)*bjinv*bkinv - scp*rnj(2)*bj2inv )
@@ -15716,9 +15716,9 @@ dv     = wgt*rstang(ir)%fk*db
 
 ! calculate sin(theta) to use in forces
 f1 = sin ( theta )
-if ( abs(f1) .lt. 1.e-4_prec ) then
+if ( abs(f1) .lt. 1.e-5_prec ) then
         ! avoid division by zero
-        f1 = -1.e12_prec
+        f1 = -1.e5_prec
 else
         f1 =  -one / f1
 end if
@@ -17024,7 +17024,7 @@ EQ(istate)%q%angle = EQ(istate)%q%angle + ae*gamma
 
 dv = gamma*qanglib(ic)%fk*da*EQ(istate)%lambda
 f1 = sin ( ang )
-if ( abs(f1) .lt. 1.e-4_prec ) f1 = 1.e-4_prec
+if ( abs(f1) .lt. 1.e-5_prec ) f1 = 1.e-5_prec
 f1 =  -one / f1
 di(1) = f1 * ( rjk(1)/(bji*bjk) - scp*rji(1)/bji**2 )
 di(2) = f1 * ( rjk(2)/(bji*bjk) - scp*rji(2)/bji**2 )
@@ -17275,7 +17275,7 @@ dv = dv*gamma*EQ(istate)%lambda
 ! ---       forces
 
 f1 = sin ( phi ) 
-if ( abs(f1) .lt. 1.e-4_prec ) f1 = 1.e-4_prec
+if ( abs(f1) .lt. 1.e-5_prec ) f1 = 1.e-5_prec
 f1 =  -one / f1
 di(1) = f1 * ( rnk(1)/(bj*bk) - scp*rnj(1)/bj**2 )
 di(2) = f1 * ( rnk(2)/(bj*bk) - scp*rnj(2)/bj**2 )
@@ -17420,7 +17420,7 @@ dv = -qtorlib(ic)%rmult*qtorlib(ic)%fk*sin(arg)*gamma*EQ(istate)%lambda
 ! ---       forces
 
 f1 = sin ( phi ) 
-if ( abs(f1) .lt. 1.e-4_prec ) f1 = 1.e-4_prec
+if ( abs(f1) .lt. 1.e-5_prec ) f1 = 1.e-5_prec
 f1 =  -one / f1
 di(1) = f1 * ( rnk(1)/(bj*bk) - scp*rnj(1)/bj**2 )
 di(2) = f1 * ( rnk(2)/(bj*bk) - scp*rnj(2)/bj**2 )
@@ -17949,7 +17949,7 @@ dv = -lib%rmult*lib%fk*sin(arg)*lib%paths
 ! ---       forces
 
 f1 = sin ( phi ) 
-if ( abs(f1) .lt. 1.e-4_prec ) f1 = 1.e-4_prec
+if ( abs(f1) .lt. 1.e-5_prec ) f1 = 1.e-5_prec
 f1 =  -one / f1
 di(1) = f1 * ( rnk(1)*(bjinv*bkinv) - scp*rnj(1)*bj2inv )
 di(2) = f1 * ( rnk(2)*(bjinv*bkinv) - scp*rnj(2)*bj2inv )
@@ -18454,7 +18454,7 @@ scp = rmu(1)*rcu(1)+rmu(2)*rcu(2)+rmu(3)*rcu(3)
 if ( scp .gt.  one ) scp =  one
 if ( scp .lt. -one ) scp = -one
 f0 = sin ( acos(scp) )
-if ( abs(f0) .lt. 1.e-4_prec ) f0 = 1.e-4_prec
+if ( abs(f0) .lt. 1.e-5_prec ) f0 = 1.e-5_prec
 f0 = -one / f0
 f0 = dv*f0
 
