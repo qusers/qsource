@@ -15,7 +15,8 @@
 ################################################################################
 
 BUILD_NUMBER_FILE=build-number.txt
-
+# define program precision here
+PREC=		-DDOUBLE
 ################################################################################
 # Intel Fortran ifort ( tested in linux and osx)
 ################################################################################
@@ -24,7 +25,7 @@ ifeq ($(COMP),ifort)
 	FC_OPT=		-O3 -ip -ipo -unroll -xHost -inline-forceinline \
 				-unroll-aggressive -finline-limit=1000 \
 				-no-inline-max-size -no-prec-div
-	FFLAGS=		-fp-model precise -fp-model except
+	FFLAGS=		-fp-model precise -fp-model except ${PREC}
 	FFLAGS_R8=	-r8
 	FC_DEBUG=	-unroll 
 	FPP_FLG=	-fpp -DINTEL
@@ -50,7 +51,7 @@ else ifeq ($(COMP),osx)
 	FC_OPT=         -O3
 	FFLAGS=         -fstack-protector -DG95=1 \
                         -ffree-line-length-none -fcray-pointer -fall-intrinsics\
-                        -std=legacy -Wall -Wtabs 
+                        -std=legacy -Wall -Wtabs  ${PREC}
 	FFLAGS_R8=	-fdefault-real-8
 	FPP_FLG=        -cpp -DOSX
 
@@ -68,7 +69,7 @@ else ifeq ($(COMP),osx)
 else ifeq ($(COMP),pgi)
 	FC=		pgf90
 	FC_OPT=		-fastsse -Mipa=fast,inline -Minline=lrf_update,size:10000,levels:2 -O4 -Munroll -mcmodel=medium -Minfo=inline
-	FFLAGS=		
+	FFLAGS=		${PREC}
 	FFLAGS_R8=	-r8
 	FPP_FLG=	-Mpreprocess -DPGI
 
@@ -84,7 +85,7 @@ else ifeq ($(COMP),pgi)
 else ifeq ($(COMP),ibm)
 	FC=             xlf90
 	FC_OPT=         -qsmp=omp
-	FFLAGS=		-qrealsize=8 -DIBM
+	FFLAGS=		-qrealsize=8 -DIBM ${PREC}
 
 ################################################################################
 # GNU gcc-gfortran
@@ -98,15 +99,15 @@ else ifeq ($(COMP),gcc)
 	OMPI_FC=	${FC}
 	OMPI_FCFLAGS=	-DG95=1 \
                         -ffree-line-length-none -fcray-pointer -fall-intrinsics -std=legacy 
-	MPI=		${OMPI_FCFLAGS} ${FC_OPT}
+	MPI=		${OMPI_FCFLAGS} ${FC_OPT} ${PREC}
 	MPFLAG=		-fopenmp ${MPI}
 
-	FFLAGS=		--static ${OMPI_FCFLAGS}
+	FFLAGS=		--static ${OMPI_FCFLAGS} ${PREC}
 	FFLAGS_R8=	-fdefault-real-8
 
-	DEBUG=          -fbacktrace -g ${DEBUG_FC}	-ffree-line-length-none -fcray-pointer -fall-intrinsics -std=legacy
-	DEBUGMPI=       -fbacktrace -g ${DEBUG_FC}      -ffree-line-length-none -fcray-pointer -fall-intrinsics -std=legacy
-	DEBUGMP=        -fopenmp -fbacktrace -g ${DEBUG_FC}      -ffree-line-length-none -fcray-pointer -fall-intrinsics -std=legacy
+	DEBUG=          -fbacktrace -g ${DEBUG_FC}	-ffree-line-length-none -fcray-pointer -fall-intrinsics -std=legacy ${PREC}
+	DEBUGMPI=       -fbacktrace -g ${DEBUG_FC}      -ffree-line-length-none -fcray-pointer -fall-intrinsics -std=legacy ${PREC}
+	DEBUGMP=        -fopenmp -fbacktrace -g ${DEBUG_FC}      -ffree-line-length-none -fcray-pointer -fall-intrinsics -std=legacy ${PREC}
 
 	PROF=		-pg ${DEBUG}
 
@@ -118,7 +119,7 @@ else
 	MPI=		-DG95=1 \
                         -ffree-line-length-none -fcray-pointer -fall-intrinsics -std=legacy
 	MPFLAG=		-fopenmp ${MPI}
-	FFLAGS=		--static ${MPI}
+	FFLAGS=		--static ${MPI} ${PREC}
 	FFLAGS_R8=	-fdefault-real-8
 endif
 
