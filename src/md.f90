@@ -173,7 +173,7 @@ type SHELL_TYPE_DOUBLE
         real(kind=doubleprecision)                                 ::      avtheta, avn_insh, theta_corr
         integer                                 ::      n_insh
 end type SHELL_TYPE_DOUBLE
-#ifndef PGI
+#ifdef HAVEQUAD
 type SHELL_TYPE_QUAD
         real(kind=quadprecision)                                 ::      rout, dr, cstb
         real(kind=quadprecision)                                 ::      avtheta, avn_insh, theta_corr
@@ -185,7 +185,7 @@ type(SHELL_TYPE), allocatable::	wshell(:)
 type(OLD_SHELL_TYPE), allocatable::old_wshell(:)
 type(SHELL_TYPE_SINGLE), allocatable:: wshell_single(:)
 type(SHELL_TYPE_DOUBLE), allocatable:: wshell_double(:)
-#ifndef PGI
+#ifdef HAVEQUAD
 type(SHELL_TYPE_QUAD), allocatable:: wshell_quad(:)
 #endif
 ! constants & default values
@@ -1195,12 +1195,11 @@ dv = anglib(ic)%fk*da
 
         ! calculate f1
 f1 = sin ( angv ) 
-if ( abs(f1) .lt. 1.e-12_prec ) then	! E is for single precision adding _prec customise precision D for double but _prec addon could not work propielty.
+if ( abs(f1) .lt. QREAL_EPS ) then	! E is for single precision adding _prec customise precision D for double but _prec addon could not work propielty.
           ! avoid division by zero
-          f1 = -1.e12_prec
-        else
+          f1 = QREAL_EPS
+  end if
   f1 =  -one / f1
-        end if
 
         ! calculate di and dk
 di(1) = f1 * ( rjk(1)*bjiinv*bjkinv - scp*rji(1)*bji2inv )
@@ -3205,7 +3204,7 @@ dv  = lib%fk*arg
 ! ---       forces
 
 f1 = sin ( phi ) 
-if ( abs(f1) .lt. 1.e-12_prec ) f1 = 1.e-12_prec
+if ( abs(f1) .lt. QREAL_EPS ) f1 = QREAL_EPS
 f1 =  -one / f1
 di(1) = f1 * ( rnk(1)*bjinv*bkinv - scp*rnj(1)*bj2inv )
 di(2) = f1 * ( rnk(2)*bjinv*bkinv - scp*rnj(2)*bj2inv )
@@ -3347,7 +3346,7 @@ dv  = -2*lib%fk * sin(arg)
 ! ---       forces
 
 f1 = sin ( phi ) 
-if ( abs(f1) .lt. 1.e-12_prec ) f1 = 1.e-12_prec
+if ( abs(f1) .lt. QREAL_EPS ) f1 = QREAL_EPS
 f1 =  -one / f1
 di(1) = f1 * ( rnk(1)*bjinv*bkinv - scp*rnj(1)*bj2inv )
 di(2) = f1 * ( rnk(2)*bjinv*bkinv - scp*rnj(2)*bj2inv )
@@ -15716,12 +15715,9 @@ dv     = wgt*rstang(ir)%fk*db
 
 ! calculate sin(theta) to use in forces
 f1 = sin ( theta )
-if ( abs(f1) .lt. 1.e-12_prec ) then
-        ! avoid division by zero
-        f1 = -1.e12_prec
-else
+if ( abs(f1) .lt. QREAL_EPS ) f1 = QREAL_EPS
+! avoid division by zero
         f1 =  -one / f1
-end if
 
         ! calculate di and dk
 di(1) = f1 * ( dr2(1) / ( rij * rjk ) - scp * dr(1) / r2ij )
@@ -16346,7 +16342,7 @@ real(kind=singleprecision),allocatable :: x_single(:),v_single(:)
 real(kind=singleprecision)             :: boxl_single(3),boxc_single(3)
 real(kind=doubleprecision),allocatable :: x_double(:),v_double(:)
 real(kind=doubleprecision)             :: boxl_double(3),boxc_double(3)
-#ifndef PGI
+#ifdef HAVEQUAD
 real(kind=quadprecision),allocatable   :: x_quad(:),v_quad(:)
 real(kind=quadprecision)               :: boxl_quad(3),boxc_quad(3)
 #endif
@@ -16354,7 +16350,7 @@ if (prec .eq. singleprecision) then
 myprec = -137
 elseif (prec .eq. doubleprecision) then
 myprec = -1337
-#ifndef PGI
+#ifdef HAVEQUAD
 elseif (prec .eq. quadprecision) then
 myprec = -13337
 #endif
@@ -16394,7 +16390,7 @@ read(12) headercheck
          xtop(1:nat_pro*3) = x_double(1:nat_pro*3)
          deallocate(x_double)
        else if (headercheck .eq. -13337) then
-#ifndef PGI
+#ifdef HAVEQUAD
          allocate(x_quad(nat3))
          read (12,err=112,end=112) nat3, (x_quad(i),i=1,nat_pro*3)
          xtop(1:nat_pro*3) = x_quad(1:nat_pro*3)
@@ -16509,7 +16505,7 @@ if(restart) then
                  boxcentre(1:3) = boxc_double(1:3)
               end if
             else if (headercheck .eq. -13337) then
-#ifndef PGI
+#ifdef HAVEQUAD
               allocate(x_quad(nat3),v_quad(nat3))
               read (2,err=112,end=112) nat3, (x_quad(i),i=1,nat3)
               read (2,err=112,end=112) nat3, (v_quad(i),i=1,nat3)
@@ -16945,7 +16941,7 @@ if (prec .eq. singleprecision) then
 canary = 137
 else if (prec .eq. doubleprecision) then
 canary = 1337
-#ifndef PGI
+#ifdef HAVEQUAD
 else if (prec .eq. quadprecision) then
 canary = 13337
 #endif
@@ -17024,7 +17020,7 @@ EQ(istate)%q%angle = EQ(istate)%q%angle + ae*gamma
 
 dv = gamma*qanglib(ic)%fk*da*EQ(istate)%lambda
 f1 = sin ( ang )
-if ( abs(f1) .lt. 1.e-12_prec ) f1 = 1.e-12_prec
+if ( abs(f1) .lt. QREAL_EPS ) f1 = QREAL_EPS
 f1 =  -one / f1
 di(1) = f1 * ( rjk(1)/(bji*bjk) - scp*rji(1)/bji**2 )
 di(2) = f1 * ( rjk(2)/(bji*bjk) - scp*rji(2)/bji**2 )
@@ -17275,7 +17271,7 @@ dv = dv*gamma*EQ(istate)%lambda
 ! ---       forces
 
 f1 = sin ( phi ) 
-if ( abs(f1) .lt. 1.e-12_prec ) f1 = 1.e-12_prec
+if ( abs(f1) .lt. QREAL_EPS ) f1 = QREAL_EPS
 f1 =  -one / f1
 di(1) = f1 * ( rnk(1)/(bj*bk) - scp*rnj(1)/bj**2 )
 di(2) = f1 * ( rnk(2)/(bj*bk) - scp*rnj(2)/bj**2 )
@@ -17420,7 +17416,7 @@ dv = -qtorlib(ic)%rmult*qtorlib(ic)%fk*sin(arg)*gamma*EQ(istate)%lambda
 ! ---       forces
 
 f1 = sin ( phi ) 
-if ( abs(f1) .lt. 1.e-12_prec ) f1 = 1.e-12_prec
+if ( abs(f1) .lt. QREAL_EPS ) f1 = QREAL_EPS
 f1 =  -one / f1
 di(1) = f1 * ( rnk(1)/(bj*bk) - scp*rnj(1)/bj**2 )
 di(2) = f1 * ( rnk(2)/(bj*bk) - scp*rnj(2)/bj**2 )
@@ -17949,7 +17945,7 @@ dv = -lib%rmult*lib%fk*sin(arg)*lib%paths
 ! ---       forces
 
 f1 = sin ( phi ) 
-if ( abs(f1) .lt. 1.e-12_prec ) f1 = 1.e-12_prec
+if ( abs(f1) .lt. QREAL_EPS ) f1 = QREAL_EPS
 f1 =  -one / f1
 di(1) = f1 * ( rnk(1)*(bjinv*bkinv) - scp*rnj(1)*bj2inv )
 di(2) = f1 * ( rnk(2)*(bjinv*bkinv) - scp*rnj(2)*bj2inv )
@@ -18149,13 +18145,13 @@ logical :: old_restart = .false.
 real(8),allocatable :: x_old(:), v_old(:)
 real(kind=singleprecision),allocatable :: x_1(:), v_1(:)
 real(kind=doubleprecision),allocatable :: x_2(:), v_2(:)
-#ifndef PGI
+#ifdef HAVEQUAD
 real(kind=quadprecision),allocatable :: x_3(:), v_3(:)
 #endif
 real(8) :: old_boxlength(3),old_boxcentre(3)
 real(kind=singleprecision) :: boxlength_1(3),boxcentre_1(3)
 real(kind=doubleprecision) :: boxlength_2(3),boxcentre_2(3)
-#ifndef PGI
+#ifdef HAVEQUAD
 real(kind=quadprecision) :: boxlength_3(3),boxcentre_3(3)
 #endif
 integer :: headercheck,i,myprec,dummy
@@ -18164,7 +18160,7 @@ if (prec .eq. singleprecision) then
 myprec = -137
 elseif (prec .eq. doubleprecision) then
 myprec = -1337
-#ifndef PGI
+#ifdef HAVEQUAD
 elseif (prec .eq. quadprecision) then
 myprec = -13337
 #endif
@@ -18225,7 +18221,7 @@ if(restart) then !try to load theta_corr from restart file
      end if
      deallocate(x_2,v_2)
    else if (headercheck .eq. -13337) then
-#ifndef PGI
+#ifdef HAVEQUAD
      allocate(x_3(3*natom),v_3(3*natom))
      read(2) dummy,(x_3(i),i=1,nat3)
      read(2) dummy,(v_3(i),i=1,nat3)
@@ -18264,7 +18260,7 @@ if(restart) then !try to load theta_corr from restart file
                        wshell(:)%theta_corr = wshell_double(:)%theta_corr
                        deallocate(wshell_double)
                      else if (headercheck .eq. -13337) then
-#ifndef PGI
+#ifdef HAVEQUAD
                        allocate(wshell_quad(nwpolr_shell), stat=alloc_status)
                        read(2) nwpolr_shell_restart,wshell_quad(:)%theta_corr
                        wshell(:)%theta_corr = wshell_quad(:)%theta_corr
@@ -18454,7 +18450,7 @@ scp = rmu(1)*rcu(1)+rmu(2)*rcu(2)+rmu(3)*rcu(3)
 if ( scp .gt.  one ) scp =  one
 if ( scp .lt. -one ) scp = -one
 f0 = sin ( acos(scp) )
-if ( abs(f0) .lt. 1.e-12_prec ) f0 = 1.e-12_prec
+if ( abs(f0) .lt. QREAL_EPS ) f0 = QREAL_EPS
 f0 = -one / f0
 f0 = dv*f0
 
@@ -18660,7 +18656,7 @@ if (prec .eq. singleprecision) then
 canary = -137
 elseif (prec .eq. doubleprecision) then
 canary = -1337
-#ifndef PGI
+#ifdef HAVEQUAD
 elseif (prec .eq. quadprecision) then
 canary = -13337
 #endif

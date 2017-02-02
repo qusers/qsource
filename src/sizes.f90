@@ -12,11 +12,31 @@ module	SIZES
 	!Set precision for real
 	integer, parameter :: singleprecision = SELECTED_REAL_KIND(6, 37)
 	integer, parameter :: doubleprecision = SELECTED_REAL_KIND(15,307)
-#ifndef PGI
+#ifdef HAVEQUAD
 	integer, parameter :: quadprecision = SELECTED_REAL_KIND(33,4931)
 #endif
 
-	integer, parameter :: prec = doubleprecision 
+#ifdef SINGLE
+#if defined DOUBLE || defined QUADRUPLE
+#ERROR No double defining of precision
+#endif
+        integer, parameter :: prec = singleprecision
+        real(kind=prec),parameter :: QREAL_EPS = 1.E-5_prec
+#endif
+#ifdef DOUBLE
+#if defined SINGLE || defined QUADRUPLE
+#ERROR No double defining of precision
+#endif
+        integer, parameter :: prec = doubleprecision 
+        real(kind=prec),parameter :: QREAL_EPS = 1.E-14_prec
+#endif
+#ifdef QUADRUPLE
+#if defined SINGLE || defined DOUBLE 
+#ERROR No double defining of precision
+#endif
+        integer, parameter :: prec = quadprecision
+        real(kind=prec),parameter :: QREAL_EPS = 1.E-32_prec
+#endif
 
 	real(kind=prec),parameter	:: zero = 0.0_prec
 	real(kind=prec),parameter	:: one  = 1.0_prec
