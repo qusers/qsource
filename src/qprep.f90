@@ -9,10 +9,10 @@
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
-!>  (c) 2016 Uppsala Molekylmekaniska HB, Uppsala, Sweden
-!>  program: qprep.f90
-!>  by Johan Aqvist & John Marelius
-!>  qprep topology preparation main program
+!>  (c) 2017 Uppsala Molekylmekaniska HB, Uppsala, Sweden  
+!!  program: **qprep**  
+!!  by Johan Aqvist & John Marelius  
+!!  qprep topology preparation main program  
 !------------------------------------------------------------------------------!
 program qprep
   use iso_fortran_env
@@ -53,8 +53,8 @@ program qprep
 contains
 
   !----------------------------------------------------------------------------!
-  !>  subroutine: qprep_from_inputfile
-  !>  Read input from file and execute commands
+  !!  subroutine: qprep_from_inputfile  
+  !!  Read input from file and execute commands  
   !----------------------------------------------------------------------------!
   subroutine qprep_from_inputfile(filename)
   character(200)  :: filename
@@ -83,8 +83,8 @@ contains
 
 
   !----------------------------------------------------------------------------!
-  !>  subroutine: qprep_from_commandline
-  !>  Read input from command line and execute commands
+  !!  subroutine: qprep_from_commandline  
+  !!  Read input from command line and execute commands  
   !----------------------------------------------------------------------------!
   subroutine qprep_from_commandline
   character(200) :: command
@@ -105,8 +105,8 @@ contains
 
 
   !----------------------------------------------------------------------------!
-  !>  subroutine: parse_command(command)
-  !>  Parse a command and call corresponding subroutine
+  !!  subroutine: parse_command(command)  
+  !!  Parse a command and call corresponding subroutine  
   !----------------------------------------------------------------------------!
   subroutine parse_command(command)
   character(*), intent(IN) :: command
@@ -183,8 +183,8 @@ contains
 
 
   !----------------------------------------------------------------------------!
-  !>  subroutine: help
-  !>  Give help on commands
+  !!  subroutine: help  
+  !!  Give help on commands  
   !----------------------------------------------------------------------------!
   subroutine help
   write( *, * )
@@ -280,8 +280,8 @@ contains
 
 
   !----------------------------------------------------------------------------!
-  !>  subroutine: startup
-  !>  Startup
+  !!  subroutine: startup  
+  !!  Startup  
   !----------------------------------------------------------------------------!
 subroutine startup
 !    call version_check(PROGRAM_NAME, PROGRAM_VERSION, PROGRAM_DATE, PROGRAM_SUFFIX)
@@ -307,8 +307,8 @@ end subroutine startup
 
 
   !----------------------------------------------------------------------------!
-  !>  subroutine: shutdown
-  !>  Shutdown call
+  !!  subroutine: shutdown
+  !!  Shutdown call
   !----------------------------------------------------------------------------!
   subroutine shutdown
     call prep_shutdown
@@ -317,7 +317,7 @@ end subroutine startup
 
   
   !----------------------------------------------------------------------------!
-  !>  subroutine: commandlineoptions
+  !!  subroutine: commandlineoptions  
   !----------------------------------------------------------------------------!
   subroutine commandlineoptions
   do i = 1, command_argument_count()
@@ -338,7 +338,7 @@ end subroutine startup
   end subroutine commandlineoptions
 
   !----------------------------------------------------------------------------!
-  !>  subroutine: print_help
+  !!  subroutine: print_help  
   !----------------------------------------------------------------------------!
   subroutine print_help()
     print '(a)', 'usage:'
@@ -356,8 +356,8 @@ end subroutine startup
 
 
   !----------------------------------------------------------------------------!
-  !> function: check_inputfile
-  !> Determine if qprep is to be run from command line or from input file
+  !! function: check_inputfile  
+  !! Determine if qprep is to be run from command line or from input file  
   !----------------------------------------------------------------------------!
   logical function check_inputfile(infilename)
     !local variables

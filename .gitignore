@@ -14,9 +14,11 @@ obj/**
 *DS_Store*
 *.DS_Store
 slurm*
-osbinaries/**
+osbinaries
 *.Rhistory
 argcount*
-usercases/**
-logs/**
-doxygen/**
+usercases
+logs
+doxygen
+devdocs
+qdev.pdf

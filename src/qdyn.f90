@@ -9,10 +9,10 @@
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
-!>  (c) 2015 Uppsala Molekylmekaniska HB, Uppsala, Sweden
-!>  program: qdyn
-!>  by Johan Aqvist, John Marelius, Anders Kaplan & Martin Nervall
-!>  qdyn molecular dynamics main program
+!>  (c) 2017 Uppsala Molekylmekaniska HB, Uppsala, Sweden  
+!!  program: **qdyn**  
+!!  by Johan Aqvist, John Marelius, Anders Kaplan & Martin Nervall  
+!!  qdyn molecular dynamics main program  
 !------------------------------------------------------------------------------!
 program qdyn
   use md

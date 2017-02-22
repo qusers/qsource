@@ -106,7 +106,7 @@ tabsize=3}
 \lhead{}
 \chead{}
 \rhead{}
-\lfoot{\footnotesize Q Development - \texttt{qdyn.org}}
+\lfoot{\footnotesize Q Development - \texttt{qdyn.bmc.uu.se}}
 \cfoot{}
 \rfoot{\footnotesize page \thepage\ }%of \pageref{LastPage}}    % "Page 1 of 2"
 \renewcommand{\headrulewidth}{0.0pt}
@@ -149,8 +149,8 @@ processors, OS, number of processors, etc.
 
 \subsection{Documentation}
 \label{documentation}
-To document the code we've selected ford, a package by,
-It's a python package so it can be installed with pip.
+To document the code we've selected ford, a package by Chris
+MacMackin. It's a python package so it can be installed with pip.
 To run it we use:
 \begin{Verbatim}
     ford -d ../../src -o devdocs forddocs.md
@@ -432,10 +432,10 @@ programers.
 
 \subsection{Doxygen}
 \label{doxygen}
-To  automatically document  fortran  code the  only current  available
-option is doxygen.
-To  use doxygen  a  configuration  file is  necessary.  This has  been
-downloaded from:\\
+To automatically  document the fortran  code to help  developers there
+are two alternatives. One is ford  which we described in the beggining
+of this  document, and  the other  one is doxygen.   To use  doxygen a
+configuration file is necessary.  This has been downloaded from:\\
 
 \url{https://modelingguru.nasa.gov/docs/DOC-1811}
 
@@ -447,10 +447,7 @@ Just doing:
 doxygen DoxygenConfigFortran
 \end{lstlisting}
 
-
-Generates html code which we make available at:
-
-doxygen.qdyn.org
+Generates html code.
 
 A mainfile document is included in the file maintext.txt
 
@@ -473,6 +470,9 @@ OpenMC. A Monte Carlo code.\\
 
 A collection of generic Fortran routines.\\
 \url{https://github.com/astrofrog/fortranlib}\\
+
+Fluidity: A fluid dynamics code.\\
+\url{http://fluidityproject.github.io/}\\
 
 
 \bibliography{biblio}

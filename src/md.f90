@@ -10,10 +10,10 @@
 
 !------------------------------------------------------------------------------!
 !>  (c) 2003 Uppsala Molekylmekaniska HB, Uppsala, Sweden                      !
-!>  md.f90                                                                     !
-!>  by Johan Aqvist, John Marelius, Anders Kaplan, Isabella Feierberg,         !
-!>  Martin Nervall & Martin Almlof                                             !
-!>  molecular dynamics                                                         !
+!!  md.f90                                                                     !
+!!  by Johan Aqvist, John Marelius, Anders Kaplan, Isabella Feierberg,         !
+!!  Martin Nervall & Martin Almlof                                             !
+!!  molecular dynamics                                                         !
 !------------------------------------------------------------------------------!
 module md
   ! load modules
@@ -26,7 +26,7 @@ module md
   implicit none
 
 #if defined (USE_MPI)
-  include "mpif.h"
+#include "mpif.h"
 #endif
 
   !-----------------------------------------------------------------------------
@@ -65,7 +65,7 @@ module md
   !-----------------------------------------------------------------------------
   !       Periodic box information
   !-----------------------------------------------------------------------------
-  !******PWadded variable 2001-10-10
+  !******Petra Wennerstrom added variable 2001-10-10
   logical                   :: box, rigid_box_centre
   logical                   :: put_solute_back_in_box, put_solvent_back_in_box
 
@@ -272,13 +272,13 @@ end type RSTRANG_TYPE
   type(NB_TYPE), allocatable, target::nbpw(:)
 
   integer                    :: nbqq_max !max number of q-q pairs in any state
-  integer(TINY), allocatable ::      qconn(:,:,:) !Q-atom connectivity list
+  integer(TINY), allocatable :: qconn(:,:,:) !Q-atom connectivity list
 
-  integer                    ::      nbqq_pair(max_states)
-  type(NBQ_TYPE), allocatable ::nbqq(:,:)
+  integer                     :: nbqq_pair(max_states)
+  type(NBQ_TYPE), allocatable :: nbqq(:,:)
 
-  integer                          :: nbqp_pair !current no of qatom-solute pairs
-  type(NBQP_TYPE), allocatable, target::nbqp(:)
+  integer                     :: nbqp_pair !current no of qatom-solute pairs
+  type(NBQP_TYPE), allocatable, target :: nbqp(:)
 
   integer                          :: nbqw_pair !current no of q-atom-water mol. pairs
   integer(AI), allocatable         :: nbqw(:)
@@ -293,7 +293,7 @@ end type RSTRANG_TYPE
   type(CGP_PAIR_TYPE), allocatable :: nbqp_cgp(:)
 
   !special monitoring of pairs
-  integer (TINY),allocatable  :: special_LJcod(:,:,:,:)
+  integer (TINY),allocatable       :: special_LJcod(:,:,:,:)
 
   ! LRF related variables
   integer(AI), allocatable         :: iwhich_cgp(:)
@@ -478,8 +478,9 @@ contains
     call check_alloc('atom data arrays')
   end subroutine allocate_natom_arrays
 
-  !----------------------------------------------------------------------
+  !-------------------------------------------------------------------------------
   !Allocate arrays that hold no. pairs per chargegroup.
+  !-------------------------------------------------------------------------------
   subroutine allocate_nbxx_per_cgp
 
     allocate(nbpp_per_cgp(ncgp_solute), & 
@@ -559,9 +560,7 @@ contains
 
   subroutine md_deallocate
     ! deallocatde this module's own arrays. Called by shutdown
-
     ! use status to avoid errors if not allocated
-
     ! atom arrays
     deallocate (x, stat=alloc_status)
     deallocate (xx, stat=alloc_status)
@@ -16016,46 +16015,46 @@ end subroutine gather_nonbond
 #endif
 !-------------------------------------------------------------------------------
 !*******************************************************
-!Will find and return the xtop atom number from 
+!  Will find and return the xtop atom number from 
 !  residue number and atom number in residue from
 !  library sequence.
-! Uses global variables: xtop,nres,res
+!  Uses global variables: xtop,nres,res
 !*******************************************************
 
 integer function get_atom_from_resnum_atnum(aid)
   !arguments
- character(*), intent(in)        ::      aid     !string=residue:atom
+  character(*), intent(in)             :: aid     !string=residue:atom
 
- !locals
- integer                                         ::      separator_pos
- character(len=20)                       ::      res_str
- character(len=5)                        ::      atom_str
- integer                                         ::      filestat
- integer                                         ::      resnum, atnum
+  !locals
+  integer                              :: separator_pos
+  character(len=20)                    :: res_str
+  character(len=5)                     :: atom_str
+  integer                              :: filestat
+  integer                              :: resnum, atnum
 
- get_atom_from_resnum_atnum = 0
+  get_atom_from_resnum_atnum = 0
 
- separator_pos = scan(aid, ':')
- if(separator_pos < 2 .or. separator_pos == len_trim(aid)) return !no valid colon found
- res_str = aid(1:separator_pos-1)
- atom_str = aid(separator_pos+1:len_trim(aid))
- read(res_str, *, iostat=filestat) resnum
- read(atom_str, *, iostat=filestat) atnum
- if(filestat > 0) return
+  separator_pos = scan(aid, ':')
+  if(separator_pos < 2 .or. separator_pos == len_trim(aid)) return !no valid colon found
+  res_str = aid(1:separator_pos-1)
+  atom_str = aid(separator_pos+1:len_trim(aid))
+  read(res_str, *, iostat=filestat) resnum
+  read(atom_str, *, iostat=filestat) atnum
+  if(filestat > 0) return
 
- !Residue must be in topology
- if(resnum < 1 .or. resnum > nres) then                     
+  !Residue must be in topology
+  if(resnum < 1 .or. resnum > nres) then                     
     return                                                 
- end if
+  end if
 
- if(atnum .le. (res(resnum+1)%start - res(resnum)%start)) then
+  if(atnum .le. (res(resnum+1)%start - res(resnum)%start)) then
     get_atom_from_resnum_atnum = res(resnum)%start + atnum - 1
     return
- end if
+  end if
 
- !we have an error: 
- write(*, 120) atnum, resnum
- call die('error in finding atom number from resnum:atnum.')
+  !we have an error: 
+  write(*, 120) atnum, resnum
+  call die('error in finding atom number from resnum:atnum.')
 
 120 format('>>>>> ERROR: There is no atom number ',i4,' in residue ',i4,'.')
 end function get_atom_from_resnum_atnum

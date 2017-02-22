@@ -9,10 +9,10 @@
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
-!>  (c) 2015 Uppsala Molekylmekaniska HB, Uppsala, Sweden
-!>  program: qcalc
-!>  by John Marelius
-!>  qcalc trajectory analysis main program
+!>  (c) 2017 Uppsala Molekylmekaniska HB, Uppsala, Sweden  
+!!  program: **qcalc**  
+!!  by John Marelius  
+!!  qcalc trajectory analysis main program  
 !------------------------------------------------------------------------------!
 program qcalc
 !  use version
