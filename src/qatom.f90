@@ -1667,6 +1667,7 @@ logical function qatom_load_fep(fep_file)
 544		format (/,'No. of angle-Morse couplings = ',i5)
 		write(*,543)
 		do i=1,nang_coupl
+		    if (.not. prm_get_line(line)) goto 1000
                         read(line,*, iostat=stat) j,k,l
                         if(stat .eq. 0) then
 				iang_coupl(1,i) = j
@@ -1703,6 +1704,7 @@ logical function qatom_load_fep(fep_file)
 548		format (/,'No. of torsion-Morse couplings = ',i5)
 		write(*,547)
 		do i=1,ntor_coupl
+		    if (.not. prm_get_line(line)) goto 1000
                         read(line,*, iostat=stat) j,k,l
 			if(stat .eq. 0) then
 				itor_coupl(1,i) = j
