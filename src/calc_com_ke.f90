@@ -16,68 +16,68 @@
 !  mask is specified
 !------------------------------------------------------------------------------!
 module calc_com_ke
-        use calc_base
-        use maskmanip
-!       use LAPACKMINI
-        implicit none
+  use calc_base
+  use maskmanip
+! use LAPACKMINI
+  implicit none
 
 !constants
-        integer, parameter                      ::      MAX_MASKS = 10
+  integer, parameter               :: max_masks = 10
 !module variables
-        integer, parameter, private :: conversion_factor = 2390.0574   ! gram/mol**^2/fs^2  -->  kcal/mol
-        integer, private                        :: frames(MAX_MASKS), apa
-        real(8), allocatable            :: kineticenergy(:)
-        type(MASK_TYPE), private, target        ::      masks(MAX_MASKS)
-        integer, private                        ::      Nmasks = 0
-        type COM_KE_COORD_TYPE
-                real, pointer           ::      x(:), y(:), z(:), mass(:)
-        end type COM_KE_COORD_TYPE
-        type(COM_KE_COORD_TYPE), private        ::      coords_mass(MAX_MASKS), prev_coords_mass(MAX_MASKS)
+  integer, parameter, private      :: conversion_factor = 2390.0574   ! gram/mol**^2/fs^2  -->  kcal/mol
+  integer, private                 :: frames(MAX_MASKS), apa
+  real(8), allocatable             :: kineticenergy(:)
+  type(MASK_TYPE), private, target :: masks(MAX_MASKS)
+  integer, private                 :: Nmasks = 0
+  type COM_KE_COORD_TYPE
+    real, pointer                  :: x(:), y(:), z(:), mass(:)
+  end type COM_KE_COORD_TYPE
+  type(COM_KE_COORD_TYPE), private :: coords_mass(MAX_MASKS), prev_coords_mass(MAX_MASKS)
 
-        type COM_KE_VELOCITY_TYPE
-                real, pointer           ::      x(:), y(:), z(:)
-        end type COM_KE_VELOCITY_TYPE
-        type(COM_KE_VELOCITY_TYPE), private     ::      velocity(MAX_MASKS), rel_coords(MAX_MASKS), prev_rel_coords(MAX_MASKS),rad_vec(MAX_MASKS,3) !rel_coords is not velocities
-        
-        type COORD_TYPE
-                real, pointer           ::      xyz(:)
-        end type COORD_TYPE
-        type(COORD_TYPE), private       ::      coords(MAX_MASKS), prev_coords(MAX_MASKS)
+  type COM_KE_VELOCITY_TYPE
+    real, pointer                  :: x(:), y(:), z(:)
+  end type COM_KE_VELOCITY_TYPE
+  type(COM_KE_VELOCITY_TYPE), private :: velocity(MAX_MASKS), rel_coords(MAX_MASKS), prev_rel_coords(MAX_MASKS),rad_vec(MAX_MASKS,3) !rel_coords is not velocities
+  
+  type COORD_TYPE
+    real, pointer                  :: xyz(:)
+  end type COORD_TYPE
+  type(COORD_TYPE), private        :: coords(MAX_MASKS), prev_coords(MAX_MASKS)
 
-        type DP_TYPE
-                real, pointer           ::      dp(:)
-        end type DP_TYPE
-        type(DP_TYPE), private  ::      dp_vect(MAX_MASKS)
-
-
-
-        type MASS_AVE_TYPE
-                real            ::      x,y,z
-        end type MASS_AVE_TYPE
-        type(MASS_AVE_TYPE), private    ::      mass_ave(MAX_MASKS), prev_mass_ave(MAX_MASKS) , ang_momentum(MAX_MASKS,3)
-        
-        type EIGEN_STUFF_TYPE
-                real            ::      evalue(3),evector(3,3)
-        end type EIGEN_STUFF_TYPE
-        type(EIGEN_STUFF_TYPE), private ::      eigen_stuff(MAX_MASKS)
+  type DP_TYPE
+    real, pointer                  :: dp(:)
+  end type DP_TYPE
+  type(DP_TYPE), private           :: dp_vect(MAX_MASKS)
 
 
 
+  type MASS_AVE_TYPE
+    real                          :: x,y,z
+  end type MASS_AVE_TYPE
+  type(MASS_AVE_TYPE), private    :: mass_ave(MAX_MASKS), prev_mass_ave(MAX_MASKS) , ang_momentum(MAX_MASKS,3)
+  
+  type EIGEN_STUFF_TYPE
+    real                          :: evalue(3),evector(3,3)
+  end type EIGEN_STUFF_TYPE
+  type(EIGEN_STUFF_TYPE), private :: eigen_stuff(MAX_MASKS)
 
-        real,private                    :: tot_mass(MAX_MASKS), KE_rot(MAX_MASKS,3)
-        logical,private                 :: first_frame(MAX_MASKS) = .true.
+
+
+
+  real,private                    :: tot_mass(MAX_MASKS), KE_rot(MAX_MASKS,3)
+  logical,private                 :: first_frame(MAX_MASKS) = .true.
 !       real,private                    :: previous_mass_center(3,MAX_MASKS)
-        real, private                   :: frame_length = 0
+  real, private                   :: frame_length = 0
         
 contains
 
-subroutine COM_KE_initialize
-end subroutine COM_KE_initialize
+subroutine com_ke_initialize
+end subroutine com_ke_initialize
 
-subroutine COM_KE_finalize(i)
-        integer                                         ::      i
+subroutine com_ke_finalize(i)
+  integer                          :: i
 
-        call mask_finalize(masks(i))
+  call mask_finalize(masks(i))
 end subroutine COM_KE_finalize
 
 integer function COM_KE_add(desc)

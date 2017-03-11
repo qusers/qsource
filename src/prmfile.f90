@@ -15,56 +15,55 @@
 !  parsing of data files with sections+keywords (input/parameter/library/FEP)
 !------------------------------------------------------------------------------!
 module prmfile
+  !!This module reads files with the following format
+  !![section_name]
+  !!key  value
+  !!key  value  !comment
+  !!#comment
+  !!!comment
+  !!*comment
+  !!key value
 
-  !This module reads files with the following format
-  ![section_name]
-  !key  value
-  !key  value  !comment
-  !#comment
-  !!comment
-  !*comment
-  !key value
+  !![another_section]
+  !!value value 
+  !!value value 
+  !!value value 
 
-  ![another_section]
-  !value value 
-  !value value 
-  !value value 
+  !! section_name identifies a section in the file which can be opened with 
+  !! prm_open_section. The name is not case-sensitive.
+  !! Blank lines and lines starting with '!', '*' or '#' are ignored. 
+  !! White spaces anywhere in key-value lines are ignored.
+  !! Values may be followed by comments initated by '!', '*' or '#'
+  !! Keys identify the values by a label. 
+  !! A key name may not contain white-space.
 
-  ! section_name identifies a section in the file which can be opened with 
-  ! prm_open_section. The name is not case-sensitive.
-  ! Blank lines and lines starting with '!', '*' or '#' are ignored. 
-  ! White spaces anywhere in key-value lines are ignored.
-  ! Values may be followed by comments initated by '!', '*' or '#'
-  ! Keys identify the values by a label. 
-  ! A key name may not contain white-space.
+  !! The parameter file is opened by the function
+  !! prm_open(file) where "file" is the file name. prm_open returns .true. on 
+  !! success or .false. on failure (if the file does not exist or can't be opened)
 
-  ! The parameter file is opened by the function
-  ! prm_open(file) where "file" is the file name. prm_open returns .true. on 
-  ! success or .false. on failure (if the file does not exist or can't be opened)
+  !! Data from the file is retrieved by calling the data retrieval functions 
+  !! which all return .true. on success or .false. on failure
+  !! Entire lines within a section are retrieved by prm_get_line(line) where 
+  !! line is a string of suitable length to hold the expected data
 
-  ! Data from the file is retrieved by calling the data retrieval functions 
-  ! which all return .true. on success or .false. on failure
-  ! Entire lines within a section are retrieved by prm_get_line(line) where 
-  ! line is a string of suitable length to hold the expected data
+  !! Key-value pairs can be retrieved by the following functions
+  !! prm_get_value_by_key(key, value)
+  !! with the input argument "key" identifying the key and the
+  !! output argument "value" which is an integer, a real or a string
+  !! (different functions with same name for different data types)
 
-  ! Key-value pairs can be retrieved by the following functions
-  ! prm_get_value_by_key(key, value)
-  ! with the input argument "key" identifying the key and the
-  ! output argument "value" which is an integer, a real or a string
-  ! (different functions with same name for different data types)
-
-  !prm_get_string_string(key, value) 
-  !       key and value are both strings
-  !prm_get_string_int(key, value) 
-  !       key is string and value is integer
-  !prm_get_string_real(key, value) 
-  !       key is string and value is real
-  !prm_get_int_real(key, value) 
-  !       key is integer and value is real
-  !prm_get_int_int(key, value) 
-  !       key and value are both integers
-  !prm_get_int(value)
-  !       there is no key, only an integer value
+  !!prm_get_string_string(key, value) 
+  !!       key and value are both strings
+  !!prm_get_string_int(key, value) 
+  !!       key is string and value is integer
+  !!prm_get_string_real(key, value) 
+  !!       key is string and value is real
+  !!prm_get_int_real(key, value) 
+  !!       key is integer and value is real
+  !!prm_get_int_int(key, value) 
+  !!       key and value are both integers
+  !!prm_get_int(value)
+  !!       there is no key, only an integer value
 
 
   use misc
@@ -369,7 +368,7 @@ end function prm_get_logical_by_key
 !-------------------------------------------------------------------------------
   logical function prm_get_line(line)
     !arguments
-    character(*), intent(out)       ::      line
+    character(*), intent(out)       :: line
 
     !if there's a line
     if(associated(current_lp)) then
@@ -389,15 +388,15 @@ end function prm_get_logical_by_key
 
   logical function prm_get_field(field, skip)
     !arguments
-    character(*), intent(out)       ::      field
-    logical, optional, intent(in):: skip
+    character(*), intent(out)       :: field
+    logical, optional, intent(in)   :: skip
     !locals
-    character(len=500), save        ::      line
-    integer, save                           ::      pos, linelen
-    type(LINE_TYPE), pointer, save :: my_line
-    character, save                         ::      TAB = char(9)
-    integer                                         ::      start_field, end_field
-    logical                                         ::      prm_res
+    character(len=500), save        :: line
+    integer, save                   :: pos, linelen
+    type(LINE_TYPE), pointer, save  :: my_line
+    character, save                 :: TAB = char(9)
+    integer                         :: start_field, end_field
+    logical                         :: prm_res
 
     prm_get_field = .false.
 
@@ -451,7 +450,7 @@ end function prm_get_logical_by_key
   !---------------------------------------------------------------------------------
   integer function prm_count(section)
     !argument
-    character(*),intent(in) ::      section
+    character(*),intent(in) :: section
 
     if(find_section(section)) then
        prm_count = current_sec%count

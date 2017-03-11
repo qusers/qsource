@@ -21,15 +21,16 @@ module calc_rmsf
 
 !constants
   integer, parameter                   :: max_masks = 10
+
 !module variables
   integer, private                     :: frames(max_masks), apa
   real(8), allocatable                 :: rmsf(:)
-  type(MASK_TYPE), private, target     :: masks(max_masks)
+  type(mask_type), private, target     :: masks(max_masks)
   integer, private                     :: Nmasks = 0
-  type RMSF_COORD_TYPE
+  type rmsf_coord_type
     real, pointer                      :: x(:), x0(:), x2(:)
-  end type RMSF_COORD_TYPE
-  type(RMSF_COORD_TYPE), private       :: coords(max_masks)
+  end type rmsf_coord_type
+  type(rmsf_coord_type), private       :: coords(max_masks)
 contains
 
 subroutine rmsf_initialize
@@ -37,6 +38,7 @@ end subroutine rmsf_initialize
 
 subroutine rmsf_finalize(i)
   integer                              :: i
+
   call mask_finalize(masks(i))
 end subroutine rmsf_finalize
 
@@ -60,6 +62,7 @@ integer function rmsf_add(desc)
     RMSF_add = 0
     return
   end if
+
   allocate(coords(Nmasks)%x(3*ats), coords(Nmasks)%x0(3*ats),coords(Nmasks)%x2(3*ats), rmsf(masks(Nmasks)%included))
   coords(Nmasks)%x2(:) = 0
   coords(Nmasks)%x0(:) = 0
@@ -68,7 +71,7 @@ integer function rmsf_add(desc)
   RMSF_add = Nmasks
   write(desc, 20) masks(Nmasks)%included
 20      format('RMSF coordinate deviation for ',i6,' atoms')
- end function rmsd_add
+ end function rmsf_add
 
 
 subroutine rmsf_calc(i)

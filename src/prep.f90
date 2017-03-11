@@ -3039,152 +3039,152 @@ end subroutine check_overload
 
 
 subroutine oldreadparm(flag)
-!       arguments
-        LOGICAL flag
+!  arguments
+  logical flag
 ! *** local variables
-        integer i, ityp, filestat
-        character(200)                          ::      line
-        character(len=KEYLENGTH)        ::      taci, tacj, tack, tacl
-        integer                                         ::      iaci, iacj, iack, iacl
+  integer i, ityp, filestat
+  character(200)                   :: line
+  character(len=KEYLENGTH)         :: taci, tacj, tack, tacl
+  integer                          :: iaci, iacj, iack, iacl
 !.......................................................................
 
-        !set default values for options which are not available in old param. file
-        iuse_switch_atom = 1 !this is the default. It can be overridden
-        !in old libraries by setting switch atoms to 0
-        !new parameter files have the keyword switch_atoms (sec. options)
-        !to control this
-        coulomb_constant = 332.0 
-        imp_explicit = .false.  
-        imp_type = 1 !harmonic impropers
-        ff_type = FF_GROMOS
+  !set default values for options which are not available in old param. file
+  iuse_switch_atom = 1 !this is the default. It can be overridden
+  !in old libraries by setting switch atoms to 0
+  !new parameter files have the keyword switch_atoms (sec. options)
+  !to control this
+  coulomb_constant = 332.0 
+  imp_explicit = .false.  
+  imp_type = 1 !harmonic impropers
+  ff_type = FF_GROMOS
 
-        flag = .true.
-        CALL skip_comments(2)
+  flag = .true.
+  CALL skip_comments(2)
 
-        i = 0
-        READ(2, *, err = 1000) nbnd_prm
-        CALL skip_comments(2)
-        if(allocated(bnd_prm)) deallocate(bnd_prm)
-        if(allocated(bnd_types)) deallocate(bnd_types)
-        allocate(bnd_prm(nbnd_prm), stat=alloc_status)
-        allocate(bnd_types(nbnd_prm), stat=alloc_status)
-        call check_alloc('bond parameters')
-        do i = 1, nbnd_prm
-                READ(2, *, err = 1000) iaci, iacj, bnd_prm(i)%prm%fk, bnd_prm(i)%prm%bnd0
-                bnd_types(i)%taci = tac(iaci)
-                bnd_types(i)%tacj = tac(iacj)
-                bnd_prm(i)%SYBYLtype = '1 ' !set to default
-        enddo
-        write( * , 110) nbnd_prm, 'bond types'
-        CALL skip_comments(2)
-        i = 0
-        READ(2, *, err = 1010) nang_prm
-        CALL skip_comments(2)
-        if(allocated(ang_prm)) deallocate(ang_prm)
-        allocate(ang_prm(nang_prm), stat=alloc_status)
-        if(allocated(ang_types)) deallocate(ang_types)
-        allocate(ang_types(nang_prm), stat=alloc_status)
-        call check_alloc('angle parameters')
-        !set optional parameters to 0.
-        ang_prm(:)%ureyfk = 0.
-        ang_prm(:)%ureyr0 = 0.
-        do i = 1, nang_prm
-                read(2, '(a80)', err=1010) line
-                read(line, *, iostat=filestat) iaci, iacj, iack, ang_prm(i)
-                ang_types(i)%taci = tac(iaci)
-                ang_types(i)%tacj = tac(iacj)
-                ang_types(i)%tack = tac(iack)
-                !accept missing parameters but not read error
-                if(filestat > 0) goto 1010
-        enddo
-        write( * , 110) nang_prm, 'angle types'
+  i = 0
+  READ(2, *, err = 1000) nbnd_prm
+  CALL skip_comments(2)
+  if(allocated(bnd_prm)) deallocate(bnd_prm)
+  if(allocated(bnd_types)) deallocate(bnd_types)
+  allocate(bnd_prm(nbnd_prm), stat=alloc_status)
+  allocate(bnd_types(nbnd_prm), stat=alloc_status)
+  call check_alloc('bond parameters')
+  do i = 1, nbnd_prm
+          READ(2, *, err = 1000) iaci, iacj, bnd_prm(i)%prm%fk, bnd_prm(i)%prm%bnd0
+          bnd_types(i)%taci = tac(iaci)
+          bnd_types(i)%tacj = tac(iacj)
+          bnd_prm(i)%SYBYLtype = '1 ' !set to default
+  enddo
+  write( * , 110) nbnd_prm, 'bond types'
+  CALL skip_comments(2)
+  i = 0
+  READ(2, *, err = 1010) nang_prm
+  CALL skip_comments(2)
+  if(allocated(ang_prm)) deallocate(ang_prm)
+  allocate(ang_prm(nang_prm), stat=alloc_status)
+  if(allocated(ang_types)) deallocate(ang_types)
+  allocate(ang_types(nang_prm), stat=alloc_status)
+  call check_alloc('angle parameters')
+  !set optional parameters to 0.
+  ang_prm(:)%ureyfk = 0.
+  ang_prm(:)%ureyr0 = 0.
+  do i = 1, nang_prm
+          read(2, '(a80)', err=1010) line
+          read(line, *, iostat=filestat) iaci, iacj, iack, ang_prm(i)
+          ang_types(i)%taci = tac(iaci)
+          ang_types(i)%tacj = tac(iacj)
+          ang_types(i)%tack = tac(iack)
+          !accept missing parameters but not read error
+          if(filestat > 0) goto 1010
+  enddo
+  write( * , 110) nang_prm, 'angle types'
 
-        CALL skip_comments(2)
-        i = 0
-        READ(2, *, err = 1020) ntor_prm
-        CALL skip_comments(2)
-        if(allocated(tor_prm)) deallocate(tor_prm)
-        allocate(tor_prm(ntor_prm), stat=alloc_status)
-        if(allocated(tor_types)) deallocate(tor_types)
-        allocate(tor_types(ntor_prm), stat=alloc_status)
-        call check_alloc('torsion parameters')
-        do i = 1, ntor_prm
-                READ(2, *, err = 1020) iaci, iacj, iack, iacl, tor_prm(i)
-                tor_types(i)%taci = tac(iaci)
-                tor_types(i)%tacj = tac(iacj)
-                tor_types(i)%tack = tac(iack)
-                tor_types(i)%tacl = tac(iacl)
-        enddo
-        write(*, 110) ntor_prm, 'torsion types'
+  CALL skip_comments(2)
+  i = 0
+  READ(2, *, err = 1020) ntor_prm
+  CALL skip_comments(2)
+  if(allocated(tor_prm)) deallocate(tor_prm)
+  allocate(tor_prm(ntor_prm), stat=alloc_status)
+  if(allocated(tor_types)) deallocate(tor_types)
+  allocate(tor_types(ntor_prm), stat=alloc_status)
+  call check_alloc('torsion parameters')
+  do i = 1, ntor_prm
+          READ(2, *, err = 1020) iaci, iacj, iack, iacl, tor_prm(i)
+          tor_types(i)%taci = tac(iaci)
+          tor_types(i)%tacj = tac(iacj)
+          tor_types(i)%tack = tac(iack)
+          tor_types(i)%tacl = tac(iacl)
+  enddo
+  write(*, 110) ntor_prm, 'torsion types'
 
-        CALL skip_comments(2)
-        i = 0
-        READ(2, *, err = 1030) nimp_prm
-        CALL skip_comments(2)
-        if(allocated(imp_prm)) deallocate(imp_prm)
-        allocate(imp_prm(nimp_prm), stat=alloc_status)
-        call check_alloc('improper parameters')
-        do i = 1, nimp_prm
-                READ(2, *, err = 1030) iacj, iack, imp_prm(i)%prm
-                imp_prm(i)%taci = '' !not used
-                imp_prm(i)%tacj = tac(iacj)
-                imp_prm(i)%tack = tac(iack)
-                imp_prm(i)%tacl = '' !not used
-        enddo
-        write( * , 110) nimp_prm, 'improper types'
+  CALL skip_comments(2)
+  i = 0
+  READ(2, *, err = 1030) nimp_prm
+  CALL skip_comments(2)
+  if(allocated(imp_prm)) deallocate(imp_prm)
+  allocate(imp_prm(nimp_prm), stat=alloc_status)
+  call check_alloc('improper parameters')
+  do i = 1, nimp_prm
+          READ(2, *, err = 1030) iacj, iack, imp_prm(i)%prm
+          imp_prm(i)%taci = '' !not used
+          imp_prm(i)%tacj = tac(iacj)
+          imp_prm(i)%tack = tac(iack)
+          imp_prm(i)%tacl = '' !not used
+  enddo
+  write( * , 110) nimp_prm, 'improper types'
 
-        CALL skip_comments(2)
-        i = 0
-        READ(2, *, err = 1040) natyps
+  CALL skip_comments(2)
+  i = 0
+  READ(2, *, err = 1040) natyps
 
-        READ(2, *, err = 1040) ivdw_rule
-        READ(2, *, err = 1040) el14_scale
-        CALL skip_comments(2)
-        
-        !if no PDB file read (blank topology)
-        if(allocated(iaclib)) deallocate(iaclib) 
-        max_atyps = max_old_atyps
-        allocate(iaclib(max_atyps)) 
-        if(allocated(SYBYL_atom_type)) deallocate(SYBYL_atom_type)
-        allocate(SYBYL_atom_type(max_atyps)) 
-        if(allocated(tac)) deallocate(tac)
-        allocate(tac(max_atyps))
-        !clear atom type parameters
-        do i=1,max_atyps
-                iaclib(i)%avdw(:) = 0.
-                iaclib(i)%bvdw(:) = 0.
-                iaclib(i)%mass = 0.
-                SYBYL_atom_type(i) = '     '
-                tac(i) = ''
-        end do
+  READ(2, *, err = 1040) ivdw_rule
+  READ(2, *, err = 1040) el14_scale
+  CALL skip_comments(2)
+  
+  !if no PDB file read (blank topology)
+  if(allocated(iaclib)) deallocate(iaclib) 
+  max_atyps = max_old_atyps
+  allocate(iaclib(max_atyps)) 
+  if(allocated(SYBYL_atom_type)) deallocate(SYBYL_atom_type)
+  allocate(SYBYL_atom_type(max_atyps)) 
+  if(allocated(tac)) deallocate(tac)
+  allocate(tac(max_atyps))
+  !clear atom type parameters
+  do i=1,max_atyps
+          iaclib(i)%avdw(:) = 0.
+          iaclib(i)%bvdw(:) = 0.
+          iaclib(i)%mass = 0.
+          SYBYL_atom_type(i) = '     '
+          tac(i) = ''
+  end do
 
-        call index_create(natyps)
-        do i = 1, natyps
-                READ(2, *, err = 1040) ityp, iaclib(ityp)%avdw(1), iaclib(ityp)%avdw(2), &
-                        iaclib(ityp)%bvdw(1), iaclib(ityp)%avdw(3), iaclib(ityp)%bvdw(3), &
-                        iaclib(ityp)%mass
-                iaclib(ityp)%bvdw(2) = iaclib(ityp)%bvdw(1)
-                write(taci,'(i4)') ityp
-                tac(ityp) = adjustl(taci)
-                if(.not. index_add(tac(ityp), ityp)) then
-                        write(*,130) tac(i)
-                end if
-        enddo
-        write( * , 110) natyps, 'atom types'
+  call index_create(natyps)
+  do i = 1, natyps
+          READ(2, *, err = 1040) ityp, iaclib(ityp)%avdw(1), iaclib(ityp)%avdw(2), &
+                  iaclib(ityp)%bvdw(1), iaclib(ityp)%avdw(3), iaclib(ityp)%bvdw(3), &
+                  iaclib(ityp)%mass
+          iaclib(ityp)%bvdw(2) = iaclib(ityp)%bvdw(1)
+          write(taci,'(i4)') ityp
+          tac(ityp) = adjustl(taci)
+          if(.not. index_add(tac(ityp), ityp)) then
+                  write(*,130) tac(i)
+          end if
+  enddo
+  write( * , 110) natyps, 'atom types'
 
-        CALL skip_comments(2)
-        i = 0
-        READ(2, *, err = 1050) nlj2
-        CALL skip_comments(2)
-        if(allocated(lj2)) deallocate(lj2)
-        allocate(lj2(nlj2)) 
-        do i = 1, nlj2
-        READ(2, *, err = 1050) lj2(i)%i, lj2(i)%j
-        enddo
-        write( * , 110) nlj2, 'LJ type 2 pairs'
+  CALL skip_comments(2)
+  i = 0
+  READ(2, *, err = 1050) nlj2
+  CALL skip_comments(2)
+  if(allocated(lj2)) deallocate(lj2)
+  allocate(lj2(nlj2)) 
+  do i = 1, nlj2
+  READ(2, *, err = 1050) lj2(i)%i, lj2(i)%j
+  enddo
+  write( * , 110) nlj2, 'LJ type 2 pairs'
 
-        write( * , '(a,/)') 'Force field parameters successfully read.'
-        return
+  write( * , '(a,/)') 'Force field parameters successfully read.'
+  return
 
   110 format ('Read ',i4,' ', a)
   120 format ('>>> ERROR: Failed to read ',a,' number ',i4)
@@ -3418,6 +3418,8 @@ subroutine readparm(filnam)
 
         do i = 1, natyps
                 if(.not. prm_get_line(line)) goto 1040
+                !Name Ai Bi Ci ai Ai(1-4) Bi(1-4) Mass
+                ! tac(i)  avdw(1)   avdw(2)  bvdw(1)  avdw(3) bvdw(3) mass SYBYL_atom_type(i)
                 READ(line, *, iostat=j) tac(i), iaclib(i)%avdw(1), iaclib(i)%avdw(2), &
                         iaclib(i)%bvdw(1), iaclib(i)%avdw(3), &
                         iaclib(i)%bvdw(3), iaclib(i)%mass, SYBYL_atom_type(i)

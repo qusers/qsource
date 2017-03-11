@@ -114,7 +114,7 @@ have  contributed  to  the  code, among  them:  John  Marelius,  Karin
 Kolmodin,  Isabella Feierberg,  Martin  Alml\"of,  Martin Ander,  Jens
 Carlson,  Peter  Hanspers,  Anders   Kaplan,  Kajsa  Ljunjberg,  Petra
 Wennerstr\"om,  Martin Nervall,  Johan Sund,  Alexandre Barrozo,  Paul
-Bauer, Beat Amrein,  Masoud Karemi, Irek Szeler, Miha Purg  and \AA ke
+Bauer, Beat Amrein,  Masoud Kazemi, Irek Szeler, Miha Purg  and \AA ke
 Sandgren. The code is in active development and new features are being
 implemented mainly following the  fortran 2003 standard.  Additionally
 the  MPI implementation  has  been  updated to  enhance  the speed  of
@@ -214,7 +214,7 @@ systems that are used with the periodic boundary condition.
 %===============================================================================
 \section{INSTALLATION AND SETUP}
 \subsection{System requirements} 
-\textbf{Q}  5.7 can  be compiled  and run  in Windows  7, Mac  OSX and
+\textbf{Q}  5.7 can  be compiled  and run  in Windows  10, Mac  OSX and
 Linux.   The  parallel \textbf{qdynp}  version  of  the main  dynamics
 program \textbf{qdyn} has  been greatly improved from  that of version
 5.0 which was using an  older Message Passing Interface (MPI) standard
@@ -247,14 +247,14 @@ and download the files to this directory, or clone them from the
 github repository.
 
 \subsubsection{Installing executable images}
-\textbf{Windows 7}
+\textbf{Windows 10}
 
 \textbf{Linux}
 
 \textbf{Mac OSX}
 
 \subsubsection{Building the programs from source code}
-\textbf{Windows 7}
+\textbf{Windows 10}
 
 \textbf{Linux} 
 
@@ -1113,7 +1113,7 @@ the simpler ones.  For a complete description of the  file format, see
 FEP file format on page \pageref{subsubsec:fepfileformat}.\\
 
 
-\textbf{Example: Charging a benzene molecule}\\*[0.25cm] 
+\textbf{Example 1: Charging a benzene molecule}\\*[0.25cm] 
 The FEP  file shown below may  be used to calculate  the electrostatic
 contribution  to   the  free  energy   of  solvation  for   a  benzene
 molecule.  The atoms  and  bonds  of the  molecule  are  defined in  a
@@ -1169,7 +1169,7 @@ define two  ``charge'' states, one  with the CH dipolar  charges being
 $\pm $0.15~e and one state with zero partial charges.\\
 
 
-\textbf{Example: Changing van der Waals parameters}\\*[0.25cm] In
+\textbf{Example 2: Changing van der Waals parameters}\\*[0.25cm] In
 this example we will take a look at how to redefine van der Waals
 (Lennard-Jones) interaction parameters. The FEP file shown below
 may be used if we want to calculate the difference in hydration
@@ -1222,7 +1222,7 @@ parameters for Na$^{+}$ and K$^{+}$ (Q-atom types for Na and K) as the
 two different states for our single ion.\\
 
 
-\textbf{Example: Valence bond (EVB) states for a proton transfer
+\textbf{Example 3: Valence bond (EVB) states for a proton transfer
 reaction}\\*[0.25cm] 
 This is an example from the reaction of a protein tyrosine phosphatase
 where proton transfer  from a Cys residue of the  enzyme to the doubly
@@ -2693,9 +2693,9 @@ position. The  B parameter  is the same  for sets 2  and 3.  Atom type
 names  are alphanumeric.  The  length  of the  name  is  limited to  8
 characters.
 
-The   section  \textbf{[atom{\_}aliases]}   is  used   facilitate  the
-transition from numeric atom type  names used in earlier versions.  In
-this section alias names may be  assigned to atom types defined in the
+The section \textbf{[atom{\_}aliases]} is  used to ease the transition
+from  numeric atom  type  names  used in  earlier  versions.  In  this
+section  alias names  may be  assigned to  atom types  defined in  the
 atom{\_}types section, $e.g.$  to be able to use the  old numeric name
 as an alias for the new descriptive atom type name in library files.
 
