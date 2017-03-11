@@ -1,15 +1,21 @@
 Qsource development.
 ================================================================================
 
-This is a repository to hold clean and readable Q code.
+This is a repository to hold clean and readable Q code.  
 The code is in the process of being reorganized and cleaned-up
-according to best coding practices.
+according to best coding practices.  
 
-We are documenting the code using doxygen. To generate the doxygen
-documentation do:  
+We are documenting the code using doxygen and ford.   
+To generate the doxygen documentation do:  
 
-    cd documentation/manuals/developers
-	doxygen DoxygenConfigFortran
+    cd docs/developers  
+    doxygen DoxygenConfigFortran  
+
+
+To generate the ford docs:  
+    
+    cd docs/developers  
+    ford -d ../../src -o devdocs forddocs.md  
 
 
 Some basic development rules somewhat similar to those of the
@@ -29,7 +35,7 @@ code.
     using abstract data types  
 3.  **Interfaces** - the Application Programming Interface should say it
     all  
-4.  **Comments in code** - comments in code that doxygen can use  
+4.  **Comments in code** - comments in code that ford can use  
 5.  **Compilation** - using different hardware  
 6.  **Allowed Fortran Features**  
 7.  **Error Handling**  
