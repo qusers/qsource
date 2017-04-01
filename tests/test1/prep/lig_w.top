@@ -1,11 +1,11 @@
 Q topology file
 TITLE      lig_w
-DATE       20150228
-VERSION     5.03
-LIB_FILES  lig.lib;Qoplsaa.lib
+DATE       20170401
+VERSION     5.70
+LIB_FILES  lig.lib;qoplsaa.lib
 FORCEFIELD Q-OPLSAA
 FF_TYPE    2
-PRM_FILE   Qoplsaa.prm
+PRM_FILE   qoplsaa.prm
 END        of header
     3397      46 = Total no. of atoms, no. of solute atoms. Coordinates: (2*3 per line)
    14.157     4.397    -0.972     12.973     3.895    -1.402

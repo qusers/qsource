@@ -3,9 +3,9 @@
 #  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      #
 #  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          #
 #  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          #
-#  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Karemi, Miha Purg,      #
-#  Irek Szeler                                                                 #
-#  Latest update: October 14, 2015                                             #
+#  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Karemi, Paul Bauer      #
+#  Miha Purg, Irek Szeler                                                      #
+#  Latest update: March 29, 2017                                               #
 #  make [option] [COMP=compiler]                                               #
 ################################################################################
 
@@ -150,7 +150,7 @@ nuke:
 	-rm -rf *.o  *.mod *.M *.kmo *.il *.oo qfep qdynp qdyn qprep qcalc \
 	qdum ../bin ../obj
 
-qcalc qdyn qdum qdynp qprep qfep: version.o misc.o mpiglob.o
+qcalc qdyn qdum qdynp qprep qfep: misc.o mpiglob.o
 
 qcalc qdyn qdum qdynp qprep: mask.o prmfile.o sizes.o topo.o trj.o index.o
 
@@ -244,13 +244,13 @@ mask.o:	mask.f90 topo.o
 maskmanip.o:maskmanip.f90 mask.o misc.o parse.o
 	${FC} ${FFLAGS} -c $<
 
-md.o:	md.f90 mpiglob.o qatom.o sizes.o trj.o topo.o version.o
+md.o:	md.f90 mpiglob.o qatom.o sizes.o trj.o topo.o
 	${FC} ${FFLAGS} ${FPP_FLG} -c md.f90
 
-md_dum.o:md.f90 mpiglob.o qatom.o sizes.o topo.o version.o
+md_dum.o:md.f90 mpiglob.o qatom.o sizes.o topo.o
 	${FC} ${FFLAGS} ${FPP_FLG} -DDUM -c md.f90 -o md_dum.o
 
-md_mpi.o: md.f90 mpiglob.o qatom.o sizes.o topo.o trj.o version.o
+md_mpi.o: md.f90 mpiglob.o qatom.o sizes.o topo.o trj.o
 	${MPIFC} ${MPIFLAGS} ${FFLAGS} ${FPP_FLG} -DUSE_MPI \
 	-c md.f90 -o md_mpi.o
 
@@ -285,17 +285,17 @@ qcalc.o: qcalc.f90 calc_chemscore.o calc_pmfscore.o calc_xscore.o trj.o \
 	calc_base.o calc_rms.o calc_fit.o calc_geom.o
 	${FC} ${FFLAGS} ${FPP_FLG} -c qcalc.f90
 
-qdyn.o: qdyn.f90 md.o mpiglob.o version.o
+qdyn.o: qdyn.f90 md.o mpiglob.o
 	${FC} ${FFLAGS} ${FPP_FLG} -c qdyn.f90
 
-qdyn_dum.o: qdyn.f90 md.o mpiglob.o version.o
+qdyn_dum.o: qdyn.f90 md.o mpiglob.o
 	${FC} ${FFLAGS} ${FPP_FLG} -DDUM -c qdyn.f90 -o qdyn_dum.o
 
-qdyn_mpi.o: qdyn.f90 md_mpi.o mpiglob.o version.o
+qdyn_mpi.o: qdyn.f90 md_mpi.o mpiglob.o
 	${MPIFC} ${MPIFLAGS} ${FFLAGS} ${FPP_FLG} -DUSE_MPI \
         -c qdyn.f90 -o qdyn_mpi.o
 
-qfep.o: qfep.f90 nrgy.o parse.o version.o
+qfep.o: qfep.f90 nrgy.o parse.o
 	${FC} ${FFLAGS} ${FPP_FLG} -c qfep.f90
 
 sizes.o: sizes.f90
@@ -306,9 +306,6 @@ topo.o:  topo.f90 misc.o mpiglob.o sizes.o
 
 trj.o:  trj.f90 mask.o misc.o
 	${FC} ${FFLAGS} -c $<
-
-version.o: version.f90
-	${FC} ${FFLAGS} ${FPP_FLG} ${BUILD_NUMBER_LDFLAGS} -c $<
 
 move1:
 	mkdir -p ../obj ; mv *.o *.mod ../obj/

@@ -3,9 +3,9 @@
 !  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
 !  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
-!  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Karemi, Miha Purg,      !
-!  Irek Szeler                                                                 !
-!  latest update: October 14, 2015                                             !
+!  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Karemi, Paul Bauer,     !
+!  Miha Purg, Irek Szeler                                                      !
+!  latest update: March 29, 2017                                               !
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
@@ -15,7 +15,8 @@
 !!  qcalc trajectory analysis main program  
 !------------------------------------------------------------------------------!
 program qcalc
-!  use version
+  use iso_fortran_env
+
   use trj
   use calc_base
   use calc_rms
@@ -35,8 +36,12 @@ program qcalc
   implicit none
 
   ! version data
-  character(*), parameter ::      PROGRAM_VERSION = '5.7'
-  character(*), parameter ::      PROGRAM_DATE = '2015-02-22'
+  character(*), parameter :: program_name = 'qcalc'
+  character(*), parameter :: program_version = '5.7'
+  character(*), parameter :: program_date = '2015-02-22'
+  character(*), parameter :: options = compiler_options()
+  character(len=32)       :: arg 
+  integer                 :: k
 
   !constants
   integer, parameter                      ::      MAX_CALCS = 99
@@ -78,9 +83,11 @@ program qcalc
   call add_kind(desc='Center of mass position',           key = 'com', output=.true.)
   !add more calc. kind registrations here...
 
+  
+  call commandlineoptions
+
   ! startup prints welcome msg and calls calc_help to print 
   ! helper info. mask_startup and topo_startup are dummy routines
-
   call startup
 
   if(get_topology()) then         ! attempt to load topology (req. user input)
@@ -106,11 +113,31 @@ program qcalc
 
 contains
 
+  !----------------------------------------------------------------------------!
+  !!  subroutine: startup  
+  !!  Startup  
+  !----------------------------------------------------------------------------!
 subroutine startup
   integer :: i
 
-  write(*,'(79a)')('#',i=1,79)
-  write(*,'(a,a)') 'Welcome to qcalc version ', PROGRAM_VERSION
+!  write(*,'(79a)')('#',i=1,79)
+!  print '(a)',  '--------------------------------------------------------------------------------'
+!  write(*,'(a,a)') 'Welcome to qcalc version ', program_version
+  print '(a)',  '--------------------------------------------------------------------------------'
+  print '(4a)', 'Welcome to ', program_name, ' version: ', program_version
+  print '(a)',  ' '
+  print '(2a)', 'This version was compiled using: ', compiler_version()
+  print '(a)',  ' '
+  print '(a)',  'And using the following compiler options: '
+  write (output_unit, *, delim='quote') options
+!  write ( *, '( A /)' ) trim ( compiler_options() )
+!  print '(a)',  trim(compiler_options())
+  print '(a)',  ' '
+  print '(a)',  'For command line options type qcalc --help  or qcalc -h at the terminal.'
+  print '(a)',  ' '
+  print '(a)',  'If you are using the interactive mode and want to quit type "quit" or Ctrl-C.' 
+  print '(a)',  '--------------------------------------------------------------------------------'
+
   
   call mask_startup       ! mask_startup calls topo_startup, which is empty
   write(*,*)
@@ -119,7 +146,13 @@ subroutine startup
 end subroutine startup
 
 
+  !----------------------------------------------------------------------------!
+  !!  subroutine: shutdown
+  !!  Shutdown call
+  !!  TODO: Implement fully.
+  !----------------------------------------------------------------------------!
 subroutine shutdown
+  call trj_shutdown
 end subroutine shutdown
 
 logical function get_topology()
@@ -686,6 +719,45 @@ subroutine calc_all(frame)
                 end select
          end do 
 end subroutine calc_all
+
+  !----------------------------------------------------------------------------!
+  !!  subroutine: commandlineoptions  
+  !----------------------------------------------------------------------------!
+  subroutine commandlineoptions
+  do k = 1, command_argument_count()
+    call get_command_argument(k, arg)
+    select case (arg)
+    case ('-v', '--version')
+      print '(3a)', program_name, ' version ', program_version
+      stop
+    case ('-h', '--help')
+      call print_help()
+      stop
+    case default
+      print '(a,a,/)', 'Unrecognized command-line option: ', arg
+      call print_help()
+      stop
+    end select
+  end do
+  end subroutine commandlineoptions
+
+  !----------------------------------------------------------------------------!
+  !!  subroutine: print_help  
+  !----------------------------------------------------------------------------!
+  subroutine print_help()
+    print '(a)', 'usage:'
+    print '(a)', 'qcalc [OPTION]'
+    print '(a)', '  or'
+    print '(a)', 'qcalc < inputfile.inp > outputfile.out'
+    print '(a)', ''
+    print '(a)', 'Without options, qcalc goes into interactive mode.'
+    print '(a)', ''
+    print '(a)', 'qcalc [OPTION]:'
+    print '(a)', ''
+    print '(a)', '  -v, --version     print version information and exit'
+    print '(a)', '  -h, --help        print usage information and exit'
+  end subroutine print_help
+
 
 end program qcalc
 

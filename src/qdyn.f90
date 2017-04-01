@@ -3,9 +3,9 @@
 !  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
 !  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
-!  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Karemi, Miha Purg,      !
-!  Irek Szeler                                                                 !
-!  latest update: October 14, 2015                                             !
+!  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Karemi, Paul Bauer,     !
+!  Miha Purg, Irek Szeler                                                      !
+!  latest update: March 29, 2017                                               !
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
@@ -15,26 +15,29 @@
 !!  qdyn molecular dynamics main program  
 !------------------------------------------------------------------------------!
 program qdyn
+  use iso_fortran_env
+
   use md
   use mpiglob
-  use version
 
 #if defined (_DF_VERSION_)
   use dfport ! portability lib for signals. Used in windows.
 #endif
 
   implicit none
-
   ! version data
+  character(*), parameter :: program_name = 'qdyn'
+  character(*), parameter :: program_version = '5.7'
+  character(*), parameter :: program_date = '2015-02-22'
+  character(*), parameter :: options = compiler_options()
+  character(len=32)       :: arg
+  integer                 :: k
+ 
   
-  character(*), parameter :: PROGRAM_NAME = 'qdyn'
-  character(*), parameter :: PROGRAM_VERSION = '5.7'
-  character(*), parameter :: PROGRAM_DATE = '2015-02-22'
-
 #if defined (USE_MPI)
-  character(10) :: PROGRAM_SUFFIX = '_parallel'
+  character(10) :: program_suffix = '_parallel'
 #else
-  character(10) :: PROGRAM_SUFFIX = ''
+  character(10) :: program_suffix = ''
 #endif
 
 #if defined (USE_MPI)
@@ -72,6 +75,8 @@ program qdyn
   sigret = SIGNAL(SIGINT, sigint_handler, -1_4)
   sigret = SIGNAL(SIGKILL, sigkill_handler, -1_4)
   sigret = SIGNAL(SIGABRT, sigabrt_handler, -1_4)
+
+!  call commandlineoptions
 
   ! initialize static data, display banner etc
   call startup
@@ -127,38 +132,74 @@ program qdyn
   call MPI_Finalize(qdyn_ierr)
 #endif
 
+
+
 contains
 
-  !-----------------------------------------------------------------------------
-  ! startup subroutine
-  !-----------------------------------------------------------------------------
-  subroutine startup
-    integer :: i
-    integer :: datum(8)
+!  !-----------------------------------------------------------------------------
+!  ! startup subroutine
+!  !-----------------------------------------------------------------------------
+!  subroutine startup
+!    integer :: i
+!    integer :: datum(8)
+!
+!    if (nodeid .eq. 0) then
+!       ! start-of-header
+!       write (*,'(79a)') ('#',i=1,79)
+!
+!#if defined (DUM)
+!  print '(a)',  '--------------------------------------------------------------------------------'
+!       write(*,'(a,a,a)') 'qdum input checker version ', trim(program_version), ' initializing'
+!  print '(a)',  '--------------------------------------------------------------------------------'
+!#elif defined(EVAL)
+!  print '(a)',  '--------------------------------------------------------------------------------'
+!       write(*,'(a,a,a)') 'qdyn evaluation version ', trim(program_version), ' initializing'
+!       write(*,'(a)') 'This version is for evaluation purposes only.'
+!       write(*,'(a)') 'Optimizations are disabled - runs at <20% of maximum speed.'
+!  print '(a)',  '--------------------------------------------------------------------------------'
+!#else
+!  print '(a)',  '--------------------------------------------------------------------------------'
+!       write(*,'(a,a,a,a)') 'qdyn version ', trim(program_version), trim(program_suffix),' initializing'
+!  print '(a)',  '--------------------------------------------------------------------------------'
+!#endif
+!
+!       call date_and_time(values=datum)
+!       write(*,130) datum(1),datum(2),datum(3),datum(5),datum(6),datum(7)  
+!130    format('Current date ',i4,'-',i2,'-',i2,' and time ',i2,':',i2,':',i2)
+!    end if
+!
+!    ! initialize used modules
+!    call md_startup
+!
+!  end subroutine startup
 
-    if (nodeid .eq. 0) then
-       ! start-of-header
-       write (*,'(79a)') ('#',i=1,79)
+  !----------------------------------------------------------------------------!
+  !!  subroutine: startup  
+  !!  Startup  
+  !----------------------------------------------------------------------------!
+subroutine startup
+!    call version_check(PROGRAM_NAME, PROGRAM_VERSION, PROGRAM_DATE, PROGRAM_SUFFIX)
 
-#if defined (DUM)
-       write(*,'(a,a,a)') 'qdum input checker version ', trim(PROGRAM_VERSION), ' initializing'
-#elif defined(EVAL)
-       write(*,'(a,a,a)') 'qdyn evaluation version ', trim(PROGRAM_VERSION), ' initializing'
-       write(*,'(a)') 'This version is for evaluation purposes only.'
-       write(*,'(a)') 'Optimizations are disabled - runs at <20% of maximum speed.'
-#else
-       write(*,'(a,a,a,a)') 'qdyn version ', trim(PROGRAM_VERSION), trim(PROGRAM_SUFFIX),' initializing'
-#endif
+  print '(a)',  '--------------------------------------------------------------------------------'
+  print '(4a)', 'Welcome to ', program_name, ' version: ', program_version
+  print '(a)',  ' '
+  print '(2a)', 'This version was compiled using: ', compiler_version()
+  print '(a)',  ' '
+  print '(a)',  'And using the following compiler options: '
+  write (output_unit, *, delim='quote') options
+!  write ( *, '( A /)' ) trim ( compiler_options() )
+!  print '(a)',  trim(compiler_options())
+  print '(a)',  ' '
+  print '(a)',  'For command line options type qdyn --help  or qprep -h at the terminal.'
+  print '(a)',  ' '
+  print '(a)',  'If you are using the interactive mode you can type "help"'
+  print '(a)',  'at the prompt. To quit type "quit".'
+  print '(a)',  '--------------------------------------------------------------------------------'
+  call md_startup
+  write(*,*)
+end subroutine startup
 
-       call date_and_time(values=datum)
-       write(*,130) datum(1),datum(2),datum(3),datum(5),datum(6),datum(7)  
-130    format('Current date ',i4,'-',i2,'-',i2,' and time ',i2,':',i2,':',i2)
-    end if
 
-    ! initialize used modules
-    call md_startup
-
-  end subroutine startup
 
   !-----------------------------------------------------------------------------
   ! shutdown subroutine
@@ -168,9 +209,9 @@ contains
 
     if (nodeid .eq. 0) then
 #if defined (DUM)
-       write(*,*) 'QDum input checker version ', PROGRAM_VERSION, ' terminated normally.'
+       write(*,*) 'qdum input checker version ', program_version, ' terminated normally.'
 #else
-       write(*,*) 'QDyn version ', trim(PROGRAM_VERSION), trim(PROGRAM_SUFFIX), ' terminated normally.'
+       write(*,*) 'qdyn version ', trim(program_version), trim(program_suffix), ' terminated normally.'
 #endif
        write (*,'(79a)') ('#',i=1,79)
     end if
@@ -188,6 +229,47 @@ contains
     signal = 1
   end function signal
 #endif
+
+
+
+  !----------------------------------------------------------------------------!
+  !!  subroutine: commandlineoptions  
+  !----------------------------------------------------------------------------!
+  subroutine commandlineoptions
+  do k = 2, command_argument_count()
+    call get_command_argument(k, arg)
+    select case (arg)
+    case ('-v', '--version')
+      print '(3a)', program_name, ' version ', program_version
+      stop
+    case ('-h', '--help')
+      call print_help()
+      stop
+    case default
+      print '(a,a,/)', 'Unrecognized command-line option: ', arg
+      call print_help()
+      stop
+    end select
+  end do
+  end subroutine commandlineoptions
+
+  !----------------------------------------------------------------------------!
+  !!  subroutine: print_help  
+  !----------------------------------------------------------------------------!
+  subroutine print_help()
+    print '(a)', 'usage:'
+    print '(a)', 'qdyn [OPTION]'
+    print '(a)', '  or'
+    print '(a)', 'qdyn  inputfile.inp > outputfile.out'
+    print '(a)', ''
+    print '(a)', 'Without options, qdyn goes into interactive mode.'
+    print '(a)', ''
+    print '(a)', 'qdyn [OPTION]:'
+    print '(a)', ''
+    print '(a)', '  -v, --version     print version information and exit'
+    print '(a)', '  -h, --help        print usage information and exit'
+  end subroutine print_help
+
 
 end program qdyn
 

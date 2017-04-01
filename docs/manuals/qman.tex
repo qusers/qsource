@@ -2247,20 +2247,22 @@ a matter of which parameter file to use. Any force field could be used
 with the program,  as long as it shares the  common functional form of
 eq.  \ref{eq:V_pot}.
 
-\begin{multline}
+\begin{align}
 \label{eq:V_pot}
- V_{pot} =\sum\limits_{bonds} {\frac{1}{2}k_b \cdot \left( {r-r_0
+ V_{pot} & =\sum\limits_{bonds} {\frac{1}{2}k_b \cdot \left( {r-r_0
 } \right)^2} +\sum\limits_{angles} {\frac{1}{2}k_\theta \left(
 {\theta -\theta_0} \right)^2} +\sum\limits_{dihedrals} {K_\varphi
 \cdot \left( {1+\cos \left( {n\cdot \varphi -\delta } \right)}
-\right)} \\
-  +\sum\limits_{\substack{improper \\ dihedrals}}
+\right)} \nonumber \\ 
+& +\sum\limits_{\substack{improper \\ dihedrals}}
 {\frac{1}{2}k_\xi \left( {\xi -\xi _0} \right)^2}
 +\sum\limits_{\substack{atom \\ pairs \; i , \, j}}
-{\frac{1}{4\cdot \pi \cdot \varepsilon_0 } \cdot q_i \cdot q_j
-\cdot r_{ij}^{-1} +A_{ij} \cdot r_{ij}^{-12} -B_{ij} \cdot
-r_{ij}^{-6}}
-\end{multline}
+\left[
+{\frac{1}{4 \pi \varepsilon_{0} } \frac{q_i \cdot q_j}
+{r_{ij}} + \left( \frac{A_{ij}}{r_{ij}^{12}} -
+\frac{B_{ij}}{r_{ij}^{6}} \right)}
+\right]
+\end{align}
 
 where V$_{pot}$ is the total potential energy, $k_{b}$ is a bond
 stretching force constant, $r$ is the distance between two bonded

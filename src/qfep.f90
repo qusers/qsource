@@ -3,9 +3,9 @@
 !  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
 !  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
-!  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Karemi, Miha Purg,      !
-!  Irek Szeler                                                                 !
-!  latest update: October 14, 2015                                             !
+!  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Karemi, Paul Bauer,     !
+!  Miha Purg, Irek Szeler                                                      !
+!  latest update: March 29, 2017                                               !
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
@@ -15,13 +15,19 @@
 !!  qfep free energy analysis program for FEP, EVB & Umbrella Sampling  
 !------------------------------------------------------------------------------!
 program qfep
+  use iso_fortran_env
+
   use nrgy
   use parse
 
   implicit none
-  character(*), parameter :: PROGRAM_VERSION = '5.7'
-  character(*), parameter :: PROGRAM_DATE = '2015-04-01'
-
+  character(*), parameter :: program_name = 'qfep'
+  character(*), parameter :: program_version = '5.7'
+  character(*), parameter :: program_date = '2015-04-01'
+  character(*), parameter :: options = compiler_options()
+  character(len=32)       :: arg
+  integer                 :: k
+  
   integer,parameter :: mxpts = 20000000
   integer,parameter :: mxbin = 100
   integer,parameter :: mxstates = 4
@@ -67,10 +73,12 @@ program qfep
   real           :: dummy !masoud
   character(100) :: iline !masoud
 
-  !header
-  write(*,100) PROGRAM_VERSION, PROGRAM_DATE
-  write(*,*)
-100 format('# qfep',t30,'version ',a,t50,'(modified on ',a,')')
+  
+  call commandlineoptions
+  call startup
+
+
+
 
   !------------------------------------------
   ! INPUT OF PARAMETERS
@@ -165,7 +173,7 @@ program qfep
   call prompt ('--> linear combination of states defining reaction coord: ')
   read (*,*) (coeff(i),i=1,nstates)
   write(*,13) coeff(1:nstates)
-13 format('# Linear combination coefficients=',8f6.2)
+13 format('# Linear combination coefficients=', 8f8.2)
 
   !allocate large arrays
   allocate(FEP(nfiles), FEPtmp%v(nstates,mxpts), FEPtmp%r(nstates,mxpts), &
@@ -307,6 +315,9 @@ program qfep
 
       do istate=1,nstates
         FEPtmp%gap(ipt)=FEPtmp%gap(ipt)+FEPtmp%v(istate,ipt)*coeff(istate)
+!        print*, "LINEAR COMBINATION"
+!        print*, "FEPtmp%gap(ipt)        coeff(istate)                istate           nstates"        
+!        print*, FEPtmp%gap(ipt) ,coeff(istate), istate, nstates
       end do
 
       if(ipt .gt. nskip) then
@@ -710,11 +721,40 @@ program qfep
   deallocate(FEP)
 
   deallocate(Hij,d,e,STAT=ERR)
-  !.......................................................................
+
+
+
 
 contains
-  !------------------------------
 
+  !----------------------------------------------------------------------------!
+  !!  subroutine: startup  
+  !!  Startup  
+  !----------------------------------------------------------------------------!
+subroutine startup
+  integer :: i
+
+  print '(a)',  '--------------------------------------------------------------------------------'
+  print '(4a)', 'Welcome to ', program_name, ' version: ', program_version
+  print '(a)',  ' '
+  print '(2a)', 'This version was compiled using: ', compiler_version()
+  print '(a)',  ' '
+  print '(a)',  'And using the following compiler options: '
+  write (output_unit, *, delim='quote') options
+!  write ( *, '( A /)' ) trim ( compiler_options() )
+!  print '(a)',  trim(compiler_options())
+  print '(a)',  ' '
+  print '(a)',  'For command line options type qfep --help  or qcalc -h at the terminal.'
+  print '(a)',  ' '
+  print '(a)',  'If you are using the interactive mode and want to quit type "quit" or Ctrl-C.' 
+  print '(a)',  '--------------------------------------------------------------------------------'
+
+end subroutine startup
+
+
+  !----------------------------------------------------------------------------!
+  !!  subroutine: prompt
+  !----------------------------------------------------------------------------!
   subroutine prompt (outtxt)
     character(*) outtxt
 #if defined (__osf__)
@@ -737,8 +777,45 @@ contains
     write (f,'($,a)') outtxt
   end subroutine prompt
 
-  !------------------------------
+  !----------------------------------------------------------------------------!
+  !!  subroutine: commandlineoptions  
+  !----------------------------------------------------------------------------!
+  subroutine commandlineoptions
+  do k = 1, command_argument_count()
+    call get_command_argument(k, arg)
+    select case (arg)
+    case ('-v', '--version')
+      print '(3a)', program_name, ' version ', program_version
+      stop
+    case ('-h', '--help')
+      call print_help()
+      stop
+    case default
+      print '(a,a,/)', 'Unrecognized command-line option: ', arg
+      call print_help()
+      stop
+    end select
+  end do
+  end subroutine commandlineoptions
 
+  !----------------------------------------------------------------------------!
+  !!  subroutine: print_help  
+  !----------------------------------------------------------------------------!
+  subroutine print_help()
+    print '(a)', 'usage:'
+    print '(a)', 'qfep [OPTION]'
+    print '(a)', '  or'
+    print '(a)', 'qfep < inputfile.inp > outputfile.out'
+    print '(a)', ''
+    print '(a)', 'Without options, qfep goes into interactive mode.'
+    print '(a)', ''
+    print '(a)', 'qfep [OPTION]:'
+    print '(a)', ''
+    print '(a)', '  -v, --version     print version information and exit'
+    print '(a)', '  -h, --help        print usage information and exit'
+  end subroutine print_help
+
+  
   subroutine tred2(A,N,NP,D,E)
     !------------------------------------------------------------
     ! This subroutine reduces a symmetric matrix to tridiagonal

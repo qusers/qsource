@@ -1,5 +1,4 @@
 init.top 
-.
 2 
 4 
 7
@@ -12,7 +11,6 @@ init.top
 10
 14
 .
-rmsd2.dat
 go
 start.dcd
 heat1.dcd

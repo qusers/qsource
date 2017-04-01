@@ -3,9 +3,9 @@
 !  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
 !  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
-!  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Karemi, Miha Purg,      !
-!  Irek Szeler                                                                 !
-!  latest update: October 14, 2015                                             !
+!  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Karemi, Paul Bauer,     !
+!  Miha Purg, Irek Szeler                                                      !
+!  latest update: March 29, 2017                                               !
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
@@ -865,8 +865,9 @@ end function prm_get_logical_by_key
 
   subroutine prm_dump
     !locals
-    type(SECTION_TYPE), pointer     ::      sp_next
-    type(LINE_TYPE), pointer        ::      lp_next, lp_current
+    type(SECTION_TYPE), pointer     :: sp_next
+    !    type(LINE_TYPE), pointer        ::      lp_next, lp_current
+    type(LINE_TYPE), pointer        :: lp_current    
 
     !start with first section
     call rewind_title

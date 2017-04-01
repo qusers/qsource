@@ -3,9 +3,9 @@
 !  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
 !  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
-!  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Karemi, Miha Purg,      !
-!  Irek Szeler                                                                 !
-!  latest update: October 14, 2015                                             !
+!  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Karemi, Paul Bauer,     !
+!  Miha Purg, Irek Szeler                                                      !
+!  latest update: March 29, 2017                                               !
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
@@ -21,14 +21,14 @@ program qprep
   use avetr
 
   implicit none
-  character(*), parameter :: PROGRAM_NAME = 'qprep'
-  character(*), parameter :: PROGRAM_VERSION = '5.7'
-  character(*), parameter :: PROGRAM_DATE = '2015-04-01'
-  character(*), parameter :: PROGRAM_SUFFIX  = ''
+  character(*), parameter :: program_name = 'qprep'
+  character(*), parameter :: program_version = '5.7'
+  character(*), parameter :: program_date = '2015-04-01'
+  character(*), parameter :: program_suffix  = ''
   character(*), parameter :: options = compiler_options()
+  character(len=200)      :: fileName = ''
+  character(len=32)       :: arg  
   logical                 :: use_inputfile
-  character(200)          :: fileName = ''
-  character(len=32)       :: arg
   integer                 :: i
 
   call commandlineoptions
@@ -287,7 +287,7 @@ subroutine startup
 !    call version_check(PROGRAM_NAME, PROGRAM_VERSION, PROGRAM_DATE, PROGRAM_SUFFIX)
 
   print '(a)',  '--------------------------------------------------------------------------------'
-  print '(4a)', 'Welcome to ', PROGRAM_NAME, ' version: ', PROGRAM_VERSION
+  print '(4a)', 'Welcome to ', program_name, ' version: ', program_version
   print '(a)',  ' '
   print '(2a)', 'This version was compiled using: ', compiler_version()
   print '(a)',  ' '
