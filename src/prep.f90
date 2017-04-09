@@ -538,9 +538,9 @@ end subroutine bond_ene
 !------------------------------------------------------------------------------!
 character(keylength) function wildcard_tac(taci)
 !arguments
-  character(*), intent(in)        ::      taci
+  character(*), intent(in)        :: taci
 ! *** local variables
-  integer                         ::      hash_pos
+  integer                         :: hash_pos
   !find # sign and truncate there - will match anything after
   hash_pos = scan(taci, '#')
   if(hash_pos > 0) then
@@ -557,12 +557,12 @@ end function wildcard_tac
 !------------------------------------------------------------------------------!
 integer function bondcode(taci, tacj)
 !arguments
-        character(*), intent(in)        ::      taci, tacj
+        character(*), intent(in)        :: taci, tacj
 ! *** local variables
-        character(len=keylength)                ::      ti, tj
+        character(len=keylength)                :: ti, tj
         integer i
-        integer                                         ::      leni, lenj
-        integer                                         ::      score, max_score = 0, max_cod
+        integer                                         :: leni, lenj
+        integer                                         :: score, max_score = 0, max_cod
 !.......................................................................
 
         ti = wildcard_tac(taci)
@@ -766,10 +766,10 @@ end function cross_product
 subroutine xlink
 !add cross-linking bonds like SS-bridges 
 !locals
-        integer                                         ::      ires, jres, iat, jat, i, j, b
-        integer                                         ::      irc, jrc
-        real                                            ::      d2
-        character(len=1)                        ::      reply
+        integer                                         :: ires, jres, iat, jat, i, j, b
+        integer                                         :: irc, jrc
+        real                                            :: d2
+        character(len=1)                        :: reply
 
         if(.not. check_residues()) then
                 return
@@ -845,11 +845,11 @@ end subroutine xlink
 
 integer function impcode(taci, tacj, tack, tacl)
 !arguments
-        character(KEYLENGTH)                    ::      taci, tacj, tack, tacl
+        character(KEYLENGTH)                    :: taci, tacj, tack, tacl
 ! *** local variables
         integer i
-        character(KEYLENGTH)                    ::      ti, tj, tk, tl
-        logical                                                 ::  found1, found2, found3, found4
+        character(KEYLENGTH)                    :: ti, tj, tk, tl
+        logical                                                 :: found1, found2, found3, found4
         ti = wildcard_tac(taci)
         tj = wildcard_tac(tacj)
         tk = wildcard_tac(tack)
@@ -1300,7 +1300,7 @@ end subroutine listseq
 
 subroutine make14list
 ! *** local variables
-        integer                                         ::      it, i, j, ioff, l
+        integer                                         :: it, i, j, ioff, l
 
         n14nbrs = 0
         n14long = 0
@@ -1364,8 +1364,8 @@ end subroutine make14list
 subroutine makeangles
 ! *** local variables
         integer ib, jb, ia, i, j, k, iaci, iacj, iack
-        logical                                         ::      used(nang_prm+max_extrabnd)
-        integer                                         ::      itrans(nang_prm+max_extrabnd)
+        logical                                         :: used(nang_prm+max_extrabnd)
+        integer                                         :: itrans(nang_prm+max_extrabnd)
 
 !.......................................................................
 
@@ -1497,8 +1497,8 @@ end subroutine make_solute_bonds
 
 subroutine makebonds
         !locals
-        integer                                         ::      nbonds_solvent, nbonds_extra
-        integer                                         ::      i
+        integer                                         :: nbonds_solvent, nbonds_extra
+        integer                                         :: i
 
         !clear bonds
         nbonds = 0
@@ -1525,8 +1525,8 @@ end subroutine makebonds
 
 integer function makeextrabonds()
         !locals
-        integer                                         ::      ix, ib,iaci, iacj
-        character(len=KEYLENGTH)        ::      taci, tacj
+        integer                                         :: ix, ib,iaci, iacj
+        character(len=KEYLENGTH)        :: taci, tacj
 
 ! --- Add extra bonds like S-S bridges
         
@@ -1559,10 +1559,10 @@ end function makeextrabonds
 
 subroutine set_bondcodes
         !locals
-        integer                                         ::      ib, iaci, iacj
-        logical                                         ::      used(nbnd_prm)
-        integer                                         ::      itrans(nbnd_prm)
-        character(len=keylength)        ::      taci, tacj
+        integer                                         :: ib, iaci, iacj
+        logical                                         :: used(nbnd_prm)
+        integer                                         :: itrans(nbnd_prm)
+        character(len=keylength)        :: taci, tacj
 
         do ib = 1, nbonds
                 iaci = iac(bnd(ib)%i)
@@ -1601,10 +1601,10 @@ end subroutine set_bondcodes
 
 integer function makesomebonds(startres, endres)
 !arguments
-        integer                                         ::      startres, endres
+        integer                                         :: startres, endres
 
 ! *** local variables
-        integer                                         ::      i, ib, ires, imol
+        integer                                         :: i, ib, ires, imol
 
         makesomebonds = 0
 
@@ -1731,9 +1731,9 @@ end subroutine makeexlist
 
 subroutine makehyds
 !local variables
-        integer                                         ::      i, nH_solute, nH_solvent, nH_required
-        real                                            ::      r
-        integer                                         ::      atom, residue
+        integer                                         :: i, nH_solute, nH_solvent, nH_required
+        real                                            :: r
+        integer                                         :: atom, residue
 
         nH_required = 0
         
@@ -1774,33 +1774,33 @@ end subroutine makehyds
 
 integer function genH(j, residue)
 !arguments
-        integer, intent(in)                     ::      j, residue
+        integer, intent(in)                     :: j, residue
 !locals
-        real(8)                                         ::      xj(3), xk(3)
-        integer                                         ::      ligand, H, kt, lt
-        real(8)                                         ::      old_xH(3), xH(3), V, Vtot, dV(3), dvLast(3), gamma, dVtot(3)
-        real(8)                                         ::      VtotLast
-        real(8)                                         ::      dx(3), dx_line, rms_dV
-        real(8),parameter                       ::      convergence_criterum = 0.1
-        real(8),parameter                       ::      dV_scale = 0.025
-        real(8),parameter                       ::      max_dx = 1. !max_dx is max distance of line search step in first CG iteration (�)
-        real(8)                                         ::      local_min = 30
-        real(8)                                         ::      tors_fk = 10.
-        integer, parameter                      ::      max_cg_iterations = 100, max_line_iterations = 35
-        integer                                         ::      cgiter, lineiter
-        real(8)                                         ::      bnd0
-        integer                                         ::      nHang, Hang_atom(max_conn)
-        integer                                         ::      Hang_code(max_conn)
-        integer                                         ::      rule
+        real(8)                                         :: xj(3), xk(3)
+        integer                                         :: ligand, H, kt, lt
+        real(8)                                         :: old_xH(3), xH(3), V, Vtot, dV(3), dvLast(3), gamma, dVtot(3)
+        real(8)                                         :: VtotLast
+        real(8)                                         :: dx(3), dx_line, rms_dV
+        real(8),parameter                       :: convergence_criterum = 0.1
+        real(8),parameter                       :: dV_scale = 0.025
+        real(8),parameter                       :: max_dx = 1. !max_dx is max distance of line search step in first CG iteration (�)
+        real(8)                                         :: local_min = 30
+        real(8)                                         :: tors_fk = 10.
+        integer, parameter                      :: max_cg_iterations = 100, max_line_iterations = 35
+        integer                                         :: cgiter, lineiter
+        real(8)                                         :: bnd0
+        integer                                         :: nHang, Hang_atom(max_conn)
+        integer                                         :: Hang_code(max_conn)
+        integer                                         :: rule
         type(LIB_ENTRY_TYPE), pointer:: lp
-        integer                                         ::      a, b, axis
-        real(8)                                         ::      bond_length, db
-        real(8)                                         ::      rjH(3), rjk(3), bjHinv, bjkinv
-        real(8)                                         ::      scp, angle, angle_deg, dVangle, da, f1
-        real(8)                                         ::      xkt(3), xlt(3), rjkt(3), rktlt(3)
-        real(8)                                         ::      rnj(3), rnk(3), bj, bk
-        real(8)                                         ::      phi, phi_deg, sgn, dVtors, arg, dH(3)
-        logical                                         ::      flipped
+        integer                                         :: a, b, axis
+        real(8)                                         :: bond_length, db
+        real(8)                                         :: rjH(3), rjk(3), bjHinv, bjkinv
+        real(8)                                         :: scp, angle, angle_deg, dVangle, da, f1
+        real(8)                                         :: xkt(3), xlt(3), rjkt(3), rktlt(3)
+        real(8)                                         :: rnj(3), rnk(3), bj, bk
+        real(8)                                         :: phi, phi_deg, sgn, dVtors, arg, dH(3)
+        logical                                         :: flipped
         integer                     :: setH
         integer, parameter          :: nsetH = 5   !number of times to flip, if local min, and retry
         
@@ -2028,7 +2028,7 @@ end function genh
 
 subroutine makeimps
 ! *** local variables
-        integer                                         ::      i
+        integer                                         :: i
 
 !.......................................................................
 
@@ -2101,12 +2101,12 @@ end subroutine imp_params
 
 integer function find_atom(ires, atom)
 !arguments
-        integer                                         ::      ires
-        character(len=5)                        ::      atom
+        integer                                         :: ires
+        character(len=5)                        :: atom
 !locals
-        integer                                         ::      my_res, iat, irc
-        character(len=4)                        ::      my_atom
-        integer                                         ::      mol1, mol2
+        integer                                         :: my_res, iat, irc
+        character(len=4)                        :: my_atom
+        integer                                         :: mol1, mol2
 
         if(atom(1:1) == '-') then 
                 my_res = ires - 1
@@ -2162,7 +2162,7 @@ end function find_atom
 subroutine makeimps_explicit
 !generate impropers using definitions in library file
 ! *** local variables
-        integer                                         ::      ires, irc, iimp, i
+        integer                                         :: ires, irc, iimp, i
 
         nimps = 0
         nimps_solute = 0
@@ -2349,7 +2349,7 @@ end subroutine set_default_mask
 
 subroutine makeconn
 !locals
-        integer                                         ::      i, ib
+        integer                                         :: i, ib
 
         nconn(:) = 0
 ! --- Make a list of connections to each atom
@@ -2374,8 +2374,8 @@ subroutine maketors
 ! *** local variables
         integer i, j, ic, jc, ib, it, iaci, iacj, iack, iacl
         integer iused(ntor_prm+max_extrabnd), itrans(ntor_prm+max_extrabnd)
-        type(TOR_CODES)                         ::      torcodes
-        integer                                         ::      icod
+        type(TOR_CODES)                         :: torcodes
+        integer                                         :: icod
 ! --- Make the torsion list
 
         ntors = 0
@@ -2482,10 +2482,10 @@ real FUNCTION randm(seed, seed_only)
         integer, intent(in), optional:: seed
         logical, intent(in), optional:: seed_only
 ! *** Local variables
-        integer, parameter                      ::      m = 100000000, m1 = 10000, mult = 31415821
-        integer, save                           ::      irand = 0
-        integer                                         ::      irandh, irandl, multh, multl
-        real                                            ::      r
+        integer, parameter                      :: m = 100000000, m1 = 10000, mult = 31415821
+        integer, save                           :: irand = 0
+        integer                                         :: irandh, irandl, multh, multl
+        real                                            :: r
 
         if(present(seed)) then
                 irand = mod(iabs(seed), m)
@@ -3022,9 +3022,9 @@ end subroutine readlib
 
 subroutine check_overload(resnam)
         ! arguments
-        character(len=80)                       ::      resnam
+        character(len=80)                       :: resnam
         !locals
-        integer                                         ::      i
+        integer                                         :: i
 
         do i = 1, nlibres
                 if(lib(i)%nam == resnam) then
@@ -3776,15 +3776,15 @@ logical function countpdb(pdb_fileno, atoms, residues, molecules)
 !count atoms, residues and molecules in a pdb file
 
 !arguments
-        integer                                         ::      pdb_fileno, atoms, residues, molecules
+        integer                                         :: pdb_fileno, atoms, residues, molecules
 
 !locals
-        integer                                         ::      resno, oldno
-        character(len=4)                        ::      resnam, atnam, oldresnam
-        character(len=80)                       ::      line
-        real                                            ::      xtmp(3)
-        integer                                         ::      atoms_in_res, atoms_in_file
-        integer                                         ::      rescode, oldrescode
+        integer                                         :: resno, oldno
+        character(len=4)                        :: resnam, atnam, oldresnam
+        character(len=80)                       :: line
+        real                                            :: xtmp(3)
+        integer                                         :: atoms_in_res, atoms_in_file
+        integer                                         :: rescode, oldrescode
         
 ! old 10        format(13x,a4,a4,i5,4x,3f8.3)
 10      format(12x,a5,a3,2x,i4,4x,3f8.3)
@@ -3887,13 +3887,13 @@ subroutine readpdb()
 ! *** local variables
         character(len=256)              :: pdb_file
         CHARACTER atnam_tmp * 4, resnam_tmp * 4
-        character(len=80)                       ::      line
+        character(len=80)                       :: line
         integer resnum_tmp, oldnum, irec, i, atom_id(max_atlib), j
         real xtmp(3)
         LOGICAL res_found, at_found
-        integer                                         ::      first_res_of_mol
-        logical                                         ::      last_line_was_gap
-        integer                                         ::      atoms, residues, molecules
+        integer                                         :: first_res_of_mol
+        logical                                         :: last_line_was_gap
+        integer                                         :: atoms, residues, molecules
 !.......................................................................
 
         write( *, * )
@@ -4132,12 +4132,12 @@ end subroutine readpdb
 
 subroutine readtop
         ! *** local variables
-        character(len=200)                       ::      filnam
-        character(len=200)                      ::      files_to_load
-        integer                                         ::       i, j, ires
-        logical                                         ::      loaded, res_found
-        integer                                         ::      fn_start, fn_end, totlen
-        character(len=4)            ::  resnam_tmp
+        character(len=200)                       :: filnam
+        character(len=200)                      :: files_to_load
+        integer                                         :: i, j, ires
+        logical                                         :: loaded, res_found
+        integer                                         :: fn_start, fn_end, totlen
+        character(len=4)            :: resnam_tmp
 
         CALL get_string_arg(filnam, '-----> Give name of(old) topology file: ')
         if(openit(10, filnam, 'old', 'formatted', 'read') /= 0) return
@@ -4208,10 +4208,10 @@ end subroutine readtop
 
 subroutine readx
 ! *** local variables
-        CHARACTER(len=80)                       ::      filnam
-        integer                                         ::      i
-        integer(4)                                      ::      nat3
-        integer                                         ::      u
+        CHARACTER(len=80)                       :: filnam
+        integer                                         :: i
+        integer(4)                                      :: nat3
+        integer                                         :: u
 
 
         CALL get_string_arg(filnam, '-----> Give name of Q-coordinate file: ')
@@ -4241,9 +4241,9 @@ end subroutine readx
 
 
 subroutine readnext
-        integer                                         ::      filestat, nat3
-        logical                                         ::      isopen
-        character(len=10)                       ::      buf
+        integer                                         :: filestat, nat3
+        logical                                         :: isopen
+        character(len=10)                       :: buf
 
         !trj_frame is the number of the record about to be read
         if(.not. trj_read(xtop)) then
@@ -4267,7 +4267,7 @@ end subroutine readnext
 
 subroutine readframe
 ! *** local variables
-        integer                                         ::      frame
+        integer                                         :: frame
 
         frame = get_int_arg('-----> Give frame number: ')
         
@@ -4282,7 +4282,7 @@ end subroutine readframe
 
 subroutine trajectory
 !locals
-        character(len=80)                       ::      reply
+        character(len=80)                       :: reply
 
         if(.not. topo_ok) then
                 !can't do this without a topology
@@ -4310,8 +4310,8 @@ end subroutine trajectory
 
 subroutine modify_mask
 !locals
-        character(len=80)                       ::      mask_def
-        integer                                         ::      atoms_added
+        character(len=80)                       :: mask_def
+        integer                                         :: atoms_added
 
         if(.not. topo_ok) then
                 write(*,900) 
@@ -4339,10 +4339,10 @@ end subroutine modify_mask
 subroutine set_cgp
 ! *** local variables
         integer ires, igp, i, ntot, ntot_solute, i3
-        integer                                         ::      switchatom, ia, ncgp_skipped = 0
-        real                                            ::      r2
-        real(8)                                         ::      cgp_cent(3)
-        integer                                         ::      nheavy
+        integer                                         :: switchatom, ia, ncgp_skipped = 0
+        real                                            :: r2
+        real(8)                                         :: cgp_cent(3)
+        integer                                         :: nheavy
 
         ntot = 0
         ntot_solute = 0
@@ -4373,7 +4373,7 @@ subroutine set_cgp
                                         +( xtop(i3+2) - xpcent(2) )**2 &
                                         +( xtop(i3+3) - xpcent(3) )**2
                         else
-                                !exclude by charge group centre
+                                !exclude by charge group center
           cgp_cent(:) = 0
                                   do i = 1, lib(res(ires)%irc)%natcgp(igp)
                                 ia = res(ires)%start - 1 + lib(res(ires)%irc)%atcgp(i, igp)
@@ -4466,8 +4466,8 @@ end subroutine set_crg
 
 subroutine set_iac
 ! *** local variables
-        integer                                         ::      ires, i, ntot, iaci
-        logical                                         ::      used(max_atyps)         
+        integer                                         :: ires, i, ntot, iaci
+        logical                                         :: used(max_atyps)         
 
         used(:) = .false.
         ntot = 0
@@ -4533,9 +4533,9 @@ subroutine set_solvent_type
         !set solvent type (SPC-like, TIP3P-like or general)
 
         !locals
-        integer                                         ::      irc_solvent
-        integer                                         ::      i, iac_H1, iac_H2
-        logical                                         ::      dummy
+        integer                                         :: irc_solvent
+        integer                                         :: i, iac_H1, iac_H2
+        logical                                         :: dummy
 
         solvent_type = SOLVENT_GENERAL
 
@@ -4573,14 +4573,14 @@ end subroutine set_solvent_type
 
 integer function get_atom_from_descriptor(aid)
         !arguments
-        character(*), intent(in)        ::      aid     !string=residue:atom
+        character(*), intent(in)        :: aid     !string=residue:atom
         
         !locals
-        integer                                         ::      separator_pos
-        character(len=20)                       ::      res_str
-        character(len=5)                        ::      atom_str
-        integer                                         ::      filestat
-        integer                                         ::      resnum, atnum
+        integer                                         :: separator_pos
+        character(len=20)                       :: res_str
+        character(len=5)                        :: atom_str
+        integer                                         :: filestat
+        integer                                         :: resnum, atnum
 
         get_atom_from_descriptor = 0
 
@@ -4610,7 +4610,7 @@ end subroutine define_boundary_condition
 logical function set_boundary_condition()
 
         !locals
-        character(len=80)               ::      kind_of_boundary
+        character(len=80)               :: kind_of_boundary
 
         !ask if to use simulation sphere or periodic box
         call get_string_arg(kind_of_boundary, &
@@ -4655,29 +4655,29 @@ end function set_boundary_condition
 !------------------------------------------------------------------------------!
 logical function set_simulation_sphere()
                 
-        !get centre coordinates
+        !get center coordinates
         !as residue:atom or x y z
         
         !locals
         character(len=80)           :: line
         integer                     :: filestat
-        integer                     :: centre_atom
+        integer                     :: center_atom
         real                        :: rwat_in, xwat_in
 
         set_simulation_sphere = .false.
 
-        call get_string_arg(line, '-----> Sphere centre (<x y z> or <residue:atom_name> or <"mass">): ')
+        call get_string_arg(line, '-----> Sphere center (<x y z> or <residue:atom_name> or <"mass">): ')
         if(scan(line, ':') > 0) then !got res:at
-                centre_atom=get_atom_from_descriptor(line)
-                if(centre_atom == 0) then
+                center_atom=get_atom_from_descriptor(line)
+                if(center_atom == 0) then
                         write(*,900) trim(line)
-900                     format('>>>>> ERROR: Could not find centre atom ',a)
+900                     format('>>>>> ERROR: Could not find center atom ',a)
                         return
                 end if
-                xpcent(:) = xtop(3*centre_atom-2:3*centre_atom)
+                xpcent(:) = xtop(3*center_atom-2:3*center_atom)
         elseif(scan(line, 'mass') > 0) then   !define center by center of mass 
-                if (.not. get_centre_by_mass(xpcent(:))) then
-                        write(*,*) ('>>>>> ERROR: Could not create centre ')
+                if (.not. get_center_by_mass(xpcent(:))) then
+                        write(*,*) ('>>>>> ERROR: Could not create center ')
                         return
                 end if
         else !got x
@@ -4685,9 +4685,9 @@ logical function set_simulation_sphere()
                 if(filestat > 0) then !invalid x coordinate
                         return
                 end if
-                xwat_in=get_real_arg('-----> Sphere centre y: ')
+                xwat_in=get_real_arg('-----> Sphere center y: ')
                 xpcent(2) = xwat_in
-                xwat_in=get_real_arg('-----> Sphere centre z: ')
+                xwat_in=get_real_arg('-----> Sphere center z: ')
                 xpcent(3) = xwat_in
         end if
 
@@ -4702,7 +4702,7 @@ logical function set_simulation_sphere()
     write(*,*)
     write(*,100) xpcent(:)
     write(*,110) rexcl_o
-100 format('Simulation sphere centre                =   ',3f8.3)
+100 format('Simulation sphere center                =   ',3f8.3)
 110 format('Simulation radius                       =   ',f8.3)
     set_simulation_sphere = .true.
 
@@ -4716,41 +4716,41 @@ end function set_simulation_sphere
 logical function set_solvent_box()
 
         !locals
-        integer                                 ::      i !loop index
-        character(len=80)               ::      line
-        integer                                 ::      centre_atom
-        integer                                 ::      filestat
-        real                                    ::      xwat_in, coord_in
+        integer                                 :: i !loop index
+        character(len=80)               :: line
+        integer                                 :: center_atom
+        integer                                 :: filestat
+        real                                    :: xwat_in, coord_in
         
         have_solvent_boundary = .false.
         set_solvent_box = .false.
 
 
-        !the centre of the PCB-box
-        call get_string_arg(line, '-----> Periodic box centre (<x y z> or <residue:atom_name> or <"mass">): ')
+        !the center of the PCB-box
+        call get_string_arg(line, '-----> Periodic box center (<x y z> or <residue:atom_name> or <"mass">): ')
         call upcase(line)
         if(scan(line, ':') > 0) then !got res:at
-                centre_atom=get_atom_from_descriptor(line)
-                if(centre_atom == 0) then
+                center_atom=get_atom_from_descriptor(line)
+                if(center_atom == 0) then
                         write(*,900) trim(line)
-900                     format('>>>>> ERROR: Could not find centre atom ',a)
+900                     format('>>>>> ERROR: Could not find center atom ',a)
                         return
                 end if
-                boxcentre(:) = xtop(3*centre_atom-2:3*centre_atom)
+                boxcenter(:) = xtop(3*center_atom-2:3*center_atom)
         elseif(line == 'MASS') then   !define center by center of mass 
-                if (.not. get_centre_by_mass(boxcentre(:))) then
-                        write(*,*) ('>>>>> ERROR: Could not create centre ')
+                if (.not. get_center_by_mass(boxcenter(:))) then
+                        write(*,*) ('>>>>> ERROR: Could not create center ')
                         return
                 end if
         else !got x
-                read(line, *, iostat=filestat) boxcentre(1)
+                read(line, *, iostat=filestat) boxcenter(1)
                 if(filestat > 0) then !invalid x coordinate
                         return
                 end if
-                xwat_in=get_real_arg('-----> Box centre y: ')
-                boxcentre(2) = xwat_in
-                xwat_in=get_real_arg('-----> Box centre z: ')
-                boxcentre(3) = xwat_in
+                xwat_in=get_real_arg('-----> Box center y: ')
+                boxcenter(2) = xwat_in
+                xwat_in=get_real_arg('-----> Box center z: ')
+                boxcenter(3) = xwat_in
         end if
 
 
@@ -4807,12 +4807,12 @@ end subroutine solvate
 !
 !------------------------------------------------------------------------------!
 subroutine solvate_box
-        character(len=80)                       ::      solvate_mode
+        character(len=80)                       :: solvate_mode
 
-        write(*,'(a)') 'Using predefined boxcentre and boxlengths.'
-        write(*,101) boxcentre
+        write(*,'(a)') 'Using predefined boxcenter and boxlengths.'
+        write(*,101) boxcenter
         write(*,102) boxlength
-101 format('Boxcentre (x,y,z)                :  ',3f8.3)                 
+101 format('Boxcenter (x,y,z)                :  ',3f8.3)                 
 102 format('Boxlengths (x,y,z)               :  ',3f8.3)
 
         !chose solvation mode
@@ -4845,12 +4845,12 @@ end subroutine solvate_box
 !------------------------------------------------------------------------------!
 subroutine solvate_box_grid
         !locals
-        real(8)              ::      xmin, xmax, ymin, ymax, zmin, zmax
-        real(8)              ::      xgrid, ygrid, zgrid
-        integer              ::      max_wat !max number of molecules
-        integer              ::      waters_in_box
-        real(8)              ::      radius2, solvent_grid
-        character(len=200)   ::      solvent
+        real(8)              :: xmin, xmax, ymin, ymax, zmin, zmax
+        real(8)              :: xgrid, ygrid, zgrid
+        integer              :: max_wat !max number of molecules
+        integer              :: waters_in_box
+        real(8)              :: radius2, solvent_grid
+        character(len=200)   :: solvent
 
         !set water residue name
         call get_string_arg(solvent, &
@@ -4882,12 +4882,12 @@ subroutine solvate_box_grid
         call check_alloc('water sphere coordinate array')
 
 
-        xmin = boxcentre(1) - boxlength(1)/2 + solvent_grid/2
-        xmax = boxcentre(1) + boxlength(1)/2 - solvent_grid/2
-        ymin = boxcentre(2) - boxlength(2)/2 + solvent_grid/2
-        ymax = boxcentre(2) + boxlength(2)/2 - solvent_grid/2
-        zmin = boxcentre(3) - boxlength(3)/2 + solvent_grid/2
-        zmax = boxcentre(3) + boxlength(3)/2 - solvent_grid/2
+        xmin = boxcenter(1) - boxlength(1)/2 + solvent_grid/2
+        xmax = boxcenter(1) + boxlength(1)/2 - solvent_grid/2
+        ymin = boxcenter(2) - boxlength(2)/2 + solvent_grid/2
+        ymax = boxcenter(2) + boxlength(2)/2 - solvent_grid/2
+        zmin = boxcenter(3) - boxlength(3)/2 + solvent_grid/2
+        zmax = boxcenter(3) + boxlength(3)/2 - solvent_grid/2
         
         write(*,100) boxlength(1), boxlength(2), boxlength(3), solvent_grid
 100     format('New boxlength                     = ',3f8.2,' A',/ &
@@ -5098,9 +5098,9 @@ subroutine solvate_box_file
   end if
 
 
-!Compute the centre coordinates for the waterbox
+!Compute the center coordinates for the waterbox
   xcm(:) = sum( sum(xw, dim=3), dim=2) / (nw*lib(irc_solvent)%nat)
-  wshift(:) = boxcentre(:) - xcm(:)
+  wshift(:) = boxcenter(:) - xcm(:)
 
 !Remove water molecules outside of periodic box
   nwat_keep = 0
@@ -5113,7 +5113,7 @@ subroutine solvate_box_file
                   !keep this molecule
                   nwat_keep = nwat_keep + 1
                   keep(i) = .true.
-                  !shift to periodic box centre
+                  !shift to periodic box center
                   do j = 1, lib(irc_solvent)%nat
                           xw(:, j, i) = xw(:, j, i) + wshift(:)
                   end do
@@ -5173,31 +5173,31 @@ end subroutine solvate_sphere
 !------------------------------------------------------------------------------!
 logical function set_solvent_sphere()        
         !locals
-        character(len=80)                       ::      line
-        integer                                         ::      filestat
-        integer                                         ::      centre_atom
-        real                                            ::      rwat_in, xwat_in
+        character(len=80)                       :: line
+        integer                                         :: filestat
+        integer                                         :: center_atom
+        real                                            :: rwat_in, xwat_in
 
         set_solvent_sphere = .false.
         have_solvent_boundary = .false.  
 
-        if (have_title) then !Print old centre if available
-                write(*,'(a,3f8.3)') 'Previous solvent centre:', xwcent(1), xwcent(2), xwcent(3)
+        if (have_title) then !Print old center if available
+                write(*,'(a,3f8.3)') 'Previous solvent center:', xwcent(1), xwcent(2), xwcent(3)
         end if
-        call get_string_arg(line, '-----> Sphere centre (<x y z> or <residue:atom_name> or <"mass"> or <"boundary">): ')
+        call get_string_arg(line, '-----> Sphere center (<x y z> or <residue:atom_name> or <"mass"> or <"boundary">): ')
         call upcase(line)
 
         if(scan(line, ':') > 0) then !got res:at
-                centre_atom=get_atom_from_descriptor(line)
-                if(centre_atom == 0) then
+                center_atom=get_atom_from_descriptor(line)
+                if(center_atom == 0) then
                         write(*,900) trim(line)
-900                     format('>>>>> ERROR: Could not find centre atom ',a)
+900                     format('>>>>> ERROR: Could not find center atom ',a)
                         return
                 end if
-                xwcent(:) = xtop(3*centre_atom-2:3*centre_atom)
+                xwcent(:) = xtop(3*center_atom-2:3*center_atom)
         elseif(line == 'MASS') then   !define center by center of mass 
-                if (.not. get_centre_by_mass(xwcent(:))) then
-                        write(*,*) ('>>>>> ERROR: Could not create centre ')
+                if (.not. get_center_by_mass(xwcent(:))) then
+                        write(*,*) ('>>>>> ERROR: Could not create center ')
                         return
                 end if
         elseif(line == 'BOUNDARY') then   !define center same as boundary center
@@ -5207,9 +5207,9 @@ logical function set_solvent_sphere()
                 if(filestat > 0) then !invalid x coordinate
                         return
                 end if
-                xwat_in=get_real_arg('-----> Sphere centre y: ')
+                xwat_in=get_real_arg('-----> Sphere center y: ')
                 xwcent(2) = xwat_in
-                xwat_in=get_real_arg('-----> Sphere centre z: ')
+                xwat_in=get_real_arg('-----> Sphere center z: ')
                 xwcent(3) = xwat_in
         end if
 
@@ -5226,7 +5226,7 @@ logical function set_solvent_sphere()
 
     write(*,*)
     write(*,100) xwcent(:)
-100 format('Solvation sphere centre                 =   ',3f8.3)
+100 format('Solvation sphere center                 =   ',3f8.3)
 
     set_solvent_sphere = .true.
     have_solvent_boundary = .true. 
@@ -5240,12 +5240,12 @@ end function set_solvent_sphere
 !------------------------------------------------------------------------------!
 subroutine solvate_sphere_grid
         !locals
-        real(8)                                         ::      xmin, xmax, ymin, ymax, zmin, zmax
-        real(8)                                         ::      xgrid, ygrid, zgrid
-        integer                                         ::      max_wat !max number of molecules
-        integer                                         ::      waters_in_sphere
-        real(8)                                         ::      radius2, solvent_grid
-        character(len=200)                      ::      solvent
+        real(8)                                         :: xmin, xmax, ymin, ymax, zmin, zmax
+        real(8)                                         :: xgrid, ygrid, zgrid
+        integer                                         :: max_wat !max number of molecules
+        integer                                         :: waters_in_sphere
+        real(8)                                         :: radius2, solvent_grid
+        character(len=200)                      :: solvent
 
         !set water residue name
         call get_string_arg(solvent, &
@@ -5323,27 +5323,27 @@ subroutine solvate_sphere_file(shift)
         logical, intent(in), optional:: shift
 
 ! local variables
-        integer                    ::      i,j,nw,nnw
-        integer                                         ::      nwat_allocate, nwat_keep
-        real(8)                                         ::      rmax2,dx2,boxl, newboxl
-        real(8), save                           ::      xcm(3),wshift(3)
-        integer                                         ::      fstat
-        logical                                         ::      is_box
-        character(len=6)                        ::      sphere
-        character(len=80)                       ::      line
-        real(8)                                         ::      volume
-        real                                            ::      r4dum
-        character(len=80)                       ::      xwat_file
-        real(8)                                         ::      xwshift(3,7)
-        integer                                         ::      box
-        character(len=3)                        ::      atomnames
-        integer                                         ::      filestat
-        character(len=10)                       ::      filepos
-        integer                                         ::      resno(3)
-        character(len=4)                        ::      resnam(3)
+        integer                    :: i,j,nw,nnw
+        integer                                         :: nwat_allocate, nwat_keep
+        real(8)                                         :: rmax2,dx2,boxl, newboxl
+        real(8), save                           :: xcm(3),wshift(3)
+        integer                                         :: fstat
+        logical                                         :: is_box
+        character(len=6)                        :: sphere
+        character(len=80)                       :: line
+        real(8)                                         :: volume
+        real                                            :: r4dum
+        character(len=80)                       :: xwat_file
+        real(8)                                         :: xwshift(3,7)
+        integer                                         :: box
+        character(len=3)                        :: atomnames
+        integer                                         :: filestat
+        character(len=10)                       :: filepos
+        integer                                         :: resno(3)
+        character(len=4)                        :: resnam(3)
 
-        real(8)                                         ::      xwtmp(3, max_atlib)
-        integer                                         ::      at_id(max_atlib)
+        real(8)                                         :: xwtmp(3, max_atlib)
+        integer                                         :: at_id(max_atlib)
 
         call get_string_arg(xwat_file, '-----> Solvent file name: ')
         open (unit=13, file=xwat_file, status='old', form='formatted', &
@@ -5527,11 +5527,11 @@ end subroutine solvate_sphere_file
 !------------------------------------------------------------------------------!
 subroutine solvate_restart
 !locals
-        integer(4)                                      ::      natom, nat3, waters_added
-        character(len=80)                       ::      xfile
-        integer                                         ::      u, fstat
-        real(8),allocatable                     ::      xtmp(:)
-        character(len=200)                      ::      solvent
+        integer(4)                                      :: natom, nat3, waters_added
+        character(len=80)                       :: xfile
+        integer                                         :: u, fstat
+        real(8),allocatable                     :: xtmp(:)
+        character(len=200)                      :: solvent
 
         u=freefile()
 
@@ -5590,17 +5590,17 @@ end subroutine solvate_restart
 !------------------------------------------------------------------------------!
 subroutine add_solvent_to_topology(waters_in_sphere, max_waters, make_hydrogens, pack)
 !arguments
-        integer                                         ::      waters_in_sphere
-        integer                                         ::      max_waters
-        logical                                         ::      make_hydrogens
-        real                                            ::      pack
+        integer                                         :: waters_in_sphere
+        integer                                         :: max_waters
+        logical                                         :: make_hydrogens
+        real                                            :: pack
 !locals
-        integer                                         ::      waters_added
-        real(8)                                         ::      rpack2
-        integer                                         ::      w_at, w_mol, p_atom
-        logical                                         ::      wheavy(max_atlib)
-        real(8)                                         ::      dx, dy, dz, r2
-        integer                                         ::      next_wat, next_atom
+        integer                                         :: waters_added
+        real(8)                                         :: rpack2
+        integer                                         :: w_at, w_mol, p_atom
+        logical                                         :: wheavy(max_atlib)
+        real(8)                                         :: dx, dy, dz, r2
+        integer                                         :: next_wat, next_atom
 
         if(use_PBC) then
                 write(*,111) waters_in_sphere
@@ -5725,12 +5725,12 @@ end subroutine add_solvent_to_topology
 subroutine grow_arrays_for_solvent(nmore, atoms_per_molecule)
 !make space for nmore more water molecules
 !arguments
-        integer, intent(in)                     ::      nmore, atoms_per_molecule
+        integer, intent(in)                     :: nmore, atoms_per_molecule
 !locals
-        real(8), allocatable            ::      r8temp(:)
-        logical, allocatable            ::      ltemp(:)
-        integer, allocatable            ::      itemp(:)
-        integer                                         ::      new_nat, nat3old
+        real(8), allocatable            :: r8temp(:)
+        logical, allocatable            :: ltemp(:)
+        integer, allocatable            :: itemp(:)
+        integer                                         :: new_nat, nat3old
         type(residue_type), allocatable :: restemp(:)
 
         if(nmore == 0) return
@@ -5866,10 +5866,10 @@ end function rwat_eff
 !------------------------------------------------------------------------------!
 type(TOR_CODES) function torcode(taci, tacj, tack, tacl)
 !arguments
-        character(KEYLENGTH)                    ::      taci, tacj, tack, tacl
+        character(KEYLENGTH)                    :: taci, tacj, tack, tacl
 ! *** local variables
         integer i
-        character(KEYLENGTH)                    ::      ti, tj, tk, tl
+        character(KEYLENGTH)                    :: ti, tj, tk, tl
 
         ti = wildcard_tac(taci)
         tj = wildcard_tac(tacj)
@@ -6045,7 +6045,7 @@ end subroutine tors_ene
 !------------------------------------------------------------------------------!
 logical function check_residues()
 !locals
-        integer                                         ::      i,j
+        integer                                         :: i,j
 
         !stop immediately if no library
         if(nlibres == 0 .and. nat_pro > 0) then
@@ -6389,8 +6389,8 @@ end subroutine listprefs
 !------------------------------------------------------------------------------!
 subroutine set
   !locals
-  character(len=PREF_LEN)         ::  name, value
-  logical                         ::  l
+  character(len=PREF_LEN)         :: name, value
+  logical                         :: l
 
   call get_string_arg(name, '-----> Enter name (or number): ')
   call get_string_arg(value, '-----> Enter value: ')
@@ -6444,18 +6444,18 @@ end subroutine make_shell2
 
 
 !------------------------------------------------------------------------------!
-!>  function: get_centre_by_mass
+!>  function: get_center_by_mass
 !
-!>  Returns true if centre of mass can be assigned
-!>  and returns centre of mass for a mask of atoms in the vector 'centre'
+!>  Returns true if center of mass can be assigned
+!>  and returns center of mass for a mask of atoms in the vector 'center'
 !------------------------------------------------------------------------------!
-logical function get_centre_by_mass(centre)
-  real(8), intent(out)             :: centre(3)
+logical function get_center_by_mass(center)
+  real(8), intent(out)             :: center(3)
   type(mask_type)                  :: mask
   integer                          :: ats, imaskat, iat
   real(8)                          :: totmass, mass
-  get_centre_by_mass = .false.
-  centre = 0
+  get_center_by_mass = .false.
+  center = 0
   totmass = 0
   call mask_initialize(mask)
   ats = maskmanip_make_pretop(mask)  
@@ -6466,13 +6466,13 @@ logical function get_centre_by_mass(centre)
       if(heavy(iat)) then !skip hydrogens
         mass=iaclib(iac(iat))%mass
         totmass=totmass+mass
-        centre = centre + mass*xtop(iat*3-2:iat*3)
+        center = center + mass*xtop(iat*3-2:iat*3)
       end if
     end if
   end do
-  centre = centre/totmass  
-  get_centre_by_mass = .true.
-end function get_centre_by_mass
+  center = center/totmass  
+  get_center_by_mass = .true.
+end function get_center_by_mass
 
 
 end module prep

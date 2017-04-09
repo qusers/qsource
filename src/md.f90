@@ -21,7 +21,6 @@ module md
   use trj
   use mpiglob
   use qatom
-!  use version
 
   implicit none
 
@@ -35,8 +34,8 @@ module md
   !-----------------------------------------------------------------------------
   !       Constants
   !-----------------------------------------------------------------------------
-  character*(*), parameter  :: MD_VERSION = '5.7'
-  character*(*), parameter  :: MD_DATE = '2015-02-22'
+  character*(*), parameter  :: md_version = '5.7'
+  character*(*), parameter  :: md_date = '2015-02-22'
   real, parameter           :: rho_wat = 0.0335  ! molecules / A**3
   real, parameter           :: Boltz = 0.001986
   real(8)                   :: pi, deg2rad !set in sub startup
@@ -66,7 +65,7 @@ module md
   !       Periodic box information
   !-----------------------------------------------------------------------------
   !******Petra Wennerstrom added variable 2001-10-10
-  logical                   :: box, rigid_box_centre
+  logical                   :: box, rigid_box_center
   logical                   :: put_solute_back_in_box, put_solvent_back_in_box
 
   !variables used for constant pressure algorithm
@@ -177,7 +176,7 @@ module md
      integer(AI)            :: i,j
      real(8)                :: fk
      integer(TINY)          :: ih
-     integer                :: to_centre !flag for restraining to geom. or mass centre
+     integer                :: to_center !flag for restraining to geom. or mass center
   end type RSTRSEQ_TYPE
 
   type RSTRPOS_TYPE
@@ -1925,7 +1924,7 @@ contains
     ! arrays:
     !  x,v,iqatom,ljcod,qconn,iwhich_cgp,lrf,excl,iac,crg,cgpatom,cgp,iaclib
     !  list14,listex,list14long,listexlong,iqseq,qiac,qcrg,qavdw,qbvdw,EQ(:)%lambda,
-    !  boxlength, inv_boxl, boxcentre, sc_lookup 
+    !  boxlength, inv_boxl, boxcenter, sc_lookup 
     !
 
     integer, parameter              :: vars = 40 !increment this var when adding data to broadcast in batch 1
@@ -2005,8 +2004,8 @@ contains
     !Periodic Boudary Condition
     call MPI_Bcast(use_PBC, 1, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
     if (ierr .ne. 0) call die('init_nodes/MPI_Bcast use_PBC')
-    call MPI_Bcast(boxcentre, 3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast boxcentre')
+    call MPI_Bcast(boxcenter, 3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
+    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast boxcenter')
     call MPI_Bcast(boxlength, 3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
     if (ierr .ne. 0) call die('init_nodes/MPI_Bcast boxlength')
     call MPI_Bcast(inv_boxl, 3, MPI_REAL8, 0, MPI_COMM_WORLD, ierr)
@@ -2017,8 +2016,8 @@ contains
     if (ierr .ne. 0) call die('init_nodes/MPI_Bcast constant_pressure')
     call MPI_Bcast(ivolume_cycle, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
     if (ierr .ne. 0) call die('init_nodes/MPI_Bcast ivolume_cycle')
-    call MPI_Bcast(rigid_box_centre, 1, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
-    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast rigid_box_centre')
+    call MPI_Bcast(rigid_box_center, 1, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
+    if (ierr .ne. 0) call die('init_nodes/MPI_Bcast rigid_box_center')
     call MPI_Bcast(put_solvent_back_in_box, 1, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
     if (ierr .ne. 0) call die('init_nodes/MPI_Bcast put_solvent_back_in_box')
     call MPI_Bcast(put_solute_back_in_box, 1, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
@@ -2587,11 +2586,11 @@ contains
     else
        box = .true.
        write(*,'(a)') 'Boundary: periodic box'
-       if( .not. prm_get_logical_by_key('rigid_box_centre', rigid_box_centre, .false. ) ) then
-          write(*,'(a)') '>>> Error: rigid_box_centre must be on or off'
+       if( .not. prm_get_logical_by_key('rigid_box_center', rigid_box_center, .false. ) ) then
+          write(*,'(a)') '>>> Error: rigid_box_center must be on or off'
           initialize = .false.
        end if
-       write(*,'(a,a3)') 'Rigid box centre ', onoff(rigid_box_centre)
+       write(*,'(a,a3)') 'Rigid box center ', onoff(rigid_box_center)
        if( .not. prm_get_logical_by_key('constant_pressure', constant_pressure, .false.) ) then
           write(*,'(a)') '>>> Error: constant_pressure must be on or off'
           initialize = .false.
@@ -2812,8 +2811,8 @@ contains
           rexcl_i = shell_default
           write(*,50) rexcl_i
        else
-          if(prm_get_line_by_key('centre', instring)) then
-             write(*,30) 'centre'
+          if(prm_get_line_by_key('center', instring)) then
+             write(*,30) 'center'
           end if
           ! --- rexcl_o, rexcl_i, fk_pshell
           if(prm_get_real8_by_key('radius', rjunk)) then
@@ -2860,8 +2859,8 @@ contains
           if(prm_get_real8_by_key('radius', rwat_in)) then
              write(*,'(a,f8.2)') 'Target solvent radius =',rwat_in
           end if
-          if(prm_get_line_by_key('centre', instring)) then
-             write(*,30) 'centre'
+          if(prm_get_line_by_key('center', instring)) then
+             write(*,30) 'center'
           end if
           if(prm_get_real8_by_key('pack', rjunk)) then
              write(*,30) 'pack'
@@ -3120,11 +3119,11 @@ contains
        allocate(rstseq(nrstr_seq), stat=alloc_status)
        call check_alloc('restraint list')
        write (*,110)
-110    format ('  atom_i  atom_j      fc  H-flag to_centre')
+110    format ('  atom_i  atom_j      fc  H-flag to_center')
        do i=1,nrstr_seq
           ! read rstseq(i)
           yes = prm_get_line(text)
-          rstseq(i)%to_centre = 0 
+          rstseq(i)%to_center = 0 
           read(text,*, end=111, err=111) rstseq(i)
 111       write(*,112) rstseq(i)
 112       format (2i8,f8.2,i8,i10)
@@ -3387,7 +3386,7 @@ end if
     ! --- protein center: xpcent(:)
     read (fu,*) 
     write (*,40)
-40  format ('Ignoring solute centre.')
+40  format ('Ignoring solute center.')
 
     ! --- rexcl_o, rexcl_i, fk_pshell
     read (fu,*) rjunk, rjunk, fk_pshell
@@ -3399,7 +3398,7 @@ end if
     ! --- water center: xwcent(:)
     read (fu,*) 
     write (*,50) 
-50  format ('Ignoring solvent centre.')
+50  format ('Ignoring solvent center.')
 
     ! set default values before reading
     ! done this way because the SGI compiler initializes values to be read to zero
@@ -3536,12 +3535,12 @@ end if
        allocate(rstseq(nrstr_seq), stat=alloc_status)
        call check_alloc('restraint list')
        write (*,110)
-110    format (1x,'  atom_i  atom_j      fc  H-flag to_centre')
+110    format (1x,'  atom_i  atom_j      fc  H-flag to_center')
     end if
     do i=1,nrstr_seq
        ! read rstseq(i)
        read (fu,'(a80)') text
-       rstseq(i)%to_centre = 0 
+       rstseq(i)%to_center = 0 
        read(text,*, end=111, err=111) rstseq(i)
 111    write(*,112) rstseq(i)
 112    format (2i8,f8.2,i8,i10)
@@ -12943,8 +12942,8 @@ subroutine p_restrain
  do ir = 1, nrstr_seq
     fk = rstseq(ir)%fk
 
-    if(rstseq(ir)%to_centre == 1) then     ! Put == 1, then equal to 2
-       ! restrain to geometrical centre
+    if(rstseq(ir)%to_center == 1) then     ! Put == 1, then equal to 2
+       ! restrain to geometrical center
 
        ! reset dr & atom counter
        dr(:) = 0.
@@ -12975,8 +12974,8 @@ subroutine p_restrain
           end do
        end if
 
-    else if(rstseq(ir)%to_centre == 2) then     ! Put == 1, then equal to 2
-       ! restrain to mass centre
+    else if(rstseq(ir)%to_center == 2) then     ! Put == 1, then equal to 2
+       ! restrain to mass center
        ! reset dr & variable to put masses
        dr(:) = 0.
        totmass = 0.
@@ -13656,10 +13655,10 @@ subroutine prep_coord
 
     if( use_PBC) then
        read(2,err=112,end=112) boxlength(:)
-       read(2,err=112,end=112) boxcentre(:)
+       read(2,err=112,end=112) boxcenter(:)
        write(*,*)
        write(*,'(a16,3f8.3)') 'Boxlength     =', boxlength(:)
-       write(*,'(a16,3f8.3)') 'Centre of box =', boxcentre(:)
+       write(*,'(a16,3f8.3)') 'Center of box =', boxcenter(:)
     end if
     !water polarization data will be read from restart file in wat_shells
  else
@@ -15432,13 +15431,13 @@ subroutine write_xfin
 
  if( use_PBC )then
     write(3) boxlength(:)
-    write(3) boxcentre(:)
+    write(3) boxcenter(:)
  end if
 end subroutine write_xfin
 
 !-----------------------------------------------------------------------
 !Put molecules back in box for nice visualisation.
-!Change boxcentre if rigid_box_centre is off.
+!Change boxcenter if rigid_box_center is off.
 !Update cgp_centers for LRF.
 !-----------------------------------------------------------------------
 subroutine put_back_in_box
@@ -15452,12 +15451,12 @@ subroutine put_back_in_box
  integer                         ::  k, ig
  integer                         ::  pbib_start, pbib_stop
 
- if( .not. rigid_box_centre ) then !if the box is allowed to float around, center on solute if present, otherwise center on solvent
+ if( .not. rigid_box_center ) then !if the box is allowed to float around, center on solute if present, otherwise center on solvent
     if( nat_solute > 0) then
        slutet = nat_solute
        !starten = ncgp_solute + 1
 
-    else !if no solute present, centre box around solvent
+    else !if no solute present, center box around solvent
        slutet = natom
        !starten = 1
     end if
@@ -15469,11 +15468,11 @@ subroutine put_back_in_box
        boxc(3) = boxc(3) + x( 3*i   )
     end do
     boxc(:) = boxc(:)/slutet
-    boxcentre(:) = boxc(:) !store new boxcentre
+    boxcenter(:) = boxc(:) !store new boxcenter
     ! starten = ncgp_solute + 1 !solute can not move around the corner
  else
     !use boxcenter given in topology, ie. 'moving' solute
-    boxc(:) = boxcentre(:)
+    boxc(:) = boxcenter(:)
     !starten = 1
  end if
 
@@ -15506,10 +15505,10 @@ subroutine put_back_in_box
           cm(2) = cm(2) + x(j*3-1)*mass(j)
           cm(3) = cm(3) + x(j*3  )*mass(j)
        end do
-       cm(:) = cm(:) * mol_mass(i) !centre of mass of molecule i
+       cm(:) = cm(:) * mol_mass(i) !center of mass of molecule i
 
        !x-direction
-       if( cm(1) .gt. x_max) then !position of centre of mass
+       if( cm(1) .gt. x_max) then !position of center of mass
 
           do j= istart_mol(i),istart_mol(i+1)-1 !move the molecule
              x(j*3-2) = x(j*3-2) - boxlength(1)
@@ -15523,7 +15522,7 @@ subroutine put_back_in_box
        end if
 
        ! y-direction
-       if( cm(2) .gt. y_max) then !position of centre of mass
+       if( cm(2) .gt. y_max) then !position of center of mass
           do j= istart_mol(i),istart_mol(i+1)-1 !move the molecule
              x(j*3-1) = x(j*3-1) - boxlength(2)
           end do
@@ -15536,7 +15535,7 @@ subroutine put_back_in_box
        end if
 
        !z-direction
-       if( cm(3) .gt. z_max) then !position of centre of mass
+       if( cm(3) .gt. z_max) then !position of center of mass
           do j= istart_mol(i),istart_mol(i+1)-1 !move the molecule
              x(j*3  ) = x(j*3  ) - boxlength(3)
           end do
@@ -15672,7 +15671,7 @@ subroutine MC_volume()
        call die('LRF cut-off radii too large')
     end if
 
-    !compute new coordinates after molecules and centre of mass
+    !compute new coordinates after molecules and center of mass
     do i=1,nmol-1 !looping over all molecules but the last one
        cm(:) =0.0
        do j = istart_mol(i),istart_mol(i+1)-1 !loop over all atoms in molecule i
@@ -15680,11 +15679,11 @@ subroutine MC_volume()
           cm(2) = cm(2) + x(j*3-1)*mass(j)
           cm(3) = cm(3) + x(j*3  )*mass(j)
        end do
-       cm(:) = cm(:) * mol_mass(i) !centre of mass of molecule i
+       cm(:) = cm(:) * mol_mass(i) !center of mass of molecule i
 
-       move_x = ( ( cm(1)-boxcentre(1) )*boxlength(1)/old_boxl(1) + boxcentre(1) ) - cm(1)
-       move_y = ( ( cm(2)-boxcentre(2) )*boxlength(2)/old_boxl(2) + boxcentre(2) ) - cm(2)
-       move_z = ( ( cm(3)-boxcentre(3) )*boxlength(3)/old_boxl(3) + boxcentre(3) ) - cm(3)
+       move_x = ( ( cm(1)-boxcenter(1) )*boxlength(1)/old_boxl(1) + boxcenter(1) ) - cm(1)
+       move_y = ( ( cm(2)-boxcenter(2) )*boxlength(2)/old_boxl(2) + boxcenter(2) ) - cm(2)
+       move_z = ( ( cm(3)-boxcenter(3) )*boxlength(3)/old_boxl(3) + boxcenter(3) ) - cm(3)
 
        do j= istart_mol(i),istart_mol(i+1)-1 !move the molecule
           x(j*3-2) = x(j*3-2) + move_x
@@ -15704,9 +15703,9 @@ subroutine MC_volume()
 
     cm(:) = cm(:) * mol_mass(nmol)
 
-    move_x = ( ( cm(1)-boxcentre(1) )*boxlength(1)/old_boxl(1) + boxcentre(1) ) - cm(1)
-    move_y = ( ( cm(2)-boxcentre(2) )*boxlength(2)/old_boxl(2) + boxcentre(2) ) - cm(2)
-    move_z = ( ( cm(3)-boxcentre(3) )*boxlength(3)/old_boxl(3) + boxcentre(3) ) - cm(3)
+    move_x = ( ( cm(1)-boxcenter(1) )*boxlength(1)/old_boxl(1) + boxcenter(1) ) - cm(1)
+    move_y = ( ( cm(2)-boxcenter(2) )*boxlength(2)/old_boxl(2) + boxcenter(2) ) - cm(2)
+    move_z = ( ( cm(3)-boxcenter(3) )*boxlength(3)/old_boxl(3) + boxcenter(3) ) - cm(3)
 
     do j=istart_mol(nmol) , natom
        x(j*3-2) = x(j*3-2) + move_x

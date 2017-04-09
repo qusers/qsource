@@ -489,7 +489,7 @@ subroutine RotationAndTranslation(t,i)
  real(8)               :: xcm(3)        
  type(trajectory)      :: t
  
-        !calc. mass centre of xin
+        !calc. mass center of xin
         xcm(:) = 0.
         totmass = 0
         do at = 1, nat_pro
@@ -577,7 +577,7 @@ subroutine fit_make_reference(i)
     real(8)                     ::  totmass
 
         if(i < 1 .or. i > Nmasks) return
-        !calc centre vector of mass
+        !calc center vector of mass
          coords(i)%xrcm(:) = 0.
 
         totmass = 0.0

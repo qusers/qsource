@@ -111,7 +111,7 @@ module topo
   integer, public :: ligand_offset ! topology index offset for ligand. xtop(1:ligand_offset) = protein
 
   !sphere information
-  !!sim. sphere & water sphere centres
+  !!sim. sphere & water sphere centers
   real(8)                                         ::      xpcent(3), xwcent(3) 
   real(8)                                         ::      rwat !solvation radius
   real(8)                                         ::      rexcl_o,rexcl_i
@@ -121,7 +121,7 @@ module topo
 
   !box information
   real(8)                                         ::      boxlength(3) !length of the boxedges
-  real(8)                                         ::      boxcentre(3) !center coordinates of the box
+  real(8)                                         ::      boxcenter(3) !center coordinates of the box
   real(8)                                         ::      inv_boxl(3)  !inverse of the boxedges
 
   !flag indication if simulation sphere (.false.) or periodic box (.true.)is used. 
@@ -995,8 +995,8 @@ logical function topo_read(u, require_version, extrabonds)
        write(*,'(a)')'Boundary: periodic box'
        read(unit=u, fmt=*, err=1000) boxlength(:)
        write(*,'(a,3f10.3)') 'Box size                = ', boxlength(:)
-       read(unit=u, fmt=*, err=1000) boxcentre(:)
-       write(*,'(a,3f10.3)') 'Box centre              = ', boxcentre(:)
+       read(unit=u, fmt=*, err=1000) boxcenter(:)
+       write(*,'(a,3f10.3)') 'Box center              = ', boxcenter(:)
        excl(:) = .false.
        shell(:) = .false.
 
@@ -1017,9 +1017,9 @@ logical function topo_read(u, require_version, extrabonds)
           write(*, '(a,f10.3)') 'Eff. solvent radius     = ', rwat
        end if
        read(unit=u, fmt=*, err=1000) xpcent(:)
-       write(*, '(a,3f10.3)') 'Solute centre           = ', xpcent(:)
+       write(*, '(a,3f10.3)') 'Solute center           = ', xpcent(:)
        read(unit=u, fmt=*, err=1000) xwcent(:)
-       write(*, '(a,3f10.3)') 'Solvent centre          = ', xwcent(:)
+       write(*, '(a,3f10.3)') 'Solvent center          = ', xwcent(:)
 
        excl(:) = .false.
        shell(:) = .false.
@@ -1324,13 +1324,13 @@ logical function topo_read(u, require_version, extrabonds)
        write(u,'(a8,a)') 'PBC', ' = kind of boundary'
        !PBC-parameters
        write(u,'(3f8.3, a)') boxlength(:), ' = Size of box, x y z'
-       write(u,'(3f8.3, a)') boxcentre(:), ' = Centre coordinate of box'
+       write(u,'(3f8.3, a)') boxcenter(:), ' = Center coordinate of box'
     else !use simulation sphere
-       !radii & centres
+       !radii & centers
        write(u, '(2f8.3,a)') rexcl_o, rwat, &
             ' = Exclusion, solvent radii'
-       write(u, '(3f8.3,a)') xpcent(:), ' = Solute centre'
-       write(u, '(3f8.3,a)') xwcent(:), ' = Solvent centre'
+       write(u, '(3f8.3,a)') xpcent(:), ' = Solute center'
+       write(u, '(3f8.3,a)') xwcent(:), ' = Solvent center'
        !exluded atoms
        write(*, 10, advance='no') 'excluded atom list'
        write(u, '(2i8,a)') nexats, nexwat, &

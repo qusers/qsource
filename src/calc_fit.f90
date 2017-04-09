@@ -87,7 +87,7 @@ subroutine fit_calc(i)
 
     if(i < 1 .or. i > Nmasks) return
         
-        !calc. mass centre of xin
+        !calc. mass center of xin
         xcm(:) = 0.
         totmass = 0.0
         do at = 1, nat_pro
@@ -134,7 +134,7 @@ subroutine fit_make_ref(i)
     real(8)                     :: totmass
 
         if(i < 1 .or. i > Nmasks) return
-        !calc centre vector
+        !calc center vector
         coords(i)%xrcm(:) = 0.
         totmass = 0.0
         do at = 1, nat_pro

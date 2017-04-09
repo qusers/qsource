@@ -162,8 +162,8 @@ The  makefile follows  closely the  \textbf{GNU} \textbf{make}  manual
 (\url{http://www.gnu.org/software/make/manual/make.html}).         Any
 modifications to the makefile should  make sure that user-space is not
 broken,  that  is,  \textbf{Q}  should  compile on  any  of  the  main
-operating  systems and  avoid as  much as  possible hardware  specific
-compiler options.\\
+operating systems  and avoid fully,  or as much as  possible, hardware
+specific compiler options.\\
 
 \subsection{Cluster Architectures}
 \label{clusterarchitectures}
@@ -196,7 +196,7 @@ compiler options.\\
 files into a format which the dynamics engine can understand. The main
 file  generated  by \textbf{qprep}  is  refered  to as  the  topology,
 generally  given the  \textit{.top} extension.  The following  command
-passes an input file to qprep.
+passes an input file to \textbf{qprep}.
 
 \lstset{language=sh, frame=single}
 %\begin{Verbatim}[numbers=left]
@@ -206,11 +206,18 @@ passes an input file to qprep.
 qprep < generate.inp >& generate.log &
 \end{Verbatim}
 
+Apart from topology creation \textbf{qprep} is also used to solvate a
+solute and generate an SCAS boundary.
+
+
+
 \subsection{qprep.f90}
 
 \textbf{qprep.f90} is the  main program which acts as  an interface to
 the main  code which resides  mainly in the  \textbf{prep.f90} module.
-It's composed of six subroutines.\\
+It's composed of six subroutines\\
+
+
 
 \textbf{Modules: }\\
 \textit{iso\_fortran\_env}\\
