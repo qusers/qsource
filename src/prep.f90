@@ -3,7 +3,7 @@
 !  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
 !  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
-!  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Karemi, Paul Bauer,     !
+!  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Kazemi, Paul Bauer,     !
 !  Miha Purg, Irek Szeler                                                      !
 !  latest update: March 29, 2017                                               !
 !------------------------------------------------------------------------------!
@@ -25,8 +25,8 @@ module prep
   implicit none
 
   !constants
-  character(*), private, parameter :: MODULE_VERSION = '5.7'
-  character(*), private, parameter :: MODULE_DATE = '2015-02-22'
+  character(*), private, parameter :: module_version = '5.7'
+  character(*), private, parameter :: module_date = '2015-02-22'
   integer,parameter,public :: CDK = selected_char_kind('DEFAULT')
 
   !library
@@ -308,7 +308,7 @@ subroutine addbond
   integer                   :: readstat
 
   call get_string_arg(reply, &
-          '-----> First atom (number or residue:atom_name): ')
+          '-----> First atom (residue_number:atom_name): ')
   if(scan(reply, ':') > 0) then !got res:at
           ia=get_atom_from_descriptor(reply)
           if(ia== 0) then
@@ -328,7 +328,7 @@ subroutine addbond
           return
   end if
   call get_string_arg(reply, &
-          '-----> Second atom (number or residue:atom_name): ')
+          '-----> Second atom (residue_number:atom_name): ')
   if(scan(reply, ':') > 0) then !got res:at
           ja=get_atom_from_descriptor(reply)
           if(ja== 0) then
@@ -485,49 +485,47 @@ end function anglecode
 !
 !------------------------------------------------------------------------------!
 subroutine bond_ene(emax, nlarge, av_ene)
-! *** local variables
-        integer i, j, ib, ic, istart, iend, i3, j3, nlarge
-        real rij(3), b, db, be, dv, emax, av_ene
+  ! *** local variables
+  integer i, j, ib, ic, istart, iend, i3, j3, nlarge
+  real rij(3), b, db, be, dv, emax, av_ene
 
-!.......................................................................
+  istart = 1
+  iend = nbonds
+  nlarge = 0
+  av_ene = 0
 
-        istart = 1
-        iend = nbonds
-        nlarge = 0
-        av_ene = 0
+  do ib = istart, iend
 
-        do ib = istart, iend
-
-        i = bnd(ib)%i
-        j = bnd(ib)%j
-        ic = bnd(ib)%cod
-        if(ic == 0) then !missing parameter
-                write(*, '(3i5,1x,a)') ib, i, j,  'MISSING PARAMETERS'
-                cycle 
-        end if
+    i = bnd(ib)%i
+    j = bnd(ib)%j
+    ic = bnd(ib)%cod
+    if(ic == 0) then !missing parameter
+      write(*, '(3i5,1x,a)') ib, i, j,  'MISSING PARAMETERS'
+      cycle
+    end if
         
-        i3 = i * 3 - 3
-        j3 = j * 3 - 3
-        rij(1) = xtop(j3 + 1) - xtop(i3 + 1)
-        rij(2) = xtop(j3 + 2) - xtop(i3 + 2)
-        rij(3) = xtop(j3 + 3) - xtop(i3 + 3)
-        b = sqrt(rij(1) **2 + rij(2) **2 + rij(3) **2)
-        db = b - bondlib(ic)%bnd0
-        be = 0.5 * bondlib(ic)%fk * db**2
-        av_ene = av_ene+be
+    i3 = i * 3 - 3
+    j3 = j * 3 - 3
+    rij(1) = xtop(j3 + 1) - xtop(i3 + 1)
+    rij(2) = xtop(j3 + 2) - xtop(i3 + 2)
+    rij(3) = xtop(j3 + 3) - xtop(i3 + 3)
+    b = sqrt(rij(1) **2 + rij(2) **2 + rij(3) **2)
+    db = b - bondlib(ic)%bnd0
+    be = 0.5 * bondlib(ic)%fk * db**2
+    av_ene = av_ene+be
 
-        if(be>emax) then
-                nlarge = nlarge+1
-                write( * , '(4i5,4f8.2)') ib, i, j, ic, bondlib(ic)%fk,&
-                        bondlib(ic)%bnd0, b, be
-        endif
+    if(be>emax) then
+      nlarge = nlarge+1
+      write( * , '(4i5,4f8.2)') ib, i, j, ic, bondlib(ic)%fk,&
+        bondlib(ic)%bnd0, b, be
+    endif
 
-        enddo
+  enddo
 
-        if(nbonds/=0) av_ene = av_ene / real(nbonds)
+  if(nbonds/=0) av_ene = av_ene / real(nbonds)
 
-        return
-!.......................................................................
+  return
+
 end subroutine bond_ene
 
 
@@ -4570,10 +4568,13 @@ subroutine set_solvent_type
 end subroutine set_solvent_type
 
 
-
+!------------------------------------------------------------------------------!
+!>  function: get_atom_from_descriptor
+!>
+!------------------------------------------------------------------------------!
 integer function get_atom_from_descriptor(aid)
         !arguments
-        character(*), intent(in)        :: aid     !string=residue:atom
+        character(*), intent(in)        :: aid     !string=residue_number:atom_name
         
         !locals
         integer                                         :: separator_pos
@@ -4656,7 +4657,7 @@ end function set_boundary_condition
 logical function set_simulation_sphere()
                 
         !get center coordinates
-        !as residue:atom or x y z
+        !as residue_number:atom_name or x y z
         
         !locals
         character(len=80)           :: line
@@ -4666,7 +4667,7 @@ logical function set_simulation_sphere()
 
         set_simulation_sphere = .false.
 
-        call get_string_arg(line, '-----> Sphere center (<x y z> or <residue:atom_name> or <"mass">): ')
+        call get_string_arg(line, '-----> Sphere center (<x y z> or <residue_number:atom_name> or <"mass">): ')
         if(scan(line, ':') > 0) then !got res:at
                 center_atom=get_atom_from_descriptor(line)
                 if(center_atom == 0) then
@@ -4727,7 +4728,7 @@ logical function set_solvent_box()
 
 
         !the center of the PCB-box
-        call get_string_arg(line, '-----> Periodic box center (<x y z> or <residue:atom_name> or <"mass">): ')
+        call get_string_arg(line, '-----> Periodic box center (<x y z> or <residue_number:atom_name> or <"mass">): ')
         call upcase(line)
         if(scan(line, ':') > 0) then !got res:at
                 center_atom=get_atom_from_descriptor(line)
@@ -5184,7 +5185,7 @@ logical function set_solvent_sphere()
         if (have_title) then !Print old center if available
                 write(*,'(a,3f8.3)') 'Previous solvent center:', xwcent(1), xwcent(2), xwcent(3)
         end if
-        call get_string_arg(line, '-----> Sphere center (<x y z> or <residue:atom_name> or <"mass"> or <"boundary">): ')
+        call get_string_arg(line, '-----> Sphere center (<x y z> or <residue_number:atom_name> or <"mass"> or <"boundary">): ')
         call upcase(line)
 
         if(scan(line, ':') > 0) then !got res:at
@@ -5319,204 +5320,204 @@ end subroutine solvate_sphere_grid
 !
 !------------------------------------------------------------------------------!
 subroutine solvate_sphere_file(shift)
-! parameters
-        logical, intent(in), optional:: shift
+  ! parameters
+  logical, intent(in), optional:: shift
 
-! local variables
-        integer                    :: i,j,nw,nnw
-        integer                                         :: nwat_allocate, nwat_keep
-        real(8)                                         :: rmax2,dx2,boxl, newboxl
-        real(8), save                           :: xcm(3),wshift(3)
-        integer                                         :: fstat
-        logical                                         :: is_box
-        character(len=6)                        :: sphere
-        character(len=80)                       :: line
-        real(8)                                         :: volume
-        real                                            :: r4dum
-        character(len=80)                       :: xwat_file
-        real(8)                                         :: xwshift(3,7)
-        integer                                         :: box
-        character(len=3)                        :: atomnames
-        integer                                         :: filestat
-        character(len=10)                       :: filepos
-        integer                                         :: resno(3)
-        character(len=4)                        :: resnam(3)
+  ! local variables
+  integer                                 :: i,j,nw,nnw
+  integer                                 :: nwat_allocate, nwat_keep
+  real(8)                                 :: rmax2,dx2,boxl, newboxl
+  real(8), save                           :: xcm(3),wshift(3)
+  integer                                 :: fstat
+  logical                                 :: is_box
+  character(len=6)                        :: sphere
+  character(len=80)                       :: line
+  real(8)                                 :: volume
+  real                                    :: r4dum
+  character(len=80)                       :: xwat_file
+  real(8)                                 :: xwshift(3,7)
+  integer                                 :: box
+  character(len=3)                        :: atomnames
+  integer                                 :: filestat
+  character(len=10)                       :: filepos
+  integer                                 :: resno(3)
+  character(len=4)                        :: resnam(3)
 
-        real(8)                                         :: xwtmp(3, max_atlib)
-        integer                                         :: at_id(max_atlib)
+  real(8)                                 :: xwtmp(3, max_atlib)
+  integer                                 :: at_id(max_atlib)
 
-        call get_string_arg(xwat_file, '-----> Solvent file name: ')
-        open (unit=13, file=xwat_file, status='old', form='formatted', &
-                action='read', iostat=fstat)
-        if(fstat /= 0) then
-                write(*,'(a)') '>>>>> ERROR: Could not open water coordinate file.'
-                call parse_reset
-                return
-        end if
+  call get_string_arg(xwat_file, '-----> Solvent file name: ')
+  open (unit=13, file=xwat_file, status='old', form='formatted', &
+    action='read', iostat=fstat)
+  if(fstat /= 0) then
+    write(*,'(a)') '>>>>> ERROR: Could not open water coordinate file.'
+    call parse_reset
+    return
+  end if
 
-2       format('Boxlength of solvent file               = ',f10.3)
-3       format('Radius of sphere in solvent file        = ',f10.3)
+2 format('Boxlength of solvent file               = ',f10.3)
+3 format('Radius of sphere in solvent file        = ',f10.3)
 
   ! --> water coordinate file for initial generation (13)
 
-        read (13,'(a80)') line
-        read(line,*, iostat=fstat) boxl
-        if(fstat /=0 ) then
-                write(*,'(a)') 'ERROR >>>>>: Size not specified in water file.'
-                close(13)
-                call parse_reset
-                return
-        end if
-        read(line, *, iostat=fstat) boxl, sphere
-        call upcase(sphere)
-        if(sphere == 'SPHERE') then
-                volume = boxl**3*4*pi/3.
-                is_box = .false.
-                write(*,3) boxl
-        else
-                volume = boxl**3
-                is_box = .true. 
-                write(*,2) boxl
-        end if
+  read (13,'(a80)') line
+  read(line,*, iostat=fstat) boxl
+  if(fstat /=0 ) then
+    write(*,'(a)') 'ERROR >>>>>: Size not specified in water file.'
+    close(13)
+    call parse_reset
+    return
+  end if
+  read(line, *, iostat=fstat) boxl, sphere
+  call upcase(sphere)
+  if(sphere == 'SPHERE') then
+    volume = boxl**3*4*pi/3.
+    is_box = .false.
+    write(*,3) boxl
+  else
+    volume = boxl**3
+    is_box = .true.
+    write(*,2) boxl
+  end if
 
-        !determine residue name to use for solvent molecules
-        read(13,1) atomnames(1:1), solvent_name
-        backspace(13)
-        if(.not. set_irc_solvent()) then
-                goto 999
-        else if(lib(irc_solvent)%nat /= 3) then
-                write(*,900) 
-900             format('>>>>> ERROR: Solvate only works for 3-atom solvents (in this version).')
-                goto 999
-        else if(lib(irc_solvent)%density <= 0.) then
-                write(*,910) lib(irc_solvent)%nam
-910             format('>>>>> ERROR: Density not set in library entry ',a)
-                goto 999
-        end if
+  !determine residue name to use for solvent molecules
+  read(13,1) atomnames(1:1), solvent_name
+  backspace(13)
+  if(.not. set_irc_solvent()) then
+    goto 999
+  else if(lib(irc_solvent)%nat /= 3) then
+    write(*,900)
+900 format('>>>>> ERROR: Solvate only works for 3-atom solvents (in this version).')
+    goto 999
+  else if(lib(irc_solvent)%density <= 0.) then
+    write(*,910) lib(irc_solvent)%nam
+910 format('>>>>> ERROR: Density not set in library entry ',a)
+    goto 999
+  end if
 
   ! estimate amount of memory to allocate for temporary water coordinates
-        if((is_box .and. abs(rwat) <= boxl/2.)) then
-                !don't need to replicate
-                !5% safety margin       
-                nwat_allocate = int(lib(irc_solvent)%density*1.05*volume)
-        elseif(is_box) then
-                newboxl = boxl*2**(int(log(abs(rwat)*2/boxl)/log(2.)+0.9999))
-                nwat_allocate = int(lib(irc_solvent)%density*1.05*newboxl**3)
-        elseif(abs(rwat) > boxl) then !it's a sphere and it's too small
-                write(*,'(a)') '>>>>> ERROR: Water sphere in the file is too small.'
-                call parse_reset
-                close(13)
-                return
-        else !its a sufficiently big sphere
-                nwat_allocate = int(lib(irc_solvent)%density*1.05*volume)
-        endif
-        allocate(xw(3,lib(irc_solvent)%nat,nwat_allocate), keep(nwat_allocate), &
-       stat=alloc_status)
-        call check_alloc('temporary solvent coord. arrays')
+  if((is_box .and. abs(rwat) <= boxl/2.)) then
+    !don't need to replicate
+    !5% safety margin
+    nwat_allocate = int(lib(irc_solvent)%density*1.05*volume)
+  elseif(is_box) then
+    newboxl = boxl*2**(int(log(abs(rwat)*2/boxl)/log(2.)+0.9999))
+    nwat_allocate = int(lib(irc_solvent)%density*1.05*newboxl**3)
+  elseif(abs(rwat) > boxl) then !it's a sphere and it's too small
+    write(*,'(a)') '>>>>> ERROR: Water sphere in the file is too small.'
+    call parse_reset
+    close(13)
+    return
+  else !its a sufficiently big sphere
+    nwat_allocate = int(lib(irc_solvent)%density*1.05*volume)
+  endif
+  allocate(xw(3,lib(irc_solvent)%nat,nwat_allocate), keep(nwat_allocate), &
+    stat=alloc_status)
+  call check_alloc('temporary solvent coord. arrays')
 
-        rmax2 = rwat**2
-        nw = 0
-1       format(13x,a1,3x,a4,i5,4x,3f8.3)
-        do i=1,nwat_allocate-1
-                read (13,1,iostat=filestat, end=10) &
-                        atomnames(1:1), resnam(1), resno(1), xw(:, 1,nw+1), &
-                        atomnames(2:2), resnam(2), resno(2), xw(:, 2,nw+1), &
-                        atomnames(3:3), resnam(3), resno(3), xw(:, 3,nw+1)
-                if(filestat > 0) then
-                        write(*,8) nw
-                        goto 999
-                elseif(any(resnam(:) /= solvent_name)) then
-                        write(*,9) solvent_name, nw
-                        goto 999
-                elseif(any(resno(:) /= resno(1))) then
-                        write(*,7) nw
-                        goto 999
-                else
-                        nw = nw+1
-                end if
-        end do
-7       format('>>>>> ERROR: Inconsistent residue numbering at molecule',i6)
-8       format('>>>>> ERROR: Read failure at molecule',i6)
-9       format('>>>>> ERROR: Residue name other than ',a4,&
-                   ' found at molecule ',i6)
-10      write (*,20) nw
-20      format ('No. of molecules in solvent file           = ',i10)
+  rmax2 = rwat**2
+  nw = 0
+1 format(13x,a1,3x,a4,i5,4x,3f8.3)
+  do i=1,nwat_allocate-1
+    read (13,1,iostat=filestat, end=10) &
+      atomnames(1:1), resnam(1), resno(1), xw(:, 1,nw+1), &
+      atomnames(2:2), resnam(2), resno(2), xw(:, 2,nw+1), &
+      atomnames(3:3), resnam(3), resno(3), xw(:, 3,nw+1)
+    if(filestat > 0) then
+      write(*,8) nw
+      goto 999
+    elseif(any(resnam(:) /= solvent_name)) then
+      write(*,9) solvent_name, nw
+      goto 999
+    elseif(any(resno(:) /= resno(1))) then
+      write(*,7) nw
+      goto 999
+    else
+      nw = nw+1
+    end if
+  end do
+7 format('>>>>> ERROR: Inconsistent residue numbering at molecule',i6)
+8 format('>>>>> ERROR: Read failure at molecule',i6)
+9 format('>>>>> ERROR: Residue name other than ',a4,&
+    ' found at molecule ',i6)
+10 write (*,20) nw
+20 format ('No. of molecules in solvent file           = ',i10)
 
   ! --- Replicate box if necessary
 
   nnw = nw
   if (is_box .and.  abs(rwat) .gt. boxl/2. ) then
-     do while ( abs(rwat) .gt. boxl/2. )
-        write (*,'(a)') 'Replicating periodic box...'
+    do while ( abs(rwat) .gt. boxl/2. )
+      write (*,'(a)') 'Replicating periodic box...'
                 
-                xwshift(:,1) = (/boxl, 0._8, 0._8/)
-                xwshift(:,2) = (/0._8, boxl, 0._8/)
-                xwshift(:,3) = (/0._8, 0._8, boxl/)
-                xwshift(:,4) = (/boxl, boxl, 0._8/)
-                xwshift(:,5) = (/boxl, 0._8, boxl/)
-                xwshift(:,6) = (/0._8, boxl, boxl/)
-                xwshift(:,7) = (/boxl, boxl, boxl/)
+      xwshift(:,1) = (/boxl, 0._8, 0._8/)
+      xwshift(:,2) = (/0._8, boxl, 0._8/)
+      xwshift(:,3) = (/0._8, 0._8, boxl/)
+      xwshift(:,4) = (/boxl, boxl, 0._8/)
+      xwshift(:,5) = (/boxl, 0._8, boxl/)
+      xwshift(:,6) = (/0._8, boxl, boxl/)
+      xwshift(:,7) = (/boxl, boxl, boxl/)
 
-        do i=1,nw
-                        do box = 1,7
-                                nnw = nnw+1
-                                xw(:,1,nnw) = xw(:,1,i) + xwshift(:,box)
-                                xw(:,2,nnw) = xw(:,2,i) + xwshift(:,box)
-                                xw(:,3,nnw) = xw(:,3,i) + xwshift(:,box)
-                        end do
-                end do
-        boxl = 2.*boxl
-        nw = nnw
-        write (*,28) nw
-28      format ('Number of molecules after replication      = ',i10)
-     end do
-        end if
+      do i=1,nw
+        do box = 1,7
+          nnw = nnw+1
+          xw(:,1,nnw) = xw(:,1,i) + xwshift(:,box)
+          xw(:,2,nnw) = xw(:,2,i) + xwshift(:,box)
+          xw(:,3,nnw) = xw(:,3,i) + xwshift(:,box)
+        end do
+      end do
+      boxl = 2.*boxl
+      nw = nnw
+      write (*,28) nw
+28    format ('Number of molecules after replication      = ',i10)
+    end do
+  end if
 
-        !no water coord shift
-!       shift(:) = 0.
-!       cm(:) = xwcent(:)
+  !no water coord shift
+  !       shift(:) = 0.
+  !       cm(:) = xwcent(:)
 
-        ! shift water coords from water center of mass to sphere center
-        ! do not shift for "dedicated water file"
-        if(shift) then ! shift == TRUE => normal water file equilibrated without solute
-                !xcm = center of mass for solvent atoms
-                xcm(:) = sum(sum(xw, dim=3), dim=2)/(nw*lib(irc_solvent)%nat)
-                wshift(:) = xwcent(:) -xcm(:) + epsilon(r4dum)
+  ! shift water coords from water center of mass to sphere center
+  ! do not shift for "dedicated water file"
+  if(shift) then ! shift == TRUE => normal water file equilibrated without solute
+    !xcm = center of mass for solvent atoms
+    xcm(:) = sum(sum(xw, dim=3), dim=2)/(nw*lib(irc_solvent)%nat)
+    wshift(:) = xwcent(:) -xcm(:) + epsilon(r4dum)
 
-                nnw = 0
-                nwat_keep = 0
-                do i=1,nw
-                        dx2 = dot_product(xw(:,1,i)-xcm(:),xw(:,1,i)-xcm(:))
-                        if(dx2 <= rmax2) then
-                                nwat_keep = nwat_keep+1
-                                !shift to xwcent
-                                do j = 1, lib(irc_solvent)%nat
-                                        xw(:,j,i) = xw(:,j,i) + wshift(:)
-                                end do
-                                keep(i) = .true. ! water i is in sphere
-                        else
-                                keep(i) = .false.
-                        end if
-                end do
-        else ! shift == FALSE => water file equilibrated with solute
-            do i=1,nw
-                        dx2 = dot_product(xw(:,1,i)-xwcent(:),xw(:,1,i)-xwcent(:))
-                        if(dx2 <= rmax2) then
-                                nwat_keep = nwat_keep+1
-                                keep(i) = .true. ! water i is in sphere
-                        else
-                                keep(i) = .false.
-                        end if
-                end do
-        endif
+    nnw = 0
+    nwat_keep = 0
+    do i=1,nw
+      dx2 = dot_product(xw(:,1,i)-xcm(:),xw(:,1,i)-xcm(:))
+      if(dx2 <= rmax2) then
+        nwat_keep = nwat_keep+1
+        !shift to xwcent
+        do j = 1, lib(irc_solvent)%nat
+          xw(:,j,i) = xw(:,j,i) + wshift(:)
+        end do
+        keep(i) = .true. ! water i is in sphere
+      else
+        keep(i) = .false.
+      end if
+    end do
+  else ! shift == FALSE => water file equilibrated with solute
+    do i=1,nw
+      dx2 = dot_product(xw(:,1,i)-xwcent(:),xw(:,1,i)-xwcent(:))
+      if(dx2 <= rmax2) then
+        nwat_keep = nwat_keep+1
+        keep(i) = .true. ! water i is in sphere
+      else
+        keep(i) = .false.
+      end if
+    end do
+  endif
 
 
 
-        call add_solvent_to_topology(waters_in_sphere=nwat_keep, &
-                max_waters=nw, make_hydrogens=.false., pack=solvent_pack)
-        !branch here on error
-999     close(13)
-        deallocate(xw,keep)
+  call add_solvent_to_topology(waters_in_sphere=nwat_keep, &
+    max_waters=nw, make_hydrogens=.false., pack=solvent_pack)
+  !branch here on error
+999 close(13)
+  deallocate(xw,keep)
 
 end subroutine solvate_sphere_file
 

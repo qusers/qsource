@@ -3,7 +3,7 @@
 !  Code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      !
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
 !  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
-!  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Karemi, Paul Bauer,     !
+!  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Kazemi, Paul Bauer,     !
 !  Miha Purg, Irek Szeler                                                      !
 !  latest update: March 29, 2017                                               !
 !------------------------------------------------------------------------------!
