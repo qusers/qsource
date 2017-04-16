@@ -41,7 +41,10 @@ code.
 7.  **Error Handling**  
 8.  **Benchmarking**  
 9.  **Accuracy Testing**   
-  
+
+For fortran maybe slightly different rules will be needed. The fluidity project 
+is a good example to draw from.
+
   
 1. **Code formatting**   
 --------------------------------------------------------------------------------
