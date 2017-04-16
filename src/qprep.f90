@@ -284,8 +284,6 @@ contains
   !!  Startup  
   !----------------------------------------------------------------------------!
 subroutine startup
-!    call version_check(PROGRAM_NAME, PROGRAM_VERSION, PROGRAM_DATE, PROGRAM_SUFFIX)
-
   print '(a)',  '--------------------------------------------------------------------------------'
   print '(4a)', 'Welcome to ', program_name, ' version: ', program_version
   print '(a)',  ' '
