@@ -40,10 +40,10 @@ code.
 6.  **Allowed Fortran Features**  
 7.  **Error Handling**  
 8.  **Benchmarking**  
-9.  **Accuracy Testing**  
-
-
-1. **Code formatting**  
+9.  **Accuracy Testing**   
+  
+  
+1. **Code formatting**   
 --------------------------------------------------------------------------------
 
 * No tabs, spaces only.  
