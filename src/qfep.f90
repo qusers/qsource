@@ -18,7 +18,7 @@ implicit none
 	integer		:: mxpts=200,mxbin=10,mxstates=4
 	character(80)      ::filnam, line
 	integer           ::i,j,ifile,ipt,istate,ibin,nfiles,nstates,ERR, &
-	                      nskip,nbins,nmin,idum,noffd,nnoffd,offel
+	                      nskip,nbins,nmin,idum,noffd,nnoffd,offel,num_offd
 
 	type(OFFDIAG_SAVE),allocatable		:: offd(:)
 
@@ -188,6 +188,8 @@ end if
 		read (*,*) scale_Hij
 		write (*,8) scale_Hij
 8	format('# Scale factor for Hij            =',f6.2)
+! variable to store the actual offdiagonals used later
+                num_offd = noffd
 	else
 		call prompt ('--> Number of off-diagonal elements:')
 		read (*,*) nnoffd
@@ -198,6 +200,8 @@ end if
 			read (*,*) i, j, A(i,j), mu(i,j), eta(i,j), rxy0(i,j)
 			write(*,12) i, j, A(i,j), mu(i,j), eta(i,j), rxy0(i,j)
 		end do
+! variable to store the actual offdiagonals used later
+                num_offd = nnoffd
 9	format('# Number of off-diagonal elements =',i6)
 11	format('#   i   j   A(i,j)  mu(i,j) eta(i,j) rxy0(i,j)')
 12	format('#',2i4,1x,f9.2,1x,f9.2,1x,f9.2,1x,f9.2)
@@ -232,7 +236,9 @@ end if
 		if(openit(f,filnam,'old','unformatted','read') /= 0) then
 			stop 'Qfep5 terminated abnormally: Failed to open energy file.'
 		end if
-
+                ! reset check for old/new file, if people mix them
+                ! bad idea in general, but works with same number of arrays
+                is_old_file = .false.
 		!get file header for the first time
 		read(f, iostat=filestat) canary,fileheader%arrays,fileheader%totresid
 		if ((canary .ne. 137).and.(canary.ne.1337).and.(canary.ne.13337)) then
@@ -245,7 +251,7 @@ end if
 			fileheader%version=' 5.06'
 			if(ifile.eq.1) then
 			allocate(fileheader%gcnum(fileheader%arrays),fileheader%types(fileheader%arrays),&
-				fileheader%numres(fileheader%totresid))
+				fileheader%numres(fileheader%totresid),fileheader%resid(fileheader%totresid))
 			end if
 		else if ( fileheader%arrays .lt. 1) then
 			write(*,*) 'Number of different types is < 1. Abort !'
@@ -339,7 +345,7 @@ end if
 		write(*,'(a,a)') '# Energy files from Qdyn, version: ',fileheader%version
 		!read 1st record to get lambdas
 		if(is_old_file) rewind(f)
-		idum = get_ene(f, EQ(:), offd, nstates,nnoffd,fileheader%arrays)
+		idum = get_ene(f, EQ(:), offd, nstates,num_offd,fileheader%arrays)
 		if(idum /= 0) then
 			!we have a problem
 			write(*,'(a,a)') 'ERROR: Unexpected end-of-file in first record of ', &
@@ -390,7 +396,7 @@ end if
                                 fileheader%gcnum(1:fileheader%arrays),fileheader%version
 
 		end if
-		do while(get_ene(f, EQ(:), offd, nstates, nnoffd,fileheader%arrays) == 0) !keep reading till EOF
+		do while(get_ene(f, EQ(:), offd, nstates, num_offd,fileheader%arrays) == 0) !keep reading till EOF
 			ipt = ipt + 1
 			if (ipt .eq. (mxpts-1)) then
 !ops, we need larger arrays to keep track of the temporary points
