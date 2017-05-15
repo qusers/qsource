@@ -447,7 +447,7 @@ end if
 				do j=1,fileheader%arrays
 				EQ(i)%total(j)=EQ(i)%total(j)+alfa(i)
 				FEPtmp%v(j,i, ipt) = EQ(i)%total(j)
-				if (nnoffd .ne. 0) then
+				if (num_offd .ne. 0) then
 					FEPtmp%r(j,i,ipt) = offd(i)%rkl
 			        end if
 				end do
@@ -489,10 +489,10 @@ end if
 			do j=1,fileheader%arrays
 				if (nstates==2) then
 					FEPtmp%vg(j,ipt)=0.5_prec*(EQ(1)%total(j)+EQ(2)%total(j))-  &
-						0.5_prec*sqrt( (EQ(1)%total(j)-EQ(2)%total(j))**2 + 4.*Hij(1,2,j)**2 )
-					if(nnoffd > 0) then
-						FEPtmp%c1(j,ipt)=1./(1.+((FEPtmp%vg(j,ipt)-EQ(1)%total(j))/Hij(1,2,j))**2)
-						FEPtmp%c2(j,ipt)=1-FEPtmp%c1(j,ipt)
+						0.5_prec*sqrt( (EQ(1)%total(j)-EQ(2)%total(j))**2 + 4.0_prec*Hij(1,2,j)**2 )
+					if(num_offd > 0) then
+						FEPtmp%c1(j,ipt)=one/(one+((FEPtmp%vg(j,ipt)-EQ(1)%total(j))/Hij(1,2,j))**2)
+						FEPtmp%c2(j,ipt)=one-FEPtmp%c1(j,ipt)
 					end if
 				else
 					call tred2(Hij(:,:,j),nstates,nstates,d,e)
@@ -529,7 +529,7 @@ end if
 		FEP(ifile)%gap(:,:) = FEPtmp%gap(1:fileheader%arrays,1:FEP(ifile)%npts)
 		FEP(ifile)%c1(:,:) = FEPtmp%c1(1:fileheader%arrays,1:FEP(ifile)%npts)
 		FEP(ifile)%c2(:,:) = FEPtmp%c2(1:fileheader%arrays,1:FEP(ifile)%npts)
-		if(nnoffd > 0) then
+		if(num_offd > 0) then
 			allocate(FEP(ifile)%r(fileheader%arrays,nstates, FEP(ifile)%npts), STAT=ERR)
 			if(ERR /= 0) then
 				stop 'Qfep5 terminated abnormally: Out of memory when allocating arrays. 1'
@@ -736,7 +736,7 @@ end if
 	         		avc1(ibin)=avc1(ibin)+FEP(ifile)%c1(j,ipt)
                 		avc2(ibin)=avc2(ibin)+FEP(ifile)%c2(j,ipt)
 				!Only gives first r_xy distance
-				if(nnoffd > 0)	avr(ibin)=avr(ibin)+FEP(ifile)%r(j,1,ipt)
+				if(num_offd > 0) avr(ibin)=avr(ibin)+FEP(ifile)%r(j,1,ipt)
 				nbinpts(ibin)=nbinpts(ibin)+1
 			end do          !ipt
 			do ibin=1,nbins
@@ -822,7 +822,7 @@ write(*,28)
 	do ifile=1,nfiles
 		deallocate(FEP(ifile)%v, FEP(ifile)%vg, FEP(ifile)%gap, &
 		FEP(ifile)%c1, FEP(ifile)%c2,FEP(ifile)%lambda)
-		if(nnoffd > 0) deallocate(FEP(ifile)%r)
+		if(num_offd > 0) deallocate(FEP(ifile)%r)
 	end do
 	deallocate(FEP)
 	deallocate(FEPtmp%v,FEPtmp%vg,FEPtmp%gap,FEPtmp%c1,FEPtmp%c2,FEPtmp%lambda,FEPtmp%r)
