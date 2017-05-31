@@ -256,8 +256,8 @@ integer function torsion_add(desc)
 		write(desc, 19) i, j, k, l
 19		format('torsion, torsion energy between atoms',i5,',',i5,',',i5,',',i5)
         elseif(geom(Nmeas)%is_fep) then
-                write(*, 419) i, j, k, l
-419             format('torsion, qtorsion energy between atoms',i5,',',i5,',',i5,',',i5)
+                write(desc, 419) i, j, k, l
+419		format('torsion, qtorsion energy between atoms',i5,',',i5,',',i5,',',i5)
 	else
 		write(desc, 20) i, j, k, l
 20		format('torsion between atoms',i5,',',i5,',',i5,',',i5)
