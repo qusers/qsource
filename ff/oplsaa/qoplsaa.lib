@@ -7,9 +7,11 @@
 * ARG, ARN, HIP, HID, HIE, LYS, LYN, ASP, ASH, GLU, GLH
 *  +1    0   +1    0    0   +1    0   -1    0   -1    0
 *
-* VERSION V1.2
+* VERSION V1.3
 *
 * NOTES:
+* - V1.2 => V1.3 Numbers in weird THR charge group were 
+*     replaced with atom names
 * - V1.1 => V1.2 ASH/GLH are now set to actual OPLS-AA ODE
 *   Differences to old library, github bc3cbf9:
 *     ARN improper HH21 NH2 CZ HH22 was added
@@ -1222,7 +1224,7 @@
     [charge_groups]
         N    H    CA   HA   
         CB   HB   OG1  HG1
-        7    8    9    10 !CG2  HG21  HG22  HG22
+        CG2  HG21  HG22  HG23
         C    O
 *----------------------------------------------------------------------
 {TRP}                 !Tryptophane
