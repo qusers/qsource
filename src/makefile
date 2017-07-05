@@ -25,7 +25,7 @@ ifeq ($(COMP),ifort)
 	FC_OPT=		-O3 -ip -ipo -unroll -xHost -inline-forceinline \
 				-unroll-aggressive -finline-limit=1000 \
 				-no-inline-max-size -no-prec-div
-	FFLAGS=		-fp-model precise -fp-model except ${PREC}
+	FFLAGS=		-fp-model precise -fp-model except
 	FFLAGS_R8=	-r8
 	FC_DEBUG=	-unroll 
 	FPP_FLG=	-fpp -DINTEL
@@ -51,7 +51,7 @@ else ifeq ($(COMP),osx)
 	FC_OPT=         -O3
 	FFLAGS=         -fstack-protector -DG95=1 \
                         -ffree-line-length-none -fcray-pointer -fall-intrinsics\
-                        -std=legacy -Wall -Wtabs  ${PREC}
+                        -std=legacy -Wall -Wtabs
 	FFLAGS_R8=	-fdefault-real-8
 	FPP_FLG=        -cpp -DOSX
 
@@ -69,7 +69,7 @@ else ifeq ($(COMP),osx)
 else ifeq ($(COMP),pgi)
 	FC=		pgf90
 	FC_OPT=		-fastsse -Mipa=fast,inline -Minline=lrf_update,size:10000,levels:2 -O4 -Munroll -mcmodel=medium -Minfo=inline
-	FFLAGS=		${PREC}
+	FFLAGS=		
 	FFLAGS_R8=	-r8
 	FPP_FLG=	-Mpreprocess -DPGI
 
@@ -85,12 +85,13 @@ else ifeq ($(COMP),pgi)
 else ifeq ($(COMP),ibm)
 	FC=             xlf90
 	FC_OPT=         -qsmp=omp
-	FFLAGS=		-qrealsize=8 -DIBM ${PREC}
+	FFLAGS=		-qrealsize=8 -DIBM
 
 ################################################################################
-# GNU gcc-gfortran
+# GNU gcc-gfortran (default)
 ################################################################################
-else ifeq ($(COMP),gcc)
+else
+#else ifeq ($(COMP),gcc)
 	FC=		gfortran
 	FC_OPT=		-O3 -unroll
 	FPP_FLG=	-cpp -DGCC
@@ -99,28 +100,28 @@ else ifeq ($(COMP),gcc)
 	OMPI_FC=	${FC}
 	OMPI_FCFLAGS=	-DG95=1 \
                         -ffree-line-length-none -fcray-pointer -fall-intrinsics -std=legacy 
-	MPI=		${OMPI_FCFLAGS} ${FC_OPT} ${PREC}
+	MPI=		${OMPI_FCFLAGS} ${FC_OPT}
 	MPFLAG=		-fopenmp ${MPI}
 
-	FFLAGS=		--static ${OMPI_FCFLAGS} ${PREC}
-	FFLAGS_R8=	-fdefault-real-8
+	FFLAGS=		--static ${OMPI_FCFLAGS}
+	FFLAGS_R8=	--static -fdefault-real-8
 
-	DEBUG=          -fbacktrace -g ${DEBUG_FC}	-ffree-line-length-none -fcray-pointer -fall-intrinsics -std=legacy ${PREC}
-	DEBUGMPI=       -fbacktrace -g ${DEBUG_FC}      -ffree-line-length-none -fcray-pointer -fall-intrinsics -std=legacy ${PREC}
-	DEBUGMP=        -fopenmp -fbacktrace -g ${DEBUG_FC}      -ffree-line-length-none -fcray-pointer -fall-intrinsics -std=legacy ${PREC}
+	DEBUG=          -fbacktrace -g ${DEBUG_FC}	-ffree-line-length-none -fcray-pointer -fall-intrinsics -std=legacy
+	DEBUGMPI=       -fbacktrace -g ${DEBUG_FC}      -ffree-line-length-none -fcray-pointer -fall-intrinsics -std=legacy
+	DEBUGMP=        -fopenmp -fbacktrace -g ${DEBUG_FC}      -ffree-line-length-none -fcray-pointer -fall-intrinsics -std=legacy
 
 	PROF=		-pg ${DEBUG}
 
-else
-	FC=		gfortran
-	FC_OPT=		-O3 -unroll 
-	FPP_FLG=	-cpp -DUNKNOWN
-
-	MPI=		-DG95=1 \
-                        -ffree-line-length-none -fcray-pointer -fall-intrinsics -std=legacy
-	MPFLAG=		-fopenmp ${MPI}
-	FFLAGS=		--static ${MPI} ${PREC}
-	FFLAGS_R8=	-fdefault-real-8
+#else
+#	FC=		gfortran
+#	FC_OPT=		-O3 -unroll 
+#	FPP_FLG=	-cpp -DUNKNOWN
+#
+#	MPI=		-DG95=1 \
+#                        -ffree-line-length-none -fcray-pointer -fall-intrinsics -std=legacy
+#	MPFLAG=		-fopenmp ${MPI}
+#	FFLAGS=		--static ${MPI}
+#	FFLAGS_R8=	-fdefault-real-8
 endif
 
 ################################################################################
@@ -131,45 +132,54 @@ default: what
 ################################################################################
 # Targets
 ################################################################################
-all:    tools serial 
-	
+all:
+	@make FLAGS="${FFLAGS} ${FC_OPT}" \
+	incrbuild qdyn5 qfep5 qprep5 qdum5 qcalc5 move1 move2 moveqdyn clean
+	@make FLAGS="${MPI}" \
+	qdyn5p move1 move3 clean
+	@make FLAGS="${FFLAGS_R8}" PREC="-DDOUBLE" \
+	qdyn5 move1 moveqdyn_r8 clean
 
 tools:
-	@make FFLAGS="${FFLAGS} ${FC_OPT}" \
-	qfep5 qprep5 qdum5 qcalc5 move1 move2
+	@make FLAGS="${FFLAGS} ${FC_OPT}" \
+	incrbuild qfep5 qprep5 qdum5 qcalc5 move1 move2
 
 serial:	
-	@make FFLAGS="${FFLAGS} ${FFLAGS_R8} ${FC_OPT}" \
-	qdyn5 move1 moveqdyn
+	@make FLAGS="${FFLAGS} ${FC_OPT}" \
+	incrbuild qdyn5 move1 moveqdyn
+
+serial_r8:	
+	@make FLAGS="${FFLAGS_R8}" PREC="-DDOUBLE" \
+	incrbuild qdyn5 move1 moveqdyn_r8
 
 debug:
-	@make FFLAGS="${DEBUG}" \
+	@make FLAGS="${DEBUG}" \
 	qfep5 qprep5 qdyn5 qdum5 qcalc5 move1 move2
 
 prof:
-	@make FFLAGS="${PROF}" \
+	@make FLAGS="${PROF}" \
 	qfep5 qprep5 qdyn5 qdum5 qcalc5 move1 move2
 
 mpi:
-	@make FFLAGS="${MPI}" \
-	qdyn5p move1 move3
+	@make FLAGS="${MPI}" \
+	incrbuild qdyn5p move1 move3
 
 mpidebug:
-	@make FFLAGS="${DEBUGMPI}" \
+	@make FLAGS="${DEBUGMPI}" \
 	qdyn5p move1 move3
 hybrid:
-	@make FFLAGS="${MPFLAG}" \
-	qdyn5h move1 move4
+	@make FLAGS="${MPFLAG}" \
+	incrbuild qdyn5h move1 move4
 
 hybriddebug:
-	@make FFLAGS="${DEBUGMP}" \
+	@make FLAGS="${DEBUGMP}" \
 	qdyn5h move1 move4
 
 clean:
 	-rm -f *.o  *.mod *.M *.kmo *.il *.oo
 
 nuke:
-	-rm -rf *.o  *.mod *.M *.kmo *.il *.oo qfep5 qdyn5h qdyn5p qdyn5 qprep5 qcalc5 qdum5 ../bin ../obj
+	-rm -rf *.o  *.mod *.M *.kmo *.il *.oo qfep5 qdyn5h qdyn5p qdyn5 qprep5 qcalc5 qdum5 ../bin ../obj $(BUILD_NUMBER_FILE)
 
 qcalc5 qdyn5 qdum5 qdyn5p qdyn5h qprep5 qfep5: version.o misc.o mpiglob.o
 
@@ -186,160 +196,162 @@ qcalc5 qprep5: maskmanip.o
 qdyn5 qdum5: qdyn.o
 
 qprep5: q_prep.o prefs.o prep.o avetr.o nrgy.o
-	${FC} ${FFLAGS} ${FLIBS} $+ -o $@
+	${FC} ${FLAGS} ${FLIBS} $+ -o $@
 
 qfep5: qfep.o 
-	${FC} ${FFLAGS} ${FLIBS} $+ -o $@
+	${FC} ${FLAGS} ${FLIBS} $+ -o $@
 
 qcalc5: calc_base.o calc_chemscore.o calc_fit.o calc_geom.o calc_pmfscore.o \
 	calc_com_ke.o calc_com.o calc_rdf.o calc_rms.o calc_rmsf.o \
 	calc_entropy.o calc_nb.o calc_xscore.o eigen.o qcalc.o
-	${FC} ${FFLAGS} ${FLIBS} $+ -o $@
+	${FC} ${FLAGS} ${FLIBS} $+ -o $@
 
 qdyn5 : md.o
-	${FC} ${FFLAGS} ${FLIBS} $+ -o $@
+	${FC} ${FLAGS} ${FLIBS} $+ -o $@
 
 qdum5 : md_dum.o
-	${FC} ${FFLAGS} ${FLIBS} $+ -o $@
+	${FC} ${FLAGS} ${FLIBS} $+ -o $@
 
 qdyn5p : md_mpi.o qdyn_mpi.o
-	${MPIFC} ${MPIFLAGS} ${FFLAGS} ${FLIBS} $+ -o $@
+	${MPIFC} ${MPIFLAGS} ${FLAGS} ${FLIBS} $+ -o $@
 
 qdyn5h : md_mpi.o qdyn_mpi.o
-	${MPIFC} ${MPIFLAGS} ${FFLAGS} ${FLIBS} $+ -o $@
+	${MPIFC} ${MPIFLAGS} ${FLAGS} ${FLIBS} $+ -o $@
 
 ################################################################################
 # Object modules
 ################################################################################
 avetr.o: avetr.f90 prep.o
-	${FC} ${FFLAGS} -c $<
+	${FC} ${FLAGS} -c $<
 
 calc_base.o:calc_base.f90 topo.o prmfile.o qatom.o
-	${FC} ${FFLAGS} -c $<
+	${FC} ${FLAGS} -c $<
 
 calc_chemscore.o: calc_chemscore.f90 maskmanip.o trj.o prmfile.o index.o qatom.o
-	${FC} ${FFLAGS} -c $<
+	${FC} ${FLAGS} -c $<
 
 calc_entropy.o:calc_entropy.f90 calc_base.o maskmanip.o trj.o calc_fit.o
-	${FC} ${FFLAGS} -c $<
+	${FC} ${FLAGS} -c $<
 
 calc_fit.o:calc_fit.f90 calc_base.o maskmanip.o
-	${FC} ${FFLAGS} -c $<
+	${FC} ${FLAGS} -c $<
 
 calc_geom.o:calc_geom.f90 calc_base.o
-	${FC} ${FFLAGS} -c $<
+	${FC} ${FLAGS} -c $<
 
 calc_nb.o:calc_nb.f90 calc_base.o maskmanip.o parse.o qatom.o prmfile.o
-	${FC} ${FFLAGS} -c $<
+	${FC} ${FLAGS} -c $<
 
 calc_pmfscore.o: calc_pmfscore.f90 calc_base.o maskmanip.o trj.o topo.o prmfile.o index.o qatom.o misc.o
-	${FC} ${FFLAGS} -c $<
+	${FC} ${FLAGS} -c $<
 
 calc_xscore.o: calc_xscore.f90 calc_base.o maskmanip.o trj.o topo.o prmfile.o index.o qatom.o misc.o
-	${FC} ${FFLAGS} -c $<
+	${FC} ${FLAGS} -c $<
 
 calc_rdf.o:calc_rdf.f90 calc_base.o parse.o maskmanip.o
-	${FC} ${FFLAGS} -c $<
+	${FC} ${FLAGS} -c $<
 
 calc_rms.o:calc_rms.f90 calc_base.o maskmanip.o
-	${FC} ${FFLAGS} -c $<
+	${FC} ${FLAGS} -c $<
 
 calc_com_ke.o:calc_com_ke.f90 calc_base.o maskmanip.o
-	${FC} ${FFLAGS} -c $<
+	${FC} ${FLAGS} -c $<
 
 calc_com.o:calc_com.f90 calc_base.o maskmanip.o
-	${FC} ${FFLAGS} -c $<
+	${FC} ${FLAGS} -c $<
 
 calc_rmsf.o:calc_rmsf.f90 calc_base.o maskmanip.o
-	${FC} ${FFLAGS} -c $<
+	${FC} ${FLAGS} -c $<
 
 eigen.o:eigen.f90
-	${FC} ${FFLAGS} -c $<
+	${FC} ${FLAGS} -c $<
 
 exc.o:exc.f90 misc.o qatom.o maskmanip.o
-	${FC} ${FFLAGS} -c $<
+	${FC} ${FLAGS} -c $<
 
 index.o:index.f90
-	${FC} ${FFLAGS} -c $<
+	${FC} ${FLAGS} -c $<
 
 mask.o:	mask.f90 topo.o
-	${FC} ${FFLAGS} -c $<
+	${FC} ${FLAGS} -c $<
 
 maskmanip.o:maskmanip.f90 mask.o misc.o parse.o
-	${FC} ${FFLAGS} -c $<
+	${FC} ${FLAGS} -c $<
 
 #arm grid by including this flag: -DUSE_GRID
 md.o:	md.f90 mpiglob.o qatom.o sizes.o trj.o topo.o exc.o version.o
-	${FC} ${FFLAGS} ${FPP_FLG} -c md.f90
+	${FC} ${FLAGS} ${FPP_FLG} -c md.f90
 
 md_dum.o:md.f90 mpiglob.o qatom.o sizes.o topo.o exc.o version.o
-	${FC} ${FFLAGS} ${FPP_FLG} -DDUM -c md.f90 exc.o -o md_dum.o
+	${FC} ${FLAGS} ${FPP_FLG} -DDUM -c md.f90 exc.o -o md_dum.o
 
 md_mpi.o: md.f90 mpiglob.o qatom.o sizes.o topo.o trj.o exc.o version.o
-	${MPIFC} ${MPIFLAGS} ${FFLAGS} ${FPP_FLG} -DUSE_MPI \
+	${MPIFC} ${MPIFLAGS} ${FLAGS} ${FPP_FLG} -DUSE_MPI \
 	-c md.f90 -o md_mpi.o
 
 misc.o: misc.f90 sizes.o
-	${FC} ${FFLAGS} -c $<
+	${FC} ${FLAGS} -c $<
 
 mpiglob.o: mpiglob.f90 sizes.o nrgy.o
-	${FC} ${FFLAGS} ${FPP_FLG} -c $<
+	${FC} ${FLAGS} ${FPP_FLG} -c $<
 
 nrgy.o: nrgy.f90 sizes.o
-	${FC} ${FFLAGS} -c $<
+	${FC} ${FLAGS} -c $<
 
 parse.o: parse.f90 misc.o
-	${FC} ${FFLAGS} -c $<
+	${FC} ${FLAGS} -c $<
 
 prefs.o: prefs.f90
-	${FC} ${FFLAGS} -c $<
+	${FC} ${FLAGS} -c $<
 
 prep.o: prep.f90 maskmanip.o sizes.o parse.o prmfile.o trj.o index.o prefs.o
-	${FC} ${FFLAGS} -c $<
+	${FC} ${FLAGS} -c $<
 
 prmfile.o: prmfile.f90 misc.o mpiglob.o
-	${FC} ${FFLAGS} -c $<
+	${FC} ${FLAGS} -c $<
 
 q_prep.o: q_prep.f90 prep.o avetr.o version.o
-	${FC} ${FFLAGS} -c $<
+	${FC} ${FLAGS} -c $<
 
 qatom.o: qatom.f90 misc.o nrgy.o prmfile.o sizes.o index.o topo.o
-	${FC} ${FFLAGS} -c $<
+	${FC} ${FLAGS} -c $<
 
 qcalc.o: qcalc.f90 calc_chemscore.o calc_pmfscore.o calc_xscore.o trj.o calc_base.o calc_rms.o calc_fit.o calc_geom.o version.o
-	${FC} ${FFLAGS} ${FPP_FLG} -c qcalc.f90
+	${FC} ${FLAGS} ${FPP_FLG} -c qcalc.f90
 
 qdyn.o: qdyn.f90 md.o mpiglob.o version.o
-	${FC} ${FFLAGS} ${FPP_FLG} ${BUILD_NUMBER_LDFLAGS} -c qdyn.f90
+	${FC} ${FLAGS} ${FPP_FLG} ${BUILD_NUMBER_LDFLAGS} -c qdyn.f90
 
 qdyn_dum.o: qdyn.f90 md.o mpiglob.o version.o
-	${FC} ${FFLAGS} ${FPP_FLG}  ${BUILD_NUMBER_LDFLAGS} -DDUM -c qdyn.f90 -o qdyn_dum.o
+	${FC} ${FLAGS} ${FPP_FLG}  ${BUILD_NUMBER_LDFLAGS} -DDUM -c qdyn.f90 -o qdyn_dum.o
 
 qdyn_mpi.o: qdyn.f90 md_mpi.o mpiglob.o version.o
-	${MPIFC} ${MPIFLAGS} ${FFLAGS} ${FPP_FLG}  ${BUILD_NUMBER_LDFLAGS} -DUSE_MPI \
+	${MPIFC} ${MPIFLAGS} ${FLAGS} ${FPP_FLG}  ${BUILD_NUMBER_LDFLAGS} -DUSE_MPI \
         -c qdyn.f90 -o qdyn_mpi.o
 
 qfep.o: qfep.f90 nrgy.o parse.o version.o
-	${FC} ${FFLAGS} ${FPP_FLG} -c qfep.f90
+	${FC} ${FLAGS} ${FPP_FLG} -c qfep.f90
 
 sizes.o: sizes.f90
-	${FC} ${FFLAGS} ${FPP_FLG} -c $<
+	${FC} ${FLAGS} ${FPP_FLG} ${PREC} -c $<
 
 topo.o:  topo.f90 misc.o mpiglob.o sizes.o
-	${FC} ${FFLAGS} -c $<
+	${FC} ${FLAGS} -c $<
 
 trj.o:  trj.f90 mask.o misc.o
-	${FC} ${FFLAGS} -c $<
+	${FC} ${FLAGS} -c $<
 
 version.o: version.f90
-	${FC} ${FFLAGS} ${FPP_FLG} ${BUILD_NUMBER_LDFLAGS} -c $<
+	${FC} ${FLAGS} ${FPP_FLG} ${BUILD_NUMBER_LDFLAGS} -c $<
 
 moveqdyn:
+	mkdir -p ../bin ; mv qdyn5 ../bin/qdyn5
+
+moveqdyn_r8:
 	mkdir -p ../bin ; mv qdyn5 ../bin/qdyn5_r8
+
 move1:
 	mkdir -p ../obj ; mv *.o *.mod ../obj/
-	@if ! test -f $(BUILD_NUMBER_FILE); then echo 0 > $(BUILD_NUMBER_FILE); fi
-	@echo $$(($$(cat $(BUILD_NUMBER_FILE)) + 1)) > $(BUILD_NUMBER_FILE)
 
 move2:
 	mkdir -p ../bin ; mv qfep5 qprep5 qdum5 qcalc5 ../bin/
@@ -350,6 +362,9 @@ move3:
 move4:
 	mkdir -p ../bin ; mv qdyn5h ../bin/
 
+incrbuild:
+	@if ! test -f $(BUILD_NUMBER_FILE); then echo 0 > $(BUILD_NUMBER_FILE); fi
+	@echo $$(($$(cat $(BUILD_NUMBER_FILE)) + 1)) > $(BUILD_NUMBER_FILE)
 
 include buildnumber.mak
 
@@ -363,9 +378,11 @@ what:
 	@echo "Use: make [target] [COMP=compiler]"
 	@echo
 	@echo "[target] is one of:"
-	@echo "all              Everything, including non optimized and optimized qdyn5/qdyn5p"
-	@echo "tools            Non speed optimized versions of qdyn5, qdum5, qfep5, qcalc5 and qprep5"
-	@echo "debug            Tools with debug information (stacktraces)."
+	@echo "all              Everything, including non optimized and optimized qdyn5/qdyn5p."
+	@echo "serial           Compile speed-optimized qdyn5, without MPI."
+	@echo "serial_r8        Compile qdyn5 with -r8-flag and without optimizations."
+	@echo "tools            Tools; qdum5, qfep5, qcalc5 and qprep5."
+	@echo "debug            Tools and qdyn5 with debug information (stacktraces)."
 	@echo "mpi              qdyn5p using a currently loaded MPI library"
 	@echo "mpidebug         qdyn5p with debug information (stacktraces)."
 	@echo "hybrid           qdyn5h using a currently loaded MPI library and OpenMP library"
@@ -373,8 +390,8 @@ what:
 	@echo
 	@echo "For compiler/os pick one of:"
 	@echo "ifort            Intel Fortran compiler"
-	@echo "osx              Gnu Compiler Collection (GCC) in mac"
-	@echo "gcc              GCC in linux"
+	@echo "osx              Gnu Compiler Collection (GCC) on Mac"
+	@echo "gcc (default)    GCC on Linux"
 	@echo "pgi              Portland Group compiler"
 ################################################################################
 

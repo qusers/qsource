@@ -22,20 +22,21 @@ module	SIZES
 #endif
         integer, parameter :: prec = singleprecision
         real(kind=prec),parameter :: QREAL_EPS = 1.E-5_prec
-#endif
-#ifdef DOUBLE
-#if defined SINGLE || defined QUADRUPLE
-#ERROR No double defining of precision
-#endif
-        integer, parameter :: prec = doubleprecision 
-        real(kind=prec),parameter :: QREAL_EPS = 1.E-14_prec
-#endif
-#ifdef QUADRUPLE
+#elif QUADRUPLE
 #if defined SINGLE || defined DOUBLE 
 #ERROR No double defining of precision
 #endif
         integer, parameter :: prec = quadprecision
         real(kind=prec),parameter :: QREAL_EPS = 1.E-32_prec
+#else
+#if defined SINGLE || defined QUADRUPLE
+#ERROR No double defining of precision
+#endif
+#ifndef DOUBLE
+#warning Precision not defined, fallback -> DOUBLE
+#endif
+        integer, parameter :: prec = doubleprecision 
+        real(kind=prec),parameter :: QREAL_EPS = 1.E-14_prec
 #endif
 
 	real(kind=prec),parameter	:: zero = 0.0_prec

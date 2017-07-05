@@ -2,7 +2,7 @@
 ! version.f90
 ! Initial date: 2015
 ! by Ireneusz Szeler
-! Q version and halp print info
+! Print Q-version and help.
 
 module VERSIONS
 
@@ -45,12 +45,12 @@ subroutine version_check(Q_PROGRAM, Q_VERSION, Q_DATE, Q_SUFFIX)
          case ('qdyn')
              write(*,*) 
              write(*,'(a)') 'To run calculations use: '
-             write(*,'(a,a,a)') '    ',trim(Q_PROGRAM), '5 inputfile.inp > output.file'
+             write(*,'(a,a,a)') '    ',trim(Q_PROGRAM), '5 inputfile.inp > outputfile.log'
              write(*,'(a)') ' or for parallel version'
-             write(*,'(a,a,a)') '    mpienvirment ', trim(Q_PROGRAM), '5p inputfile.inp > output.file'
+             write(*,'(a,a,a)') '    mpiexec ', trim(Q_PROGRAM), '5p inputfile.inp > outputfile.log'
              write(*,*) 
-             write(*,'(a)') 'where:'
-             write(*,'(a)') 'mpienvirment - e.q. mpirun -n 4, for more info check cluster informations '
+             write(*,'(a)') 'with:'
+             write(*,'(a)') 'mpiexec - e.q. mpirun -n 4, for more info talk to your system admin.'
              write(*,*) 
          case ('qfep')
              write(*,*) 
@@ -138,14 +138,16 @@ subroutine version_print(Q_PROGRAM, Q_VERSION, Q_DATE, Q_SUFFIX)
     write(*,'(a)') 'Optimisations are disabled - runs at <20% of maximum speed.'
 #endif
   end if
-#if defined (BUILD_USERNAME) && defined (BUILD_HOSTNAME) && defined (BUILD_DATE) && defined (BUILD_SOURCE) && defined (BUILD_NUMBER) && defined(BUILD_COMPILER)
+#if defined (BUILD_USERNAME) && defined (BUILD_HOSTNAME) && defined (BUILD_DATE) && defined (BUILD_SOURCE) && defined (BUILD_NUMBER) && defined(BUILD_COMPILER) && defined (BUILD_PRECISION) && defined (BUILD_FLAGS)
   write(*,'(a,a)') 'Build number ', BUILD_NUMBER
   write(*,'(a,a)') 'Build date   ', BUILD_DATE
   write(*,'(a)')   'Built:       '
-  write(*,'(a,a)') '      by     ', BUILD_USERNAME
-  write(*,'(a,a)') '      on     ', BUILD_HOSTNAME
-  write(*,'(a,a)') '      git id ', BUILD_SOURCE
-  write(*,'(a,a)') '      with   ', BUILD_COMPILER
+  write(*,'(a,a)') '      by (user)    ', BUILD_USERNAME
+  write(*,'(a,a)') '      on (machine) ', BUILD_HOSTNAME
+  write(*,'(a,a)') '      git id       ', BUILD_SOURCE
+  write(*,'(a,a)') '      compiler     ', BUILD_COMPILER
+  write(*,'(a,a)') '          (precision)   ', BUILD_PRECISION
+  write(*,'(a,a)') '          (other flags) ', BUILD_FLAGS
 #else
   write(*,'(a,a,a,a,a)')  trim(Q_PROGRAM), ' version ', trim(Q_VERSION), trim(Q_SUFFIX),' initialising'
 #endif

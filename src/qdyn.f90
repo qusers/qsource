@@ -148,7 +148,7 @@ contains
 subroutine startup
 
   if (nodeid .eq. 0) then
-    call version_check(QDYN_NAME, QDYN_VERSION, QDYN_DATE, QDYN_SUFFIX) ! print version and chack for flags
+    call version_check(QDYN_NAME, QDYN_VERSION, QDYN_DATE, QDYN_SUFFIX) ! print version and check for flags
   end if
 
   ! initialise used modules
