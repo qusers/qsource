@@ -4,7 +4,7 @@
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
 !  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
 !  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Kazemi, Paul Bauer,     !
-!  Miha Purg, Irek Szeler                                                      !
+!  Miha Purg, Irek Szeler, Mauricio Esguerra                                   !
 !  latest update: March 29, 2017                                               !
 !------------------------------------------------------------------------------!
 
@@ -18,7 +18,12 @@ module calc_base
 use topo
 implicit none
 
-real(8), allocatable :: xin(:) ! All functions share this vector which contains a frame (J)
+! In Fortran 90 and later, intrinsic types such as real and integer have a
+! kind attribute which guarantees a specific precision and/or range. real*8
+! and counterparts should no longer be
+! used (Chin, Worth, and Greenough, 2006, p. 5).
+  real(kind=dp), allocatable :: xin(:) ! All functions share this vector which contains a frame (J)
+! real(8), allocatable :: xin(:) ! All functions share this vector which contains a frame (J)
 ! real(8), allocatable :: xin2d(:,:) ! Schlitters formula needs all coordinates at the same time
 
 end module calc_base

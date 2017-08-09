@@ -4787,18 +4787,18 @@ end function set_solvent_box
 !>
 !------------------------------------------------------------------------------!
 subroutine solvate
-        ! Make sure boundary condition is set.
-        if (.not. boundary_set) then
-                write(*,'(a)') '>>>>> ERROR Boundary unknown'      
-                write(*,'(a)') "Use <boundary> to define boundary condition" 
-                return
-        end if 
+  ! Make sure boundary condition is set.
+  if (.not. boundary_set) then
+    write(*,'(a)') '>>>>> ERROR Boundary unknown'
+    write(*,'(a)') "Use <boundary> to define boundary condition"
+    return
+  end if
 
-        if (use_PBC) then
-                call solvate_box
-        else
-                call solvate_sphere
-        end if
+  if (use_PBC) then
+    call solvate_box
+  else
+    call solvate_sphere
+  end if
 
 end subroutine solvate
 
@@ -4808,34 +4808,34 @@ end subroutine solvate
 !
 !------------------------------------------------------------------------------!
 subroutine solvate_box
-        character(len=80)                       :: solvate_mode
+  character(len=80)                :: solvate_mode
 
-        write(*,'(a)') 'Using predefined boxcenter and boxlengths.'
-        write(*,101) boxcenter
-        write(*,102) boxlength
+  write(*,'(a)') 'Using predefined boxcenter and boxlengths.'
+  write(*,101) boxcenter
+  write(*,102) boxlength
 101 format('Boxcenter (x,y,z)                :  ',3f8.3)                 
 102 format('Boxlengths (x,y,z)               :  ',3f8.3)
 
-        !chose solvation mode
-        call get_string_arg(solvate_mode, &
-                '-----> Select solvation mode: grid(1), file(2), restart(3): ')
-        call upcase(solvate_mode)
+  !chose solvation mode
+  call get_string_arg(solvate_mode, &
+    '-----> Select solvation mode: grid(1), file(2), restart(3): ')
+  call upcase(solvate_mode)
         
-        select case(solvate_mode)
-        case ('GRID', '1')
-                call solvate_box_grid
+  select case(solvate_mode)
+    case ('GRID', '1')
+      call solvate_box_grid
 
-        case ('FILE', '2')
-                call solvate_box_file
+    case ('FILE', '2')
+      call solvate_box_file
 
-        case('RESTART', '3')
-                call solvate_restart
+    case('RESTART', '3')
+      call solvate_restart
 
-        case default
-                write(*,'(a)') '>>>>> ERROR: Unknown mode of solvation.'
-                call parse_reset
-                return
-        end select              
+    case default
+      write(*,'(a)') '>>>>> ERROR: Unknown mode of solvation.'
+      call parse_reset
+      return
+  end select
 
 end subroutine solvate_box
 
@@ -4845,80 +4845,80 @@ end subroutine solvate_box
 !>  solvate box using grid
 !------------------------------------------------------------------------------!
 subroutine solvate_box_grid
-        !locals
-        real(8)              :: xmin, xmax, ymin, ymax, zmin, zmax
-        real(8)              :: xgrid, ygrid, zgrid
-        integer              :: max_wat !max number of molecules
-        integer              :: waters_in_box
-        real(8)              :: radius2, solvent_grid
-        character(len=200)   :: solvent
+  !locals
+  real(8)                          :: xmin, xmax, ymin, ymax, zmin, zmax
+  real(8)                          :: xgrid, ygrid, zgrid
+  integer                          :: max_wat !max number of molecules
+  integer                          :: waters_in_box
+  real(8)                          :: radius2, solvent_grid
+  character(len=200)               :: solvent
 
-        !set water residue name
-        call get_string_arg(solvent, &
-                '-----> Enter library entry name for water molecule: ')
-        solvent_name = solvent(1:4)
-        !get residue code for solvent
-        if(.not. set_irc_solvent()) return
+  !set water residue name
+  call get_string_arg(solvent, &
+    '-----> Enter library entry name for water molecule: ')
+  solvent_name = solvent(1:4)
+  !get residue code for solvent
+  if(.not. set_irc_solvent()) return
 
-        !calc cubic grid spacing from density
-        if(lib(irc_solvent)%density > 0.) then
-                solvent_grid = lib(irc_solvent)%density**(-1/3.)
-        else
-                write(*,900) lib(irc_solvent)%nam
-900             format('>>>>> ERROR: Density not set in library entry ',a)
-                return
-        end if
+  !calc cubic grid spacing from density
+  if(lib(irc_solvent)%density > 0.) then
+    solvent_grid = lib(irc_solvent)%density**(-1/3.)
+  else
+    write(*,900) lib(irc_solvent)%nam
+900 format('>>>>> ERROR: Density not set in library entry ',a)
+    return
+  end if
         
 
-        !Make sure boxsize is consistent with the periodic boundary condition
-        !changed to nearest integer (nint) from truncation (int)  /M.A.
-    boxlength(1) = nint(boxlength(1)/solvent_grid)*solvent_grid
-    boxlength(2) = nint(boxlength(2)/solvent_grid)*solvent_grid
-    boxlength(3) = nint(boxlength(3)/solvent_grid)*solvent_grid
+      !Make sure boxsize is consistent with the periodic boundary condition
+      !changed to nearest integer (nint) from truncation (int)  /M.A.
+  boxlength(1) = nint(boxlength(1)/solvent_grid)*solvent_grid
+  boxlength(2) = nint(boxlength(2)/solvent_grid)*solvent_grid
+  boxlength(3) = nint(boxlength(3)/solvent_grid)*solvent_grid
 
-!Calculate max number of waters possible
-        max_wat = lib(irc_solvent)%density * boxlength(1) * boxlength(2) * boxlength(3) 
+  !Calculate max number of waters possible
+  max_wat = lib(irc_solvent)%density * boxlength(1) * boxlength(2) * boxlength(3)
 
-        allocate(xw(3,lib(irc_solvent)%nat,max_wat), keep(max_wat), stat=alloc_status)
-        call check_alloc('water sphere coordinate array')
+  allocate(xw(3,lib(irc_solvent)%nat,max_wat), keep(max_wat), stat=alloc_status)
+  call check_alloc('water sphere coordinate array')
 
 
-        xmin = boxcenter(1) - boxlength(1)/2 + solvent_grid/2
-        xmax = boxcenter(1) + boxlength(1)/2 - solvent_grid/2
-        ymin = boxcenter(2) - boxlength(2)/2 + solvent_grid/2
-        ymax = boxcenter(2) + boxlength(2)/2 - solvent_grid/2
-        zmin = boxcenter(3) - boxlength(3)/2 + solvent_grid/2
-        zmax = boxcenter(3) + boxlength(3)/2 - solvent_grid/2
+  xmin = boxcenter(1) - boxlength(1)/2 + solvent_grid/2
+  xmax = boxcenter(1) + boxlength(1)/2 - solvent_grid/2
+  ymin = boxcenter(2) - boxlength(2)/2 + solvent_grid/2
+  ymax = boxcenter(2) + boxlength(2)/2 - solvent_grid/2
+  zmin = boxcenter(3) - boxlength(3)/2 + solvent_grid/2
+  zmax = boxcenter(3) + boxlength(3)/2 - solvent_grid/2
         
-        write(*,100) boxlength(1), boxlength(2), boxlength(3), solvent_grid
-100     format('New boxlength                     = ',3f8.2,' A',/ &
-                   'Grid spacing                      = ',f10.2,' A ')
+  write(*,100) boxlength(1), boxlength(2), boxlength(3), solvent_grid
+100 format('New boxlength                     = ',3f8.2,' A',/ &
+           'Grid spacing                      = ',f10.2,' A ')
 
-        !Fill box with water
-        !xmax+0.1 is needed for intel/windows. Otherwise the last loop step is skipped
-        waters_in_box = 0
-        xgrid = xmin
-        do while (xgrid <= xmax + 0.1)
-                ygrid = ymin
-                do while (ygrid <= ymax + 0.1)
-                        zgrid = zmin
-                        do while (zgrid <= zmax + 0.1)
-                                waters_in_box = waters_in_box + 1
-                                xw(1,1,waters_in_box) = xgrid
-                                xw(2,1,waters_in_box) = ygrid
-                                xw(3,1,waters_in_box) = zgrid
-                                !all the molecules inside are inside
-                                keep(waters_in_box) = .true.
-                                zgrid = zgrid + solvent_grid
-                        end do
-                        ygrid = ygrid + solvent_grid
-                end do
-                xgrid = xgrid + solvent_grid
-        end do
+  !Fill box with water
+  !xmax+0.1 is needed for intel/windows. Otherwise the last loop step is skipped
+  waters_in_box = 0
+  xgrid = xmin
+  do while (xgrid <= xmax + 0.1)
+    ygrid = ymin
+    do while (ygrid <= ymax + 0.1)
+      zgrid = zmin
+      do while (zgrid <= zmax + 0.1)
+        waters_in_box = waters_in_box + 1
+        xw(1,1,waters_in_box) = xgrid
+        xw(2,1,waters_in_box) = ygrid
+        xw(3,1,waters_in_box) = zgrid
+        !all the molecules inside are inside
+        keep(waters_in_box) = .true.
+        zgrid = zgrid + solvent_grid
+      end do
+      ygrid = ygrid + solvent_grid
+    end do
+    xgrid = xgrid + solvent_grid
+  end do
 
-        call add_solvent_to_topology(waters_in_sphere=waters_in_box, &
-                max_waters=waters_in_box, make_hydrogens=.true., pack=solvent_pack)
-        deallocate(xw,keep)
+  call add_solvent_to_topology(waters_in_sphere=waters_in_box, &
+    max_waters=waters_in_box, make_hydrogens=.true., pack=solvent_pack)
+  deallocate(xw,keep)
 
 end subroutine solvate_box_grid
 
@@ -5139,9 +5139,9 @@ end subroutine solvate_box_file
 !>  subroutine: solvate_sphere
 !
 !------------------------------------------------------------------------------!
-subroutine solvate_sphere        
-  character(len=80)                 :: solvate_mode
-        
+subroutine solvate_sphere
+  character(len=80)                :: solvate_mode
+
   if(.not. set_solvent_sphere()) then
     call parse_reset !clear command line
     return
@@ -5149,7 +5149,7 @@ subroutine solvate_sphere
 
   !chose solvation mode
   call get_string_arg(solvate_mode, &
-  '-----> Select solvation mode: grid(1), file(2), restart(3), DWF(4): ')
+    '-----> Select solvation mode: grid(1), file(2), restart(3), DWF(4): ')
   call upcase(solvate_mode)
         
   select case(solvate_mode)
@@ -5172,65 +5172,65 @@ end subroutine solvate_sphere
 !>  function: set_solvent_sphere
 !
 !------------------------------------------------------------------------------!
-logical function set_solvent_sphere()        
-        !locals
-        character(len=80)                       :: line
-        integer                                         :: filestat
-        integer                                         :: center_atom
-        real                                            :: rwat_in, xwat_in
+logical function set_solvent_sphere()
+  !locals
+  character(len=80)                :: line
+  integer                          :: filestat
+  integer                          :: center_atom
+  real                             :: rwat_in, xwat_in
 
-        set_solvent_sphere = .false.
-        have_solvent_boundary = .false.  
+  set_solvent_sphere = .false.
+  have_solvent_boundary = .false.
 
-        if (have_title) then !Print old center if available
-                write(*,'(a,3f8.3)') 'Previous solvent center:', xwcent(1), xwcent(2), xwcent(3)
-        end if
-        call get_string_arg(line, '-----> Sphere center (<x y z> or <residue_number:atom_name> or <"mass"> or <"boundary">): ')
-        call upcase(line)
+  if (have_title) then !Print old center if available
+    write(*,'(a,3f8.3)') 'Previous solvent center:', xwcent(1), xwcent(2), xwcent(3)
+  end if
+  call get_string_arg(line, '-----> Sphere center (<x y z> or <residue_number:atom_name> or <"mass"> or <"boundary">): ')
+  call upcase(line)
 
-        if(scan(line, ':') > 0) then !got res:at
-                center_atom=get_atom_from_descriptor(line)
-                if(center_atom == 0) then
-                        write(*,900) trim(line)
-900                     format('>>>>> ERROR: Could not find center atom ',a)
-                        return
-                end if
-                xwcent(:) = xtop(3*center_atom-2:3*center_atom)
-        elseif(line == 'MASS') then   !define center by center of mass 
-                if (.not. get_center_by_mass(xwcent(:))) then
-                        write(*,*) ('>>>>> ERROR: Could not create center ')
-                        return
-                end if
-        elseif(line == 'BOUNDARY') then   !define center same as boundary center
-                xwcent = xpcent
-        else !got x
-                read(line, *, iostat=filestat) xwcent(1)
-                if(filestat > 0) then !invalid x coordinate
-                        return
-                end if
-                xwat_in=get_real_arg('-----> Sphere center y: ')
-                xwcent(2) = xwat_in
-                xwat_in=get_real_arg('-----> Sphere center z: ')
-                xwcent(3) = xwat_in
-        end if
+  if(scan(line, ':') > 0) then !got res:at
+    center_atom=get_atom_from_descriptor(line)
+    if(center_atom == 0) then
+      write(*,900) trim(line)
+900   format('>>>>> ERROR: Could not find center atom ',a)
+      return
+    end if
+    xwcent(:) = xtop(3*center_atom-2:3*center_atom)
+  elseif(line == 'MASS') then   !define center by center of mass
+    if (.not. get_center_by_mass(xwcent(:))) then
+      write(*,*) ('>>>>> ERROR: Could not create center ')
+      return
+    end if
+  elseif(line == 'BOUNDARY') then   !define center same as boundary center
+    xwcent = xpcent
+  else !got x
+    read(line, *, iostat=filestat) xwcent(1)
+    if(filestat > 0) then !invalid x coordinate
+      return
+    end if
+    xwat_in=get_real_arg('-----> Sphere center y: ')
+    xwcent(2) = xwat_in
+    xwat_in=get_real_arg('-----> Sphere center z: ')
+    xwcent(3) = xwat_in
+  end if
 
-        if (have_title) then !Print old radius if available
-                write(*,'(a,f8.3)') 'Previous effective solvent radius:', rwat_eff()
-                rwat_in = get_real_arg('-----> Solvation sphere radius: ')
-        else
-                rwat_in = get_real_arg('-----> Solvation sphere radius: ')
-        end if
-        rwat = rwat_in
-        if(rwat == 0.) then
-                return
-        end if
+  if (have_title) then !Print old radius if available
+    write(*,'(a,f8.3)') 'Previous effective solvent radius:', rwat_eff()
+    rwat_in = get_real_arg('-----> Solvation sphere radius: ')
+  else
+    rwat_in = get_real_arg('-----> Solvation sphere radius: ')
+  end if
+  rwat = rwat_in
+  if(rwat == 0.) then
+    return
+  end if
 
-    write(*,*)
-    write(*,100) xwcent(:)
+  write(*,*)
+  write(*,100) xwcent(:)
 100 format('Solvation sphere center                 =   ',3f8.3)
 
-    set_solvent_sphere = .true.
-    have_solvent_boundary = .true. 
+  set_solvent_sphere = .true.
+  have_solvent_boundary = .true.
 
 end function set_solvent_sphere
 
@@ -5240,76 +5240,76 @@ end function set_solvent_sphere
 !>  solvate sphere using grid
 !------------------------------------------------------------------------------!
 subroutine solvate_sphere_grid
-        !locals
-        real(8)                                         :: xmin, xmax, ymin, ymax, zmin, zmax
-        real(8)                                         :: xgrid, ygrid, zgrid
-        integer                                         :: max_wat !max number of molecules
-        integer                                         :: waters_in_sphere
-        real(8)                                         :: radius2, solvent_grid
-        character(len=200)                      :: solvent
+  !locals
+  real(8)                          :: xmin, xmax, ymin, ymax, zmin, zmax
+  real(8)                          :: xgrid, ygrid, zgrid
+  integer                          :: max_wat !max number of molecules
+  integer                          :: waters_in_sphere
+  real(8)                          :: radius2, solvent_grid
+  character(len=200)               :: solvent
 
-        !set water residue name
-        call get_string_arg(solvent, &
-                '-----> Enter library entry name for water molecule: ')
-        solvent_name = solvent(1:4)
-        !get residue code for solvent
-        if(.not. set_irc_solvent()) return
+  !set water residue name
+  call get_string_arg(solvent, &
+    '-----> Enter library entry name for water molecule: ')
+  solvent_name = solvent(1:4)
+  !get residue code for solvent
+  if(.not. set_irc_solvent()) return
 
-        !calc cubic grid spacing from density
-        if(lib(irc_solvent)%density > 0.) then
-                solvent_grid = lib(irc_solvent)%density**(-1/3.)
-        else
-                write(*,900) lib(irc_solvent)%nam
-900             format('>>>>> ERROR: Density not set in library entry ',a)
-                return
-        end if
+  !calc cubic grid spacing from density
+  if(lib(irc_solvent)%density > 0.) then
+    solvent_grid = lib(irc_solvent)%density**(-1/3.)
+  else
+    write(*,900) lib(irc_solvent)%nam
+900 format('>>>>> ERROR: Density not set in library entry ',a)
+    return
+  end if
         
-        max_wat = (2*rwat+solvent_grid)**3 / solvent_grid**3 
-        radius2 = rwat**2
+  max_wat = (2*rwat+solvent_grid)**3 / solvent_grid**3
+  radius2 = rwat**2
 
-        allocate(xw(3,lib(irc_solvent)%nat,max_wat), keep(max_wat), stat=alloc_status)
-        call check_alloc('water sphere coordinate array')
+  allocate(xw(3,lib(irc_solvent)%nat,max_wat), keep(max_wat), stat=alloc_status)
+  call check_alloc('water sphere coordinate array')
 
-        xmin = xwcent(1) - int(rwat/solvent_grid)*solvent_grid
-        xmax = xwcent(1) + int(rwat/solvent_grid)*solvent_grid
-        ymin = xwcent(2) - int(rwat/solvent_grid)*solvent_grid
-        ymax = xwcent(2) + int(rwat/solvent_grid)*solvent_grid
-        zmin = xwcent(3) - int(rwat/solvent_grid)*solvent_grid
-        zmax = xwcent(3) + int(rwat/solvent_grid)*solvent_grid
+  xmin = xwcent(1) - int(rwat/solvent_grid)*solvent_grid
+  xmax = xwcent(1) + int(rwat/solvent_grid)*solvent_grid
+  ymin = xwcent(2) - int(rwat/solvent_grid)*solvent_grid
+  ymax = xwcent(2) + int(rwat/solvent_grid)*solvent_grid
+  zmin = xwcent(3) - int(rwat/solvent_grid)*solvent_grid
+  zmax = xwcent(3) + int(rwat/solvent_grid)*solvent_grid
         
-        write(*,100) rwat, solvent_grid
-100     format('Radius of solvent sphere                = ',f10.2,' A',/ &
-                   'Grid spacing                            = ',f10.2,' A ')
+  write(*,100) rwat, solvent_grid
+100 format('Radius of solvent sphere                = ',f10.2,' A',/ &
+           'Grid spacing                            = ',f10.2,' A ')
 
-        !constuct water-only sphere
-        !xmax+0.1 is needed for intel/windows. Otherwise the last loop step is skipped
-        waters_in_sphere = 0
-        xgrid = xmin
-        do while (xgrid <= xmax + 0.1)
-                ygrid = ymin
-                do while (ygrid <= ymax + 0.1)
-                        zgrid = zmin
-                        do while (zgrid <= zmax + 0.1)
-                                if( .not. ((xgrid-xwcent(1))**2 + (ygrid-xwcent(2))**2 &
-                                        + (zgrid-xwcent(3))**2 > radius2) ) then
-                                    waters_in_sphere = waters_in_sphere + 1
-                                    !if not outside keep these coordinates
-                                    xw(1,1,waters_in_sphere) = xgrid
-                                    xw(2,1,waters_in_sphere) = ygrid
-                                    xw(3,1,waters_in_sphere) = zgrid
-                                    !all the molecules inside are inside
-                                    keep(waters_in_sphere) = .true.
-                                endif
-                                zgrid = zgrid + solvent_grid
-                        end do
-                        ygrid = ygrid + solvent_grid
-                end do
-                xgrid = xgrid + solvent_grid
-        end do
+  !constuct water-only sphere
+  !xmax+0.1 is needed for intel/windows. Otherwise the last loop step is skipped
+  waters_in_sphere = 0
+  xgrid = xmin
+  do while (xgrid <= xmax + 0.1)
+    ygrid = ymin
+    do while (ygrid <= ymax + 0.1)
+      zgrid = zmin
+      do while (zgrid <= zmax + 0.1)
+        if( .not. ((xgrid-xwcent(1))**2 + (ygrid-xwcent(2))**2 &
+          + (zgrid-xwcent(3))**2 > radius2) ) then
+          waters_in_sphere = waters_in_sphere + 1
+          !if not outside keep these coordinates
+          xw(1,1,waters_in_sphere) = xgrid
+          xw(2,1,waters_in_sphere) = ygrid
+          xw(3,1,waters_in_sphere) = zgrid
+          !all the molecules inside are inside
+          keep(waters_in_sphere) = .true.
+        endif
+        zgrid = zgrid + solvent_grid
+      end do
+      ygrid = ygrid + solvent_grid
+    end do
+    xgrid = xgrid + solvent_grid
+  end do
 
-        call add_solvent_to_topology(waters_in_sphere=waters_in_sphere, &
-                max_waters=waters_in_sphere, make_hydrogens=.true., pack=solvent_pack)
-        deallocate(xw,keep)
+  call add_solvent_to_topology(waters_in_sphere=waters_in_sphere, &
+    max_waters=waters_in_sphere, make_hydrogens=.true., pack=solvent_pack)
+  deallocate(xw,keep)
 
 end subroutine solvate_sphere_grid
 
@@ -5324,27 +5324,26 @@ subroutine solvate_sphere_file(shift)
   logical, intent(in), optional:: shift
 
   ! local variables
-  integer                                 :: i,j,nw,nnw
-  integer                                 :: nwat_allocate, nwat_keep
-  real(8)                                 :: rmax2,dx2,boxl, newboxl
-  real(8), save                           :: xcm(3),wshift(3)
-  integer                                 :: fstat
-  logical                                 :: is_box
-  character(len=6)                        :: sphere
-  character(len=80)                       :: line
-  real(8)                                 :: volume
-  real                                    :: r4dum
-  character(len=80)                       :: xwat_file
-  real(8)                                 :: xwshift(3,7)
-  integer                                 :: box
-  character(len=3)                        :: atomnames
-  integer                                 :: filestat
-  character(len=10)                       :: filepos
-  integer                                 :: resno(3)
-  character(len=4)                        :: resnam(3)
-
-  real(8)                                 :: xwtmp(3, max_atlib)
-  integer                                 :: at_id(max_atlib)
+  integer                          :: i,j,nw,nnw
+  integer                          :: nwat_allocate, nwat_keep
+  real(8)                          :: rmax2,dx2,boxl, newboxl
+  real(8), save                    :: xcm(3),wshift(3)
+  integer                          :: fstat
+  logical                          :: is_box
+  character(len=6)                 :: sphere
+  character(len=80)                :: line
+  real(8)                          :: volume
+  real                             :: r4dum
+  character(len=80)                :: xwat_file
+  real(8)                          :: xwshift(3,7)
+  integer                          :: box
+  character(len=3)                 :: atomnames
+  integer                          :: filestat
+  character(len=10)                :: filepos
+  integer                          :: resno(3)
+  character(len=4)                 :: resnam(3)
+  real(8)                          :: xwtmp(3, max_atlib)
+  integer                          :: at_id(max_atlib)
 
   call get_string_arg(xwat_file, '-----> Solvent file name: ')
   open (unit=13, file=xwat_file, status='old', form='formatted', &
@@ -5527,60 +5526,59 @@ end subroutine solvate_sphere_file
 !
 !------------------------------------------------------------------------------!
 subroutine solvate_restart
-!locals
-        integer(4)                                      :: natom, nat3, waters_added
-        character(len=80)                       :: xfile
-        integer                                         :: u, fstat
-        real(8),allocatable                     :: xtmp(:)
-        character(len=200)                      :: solvent
+  !locals
+  integer(4)                       :: natom, nat3, waters_added
+  character(len=80)                :: xfile
+  integer                          :: u, fstat
+  real(8),allocatable              :: xtmp(:)
+  character(len=200)               :: solvent
 
-        u=freefile()
+  u=freefile()
 
-        call get_string_arg(xfile, '-----> Restart file name: ')
-        open (unit=u, file=xfile, status='old', form='unformatted', &
-                action='read', iostat=fstat)
-        if(fstat /= 0) then
-                write(*,'(a)') '>>>>> ERROR: Could not open restart file.'
-                call parse_reset
-                return
-        end if
+  call get_string_arg(xfile, '-----> Restart file name: ')
+  open (unit=u, file=xfile, status='old', form='unformatted', &
+    action='read', iostat=fstat)
+  if(fstat /= 0) then
+    write(*,'(a)') '>>>>> ERROR: Could not open restart file.'
+    call parse_reset
+    return
+  end if
 
-        !set water residue name
-        call get_string_arg(solvent, &
-                '-----> Enter library entry name for water molecule: ')
-        solvent_name = solvent(1:4)
-        !get residue code for solvent
-        if(.not. set_irc_solvent()) return
+  !set water residue name
+  call get_string_arg(solvent, &
+    '-----> Enter library entry name for water molecule: ')
+  solvent_name = solvent(1:4)
+  !get residue code for solvent
+  if(.not. set_irc_solvent()) return
 
-        read(u) nat3
-        natom = nat3/3
-        if(natom == nat_pro) then
-                write(*,10)
-10              format('>>>>> ERROR: No. of atoms in restart file not greater than in topology.')
-                close(u)
-                return
-        elseif(mod(natom-nat_pro,3) /= 0) then
-                write(*,20) natom
-20              format('>>>>> ERROR:',i6,' new atoms in restart file is not a multiple of 3.')
-                close(u)
-                return
-        end if
+  read(u) nat3
+  natom = nat3/3
+  if(natom == nat_pro) then
+    write(*,10)
+10  format('>>>>> ERROR: No. of atoms in restart file not greater than in topology.')
+    close(u)
+    return
+  elseif(mod(natom-nat_pro,3) /= 0) then
+    write(*,20) natom
+20  format('>>>>> ERROR:',i6,' new atoms in restart file is not a multiple of 3.')
+    close(u)
+    return
+  end if
+
+  waters_added = (natom-nat_pro)/3
+  call grow_arrays_for_solvent(waters_added, 3)
+  allocate(xtmp(nat3))
+  backspace(u)
+  read(u) nat3, xtmp(1:nat3)
+  close(u)
+  allocate(xw(3,3,waters_added), keep(waters_added))
+  xw(:,:,:) = reshape(xtmp(3*nat_pro+1:nat3),(/3,3,waters_added/))
+  keep(:) = .true.
         
-
-        waters_added = (natom-nat_pro)/3
-        call grow_arrays_for_solvent(waters_added, 3)
-        allocate(xtmp(nat3))
-        backspace(u)
-        read(u) nat3, xtmp(1:nat3)
-        close(u)
-        allocate(xw(3,3,waters_added), keep(waters_added))
-        xw(:,:,:) = reshape(xtmp(3*nat_pro+1:nat3),(/3,3,waters_added/))
-        keep(:) = .true.
-        
-        !allow very tight packing of waters to solute - this is a restart file!
-        call add_solvent_to_topology(waters_in_sphere=waters_added, &
-                max_waters=waters_added, make_hydrogens=.false., pack=0.)
-        deallocate(xtmp,xw,keep)
+  !allow very tight packing of waters to solute - this is a restart file!
+  call add_solvent_to_topology(waters_in_sphere=waters_added, &
+    max_waters=waters_added, make_hydrogens=.false., pack=0.)
+  deallocate(xtmp,xw,keep)
 
 end subroutine solvate_restart
 
@@ -5590,132 +5588,132 @@ end subroutine solvate_restart
 !
 !------------------------------------------------------------------------------!
 subroutine add_solvent_to_topology(waters_in_sphere, max_waters, make_hydrogens, pack)
-!arguments
-        integer                                         :: waters_in_sphere
-        integer                                         :: max_waters
-        logical                                         :: make_hydrogens
-        real                                            :: pack
-!locals
-        integer                                         :: waters_added
-        real(8)                                         :: rpack2
-        integer                                         :: w_at, w_mol, p_atom
-        logical                                         :: wheavy(max_atlib)
-        real(8)                                         :: dx, dy, dz, r2
-        integer                                         :: next_wat, next_atom
+  !arguments
+  integer                          :: waters_in_sphere
+  integer                          :: max_waters
+  logical                          :: make_hydrogens
+  real                             :: pack
+  !locals
+  integer                          :: waters_added
+  real(8)                          :: rpack2
+  integer                          :: w_at, w_mol, p_atom
+  logical                          :: wheavy(max_atlib)
+  real(8)                          :: dx, dy, dz, r2
+  integer                          :: next_wat, next_atom
 
-        if(use_PBC) then
-                write(*,111) waters_in_sphere
-        else
-                write(*,110) waters_in_sphere
-        end if
-110     format('No. of solvent molecules in the sphere:', i6)
+  if(use_PBC) then
+    write(*,111) waters_in_sphere
+  else
+    write(*,110) waters_in_sphere
+  end if
+110 format('No. of solvent molecules in the sphere:', i6)
 111 format('No. of solvent molecules in the box:', i6)
 
-        !exclude water molecues close to heavy solute atoms
-        write(*,120) pack
-120     format('Minimum distance to solute heavy atoms:',f6.2,' A')
+  !exclude water molecues close to heavy solute atoms
+  write(*,120) pack
+120 format('Minimum distance to solute heavy atoms:',f6.2,' A')
 
-        waters_added = 0
-        rpack2 = pack**2
+  waters_added = 0
+  rpack2 = pack**2
         
-        do w_at = 1, lib(irc_solvent)%nat
-                if(lib(irc_solvent)%atnam(w_at)(1:1) == 'H') then
-                        wheavy(w_at) = .false.
-                else
-                        wheavy(w_at) = .true.
-                end if
+  do w_at = 1, lib(irc_solvent)%nat
+    if(lib(irc_solvent)%atnam(w_at)(1:1) == 'H') then
+      wheavy(w_at) = .false.
+    else
+      wheavy(w_at) = .true.
+    end if
+  end do
+
+  !loop over solvent molecules
+  wloop:do w_mol = 1, max_waters
+    !skip if not in sphere or box
+    if(.not. keep(w_mol)) cycle wloop
+
+    !loop over atoms in solvent molecule
+    do w_at = 1, lib(irc_solvent)%nat
+      !skip hydrogens
+      if(.not. wheavy(w_at)) cycle
+      !check clash with all other heavy atoms
+      ploop:  do p_atom = 1, nat_pro !for each water check all other atoms
+        if(heavy(p_atom)) then
+          !clash with a heavy atom?
+          !***** Petra Wennerstrom changed way of computing packing
+          dx = xtop(3*p_atom-2) - xw(1,w_at,w_mol)
+          dy = xtop(3*p_atom-1) - xw(2,w_at,w_mol)
+          dz = xtop(3*p_atom  ) - xw(3,w_at,w_mol)
+          if( use_PBC ) then
+            dx = dx - boxlength(1)*nint( dx*inv_boxl(1) )
+            dy = dy - boxlength(2)*nint( dy*inv_boxl(2) )
+            dz = dz - boxlength(3)*nint( dz*inv_boxl(3) )
+          end if
+          r2 = dx**2 + dy**2 + dz**2
+          if( r2<rpack2 ) then
+
+            !if(dot_product(xtop(3*p_atom-2:3*p_atom) &
+            !       -xw(:,w_at,w_mol), &
+            !       xtop(3*p_atom-2:3*p_atom)-xw(:,w_at,w_mol)) &
+            !       < rpack2) then
+            keep(w_mol) = .false.
+            cycle wloop
+          end if
+        end if
+      end do ploop
+
+      !***** PWadded new loop checking water-water distance
+      if(use_PBC) then
+        do next_wat = w_mol+1, max_waters
+          if(.not. keep(next_wat) ) cycle
+          do next_atom = 1,lib(irc_solvent)%nat
+            if(.not. wheavy(next_atom) ) cycle
+            dx = xw(1, w_at, w_mol) - xw(1, next_atom, next_wat)
+            dy = xw(2, w_at, w_mol) - xw(2, next_atom, next_wat)
+            dz = xw(3, w_at, w_mol) - xw(3, next_atom, next_wat)
+            dx = dx - boxlength(1)*nint( dx*inv_boxl(1) )
+            dy = dy - boxlength(2)*nint( dy*inv_boxl(2) )
+            dz = dz - boxlength(3)*nint( dz*inv_boxl(3) )
+            r2 = dx**2 + dy**2 + dz**2
+            if( r2<rpack2 ) then
+              keep(w_mol) = .false.
+              cycle wloop
+            end if
+          end do
         end do
+      end if
 
-        !loop over solvent molecules
-wloop:do w_mol = 1, max_waters 
-                !skip if not in sphere or box
-                if(.not. keep(w_mol)) cycle wloop 
+    end do !w_at
+    if(keep(w_mol)) then
+      !this water molecule does not clash with any other heavy atom.
+      waters_added = waters_added + 1
+    end if
+  end do wloop
+  write(*,130) waters_added
+130 format('No. of solvent molecules to add to the system:',i6)
 
-                !loop over atoms in solvent molecule
-                do w_at = 1, lib(irc_solvent)%nat
-                        !skip hydrogens
-                        if(.not. wheavy(w_at)) cycle
-                        !check clash with all other heavy atoms
-ploop:          do p_atom = 1, nat_pro !for each water check all other atoms
-                                if(heavy(p_atom)) then
-                                !clash with a heavy atom?
-                                !*****PWchanged way of computing packing
-                                        dx = xtop(3*p_atom-2) - xw(1,w_at,w_mol)
-                                        dy = xtop(3*p_atom-1) - xw(2,w_at,w_mol)
-                                        dz = xtop(3*p_atom  ) - xw(3,w_at,w_mol)
-                                        if( use_PBC ) then
-                                                dx = dx - boxlength(1)*nint( dx*inv_boxl(1) )
-                                                dy = dy - boxlength(2)*nint( dy*inv_boxl(2) )
-                                                dz = dz - boxlength(3)*nint( dz*inv_boxl(3) )
-                                        end if
-                                        r2 = dx**2 + dy**2 + dz**2
-                                        if( r2<rpack2 ) then
+  !increase size of xtop, imakeh
+  call grow_arrays_for_solvent(waters_added, lib(irc_solvent)%nat)
 
-                                        !if(dot_product(xtop(3*p_atom-2:3*p_atom) &
-                                        !       -xw(:,w_at,w_mol), &
-                                        !       xtop(3*p_atom-2:3*p_atom)-xw(:,w_at,w_mol)) &
-                                        !       < rpack2) then
-                                                keep(w_mol) = .false.
-                                                cycle wloop
-                                        end if
-                                end if
-                        end do ploop
-                
-                !*****PWadded new loop checking water-water distance
-                        if(use_PBC) then
-                                do next_wat = w_mol+1, max_waters
-                                        if(.not. keep(next_wat) ) cycle
-                                        do next_atom = 1,lib(irc_solvent)%nat
-                                                if(.not. wheavy(next_atom) ) cycle
-                                                dx = xw(1, w_at, w_mol) - xw(1, next_atom, next_wat)
-                                                dy = xw(2, w_at, w_mol) - xw(2, next_atom, next_wat)
-                                                dz = xw(3, w_at, w_mol) - xw(3, next_atom, next_wat)
-                                                dx = dx - boxlength(1)*nint( dx*inv_boxl(1) )
-                                                dy = dy - boxlength(2)*nint( dy*inv_boxl(2) )
-                                                dz = dz - boxlength(3)*nint( dz*inv_boxl(3) )
-                                                r2 = dx**2 + dy**2 + dz**2
-                                                if( r2<rpack2 ) then
-                                                        keep(w_mol) = .false.
-                                                        cycle wloop
-                                                end if
-                                        end do
-                                end do
-                        end if
-
-                end do !w_at
-                if(keep(w_mol)) then
-                        !this water molecules does not clash with any other heavy atom.
-                        waters_added = waters_added + 1
-                end if
-        end do wloop
-        write(*,130) waters_added
-130     format('No. of solvent molecules to add to the system:',i6)
-
-        !increase size of xtop, imakeh
-        call grow_arrays_for_solvent(waters_added, lib(irc_solvent)%nat)
-
-        do w_mol = 1, max_waters
-                if(.not. keep(w_mol)) cycle
-                !move this vater to topology
-                nwat=nwat+1
-                nmol = nmol + 1
-                istart_mol(nmol) = nat_pro + 1
-                nres = nres + 1
-                res(nres)%start = nat_pro + 1
-                res(nres)%irc = irc_solvent
-                res(nres)%name = lib(irc_solvent)%nam
-                do w_at = 1, lib(irc_solvent)%nat
-                        nat_pro = nat_pro + 1
-                        !copy coordinates for each atom
-                        xtop(3*nat_pro-2:3*nat_pro) = xw(:,w_at,w_mol)
-                        heavy(nat_pro) = wheavy(w_at)
-                        if(wheavy(w_at)) then
-                                makeH(nat_pro) = .false.
-                        else
-                                makeH(nat_pro) = make_hydrogens
-                        end if
-                end do
-        end do
+  do w_mol = 1, max_waters
+    if(.not. keep(w_mol)) cycle
+    !move this water to topology
+    nwat=nwat+1
+    nmol = nmol + 1
+    istart_mol(nmol) = nat_pro + 1
+    nres = nres + 1
+    res(nres)%start = nat_pro + 1
+    res(nres)%irc = irc_solvent
+    res(nres)%name = lib(irc_solvent)%nam
+    do w_at = 1, lib(irc_solvent)%nat
+      nat_pro = nat_pro + 1
+      !copy coordinates for each atom
+      xtop(3*nat_pro-2:3*nat_pro) = xw(:,w_at,w_mol)
+      heavy(nat_pro) = wheavy(w_at)
+      if(wheavy(w_at)) then
+        makeH(nat_pro) = .false.
+      else
+        makeH(nat_pro) = make_hydrogens
+      end if
+    end do
+  end do
 end subroutine add_solvent_to_topology
 
 

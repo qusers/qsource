@@ -145,7 +145,7 @@ contains
 
     if (nodeid .eq. 0) then
       ! start-of-header
-      ! write (*,'(79a)') ('#',i=1,79)
+      ! write (*,'(80a)') ('=',i=1,80)
 
 #if defined (DUM)
       print '(a)',  '--------------------------------------------------------------------------------'
@@ -190,7 +190,6 @@ contains
   !!  Startup  
   !----------------------------------------------------------------------------!
   !subroutine startup
-  !!    call version_check(PROGRAM_NAME, PROGRAM_VERSION, PROGRAM_DATE, PROGRAM_SUFFIX)
   !if (nodeid .eq. 0) then
   !  print '(a)',  '--------------------------------------------------------------------------------'
   !  print '(4a)', 'Welcome to ', program_name, ' version: ', program_version
@@ -227,7 +226,7 @@ contains
 #else
       write(*,*) 'qdyn version ', trim(program_version), trim(program_suffix), ' terminated normally.'
 #endif
-      write (*,'(79a)') ('#',i=1,79)
+      write (*,'(80a)') ('=',i=1,80)
     end if
 
     ! call md's shutdown
@@ -292,30 +291,30 @@ end program qdyn
 !-------------------------------------------------------------------------------
 ! signal handlers
 !-------------------------------------------------------------------------------
-INTEGER(4) FUNCTION sigint_handler(sig_num)
+integer(4) function sigint_handler(sig_num)
   use md
   implicit none
-  INTEGER(4) :: sig_num
+  integer(4) :: sig_num
 
   call die('user request (control-C)')
   sigint_handler = 1
-END FUNCTION sigint_handler
+end function sigint_handler
 
-INTEGER(4) FUNCTION sigkill_handler(sig_num)
+integer(4) function sigkill_handler(sig_num)
   use md
   implicit none
-  INTEGER(4) :: sig_num
+  integer(4) :: sig_num
 
   call die('kill signal')
   sigkill_handler = 1
-END FUNCTION sigkill_handler
+end function sigkill_handler
 
-INTEGER(4) FUNCTION sigabrt_handler(sig_num)
+integer(4) function sigabrt_handler(sig_num)
   use md
   implicit none
-  INTEGER(4) :: sig_num
+  integer(4) :: sig_num
 
   call die('kill signal')
   sigabrt_handler = 1
-END FUNCTION sigabrt_handler
+end function sigabrt_handler
 

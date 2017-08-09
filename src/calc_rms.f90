@@ -80,7 +80,7 @@ subroutine rms_calc(i)
 
   if(i < 1 .or. i > Nmasks) return
 
-  call mask_get(masks(i), xin, coords(i)%x)                            
+  call mask_get(masks(i), xin, coords(i)%x)
   r = sqrt(  sum((coords(i)%x-coords(i)%x0)**2)/(masks(i)%included) )  ! removed 3 in front of mask(i)
   write(*,100, advance='no') r
   write(10, 100, advance='yes') r

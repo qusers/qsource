@@ -108,21 +108,22 @@
 % Preface
 %===============================================================================
 \section{PREFACE}
+
 \textbf{Q} started  its development sometime in  the nineteen nineties
 originally by Johan \AA qvist, and  since then a list of collaborators
 have  contributed  to  the  code, among  them:  John  Marelius,  Karin
 Kolmodin,  Isabella Feierberg,  Martin  Alml\"of,  Martin Ander,  Jens
 Carlson,  Peter  Hanspers,  Anders   Kaplan,  Kajsa  Ljunjberg,  Petra
 Wennerstr\"om,  Martin Nervall,  Johan Sund,  Alexandre Barrozo,  Paul
-Bauer, Beat Amrein,  Masoud Kazemi, Irek Szeler, Miha Purg  and \AA ke
-Sandgren. The code is in active development and new features are being
-implemented mainly following the  fortran 2003 standard.  Additionally
-the  MPI implementation  has  been  updated to  enhance  the speed  of
-running parallel jobs and provide a more robust parallelization across
-different cluster  architectures.  The  program code is  hosted online
-thanks to  a generous github  academic account granted to  the program
-developers at Uppsala  University.  Instructions on how  to obtain the
-code     can     be     found     online     at     the     Q-website:
+Bauer, Beat  Amrein, Masoud Kazemi,  Irek Szeler, Miha  Purg, Mauricio
+Esguerra and  \AA ke Sandgren. The  code is in active  development and
+new features are  being implemented mainly following  the fortran 2003
+standard.   Additionally the  MPI implementation  has been  updated to
+enhance the speed  of running parallel jobs and provide  a more robust
+parallelization across  different cluster architectures.   The program
+code is  hosted online  thanks to a  generous github  academic account
+granted to the program developers at Uppsala University.  Instructions
+on  how to  obtain the  code  can be  found online  at the  Q-website:
 \url{http://qdyn.no-ip.org/}.
 
 Regarding the  name of the program  there are many conjectures  as the
@@ -266,27 +267,27 @@ github repository.
 % Main user guide.
 %===============================================================================
 \section{USER GUIDE}
-The  structure  of  Q  resembles  that of  many  other  MD  simulation
-programs.  The main  program is  \textbf{qdyn} which  carries out  the
-actual trajectory calculations. Besides  normal input control data, it
-needs  the   type  of  data   usually  referred  to  as   a  molecular
-topology. This  is a file  containing information about how  atoms are
-bonded to  each other  etc. together  with all  the parameters  of the
-force field  (FF) to be used.  This topology file is  created with the
-preparation  program \textbf{qprep}  which is  an interactive  program
-that uses  pdb (Protein Data  Bank) coordinate files together  with FF
-specific files  to generate the  topology. \textbf{qprep} can  also be
-used  for  various other  data  transformation  purposes as  described
-below.  Input data for FEP, EVB or receptor-ligand complex simulations
-is given in  a separate file, referred  to below as the  fep file. The
-fep file lists atoms to be transformed, called Q-atoms and force field
-parameters for  the different states in  perturbation simulations. For
-analysis of the computations the main tool is \textbf{qfep} which is a
-program that  carries out  FEP and EVB  calculations of  free energies
-using energy data  produced by \textbf{qdyn}. A  number of utility
-programs  (trajectory   and  energy  averaging,   radial  distribution
-functions, ...) are  also provided. The general outline of  Q is shown
-in figure \ref{fig:overview}.
+The structure of \textbf{Q} resembles that of many other MD simulation
+programs.  The main program which  solves Newton's equations of motion
+(i.e., the  trajectory calculations) is called  \textbf{qdyn}. Besides
+from input control  data, it needs a type of  data usually referred to
+as molecular topology. This is a file containing information about how
+atoms are bonded  to each other etc. together with  all the parameters
+of the  force field (FF)  to be used.   This topology file  is created
+with the  preparation program  \textbf{qprep} which is  an interactive
+program that  uses pdb (Protein  Data Bank) coordinate  files together
+with FF  specific files to  generate the topology.  \textbf{qprep} can
+also  be  used  for  various other  data  transformation  purposes  as
+described below.  Input  data for FEP, EVB  or receptor-ligand complex
+simulations is given in a separate  file, referred to below as the fep
+file. The fep  file lists atoms to be transformed,  called Q-atoms and
+force  field  parameters  for  the different  states  in  perturbation
+simulations.  For  analysis  of  the computations  the  main  tool  is
+\textbf{qfep}  which  is  a  program  that carries  out  FEP  and  EVB
+calculations  of   free  energies   using  energy  data   produced  by
+\textbf{qdyn}.  A number  of utility  programs (trajectory  and energy
+averaging, radial distribution functions,  ...) are also provided. The
+general outline of \textbf{Q} is shown in figure \ref{fig:overview}.
 
 \begin{figure}[h]
 \begin{center}
@@ -298,10 +299,10 @@ name extensions. The black boxes are programs.}
 \end{center}
 \end{figure}
 
-In the following sections we will go through the normal sequence
-of steps for preparing a topology file with \textbf{qprep} and then
-describe in detail the input data required for running MD
-simulations with \textbf{qdyn}.
+In the  following sections we will  go through the normal  sequence of
+steps  for preparing  a  topology file  with  \textbf{qprep} and  then
+describe in detail the input  data required for running MD simulations
+with \textbf{qdyn}.
 
 \subsection{Preparing a molecular topology} The topology file
 prepared with the program \textbf{qprep} contains all the information about
@@ -316,45 +317,45 @@ library entries.
 \item Coordinates for all (non-solvent) atoms in the form of a PDB file.
 \end{itemize}
 
-\subsubsection{\textbf{qprep} - Preparing coordinates} The PDB file format
-\cite{pdb} used for co-ordinate input to \textbf{qprep} is a fixed format,
-$i.e.$, the number of spaces between columns of data is significant
-and tab characters are not permitted. Case is significant -
-lower-case letters should not be used. Only ATOM and HETATM
-records are read by \textbf{qprep}, all other records are ignored.
+\subsubsection{\textbf{qprep} - Preparing coordinates}
+The  PDB  file  format  \cite{pdb}   used  for  coordinate  input  to
+\textbf{qprep} is a fixed format, $i.e.$, the number of spaces between
+columns  of   data  is   significant  and   tab  characters   are  not
+permitted.  Case is  significant -  lower-case letters  should not  be
+used. Only  ATOM and  HETATM records are  read by  \textbf{qprep}, all
+other records are ignored.
 
-Hydrogen atoms are not required - their coordinates will be
-generated by \textbf{qprep} in such a way that the bond and angles to the
-hydrogen atom are at an energy minimum. To further control the
-placement of hydrogens, a special torsion potential defined in the
-fragment library entry may be included. See
-[\textbf{build\_rules}] on page \pageref{tab:buildrules}. If
-hydrogen atom coordinates are given in the PDB file, they will not
-be altered.
+Hydrogen atoms are not required  - their coordinates will be generated
+by  \textbf{qprep} in  such a  way  that the  bond and  angles to  the
+hydrogen  atom  are at  an  energy  minimum.  To further  control  the
+placement of  hydrogens, a  special torsion  potential defined  in the
+fragment library entry may be included. See [\textbf{build\_rules}] on
+page \pageref{tab:buildrules}. If hydrogen  atom coordinates are given
+in the PDB file, they will not be altered.
 
-When a structure containing more than one molecule is loaded into
-\textbf{qprep}, the program will identify the boundaries between molecules
-either by the type of fragment or using `gap' marker lines.
-Fragments which are monomers in a polymer chain, like amino acids,
-have designated `head' and `tail' atoms in their library entries,
-defining how they should be connected to the neighbouring
-residues. Library entries describing separate molecules such as
-solvent or ligands do not contain this linkage information. To
-distinguish two peptide chains from each other it is necessary to
-introduce a gap marker line in the PDB file after the last atom of
-the first molecule. The gap marker consists of the word GAP in
-capital letters on a separate line.
+When  a structure  containing more  than one  molecule is  loaded into
+\textbf{qprep},  the  program  will identify  the  boundaries  between
+molecules either by the type of fragment or by placing a line with the
+`GAP' keyword between molecules.   Fragments which constitute monomers
+in  a polymer  chain, like  amino  acids, have  designated `head'  and
+`tail' atoms  in their  library entries, defining  how they  should be
+connected to  the neighbouring  residues.  Library  entries describing
+separate  molecules such  as solvent  or ligands  do not  contain this
+linkage  information.  To  distinguish  two peptide  chains from  each
+other it is necessary  to introduce a gap marker line  in the PDB file
+after the last atom of the first molecule.  The gap marker consists of
+the word GAP in capital letters on a separate line.
 
-The numbering of atoms in the PDB is not significant. Note that
-\textbf{qprep} will renumber all atoms in a single sequence starting at
-one. This is necessary in order to incorporate hydrogen atoms in
-the sequence. The result is thus that \textit{atom numbers in the
-PDB file read by \textbf{qprep} and PDB files generated by \textbf{qprep} will be
-different}. Residue numbers are used merely to distinguish one
-residue from the next and the residues will also be renumbered by
-\textbf{qprep}. Residue numbers must be numeric, alphanumeric identifiers
-such as 60A sometimes encountered in the protein data bank are not
-permitted.
+The  numbering of  atoms  in the  PDB is  not  significant. Note  that
+\textbf{qprep} will renumber  all atoms in a  single sequence starting
+at one.  This is necessary in  order to incorporate hydrogen  atoms in
+the sequence. The result is  that \textit{atom numbers in the PDB
+  file   read   by  \textbf{qprep}   and   PDB   files  generated   by
+  \textbf{qprep} will  be different}. Residue numbers  are used merely
+to distinguish one residue from the next and the residues will also be
+renumbered  by  \textbf{qprep}.  Residue   numbers  must  be  numeric,
+alphanumeric  identifiers such  as  60A sometimes  encountered in  the
+protein data bank are not permitted.
 
 Protein structures  determined by  X-ray crystallography  are normally
 refined  with  a  large  number  of water  molecules.  Some  of  these
@@ -375,153 +376,159 @@ molecules  outside the  simulation sphere  (more than  water radius  +
 2~{\AA}  from  solvent centre)  will  be  excluded like  solute  atoms
 outside the solute sphere.
 
+
 \subsubsection{Selecting a force field}
-Q is designed  to run with a wide selection  of force fields. Fragment
-libraries and force field parameters for AMBER95, AMBER/OPLS, OPLS-AA,
-CHARMM  v.22,  GROMOS87   and  GROMOS96  are  supplied   with  the
-program. The corresponding  library and FF parameter  files are listed
-in table \ref{tab:FF} on page \pageref{tab:FF}. In addition to all the
-interaction parameters,  a Q force  field parameter file  also include
-overall  properties of  the force  field, such  as the  van der  Waals
-parameter combination rule. Selecting a force field is thus equivalent
-to loading  the appropriate fragment  library and parameter  file into
-\textbf{qprep}.
+\textbf{Q} is designed  to run with a wide selection  of force fields.
+Fragment libraries and force field parameters for AMBER95, AMBER/OPLS,
+OPLS-AA, CHARMM v.22, CHARMM v. 36, GROMOS87 and GROMOS96 are supplied
+with the program. The corresponding library and FF parameter files are
+listed in table \ref{tab:FF} on page \pageref{tab:FF}.  In addition to
+all  the interaction  parameters, a  \textbf{Q} force  field parameter
+file also includes overall properties of  the force field, such as the
+van der Waals  equation parameter combination rule.  Selecting a force
+field is thus  equivalent to loading the  appropriate fragment library
+and parameter file into \textbf{qprep}.
+
 
 \subsubsection{Adding force field library entries}
-Your simulations will probably include molecular fragments other
-than the amino acid residues and solvent molecules that are
-included in the standard library files and you therefore need to
-write a library entry for each 'new' residue, ligand, co-factor or
-other molecule. We suggest you keep your library entries in a
-separate file rather than adding to the standard library file.
-Load first the standard library and then your own into \textbf{qprep}. If
-you need to modify an entry in the standard library, add the
-modified entry (keeping the same name) to your own library file -
-it will replace the old entry when loaded.
+Your simulations will probably  include molecular fragments other than
+the amino acid residues and solvent molecules that are included in the
+standard library files and you therefore need to write a library entry
+for  each  'new' residue,  ligand,  co-factor  or other  molecule.  We
+suggest you keep  your library entries in a separate  file rather than
+adding to the standard library  file.  Load first the standard library
+and then your own into \textbf{qprep}.  If you need to modify an entry
+in  the standard  library, add  the modified  entry (keeping  the same
+name) to your  own library file -  it will replace the  old entry when
+loaded.
 
 The best starting point for generating a new entry is to copy an
 old one, this ensures the correct syntax. For details, see the
 section Fragment library file format on page
 \pageref{subsubsec:fragment_lib_f_f}.
 
+
 \subsubsection{Running \textbf{qprep}}
-\textbf{qprep} is a command-oriented program designed to be run
-interactively. The first thing you need to learn about \textbf{qprep} is
-that there is a help command which gives a list of available
-commands. The program's input parser will prompt for the
-parameters required for each command but will also accept complex
-command lines including the parameters. Thus, you may either enter
-the command \textbf{readlib} and await the prompt 'Name of
-molecular library' or you may type \textbf{readlib
-my{\_}ligands.lib} on one line.
+\textbf{qprep}  is  a  command-oriented  program designed  to  be  run
+interactively. The first thing you  need to learn about \textbf{qprep}
+is  that there  is a  help  command which  gives a  list of  available
+commands. The  program's input parser  will prompt for  the parameters
+required for each  command but will also accept  complex command lines
+including  the parameters.  Thus,  you may  either  enter the  command
+\textbf{readlib} and await  the prompt 'Name of  molecular library' or
+you may type \textbf{readlib my{\_}ligands.lib} on one line.
 
-A good deal of effort has been spent to make \textbf{qprep} handle errors
-gracefully. When a problem is encountered in a fragment library,
-parameter file or PDB file, you will be notified but the
-processing of the file will proceed, thus exposing also errors
-later in the file. After correcting the problem you simply read
-the file again without the need to restart the program.
+A good  deal of effort  has been  spent to make  \textbf{qprep} handle
+errors  gracefully.  When  a  problem is  encountered  in  a  fragment
+library, parameter  file or  PDB file,  you will  be notified  but the
+processing of the  file will proceed, thus exposing  also errors later
+in the  file. After correcting  the problem  you simply read  the file
+again without the need to restart the program.
 
-The different steps to generate a topology with \textbf{qprep} are
-described below, in the sequence they are normally executed. More
-detailed information is available in the section Topology
-preparation reference on page \pageref{subsec:top_prep_ref}.
+The different  steps to  generate a  topology with  \textbf{qprep} are
+described  below, in  the sequence  they are  normally executed.  More
+detailed information is available  in the section Topology preparation
+reference on page \pageref{subsec:top_prep_ref}.
 
-\textbf{Loading fragment libraries}\\*[0.25cm] Use the
-\textbf{readlib} command to load fragment libraries. Many
-libraries may be loaded by repeating the \textbf{readlib} command
-for each of them. Note that if one entry name occurs more than
-once, the latest definition takes precedence. A warning message is
-issued when a library entry is overloaded.
+\textbf{Loading fragment libraries}\\*
+[0.25cm] Use the \textbf{readlib}  command to load fragment libraries.
+Many libraries may be loaded by repeating the \textbf{readlib} command
+for each of them.  Note that if one entry name  occurs more than once,
+the latest  definition takes precedence.  A warning message  is issued
+when a library entry is overloaded.
 
-Errors encountered while reading a library will be displayed and
-after they have been corrected, the library may be loaded again.
-To remove all library entries from memory, use the
-\textbf{clearlib} command.
+Errors encountered while reading a library will be displayed and after
+they have been corrected, the library  may be loaded again.  To remove
+all library entries from memory, use the \textbf{clearlib} command.
 
-\textbf{Loading force field parameters}\\*[0.25cm] Use the
-\textbf{readprm } command to load force field parameters. As
-opposed to the case with fragment libraries, only a single
-parameter file can be loaded. If you need to modify the parameter
-file, edit and save it and load it again. It is not necessary to
-reload fragment libraries or the structure.
+\textbf{Loading force field parameters}\\*
+[0.25cm]  Use  the  \textbf{readprm  } command  to  load  force  field
+parameters. As  opposed to  the case with  fragment libraries,  only a
+single  parameter file  can  be  loaded. If  you  need  to modify  the
+parameter  file,  edit and  save  it  and load  it  again.  It is  not
+necessary to reload fragment libraries or the structure.
 
-\textbf{Loading coordinates}\\*[0.25cm] Use the \textbf{readpdb}
-command to load the molecular structure file. Before loading the
-structure, the program will verify that all the required library
-entries are loaded and that the number of heavy atoms of each
-fragment is correct. Only one file can be loaded - reading another
-file clears the previously loaded structure. This is useful as you
-reload the same file after correcting a problem.
+\textbf{Loading coordinates}\\*
+[0.25cm]  Use  the  \textbf{readpdb}  command to  load  the  molecular
+structure file.  Before loading the structure, the program will verify
+that all the  required library entries are loaded and  that the number
+of  heavy atoms  of each  fragment is  correct. Only  one file  can be
+loaded   -  reading   another  file   clears  the   previously  loaded
+structure. This is useful as you reload the same file after correcting
+a problem.
 
-\textbf{Choosing boundary condition}\\*[0.25cm] Use the
-\textbf{boundary} command to set the boundary condition; sphere or
-box. When a boundary has been chosen the centre and radius in the
-spherical case, and boxlengths in the periodical case are
-specified. It is important that the boundary condition defined in
-the topology file is consistent with the boundary condition used
-when running dynamics with \textbf{qdyn}.
+\textbf{Choosing boundary condition}\\*
+[0.25cm]  Use  the  \textbf{boundary}  command  to  set  the  boundary
+condition; sphere or  box. When a boundary has been  chosen the centre
+and radius  in the  spherical case, and  boxlengths in  the periodical
+case  are  specified. It  is  important  that the  boundary  condition
+defined in the topology file is consistent with the boundary condition
+used when running dynamics with \textbf{qdyn}.
 
-\textbf{Adding solvent}\\*[0.25cm] Use the \textbf{solvate}
-command to add solvent molecules to the loaded structure. Using
-spherical boundary solvent can be generated by any of the
-following methods:
+\textbf{Adding solvent}\\*
+[0.25cm] Use the \textbf{solvate} command  to add solvent molecules to
+the loaded structure. When using  a spherical boundary the solvent can
+be generated by any of the following methods:
 
 \begin{itemize}
-\item Using randomly oriented molecules on a grid. This option does not depend
-on any solvent coordinate file but only asks which library entry
-should be used. The density is specified in the library entry.
-\item By reading solvent coordinates from a solvent file. The solvent file is
-similar to a PDB file, see Solvent file format on page
-\pageref{subsubsec:solvent_file_format}. The solvent file contains
-coordinates for a sphere or box of solvent. In the case of a box,
-it will be replicated in all directions as needed and can thus be
-used to solvate a system of any size.
-\item By reading solvent coordinates from a restart file from a previous
-simulation of the same molecular system.
+\item Using  randomly oriented molecules  on a grid. This  option does
+  not  depend on  any  solvent  coordinate file  but  only asks  which
+  library  entry should  be  used.  The density  is  specified in  the
+  library  entry.   The  sphere  center  can  be  specified  by  x,y,z
+  coordinates,    residue\_number:atom\_name,   using    the   keyword
+  \textit{MASS} to  center at the center  of mass of the  molecule, or
+  using the  keyword \textit{BOUNDARY},  to use  the same  boundary as
+  that which must have been given previously with the \textit{boundary}
+  command. 
+\item By reading solvent coordinates  from a solvent file. The solvent
+  file  is similar  to a  PDB file,  see Solvent  file format  on page
+  \pageref{subsubsec:solvent_file_format}.  The solvent  file contains
+  coordinates for a sphere or box of solvent. In the case of a box, it
+  will be replicated in all directions  as needed and can thus be used
+  to solvate a system of any size.
+\item  By reading  solvent  coordinates  from a  restart  file from  a
+  previous simulation of the same molecular system.
 \end{itemize}
 
-When using one of the two first methods, \textbf{qprep} first fills a
-sphere completely with solvent and then deletes molecules where
-heavy atoms are closer than a threshold distance to any heavy atom
-in the loaded structure. The threshold distance is controlled by
-the \textbf{qprep} preference value \textbf{solvent{\_}pack}.
-Crystallographic solvent molecules (in the PDB file loaded by
-readpdb) more than 2~{\AA} outside the solvent sphere will be
-excluded from the simulation to avoid excessive radial restraining
-forces.
+When using one of the two  first methods, \textbf{qprep} first fills a
+sphere completely with solvent and  then deletes molecules where heavy
+atoms are  closer than a threshold  distance to any heavy  atom in the
+loaded  structure.  The  threshold   distance  is  controlled  by  the
+\textbf{qprep}     preference      value     \textbf{solvent{\_}pack}.
+Crystallographic solvent molecules (in the PDB file loaded by readpdb)
+more than 2~{\AA} outside the solvent sphere will be excluded from the
+simulation to avoid excessive radial restraining forces.
 
-If periodic boundary is used it is not possible to use a solvent
-file with a sphere of solvent. Moreover the threshold distance is
-also applied to solvent molecules near the boundary, to avoid
-crashes between solvent molecules in neighbouring boxes.
+If periodic boundary is used it is  not possible to use a solvent file
+with  a sphere  of solvent.  Moreover the  threshold distance  is also
+applied  to solvent  molecules  near the  boundary,  to avoid  crashes
+between solvent molecules in neighbouring boxes.
 
-At present, the choice of solvent is limited to tri-atomic
-molecules like the SPC\cite{Berendsen:1981} and
-TIP3P\cite{Jorgensen:1983} water models or methanol in an extended
-atom representation.
+At present, the  choice of solvent is limited  to tri-atomic molecules
+like the SPC\cite{Berendsen:1981} and TIP3P\cite{Jorgensen:1983} water
+models or methanol in an extended atom representation.
 
-Note: Make sure that crystallographic water molecules and waters
-added by the solvate command have \textit{the same residue name}!
-Otherwise \textbf{qprep} will mark the topology as mixed-solvent, which is
-not implemented in \textbf{qdyn} at present.
+Note: Make sure that crystallographic water molecules and waters added
+by the solvate command have \textit{the same residue name}!  Otherwise
+\textbf{qprep} will mark  the topology as mixed-solvent,  which is not
+implemented in \textbf{qdyn} at present.
 
-\textbf{Adding cross-link bonds}\\*[0.25cm] Cross-link bonds such
-as disulphide bridges in proteins are not generated automatically
-{\-} they are not defined in the fragment library. Extra bonds can
-be added automatically by searching the solute molecules for close
-but not bonded atom pairs, or manually by specifying atom numbers.
-To generate cross-link bonds automatically, use the \textbf{xlink}
-command. For each close atom pair found, you need to confirm or
-reject the making of a bond. To add bonds manually, use the
-\textbf{addbond} and specify the atoms to be bonded, either by
+\textbf{Adding cross-link bonds}\\*
+[0.25cm] Cross-link bonds  such as disulphide bridges  in proteins are
+not generated automatically {\-} they  are not defined in the fragment
+library.  Extra bonds  can  be added  automatically  by searching  the
+solute molecules for  close but not bonded atom pairs,  or manually by
+specifying atom numbers.  To  generate cross-link bonds automatically,
+use the  \textbf{xlink} command. For  each close atom pair  found, you
+need to confirm or reject the making of a bond. To add bonds manually,
+use the \textbf{addbond} and specify the atoms to be bonded, either by
 atom numbers or in the form residue{\_}number:atom{\_}name.
 
-\textbf{Generating the topology}\\*[0.25cm] The \textbf{maketop}
-command is used to create the topology in memory. The only input
-for this command is a name for the topology. The process involves
-the following steps which are all carried out by the maketop
-routine without further user input:
+\textbf{Generating the topology}\\*
+[0.25cm] The \textbf{maketop}  command is used to  create the topology
+in  memory.  The  only input  for  this  command  is  a name  for  the
+topology.  The process  involves  the following  steps  which are  all
+carried out by the maketop routine without further user input:
 
 \begin{itemize}
 \item Setting atom types and partial charges.
@@ -536,10 +543,10 @@ and solvent atoms in the sphere, typically differs somewhat from
 the radius used in the solvation step.
 \end{itemize}
 
-\textbf{Verifying the topology}\\*[0.25cm] The successful
-generation of a topology in the step above is no guarantee that it
-is correct. Fortunately \textbf{qprep} offers a number of commands to check
-the topology:
+\textbf{Verifying the topology}\\*
+[0.25cm] The successful generation of a  topology in the step above is
+no guarantee that  it is correct. Fortunately  \textbf{qprep} offers a
+number of commands to check the topology:
 
 \begin{itemize}
 \item \textbf{Checkbonds} is used to list bonds with a potential energy
@@ -566,9 +573,9 @@ the sign of selected impropers or of all impropers with energy
 exceeding a threshold value.
 \end{itemize}
 
-\textbf{Writing topology and coordinate files}\\*[0.25cm] The
-final step in making a topology is saving it to a file by using
-the \textbf{writetop} command.
+\textbf{Writing topology and coordinate files}\\*
+[0.25cm] The final step in making a topology is saving it to a file by
+using the \textbf{writetop} command.
 
 You will also need to make a PDB (or mol2, see below) file from
 the topology to see the new numbers of the atoms. These are the
@@ -577,11 +584,12 @@ topology modifications for perturbation simulations. Use the
 \textbf{writepdb} command to write a PDB file containing all the
 atoms of the topology.
 
-\textbf{Setting preferences}\label{setting_pref}\\*[0.25cm] A
-number of parameters that affect the operation of \textbf{qprep}, $e.g.$
-during solvation, but which are not normally changed are not
-required as input to the commands. These parameters may be changed
-by experience users by the preference mechanism in \textbf{qprep}.
+\textbf{Setting preferences}\label{setting_pref}\\*
+[0.25cm]  A  number  of  parameters   that  affect  the  operation  of
+\textbf{qprep}, $e.g.$  during solvation,  but which are  not normally
+changed are  not required as  input to the commands.  These parameters
+may  be changed  by experience  users by  the preference  mechanism in
+\textbf{qprep}.
 
 The \textbf{prefs} command is used to list the values of
 user-setable parameters and the \textbf{set} command to change a
@@ -1462,7 +1470,7 @@ interactions from saved trajectory files.
 
 \subsection{Parallel version of Q} Even though computers become
 faster every year the work that a single computer can do is
-limited. A single execution of Q will take hours or even days. If
+limited. A single execution of \textbf{Q} will take hours or even days. If
 a several computers were able to work in parallel with the same
 job the execution time could be reduced substantially.
 
@@ -1472,7 +1480,7 @@ drive. The nodes communicate through a fast network switch
 providing an environment suitable for running parallel program. Q
 has been parallelised to fit these type of machines.
 
-The part of Q that can be run in parallel is \textbf{qdyn} which contain
+The part of \textbf{Q} that can be run in parallel is \textbf{qdyn} which contain
 the time demanding conformational sampling. The parallel version
 is suitable to run on 2 - 20 nodes depending on the size of the
 problem and the speed of the network.
@@ -1503,21 +1511,21 @@ where $P$ is the number of processors. The efficiency describes
 how well the total cpu-time is utilised in the parallel version
 compared to the sequential program.
 
-The speed-up and efficiency of Q was measured using periodic
-boundary condition for a molecular system with a ion-channel with
-1550 atoms solvated by 4514 water molecules. Two series of
-executions were made with two different cut-offs. The tests were
-performed at a cluster with IBM SP2-nodes, 160 MHz.
+The speed-up and efficiency of  \textbf{Q} was measured using periodic boundary
+condition for  a molecular system  with a ion-channel with  1550 atoms
+solvated by 4514  water molecules. Two series of  executions were made
+with two  different cut-offs.  The tests were  performed at  a cluster
+with IBM SP2-nodes, 160 MHz.
 
-The results of the test series can be seen in figure.
-\ref{fig:speedup} and \ref{fig:efficiency}. The graphs show the
-typical behaviour of a parallel program; the more nodes you use
-the faster executions you get. But at the same time the nodes are
-utilised less efficient. It is a trad-off between speed and
-efficiency that is up to the user to decide. When the number of
-simulations is close to the number of computers it is more
-efficient to run sequentially; performing 15 simulations on 15
-computers is best done by assigning one job per node.
+The   results  of   the   test   series  can   be   seen  in   figure.
+\ref{fig:speedup}  and  \ref{fig:efficiency}.   The  graphs  show  the
+typical behaviour  of a parallel program;  the more nodes you  use the
+faster executions you get. But at the same time the nodes are utilised
+less efficient. It is a trad-off  between speed and efficiency that is
+up to the user  to decide. When the number of  simulations is close to
+the  number of  computers it  is more  efficient to  run sequentially;
+performing 15  simulations on 15  computers is best done  by assigning
+one job per node.
 
 
 \begin{figure}[hbt]
@@ -1538,12 +1546,12 @@ more communication and longer summation of the forces.}
 \end{center}
 \end{figure}
 
-\subsubsection{Running Q on a cluster} Q version 5.0 and higher can
+\subsubsection{Running Q on a cluster} \textbf{Q} version 5.0 and higher can
 be run in parallel on clusters. The parallel version is easy to
 use. The only requirement is a computer cluster with high
 bandwidth and a version of Message Passing Interface (MPI)
 installed. MPI is a standard interface for communication between
-nodes in a cluster. To run Q on the cluster you need the parallel
+nodes in a cluster. To run \textbf{Q} on the cluster you need the parallel
 version of Q, \emph{i.e.} the one that has been compiled with the
 MPI-flag activated. If you compile the program yourself define the
 variable USE\_MPI to the preprocessor. To check that you have the
@@ -1553,12 +1561,12 @@ the top of the file where it should read "\textbf{qdyn} version
 X.XX\_parallel initialising....". The parallel version can be
 executed on a single node but still requires MPI installed.
 
-When submitting jobs to a cluster Q will automatically detect how
-many nodes that are available. Thus no special input to Q is
+When submitting jobs to a cluster \textbf{Q} will automatically detect how
+many nodes that are available. Thus no special input to \textbf{Q} is
 required about how many nodes are being used. Make sure you run on
 dedicated nodes, \emph{i.e.} you have exclusive access to the
 nodes, and that no other job is running on the nodes. If the nodes
-are not dedicated entirely to Q the parallel execution become
+are not dedicated entirely to \textbf{Q} the parallel execution become
 meaningless as a result of the synchronisation between the nodes
 in each time step. Consult your system administrator on how to
 commit jobs to a specified number of dedicated nodes.
@@ -1630,7 +1638,7 @@ markers.
 
 
 \subsubsection{Free energy calculation using \textbf{qfep}} Performing free
-energy perturbation (FEP) calculations with Q involves running a
+energy perturbation (FEP) calculations with \textbf{Q} involves running a
 set of consecutive input files which have the mapping parameter
 vector $\lambda$ ranging in a desired way (usually [1, 0] to [0,
 1] for two states). \textbf{qfep} is a program which reads the energy files
@@ -1848,7 +1856,7 @@ defined.
 
 \subparagraph{Force field}
 A  force field  translation  key has  to  be given  to  allow for  the
-translation  of atom  types according  to  the Q  convention to  types
+translation  of atom  types according  to  the \textbf{Q}  convention to  types
 according to the  Sybyl convention. The translation tables  are in the
 file ATOM\_TYPE\_CONVERSIONS.dat (shared  with PMF-Score). A different
 translation file can be specified in the input file (see below).
@@ -1958,7 +1966,7 @@ Applying more than one hydrophobic algorithm results in a consensus score. Defau
   Presently, all atoms defined as solvent atoms are ignored. Critical water molecules should be defined as part of the protein or they will be excluded.
 
   \subparagraph{Force field}
-  As for X-Score, a force field translation key has to be given to allow for the translation of Q atom types to Sybyl atom types. The Sybyl type derived is only used to determine the hybridization of carbon and nitrogen atoms.
+  As for X-Score, a force field translation key has to be given to allow for the translation of \textbf{Q} atom types to Sybyl atom types. The Sybyl type derived is only used to determine the hybridization of carbon and nitrogen atoms.
 
   \subparagraph{Scoring parameters}
   Output options, data files and the maximum ring size considered are defined in an input file. The output options are similar to those in X-Score. The maximum ring size parameter determines the number of steps the ring finding algorithm will take in every search direction. Too low a setting will prevent the algorithm from finding all rings. Too high a setting will increase the time required for the ring search.
@@ -1997,7 +2005,7 @@ of a short equilibration trajectory file!
 \section{TUTORIALS}
 \subsection{Binding affinity from LIE simulations}
 The example here  is the binding of stearate to  a muscular fatty-acid
-binding protein. We have used the Q version of the GROMOS87 forcefield
+binding protein. We have used the \textbf{Q} version of the GROMOS87 forcefield
 for the simulations.
 
 \subsubsection{Editing the PDB file}
@@ -2226,7 +2234,7 @@ OH-groups).\cite{Hansson:1998}
 \section{REFERENCE GUIDE}
 \subsection{Program modules}
 Q is  build from  Fortran90 modules, which  are combined  in different
-sets in  the Q  programs, as shown  in figure  \ref{fig:modules}. This
+sets in  the \textbf{Q}  programs, as shown  in figure  \ref{fig:modules}. This
 makes it  easier to  maintain the  software. It  also makes  it rather
 straight-forward for  users with  experience in programming  to create
 their own  special-purpose programs by re-using  $e.g.$ the trajectory
@@ -2313,7 +2321,7 @@ cut-off  only based  on the  distance between  the switching  centres,
 while others include  all interactions between two groups  if any pair
 of atoms is within the cut-off radius.
 
-Some properties of the force fields available for Q are given in table
+Some properties of the force fields available for \textbf{Q} are given in table
 \ref{tab:FF}. Please note that these are our translations of the force
 field and we cannot guarantee 100\% identity with the original.
 
@@ -2472,7 +2480,7 @@ or. If no mask is given, all atoms are selected by default.
 \hline \bf{preferences} & prefs &                  & List atoms in residue. \\
 \hline \bf{quit}        & q  &                     &  Quit the program. \\
 \hline \bf{readframe}   & rf & [trajectory file [frame no.]] &
-Load coordinates from Q trajectory file
+Load coordinates from \textbf{Q} trajectory file
                                                                (unformatted) \\
 \hline \bf{readlib}     & rl & [library file]      & Read library file. This command may be repeated to load
                                                      multiple libraries.  \\
@@ -2480,7 +2488,7 @@ Load coordinates from Q trajectory file
 \hline \bf{readpdb}     & rp & [pdb file]          & Read pdb file. \\
 \hline \bf{readprm}     & rprm & [parameter file]   &  Read force field parameter file. \\
 \hline \bf{readtop}     & rt & [topology file]     & Read topology file. \\
-\hline \bf{readx}       & rx & [restart file]      & Load coordinates from Q restart file (unformatted).\\
+\hline \bf{readx}       & rx & [restart file]      & Load coordinates from \textbf{Q} restart file (unformatted).\\
 \hline \bf{set}         & s  &                     & Set preferences.  \\
 \hline \multirow{3}{58pt}{\bf{solvate (box)}} & \multirow{3}{27pt}{so} & [grid] [solvent name] [boxcentre] [boxsize]
 & Add solvent molecules from a grid to a box. \\
@@ -2865,20 +2873,20 @@ for pairs of atom types or for single atom types col. description \\
 
 \subsubsection{Solvent file format}
 \label{subsubsec:solvent_file_format} \textbf{qprep} can solvate a
-molecular systems by filling empty space in the simulation sphere
-or box by water molecules taken from a water file. This file is a
-special PDB-like file containing a box or a sphere of water
-molecules. The residue name in the water file is used to designate
-the library entry to use for generating bonds etc.
+molecular systems by  filling empty space in the  simulation sphere or
+box by water molecules taken from a water file. This file is a special
+PDB-like file  containing a box  or a  sphere of water  molecules. The
+residue name in the water file  is used to designate the library entry
+to use for generating bonds etc.
 
-When using a box for solvation, the box can be replicated in all
-direction so that a small box can be used to solvate a big
-simulation sphere or box. Spheres cannot be replicated and must be
-larger than the intended simulation system. The box or sphere will
-be translated to the water generation centre, so the origin used
-in the file is arbitrary. A sphere can not be used to solvate a
-system intended for simulation with periodic boundaries. The file
-format is described in Table \ref{tab:wat_file}.
+When  using a  box for  solvation, the  box can  be replicated  in all
+direction so that a small box can  be used to solvate a big simulation
+sphere or  box. Spheres cannot be  replicated and must be  larger than
+the intended simulation  system. The box or sphere  will be translated
+to the  water generation  centre, so  the origin used  in the  file is
+arbitrary. A sphere  can not be used to solvate  a system intended for
+simulation with periodic  boundaries. The file format  is described in
+Table \ref{tab:wat_file}.
 
 
 \begin{table}[h]
@@ -3019,7 +3027,7 @@ In periodic boundary conditions (PBC) no restraints as described
 in the previous section is applied to the atoms and no atoms are
 excluded. This allows larger flexibility in the molecular system
 but increases runtime. This section contains some things worth to
-keep in mind when using Q with PBC.
+keep in mind when using \textbf{Q} with PBC.
 
 The shape of the box may be cubic or rectangular. The cut-off must
 never be larger than one half of the shortest side of the box.
@@ -3083,7 +3091,7 @@ max\_volume\_displacement, which corresponds to $\Delta V_{max}$.
 \subsection{Units}
 \label{subsec:units}
 
-The units used in Q are the basic units in table \ref{tab:units}
+The units used in \textbf{Q} are the basic units in table \ref{tab:units}
 and combinations thereof. \small
 \begin{table}[h]
 \begin{center}
@@ -3106,7 +3114,7 @@ equation, being some methods more precise than others. Nevertheless,
 high precision is not necessarily the most important feature of an algorithm 
 for molecular dynamics simulations. An equation of motion must be 
 time-reversible in order to conserve the phase space volume if one is looking 
-for physical conservation laws. Q provides two options of symplectic 
+for physical conservation laws. \textbf{Q} provides two options of symplectic 
 integrators: the Leapfrog and the velocity Verlet algorithms.
 
 \subsubsection{Leapfrog algorithm}
@@ -3142,11 +3150,11 @@ This is scheme is prone to less error, as it computes positions and velocities
 at the same time interval. However, the computational cost becomes slightly higher.
 
 \subsubsection{Constant temperature algorithms (Thermostats)}
-In   Q    the   thermostat   in    use   at   the   moment    is   the
+In   \textbf{Q}    the   thermostat   in    use   at   the   moment    is   the
 Berendsen\cite{Berendsen:1984}   thermostat,  implementation   of  the
 Langevin thermostat and perhaps other thermostats is underway.
 
-%In  Q  thermostat  (temperature-control) algorithms  can  be  selected
+%In  \textbf{Q}  thermostat  (temperature-control) algorithms  can  be  selected
 %according to  the users  criteria and best  judgment. There  are three
 %thermostats     implemented     in     the    code,     these     are,
 %Berendsen\cite{Berendsen:1984},                          Nos\'e-Hoover
@@ -3169,7 +3177,7 @@ the \textbf{\textit{bath\_coupling}} keyword.
 
 %% Check  Merrink2010 main  and supplementary  and also  the code  and
 %% rewrite. As far as Mauricio  Esguerra understands it, the Berendsen
-%% thermostat in Q  has been implemented in the same  way as it's done
+%% thermostat in \textbf{Q}  has been implemented in the same  way as it's done
 %% in GROMACS, that is, we couple to TempKE and report TempKE.
 
 \begin{equation}
@@ -3932,7 +3940,7 @@ energy summaries.
 
 %FIX THIS SECTION! Remove, update or put it on the web!
 
-%This section is only of interest for users of Q version 3 and
+%This section is only of interest for users of \textbf{Q} version 3 and
 %presents the important differences between versions 3 and 4. The
 %trajectory analysis program \textbf{qcalc} is added to the package, making
 %it easy to calculate RMS coordinate deviations (with or without
@@ -3971,7 +3979,7 @@ energy summaries.
 
 \subsection{Utility programs} A number of little programs and scripts that may
 be useful in the different steps in preparing or analyzing MD
-simulations are also available at the Q web site and briefly
+simulations are also available at the \textbf{Q} web site and briefly
 described here.
 
 \subsubsection{\textbf{qcalc}}\label{subsubsec:qcalc}

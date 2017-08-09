@@ -4,7 +4,7 @@
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
 !  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
 !  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Kazemi, Paul Bauer,     !
-!  Miha Purg, Irek Szeler                                                      !
+!  Miha Purg, Irek Szeler, Mauricio Esguerra                                   !
 !  latest update: March 29, 2017                                               !
 !------------------------------------------------------------------------------!
 
@@ -44,25 +44,25 @@ program qcalc
   integer                 :: k
 
   !constants
-  integer, parameter                      ::      MAX_CALCS = 99
-  integer, parameter                      ::      MAX_CALC_KINDS = 99
+  integer, parameter      :: max_calcs = 99
+  integer, parameter      :: max_calc_kinds = 99
   
   !data types  
   type calc_type
-          character(len=60)               ::      desc
-          integer                                 ::      i
-          integer                                 ::      typ
+    character(len=60)     :: desc
+    integer               :: i
+    integer               :: typ
   end type calc_type
 
   type calc_kind_type
-          character(len=40)               ::      desc
-          character(len=14)               ::      key
-          logical                                 ::      output
-  end type calc_kind_type                         
+    character(len=40)     :: desc
+    character(len=14)     :: key
+    logical               :: output
+  end type calc_kind_type
 
-  integer                                         ::      nkinds = 0, ncalcs = 0
-  type(calc_kind_type)            ::      cdef(max_calc_kinds)
-  type(calc_type)                         ::      calcs(max_calcs)
+  integer                 :: nkinds = 0, ncalcs = 0
+  type(calc_kind_type)    :: cdef(max_calc_kinds)
+  type(calc_type)         :: calcs(max_calcs)
 
 
   !register the calculation kinds
@@ -90,26 +90,21 @@ program qcalc
   ! helper info. mask_startup and topo_startup are dummy routines
   call startup
 
-  if(get_topology()) then         ! attempt to load topology (req. user input)
-                                                                                                          ! reads bnd(:) among other things
-          
-          call initialize                 ! initialize modules, mostly allocating arrays and def.ing constants
-          call add_calcs                  ! display calc menu and add calcs
-
-          call do_pre_calcs
-          
-          call process_help
-          call print_headings
-          call process_data               ! processes data frame by frame
-                         
-          call finalize_topology
-          call finalize
+  if(get_topology()) then  ! attempt to load topology (req. user input) reads bnd(:) among other things
+    call initialize        ! initialize modules, mostly allocate arrays and define constants
+    call add_calcs         ! display calc menu and add calcs
+    call do_pre_calcs
+    call process_help
+    call print_headings
+    call process_data      ! processes data frame by frame
+    call finalize_topology
+    call finalize
   else
-                write(*,900)
-900             format('>>>>> ERROR: Failed to load topology. Exiting')
-        end if
-        
-        call shutdown
+    write(*,900)
+900 format('>>>>> ERROR: Failed to load topology. Exiting')
+  end if
+
+  call shutdown
 
 contains
 
@@ -138,7 +133,6 @@ subroutine startup
   print '(a)',  'If you are using the interactive mode and want to quit type "quit" or Ctrl-C.' 
   print '(a)',  '--------------------------------------------------------------------------------'
 
-  
   call mask_startup       ! mask_startup calls topo_startup, which is empty
   write(*,*)
   
@@ -156,31 +150,30 @@ subroutine shutdown
 end subroutine shutdown
 
 logical function get_topology()
-        !locals
-
-        character(len=200)                      :: topfile
-        call getlin(topfile, '--> Topology file: ')
-        write(*,100) trim(topfile)
-100     format('Loading topology ',a)
-        get_topology = topo_load(topfile, require_version=4.)
+  !locals
+  character(len=200)                      :: topfile
+  call getlin(topfile, '--> Topology file: ')
+  write(*,100) trim(topfile)
+100 format('Loading topology ',a)
+  get_topology = topo_load(topfile, require_version=4.)
 end function get_topology
 
 
 subroutine initialize
-        allocate(xin(3*nat_pro))   ! contains all coordinates, 3*no_atoms
-        call rms_initialize
-        call rmsf_initialize
-        call fit_initialize
-        call geom_initialize
-        call entropy_initialize                                    
-        call nb_initialize         
-        call score_initialize          
-        call xscore_initialize
-        call pmf_initialize
-        call rdf_initialize
-        call com_ke_initialize
-        call com_initialize
-        !add more calls to module initialization routines here
+  allocate(xin(3*nat_pro))   ! contains all coordinates, 3*no_atoms
+  call rms_initialize
+  call rmsf_initialize
+  call fit_initialize
+  call geom_initialize
+  call entropy_initialize
+  call nb_initialize
+  call score_initialize
+  call xscore_initialize
+  call pmf_initialize
+  call rdf_initialize
+  call com_ke_initialize
+  call com_initialize
+  ! add more calls to module initialization routines if needed here
 end subroutine initialize
 
 subroutine do_pre_calcs
@@ -505,7 +498,7 @@ subroutine add_calcs
         call calc_menu                          ! calc_menu outputs menu and calc. descriptions
 
         do
-                write(*,'(a)', advance='no') 'Qcalc> '
+                write(*,'(a)', advance='no') 'qcalc> '
                 read(*,*) input
                 read(input, '(i5)', iostat=readstat) kind
                 if(readstat == 0) then !got numeric input
