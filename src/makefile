@@ -247,7 +247,7 @@ maskmanip.o:maskmanip.f90 mask.o misc.o parse.o
 md.o:	md.f90 mpiglob.o qatom.o sizes.o trj.o topo.o
 	${FC} ${FFLAGS} ${FPP_FLG} -c md.f90
 
-md_dum.o:md.f90 mpiglob.o qatom.o sizes.o topo.o
+md_dum.o:md.f90 mpiglob.o qatom.o sizes.o trj.o topo.o
 	${FC} ${FFLAGS} ${FPP_FLG} -DDUM -c md.f90 -o md_dum.o
 
 md_mpi.o: md.f90 mpiglob.o qatom.o sizes.o topo.o trj.o

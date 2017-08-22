@@ -558,7 +558,7 @@ contains
   !----------------------------------------------------------------------
 
   subroutine md_deallocate
-    ! deallocatde this module's own arrays. Called by shutdown
+    ! deallocate this module's own arrays. Called by shutdown
     ! use status to avoid errors if not allocated
     ! atom arrays
     deallocate (x, stat=alloc_status)
@@ -2734,7 +2734,7 @@ contains
       initialize = .false.
     end if
     write(*,17) 'all solvent bonds', onoff(shake_solvent)
-17  format('Shake constraints on ',a,t42,': ',a3)
+17  format('SHAKE ',a,t32,'= ',a3)
 
     if(.not. prm_get_logical_by_key('shake_solute', shake_solute, .false.)) then
       write(*,'(a)') '>>> Error: shake_solute must be on or off.'
@@ -3904,9 +3904,12 @@ contains
 
   end subroutine temperature
 
-  !-----------------------------------------------------------------------
-  !******PWchanged 2002-10-01
-  !-----------------------------------------------------------------------
+
+  !----------------------------------------------------------------------------!
+  !!  subroutine: **md_run**
+  !!  Prepare an md run
+  !! ******PWchanged 2002-10-01
+  !----------------------------------------------------------------------------!
   subroutine md_run
 
     ! local variables
@@ -3992,9 +3995,7 @@ contains
 #endif
       if ( mod(istep, NBcycle) .eq. 0 ) then
 
-
         ! every NBcycle steps:
-
         !Put molecules back in box for nice visualization, needs to be here to prevent problems with LRF
         !Update cgp_centers for LRF
         !only call put_back_in_box if using PBC and either solute or solvent should be put back in box
@@ -4034,25 +4035,23 @@ contains
 
         call MPI_Reduce(nbxx,nbxx_tot,5,MPI_INTEGER,MPI_SUM,0,MPI_COMM_WORLD,ierr)
         if (ierr .ne. 0) call die('run/Reduce')
-
-        if (nodeid .eq. 0) then
-          totnbpp=nbxx_tot(1)
-          totnbpw=nbxx_tot(2)
-          totnbww=nbxx_tot(3)
-          totnbqp=nbxx_tot(4)
-          totnbqw=nbxx_tot(5)
-          write(*,99) 'total', totnbpp,totnbpw,totnbww,totnbqp,totnbqw
-        end if
+          if (nodeid .eq. 0) then
+            totnbpp=nbxx_tot(1)
+            totnbpw=nbxx_tot(2)
+            totnbww=nbxx_tot(3)
+            totnbqp=nbxx_tot(4)
+            totnbqw=nbxx_tot(5)
+            write(*,99) 'total', totnbpp,totnbpw,totnbww,totnbqp,totnbqw
+          end if
 99      format(a10,1x,5(1x,i12))
 #endif
 332     format('node value ',5a13)
 333     format(i4,1x,a5,1x,5(1x,i12))
 #endif
+        end if ! every NBcycle steps
 
-      end if ! every NBcycle steps
 
       ! --- start of time step ---
-
       ! get potential energy and derivatives from FF
       call pot_energy
 
@@ -4166,11 +4165,8 @@ contains
           if (detail_temps) then
             write(*,2020) Tfree_solute, Tfree_solvent
              !                                                       write(*,2030) Texcl_solute, Texcl_solvent
-
           end if
-
         end if
-
 
       end if ! print results
 
@@ -4181,13 +4177,13 @@ contains
 2030 format('                             T_excl_solute=',f10.1,' T_excl_solvent=',f10.1)
 
 
-     !***********************************************************************
-     !       end MAIN DYNAMICS LOOP
-     !***********************************************************************
+         !***********************************************************************
+         !       end MAIN DYNAMICS LOOP
+         !***********************************************************************
 
-     ! end of Qdum exclusion
+         ! end of Qdum exclusion
 #else
-  end if !(nodeid .eq. 0) from far above
+  end if
 #endif
 
   ! write final trajectory image when istep = nsteps
