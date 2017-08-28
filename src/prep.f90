@@ -2659,25 +2659,28 @@ subroutine oldreadlib(filnam)
 end subroutine oldreadlib
 
 
-
+!------------------------------------------------------------------------------!
+!>  subroutine: readlib
+!>
+!------------------------------------------------------------------------------!
 subroutine readlib(file)
-! arguments
+  ! arguments
   character(*), optional           :: file
-!  character(len=*), optional       :: file
+  !  character(len=*), optional       :: file
 
-! *** local variables
-! In the topology file output the fields LIB_FILES and PRM_FILE will be
-! truncated after 256 characters. This is due to the declare statements
-! which follow. This needs to be fixed or rethought without breaking
-! compatibility.  
+  ! *** local variables
+  ! In the topology file output the fields LIB_FILES and PRM_FILE will be
+  ! truncated after 256 characters. This is due to the declare statements
+  ! which follow. This needs to be fixed or rethought without breaking
+  ! compatibility.
   character                        :: line*200
   character                        :: filnam*200
-!  character(len=*) line(*)
-!  character(len=*) filnam(*)  
-!  character(len=*), parameter      :: line = ' '
-!  character(len=*), parameter      :: filnam  = ' '
-!  character(kind=CDK,len=*), parameter                 :: line='*'
-!  character(kind=CDK,len=*), parameter                 :: filnam='*'
+  !  character(len=*) line(*)
+  !  character(len=*) filnam(*)
+  !  character(len=*), parameter      :: line = ' '
+  !  character(len=*), parameter      :: filnam  = ' '
+  !  character(kind=CDK,len=*), parameter                 :: line='*'
+  !  character(kind=CDK,len=*), parameter                 :: filnam='*'
   integer                          :: irec, i, iat, ires, j, igp, ntot
   real                             :: qtot, qgrp, qtot_grp
   character(len=80)                :: resnam
@@ -2702,304 +2705,304 @@ subroutine readlib(file)
   logical                          :: yes
   integer                          :: atoms_in_rule, readstat
 
-1  format(10a7)
-2  format(a4)
-3  format(i7)
-4  format(f7.2)
-7  format(4x,a)
-!.......................................................................
+1 format(10a7)
+2 format(a4)
+3 format(i7)
+4 format(f7.2)
+7 format(4x,a)
+  !.......................................................................
 
   res_count = 0
   if(present(file)) then
-          filnam = file
+    filnam = file
   else
-          call get_string_arg(filnam, '-----> Name of molecular library: ')
+    call get_string_arg(filnam, '-----> Name of molecular library: ')
   end if
   inquire(file=filnam, exist=lib_exists)
   if(.not. lib_exists) then
-          write(*,10) trim(filnam)
-          return
+    write(*,10) trim(filnam)
+    return
   end if
   
   if(lib_files == '') then
-          lib_files = filnam
+    lib_files = filnam
   elseif(len_trim(lib_files) < 200-len_trim(filnam)) then
-          lib_files = trim(lib_files) // ";" // trim(filnam)
+    lib_files = trim(lib_files) // ";" // trim(filnam)
   end if
 
   if(.not. prm_open(filnam)) then
-          !if reading fails try old format
-          write(*,'(a)') '>>>>>WARNING: Attempting to read old-style library file.'
-          call oldreadlib(filnam)
-          return
+    !if reading fails try old format
+    write(*,'(a)') '>>>>>WARNING: Attempting to read old-style library file.'
+    call oldreadlib(filnam)
+    return
   end if
 
-10  format('>>>>> ERROR: ',a,' does not exist.')
+10 format('>>>>> ERROR: ',a,' does not exist.')
 
   write( * , '(/,a,a,/)') 'Reading molecular library ',trim(filnam)
   write(*,2, advance='no') 'name'
   write(*,1) 'atoms','net Q', 'bonds', 'rules', 'imps', 'Q-grps'
   !loop over all titles in file
   do while(prm_get_next_title(resnam))
-          call check_overload(resnam)
-          nlibres = nlibres + 1
-          res_count = res_count + 1
-          lib(nlibres)%nam = resnam(1:len(lib(nlibres)%nam)) !copy name
-          write( *, 2, advance='no') lib(nlibres)%nam
-          lib(nlibres)%SYBYLTYPE = '****'
-          lib(nlibres)%HETATM = .false.
-          lib(nlibres)%solvent = .false.
-          if(prm_open_section('info')) then !read info
-                  if(prm_get_string_by_key('SYBYLTYPE', line)) then
-                          lib(nlibres)%SYBYLTYPE = line(1:len(lib(nlibres)%SYBYLTYPE))
-                  end if
-                  yes=prm_get_string_by_key('PDBTYPE', line, 'ATOM')
-                  call upcase(line)
-                  if(trim(line) == 'HETATM') then
-                          lib(nlibres)%HETATM = .true.
-                  elseif(trim(line) /= 'ATOM') then
-                          write(*,'(a,a)') '>>>>>WARNING: Unknown PBBtype ',trim(line)
-                  end if
-                  yes=prm_get_logical_by_key('solvent',lib(nlibres)%solvent,.false.)
-                  if(lib(nlibres)%solvent) then
-                          solvent_names = trim(solvent_names)//lib(nlibres)%nam//','
-                  end if
-                  yes=prm_get_real_by_key('density',lib(nlibres)%density,0.)
+    call check_overload(resnam)
+    nlibres = nlibres + 1
+    res_count = res_count + 1
+    lib(nlibres)%nam = resnam(1:len(lib(nlibres)%nam)) !copy name
+    write( *, 2, advance='no') lib(nlibres)%nam
+    lib(nlibres)%SYBYLTYPE = '****'
+    lib(nlibres)%HETATM = .false.
+    lib(nlibres)%solvent = .false.
+    if(prm_open_section('info')) then !read info
+      if(prm_get_string_by_key('SYBYLTYPE', line)) then
+        lib(nlibres)%SYBYLTYPE = line(1:len(lib(nlibres)%SYBYLTYPE))
+      end if
+      yes=prm_get_string_by_key('PDBTYPE', line, 'ATOM')
+      call upcase(line)
+      if(trim(line) == 'HETATM') then
+        lib(nlibres)%HETATM = .true.
+      elseif(trim(line) /= 'ATOM') then
+        write(*,'(a,a)') '>>>>>WARNING: Unknown PBBtype ',trim(line)
+      end if
+      yes=prm_get_logical_by_key('solvent',lib(nlibres)%solvent,.false.)
+      if(lib(nlibres)%solvent) then
+        solvent_names = trim(solvent_names)//lib(nlibres)%nam//','
+      end if
+      yes=prm_get_real_by_key('density',lib(nlibres)%density,0.)
+    end if
+
+    ! ---      Read no. of atoms, at. no., name, iac, charge
+    lib(nlibres)%nat = prm_count('atoms')
+    if(lib(nlibres)%nat == 0) then
+      write(*,'(a,a)') '>>>>>ERROR: No atoms in residue ',trim(resnam)
+      !undo this residue
+      nlibres = nlibres - 1
+      res_count = res_count - 1
+      exit
+    end if
+
+    write(*,3, advance='no') lib(nlibres)%nat
+
+    allocate(atnam(lib(nlibres)%nat))
+                
+    !initialise atom name -> number index
+    call index_create(lib(nlibres)%nat)
+                
+    lib(nlibres)%atnam => atnam
+                
+    allocate(tac_lib(lib(nlibres)%nat))
+    lib(nlibres)%tac_lib => tac_lib
+                
+    allocate(crg_lib(lib(nlibres)%nat))
+    lib(nlibres)%crg_lib => crg_lib
+
+    qtot = 0
+    do i = 1, lib(nlibres)%nat
+      prm_res = prm_get_line(line)
+      READ(line, *) iat
+      !Check numbering of atoms
+      if (iat>lib(nlibres)%nat) then
+        write(*,119) iat
+      end if
+      READ(line, *) iat, lib(nlibres)%atnam(iat), lib(nlibres)%tac_lib(iat), &
+        lib(nlibres)%crg_lib(iat)
+      if(.not. index_add(lib(nlibres)%atnam(iat), iat)) then
+        !could not add - name duplication?
+        write(*, 120) iat, lib(nlibres)%atnam(iat)
+      end if
+      !add also the number as an atom name
+      write(atnam1,'(i4)') iat
+      atnam1 = adjustl(atnam1)
+      if(.not. index_add(atnam1, iat)) then
+        !could not add - number duplication?
+        write(*, 121) iat
+      end if
+
+      qtot = qtot + lib(nlibres)%crg_lib(iat)
+    enddo
+    write(*, 4, advance='no') qtot
+
+    ! ---      Read bond list
+    lib(nlibres)%nbnd = prm_count('bonds')
+    allocate(bnd(lib(nlibres)%nbnd), stat=alloc_status)
+    lib(nlibres)%bnd => bnd
+
+    write(*, 3, advance='no') lib(nlibres)%nbnd
+    do i = 1, lib(nlibres)%nbnd
+      prm_res = prm_get_line(line)
+      read(line, *) atnam1, atnam2
+      if(.not. index_get(atnam1, atno1)) then
+        write(*,125) atnam1, i
+        cycle
+      end if
+      if(.not. index_get(atnam2, atno2)) then
+        write(*,126) atnam2, i
+        cycle
+      end if
+      lib(nlibres)%bnd(i)%i = atno1
+      lib(nlibres)%bnd(i)%j = atno2
+    enddo
+
+    !read head and tail connections, if present
+    lib(nlibres)%head = 0
+    lib(nlibres)%tail = 0
+    if(prm_open_section('connections')) then
+      !0 is returned if not found
+      atno1 = 0
+      if(prm_get_string_by_key('head', atnam1)) then
+        if(atnam1 /= '0' .and. .not. index_get(atnam1, atno1)) then
+          write(*,127) atnam1
+        end if
+      end if
+      lib(nlibres)%head = atno1
+      atno1 = 0
+      if(prm_get_string_by_key('tail', atnam1)) then
+        if(atnam1 /= '0' .and. .not. index_get(atnam1, atno1)) then
+          write(*,128) atnam1
+        end if
+      end if
+      lib(nlibres)%tail = atno1
+    end if
+
+    ! ---      Read hydrogen build rules
+    lib(nlibres)%nrules = prm_count('build_rules')
+    allocate(lib(nlibres)%rules(lib(nlibres)%nrules))
+
+    write(*, 3, advance='no') lib(nlibres)%nrules
+    ruleloop: do i = 1, lib(nlibres)%nrules
+      !read kind
+      prm_res = prm_get_field(line)
+      call locase(line)
+      if(line == 'torsion') then
+        lib(nlibres)%rules(i)%kind = BUILD_RULE_TORSION
+        atoms_in_rule = 4
+      else
+        lib(nlibres)%rules(i)%kind = 0
+        write(*, 200) i, trim(line)
+200     format('>>>>> ERROR: Unrecognised rule',i2,' kind ',a)
+        !skip to end of line
+        yes = prm_get_field(line, skip=.true.)
+        !continue to next rule
+        cycle ruleloop
+      end if
+      do iat = 1, atoms_in_rule
+        if(.not. prm_get_field(line)) then
+          lib(nlibres)%rules(i)%kind = 0
+          write(*, 210) i
+210       format('>>>>> ERROR: Read error at rule',i2)
+          yes = prm_get_field(line, skip=.true.)
+          !continue to next rule
+          cycle ruleloop
+        end if
+        if(.not. index_get(line, lib(nlibres)%rules(i)%atom(iat))) then
+          lib(nlibres)%rules(i)%kind = 0
+          write(*, 220) trim(line), i
+220       format('>>>>> ERROR: Atom ',a,' not found in rule',i2)
+          yes = prm_get_field(line, skip=.true.)
+          !continue to next rule
+          cycle ruleloop
+        end if
+      end do
+      if(.not. prm_get_field(line)) then
+        lib(nlibres)%rules(i)%kind = 0
+        write(*, 230) i
+230     format('>>>>> ERROR: No value for rule ',i2)
+        yes = prm_get_field(line, skip=.true.)
+        cycle ruleloop
+      end if
+      read(line, *, iostat=readstat) lib(nlibres)%rules(i)%value
+      if(readstat /= 0) then
+        lib(nlibres)%rules(i)%kind = 0
+        write(*, 240) trim(line), i
+240     format('>>>>> ERROR: Read error at rule ',i2)
+      end if
+      yes = prm_get_field(line, skip=.true.)
+    end do ruleloop
+
+
+    ! ---      Read improper list
+    lib(nlibres)%nimp = prm_count('impropers')
+    allocate(imp(lib(nlibres)%nimp), stat=alloc_status)
+    lib(nlibres)%imp => imp
+
+    write(*, 3, advance='no') lib(nlibres)%nimp
+    do i = 1, lib(nlibres)%nimp
+      prm_res = prm_get_line(line)
+      !note the order j,i,l,k used to conform with amber and charmm
+      !parameter file conventions
+      READ(line, * ) lib(nlibres)%imp(i)%i, lib(nlibres)%imp(i)%j, &
+        lib(nlibres)%imp(i)%k, lib(nlibres)%imp(i)%l
+    enddo
+
+    ! ---      Read charge group info
+    lib(nlibres)%ncgp = prm_count('charge_groups')
+    !if no chargegroups construct one
+    if(lib(nlibres)%ncgp == 0) then
+      write(*,7) 'none, creating default'
+      lib(nlibres)%ncgp = 1
+      allocate(atcgp(max(max_atcgplib, lib(nlibres)%nat), 1))
+      lib(nlibres)%atcgp => atcgp
+      allocate(natcgp(1), switch(1))
+                        
+      lib(nlibres)%natcgp => natcgp
+      lib(nlibres)%switch => switch
+                        
+      !create a charge group with all atoms
+      lib(nlibres)%switch(1) = 1
+      lib(nlibres)%natcgp(1) = lib(nlibres)%nat
+      do i = 1, lib(nlibres)%nat
+        lib(nlibres)%atcgp(i,1) = i
+      end do
+      !pass consistencty test below
+      qtot_grp = qtot
+      ntot = lib(nlibres)%nat
+    else
+      write(*, 3) lib(nlibres)%ncgp
+      allocate(atcgp(max(max_atcgplib, lib(nlibres)%nat), lib(nlibres)%ncgp))
+      lib(nlibres)%atcgp => atcgp
+      allocate(natcgp(lib(nlibres)%ncgp), switch(lib(nlibres)%ncgp))
+                        
+      lib(nlibres)%natcgp => natcgp
+      lib(nlibres)%switch => switch
+
+      qtot_grp = 0.
+      ntot = 0
+      do i = 1, lib(nlibres)%ncgp
+        qgrp = 0.
+        lib(nlibres)%natcgp(i) = 0
+        do while(prm_get_field(line)) !get one number at a time
+          if(.not. index_get(line, igp)) then
+            write(*,131) lib(nlibres)%natcgp(i) + 1, trim(line), i
+            cycle
           end if
-
-! ---      Read no. of atoms, at. no., name, iac, charge
-                lib(nlibres)%nat = prm_count('atoms')
-                if(lib(nlibres)%nat == 0) then
-                        write(*,'(a,a)') '>>>>>ERROR: No atoms in residue ',trim(resnam)
-                        !undo this residue
-                        nlibres = nlibres - 1
-                        res_count = res_count - 1
-                        exit
-                end if
-
-                write(*,3, advance='no') lib(nlibres)%nat
-
-                allocate(atnam(lib(nlibres)%nat))
-                
-                !initialise atom name -> number index
-                call index_create(lib(nlibres)%nat)
-                
-                lib(nlibres)%atnam => atnam
-                
-                allocate(tac_lib(lib(nlibres)%nat))
-                lib(nlibres)%tac_lib => tac_lib
-                
-                allocate(crg_lib(lib(nlibres)%nat))
-                lib(nlibres)%crg_lib => crg_lib
-
-                qtot = 0
-                do i = 1, lib(nlibres)%nat
-                        prm_res = prm_get_line(line)
-                        READ(line, *) iat
-                        !Check numbering of atoms
-                        if (iat>lib(nlibres)%nat) then 
-                          write(*,119) iat
-                    end if
-                        READ(line, *) iat, lib(nlibres)%atnam(iat), lib(nlibres)%tac_lib(iat), &
-                                lib(nlibres)%crg_lib(iat)
-                        if(.not. index_add(lib(nlibres)%atnam(iat), iat)) then
-                                !could not add - name duplication?
-                                write(*, 120) iat, lib(nlibres)%atnam(iat)
-                        end if
-                        !add also the number as an atom name 
-                        write(atnam1,'(i4)') iat
-                        atnam1 = adjustl(atnam1)                        
-                        if(.not. index_add(atnam1, iat)) then
-                                !could not add - number duplication?
-                                write(*, 121) iat
-                        end if
-
-                        qtot = qtot + lib(nlibres)%crg_lib(iat)
-                enddo
-                write(*, 4, advance='no') qtot
-
-! ---      Read bond list
-                lib(nlibres)%nbnd = prm_count('bonds')
-                allocate(bnd(lib(nlibres)%nbnd), stat=alloc_status)
-                lib(nlibres)%bnd => bnd
-
-                write(*, 3, advance='no') lib(nlibres)%nbnd
-                do i = 1, lib(nlibres)%nbnd
-                        prm_res = prm_get_line(line)
-                        read(line, *) atnam1, atnam2
-                        if(.not. index_get(atnam1, atno1)) then
-                                write(*,125) atnam1, i
-                                cycle
-                        end if
-                        if(.not. index_get(atnam2, atno2)) then
-                                write(*,126) atnam2, i
-                                cycle
-                        end if
-                        lib(nlibres)%bnd(i)%i = atno1
-                        lib(nlibres)%bnd(i)%j = atno2
-                enddo
-
-                !read head and tail connections, if present
-                lib(nlibres)%head = 0
-                lib(nlibres)%tail = 0
-                if(prm_open_section('connections')) then
-                        !0 is returned if not found
-                        atno1 = 0
-                        if(prm_get_string_by_key('head', atnam1)) then
-                                if(atnam1 /= '0' .and. .not. index_get(atnam1, atno1)) then
-                                        write(*,127) atnam1
-                                end if
-                        end if
-                        lib(nlibres)%head = atno1
-                        atno1 = 0
-                        if(prm_get_string_by_key('tail', atnam1)) then
-                                if(atnam1 /= '0' .and. .not. index_get(atnam1, atno1)) then
-                                        write(*,128) atnam1
-                                end if
-                        end if
-                        lib(nlibres)%tail = atno1
-                end if
-
-! ---      Read hydrogen build rules
-                lib(nlibres)%nrules = prm_count('build_rules')
-                allocate(lib(nlibres)%rules(lib(nlibres)%nrules))
-
-                write(*, 3, advance='no') lib(nlibres)%nrules
-ruleloop: do i = 1, lib(nlibres)%nrules
-                        !read kind
-                        prm_res = prm_get_field(line)
-                        call locase(line)
-                        if(line == 'torsion') then
-                                lib(nlibres)%rules(i)%kind = BUILD_RULE_TORSION
-                                atoms_in_rule = 4
-                        else
-                                lib(nlibres)%rules(i)%kind = 0
-                                write(*, 200) i, trim(line)
-200                             format('>>>>> ERROR: Unrecognised rule',i2,' kind ',a)
-                                !skip to end of line
-                                yes = prm_get_field(line, skip=.true.)
-                                !continue to next rule
-                                cycle ruleloop
-                        end if
-                        do iat = 1, atoms_in_rule
-                                if(.not. prm_get_field(line)) then
-                                        lib(nlibres)%rules(i)%kind = 0
-                                        write(*, 210) i
-210                                     format('>>>>> ERROR: Read error at rule',i2)
-                                        yes = prm_get_field(line, skip=.true.)
-                                        !continue to next rule
-                                        cycle ruleloop
-                                end if
-                                if(.not. index_get(line, lib(nlibres)%rules(i)%atom(iat))) then
-                                        lib(nlibres)%rules(i)%kind = 0
-                                        write(*, 220) trim(line), i
-220                                     format('>>>>> ERROR: Atom ',a,' not found in rule',i2)
-                                        yes = prm_get_field(line, skip=.true.)
-                                        !continue to next rule
-                                        cycle ruleloop
-                                end if
-                        end do
-                        if(.not. prm_get_field(line)) then
-                                lib(nlibres)%rules(i)%kind = 0
-                                write(*, 230) i
-230                             format('>>>>> ERROR: No value for rule ',i2)
-                                yes = prm_get_field(line, skip=.true.)
-                                cycle ruleloop
-                        end if
-                        read(line, *, iostat=readstat) lib(nlibres)%rules(i)%value                              
-                        if(readstat /= 0) then
-                                lib(nlibres)%rules(i)%kind = 0
-                                write(*, 240) trim(line), i
-240                             format('>>>>> ERROR: Read error at rule ',i2)
-                        end if
-                        yes = prm_get_field(line, skip=.true.)
-                end do ruleloop
-
-
-! ---      Read improper list
-                lib(nlibres)%nimp = prm_count('impropers')
-                allocate(imp(lib(nlibres)%nimp), stat=alloc_status)
-                lib(nlibres)%imp => imp
-
-                write(*, 3, advance='no') lib(nlibres)%nimp
-                do i = 1, lib(nlibres)%nimp
-                        prm_res = prm_get_line(line)
-                        !note the order j,i,l,k used to conform with amber and charmm
-                        !parameter file conventions
-                        READ(line, * ) lib(nlibres)%imp(i)%i, lib(nlibres)%imp(i)%j, &
-                                lib(nlibres)%imp(i)%k, lib(nlibres)%imp(i)%l
-                enddo
-
-! ---      Read charge group info
-                lib(nlibres)%ncgp = prm_count('charge_groups')
-                !if no chargegroups construct one 
-                if(lib(nlibres)%ncgp == 0) then
-                        write(*,7) 'none, creating default'
-                        lib(nlibres)%ncgp = 1
-                        allocate(atcgp(max(max_atcgplib, lib(nlibres)%nat), 1))
-                        lib(nlibres)%atcgp => atcgp
-                        allocate(natcgp(1), switch(1))
-                        
-                        lib(nlibres)%natcgp => natcgp
-                        lib(nlibres)%switch => switch
-                        
-                        !create a charge group with all atoms
-                        lib(nlibres)%switch(1) = 1
-                        lib(nlibres)%natcgp(1) = lib(nlibres)%nat
-                        do i = 1, lib(nlibres)%nat
-                                lib(nlibres)%atcgp(i,1) = i
-                        end do
-                        !pass consistencty test below
-                        qtot_grp = qtot 
-                        ntot = lib(nlibres)%nat
-                else
-                        write(*, 3) lib(nlibres)%ncgp
-                        allocate(atcgp(max(max_atcgplib, lib(nlibres)%nat), lib(nlibres)%ncgp))
-                        lib(nlibres)%atcgp => atcgp
-                        allocate(natcgp(lib(nlibres)%ncgp), switch(lib(nlibres)%ncgp))
-                        
-                        lib(nlibres)%natcgp => natcgp
-                        lib(nlibres)%switch => switch
-
-                        qtot_grp = 0.
-                        ntot = 0
-                        do i = 1, lib(nlibres)%ncgp
-                                qgrp = 0.
-                                lib(nlibres)%natcgp(i) = 0
-                                do while(prm_get_field(line)) !get one number at a time
-                                        if(.not. index_get(line, igp)) then
-                                                write(*,131) lib(nlibres)%natcgp(i) + 1, trim(line), i
-                                                cycle
-                                        end if
-                                        !read(line, *) igp 
-                                        qgrp = qgrp + lib(nlibres)%crg_lib(igp)
-                                        lib(nlibres)%natcgp(i) = lib(nlibres)%natcgp(i) + 1
-                                        lib(nlibres)%atcgp(lib(nlibres)%natcgp(i),i) = igp
-                                end do
-                                lib(nlibres)%switch(i) = lib(nlibres)%atcgp(1,i)
-                                ntot = ntot + lib(nlibres)%natcgp(i)
+          !read(line, *) igp
+          qgrp = qgrp + lib(nlibres)%crg_lib(igp)
+          lib(nlibres)%natcgp(i) = lib(nlibres)%natcgp(i) + 1
+          lib(nlibres)%atcgp(lib(nlibres)%natcgp(i),i) = igp
+        end do
+        lib(nlibres)%switch(i) = lib(nlibres)%atcgp(1,i)
+        ntot = ntot + lib(nlibres)%natcgp(i)
                                 
-                                !check fractional charges
-                                if(abs(qgrp - nint(qgrp) ) >0.000001)  then 
-                                        write( *, 130) qgrp, i
-                                end if
-                                qtot_grp = qtot_grp + qgrp
-                        enddo !charge groups
-                end if !charge groups defined
+        !check fractional charges
+        if(abs(qgrp - nint(qgrp) ) >0.000001)  then
+          write( *, 130) qgrp, i
+        end if
+        qtot_grp = qtot_grp + qgrp
+      enddo !charge groups
+    end if !charge groups defined
 
-                !check total charge & atom count consistency
-                if(ntot /= lib(nlibres)%nat) then
-                        write(*, 150)
-                endif
-                if(abs(qtot - qtot_grp)  >0.000001) then
-                        write(*,160)
-                end if
-        end do !entries
+    !check total charge & atom count consistency
+    if(ntot /= lib(nlibres)%nat) then
+      write(*, 150)
+    endif
+    if(abs(qtot - qtot_grp)  >0.000001) then
+      write(*,160)
+    end if
+  end do !entries
 
-        call prm_close
+  call prm_close
 
 
-        write( *, 110) nlibres
+  write( *, 110) nlibres
 
 110 format(/,'Accumulated no. of library entries loaded =',i4,/)
 119 format('>>> ERROR: Atom',i3,' has wrong atom number.')
@@ -3017,25 +3020,31 @@ ruleloop: do i = 1, lib(nlibres)%nrules
 end subroutine readlib
 
 
-
+!------------------------------------------------------------------------------!
+!>  subroutine: check_overload
+!>
+!------------------------------------------------------------------------------!
 subroutine check_overload(resnam)
-        ! arguments
-        character(len=80)                       :: resnam
-        !locals
-        integer                                         :: i
+  ! arguments
+  character(len=80)                :: resnam
+  !locals
+  integer                          :: i
 
-        do i = 1, nlibres
-                if(lib(i)%nam == resnam) then
-                        write(*,100) trim(resnam)
-100                     format('>>> WARNING: Overloading old definition of ',a)
-                        lib(i)%nam = 'gone'
-                        exit
-                end if
-        end do
+  do i = 1, nlibres
+    if(lib(i)%nam == resnam) then
+      write(*,100) trim(resnam)
+100   format('>>> WARNING: Overloading old definition of ',a)
+      lib(i)%nam = 'gone'
+      exit
+    end if
+  end do
 end subroutine check_overload
 
 
-
+!------------------------------------------------------------------------------!
+!>  subroutine: oldreadparm
+!>
+!------------------------------------------------------------------------------!
 subroutine oldreadparm(flag)
 !  arguments
   logical flag
@@ -3769,361 +3778,371 @@ subroutine cleartop
 end subroutine cleartop
 
 
-
+!------------------------------------------------------------------------------!
+!>  function: countpdb
+!>
+!------------------------------------------------------------------------------!
 logical function countpdb(pdb_fileno, atoms, residues, molecules)
-!count atoms, residues and molecules in a pdb file
+  !count atoms, residues and molecules in a pdb file
 
-!arguments
-        integer                                         :: pdb_fileno, atoms, residues, molecules
+  !arguments
+  integer                                         :: pdb_fileno, atoms, residues, molecules
 
-!locals
-        integer                                         :: resno, oldno
-        character(len=4)                        :: resnam, atnam, oldresnam
-        character(len=80)                       :: line
-        real                                            :: xtmp(3)
-        integer                                         :: atoms_in_res, atoms_in_file
-        integer                                         :: rescode, oldrescode
+  !locals
+  integer                                         :: resno, oldno
+  character(len=4)                        :: resnam, atnam, oldresnam
+  character(len=80)                       :: line
+  real                                            :: xtmp(3)
+  integer                                         :: atoms_in_res, atoms_in_file
+  integer                                         :: rescode, oldrescode
         
-! old 10        format(13x,a4,a4,i5,4x,3f8.3)
-10      format(12x,a5,a3,2x,i4,4x,3f8.3)
+  ! old 10        format(13x,a4,a4,i5,4x,3f8.3)
+10 format(12x,a5,a3,2x,i4,4x,3f8.3)
 
-        countpdb = .true.
+  countpdb = .true.
 
-        atoms = 0
-        residues = 0
-        molecules = 1
-        atoms_in_file = 0
-        rescode = 0
-        oldrescode = 0
-        oldno = 0
-        do
-                read(pdb_fileno,'(a)', end=100) line
-                if(adjustl(line) == 'GAP' .or. line(1:6) == 'TER   ') then
-                        molecules = molecules + 1
-                        oldrescode = 0 !avoid implicit gap check
-                else if(line(1:6) /= 'HETATM' .and. line(1:6) /= 'ATOM  ') then
-                        write(*,'(a,/,a)') '>>>WARNING: ignoring unrecognised line in PDB file', trim(line)
-                else
-                        READ(line, 10, end = 100, err = 200) atnam, resnam, resno, xtmp(1:3)
-                        if(resno /= oldno) then         
-                                if(rescode /= 0) then
-                                        !check it
-                                        if(atoms_in_res > lib(rescode)%nat) then
-                                                write(*,12) oldresnam, oldno
-                                                countpdb = .false.
-                                        end if
-                                        atoms = atoms + lib(rescode)%nat
-                                end if
-                                !lookup the new one                                             
-                                do rescode = nlibres,1,-1
-                                        if(lib(rescode)%nam == resnam) exit
-                                end do
-                                if(rescode == 0) then
-                                        write(*,11) resno, resnam
-                                        countpdb = .false.
-                                end if
-                                !check for implicit GAP
-                                if(oldrescode /= 0 .and. rescode /=0) then
-                                        if(lib(oldrescode)%tail == 0 .or. &
-                                                lib(rescode)%head == 0) then
-                                                molecules = molecules+1
-                                        end if
-                                end if
-                                !remember previous rescode
-                                oldrescode = rescode
-
-                                oldno = resno
-                                oldresnam = resnam
-                                atoms_in_res = 0
-                                residues = residues + 1
-                        else if(oldrescode /= 0 .and. resnam /= oldresnam) then
-                                !numbering problem?
-                                write(*, 13) oldresnam, resno, resnam
-                                countpdb = .false.
-                        end if
-                        atoms_in_file = atoms_in_file + 1
-                        atoms_in_res = atoms_in_res + 1
-                end if
-        !rewind but leave open
-        end do
-
-        !branch here at EOF
-        !take care of last residue
-
-100     if(rescode /= 0) then
-                !check it
-                if(atoms_in_res > lib(rescode)%nat) then
-                        write(*,12) oldresnam, oldno
-                        countpdb = .false.
-                end if
-                atoms = atoms + lib(rescode)%nat
+  atoms = 0
+  residues = 0
+  molecules = 1
+  atoms_in_file = 0
+  rescode = 0
+  oldrescode = 0
+  oldno = 0
+  do
+    read(pdb_fileno,'(a)', end=100) line
+    if(adjustl(line) == 'GAP' .or. line(1:6) == 'TER   ') then
+      molecules = molecules + 1
+      oldrescode = 0 !avoid implicit gap check
+    else if(line(1:6) /= 'HETATM' .and. line(1:6) /= 'ATOM  ') then
+      write(*,'(a,/,a)') '>>>WARNING: ignoring unrecognised line in PDB file', trim(line)
+    else
+      READ(line, 10, end = 100, err = 200) atnam, resnam, resno, xtmp(1:3)
+      if(resno /= oldno) then
+        if(rescode /= 0) then
+          !check it
+          if(atoms_in_res > lib(rescode)%nat) then
+            write(*,12) oldresnam, oldno
+            countpdb = .false.
+          end if
+          atoms = atoms + lib(rescode)%nat
         end if
-        
-        write(*,15) atoms_in_file, atoms
-        rewind(pdb_fileno)      
-        if(atoms_in_file == 0) countpdb = .false.
-        return
+        !lookup the new one
+        do rescode = nlibres,1,-1
+          if(lib(rescode)%nam == resnam) exit
+        end do
+        if(rescode == 0) then
+          write(*,11) resno, resnam
+          countpdb = .false.
+        end if
+        !check for implicit GAP
+        if(oldrescode /= 0 .and. rescode /=0) then
+          if(lib(oldrescode)%tail == 0 .or. &
+            lib(rescode)%head == 0) then
+            molecules = molecules+1
+          end if
+        end if
+        !remember previous rescode
+        oldrescode = rescode
 
-200     rewind(pdb_fileno) !error exit point
-        write(*,16) line
+        oldno = resno
+        oldresnam = resnam
+        atoms_in_res = 0
+        residues = residues + 1
+      else if(oldrescode /= 0 .and. resnam /= oldresnam) then
+        !numbering problem?
+        write(*, 13) oldresnam, resno, resnam
         countpdb = .false.
-16      format('>>>>> ERROR found in line: ', a80)
+      end if
+      atoms_in_file = atoms_in_file + 1
+      atoms_in_res = atoms_in_res + 1
+    end if
+  !rewind but leave open
+  end do
 
-11      format('>>>>> ERROR: Residue number ',i5,' is of unknown type ',a4)
-12      format('>>>>> ERROR: Too many atoms in residue ',a4,1x,i5)
-13      format('>>>>> ERROR: Two residues with same number: ',a,i5,1x,a)
+  !branch here at EOF
+  !take care of last residue
 
-15      format( 'PDB file contains',i6,' atoms.', /, &
-                        'The number of atoms in the topology will be',i6)
+100 if(rescode /= 0) then
+    !check it
+    if(atoms_in_res > lib(rescode)%nat) then
+      write(*,12) oldresnam, oldno
+      countpdb = .false.
+    end if
+    atoms = atoms + lib(rescode)%nat
+  end if
+        
+  write(*,15) atoms_in_file, atoms
+  rewind(pdb_fileno)
+  if(atoms_in_file == 0) countpdb = .false.
+  return
+
+200 rewind(pdb_fileno) !error exit point
+  write(*,16) line
+  countpdb = .false.
+16 format('>>>>> ERROR found in line: ', a80)
+
+11 format('>>>>> ERROR: Residue number ',i5,' is of unknown type ',a4)
+12 format('>>>>> ERROR: Too many atoms in residue ',a4,1x,i5)
+13 format('>>>>> ERROR: Two residues with same number: ',a,i5,1x,a)
+
+15 format( 'PDB file contains',i6,' atoms.', /, &
+    'The number of atoms in the topology will be',i6)
 
 end function countpdb
 
 
-
+!------------------------------------------------------------------------------!
+!>  subroutine: readpdb
+!>
+!------------------------------------------------------------------------------!
 subroutine readpdb()
 
-! *** local variables
-        character(len=256)              :: pdb_file
-        CHARACTER atnam_tmp * 4, resnam_tmp * 4
-        character(len=80)                       :: line
-        integer resnum_tmp, oldnum, irec, i, atom_id(max_atlib), j
-        real xtmp(3)
-        LOGICAL res_found, at_found
-        integer                                         :: first_res_of_mol
-        logical                                         :: last_line_was_gap
-        integer                                         :: atoms, residues, molecules
-!.......................................................................
+  ! *** local variables
+  character(len=256)        :: pdb_file
+  character atnam_tmp * 4, resnam_tmp * 4
+  character(len=80)         :: line
+  integer resnum_tmp, oldnum, irec, i, atom_id(max_atlib), j
+  real xtmp(3)
+  logical res_found, at_found
+  integer                   :: first_res_of_mol
+  logical                   :: last_line_was_gap
+  integer                   :: atoms, residues, molecules
 
-        write( *, * )
-        call get_string_arg(pdb_file, '-----> Name of PDB file: ')
-        if(openit(3, pdb_file, 'old', 'formatted', 'read') /= 0) return
-        REWIND(3)
-!
-!       PDB format(we need only atom name, res. name, number and coords):
-!   The format is
-!   1. |    1 -  6    |   A6    | Record ID (eg ATOM, HETATM)       
-!   2. |    7 - 11    |   I5    | Atom serial number                            
-!   -  |   12 - 12    |   1X    | Blank                                         
-!   3. |   13 - 16    |   A4    | Atom name (eg " CA " , " ND1")   
-!   4. |   17 - 17    |   A1    | Alternative location code (if any)            
-!   5. |   18 - 20    |   A3    | Standard 3-letter amino acid code for residue 
-!   -  |   21 - 21    |   1X    | Blank                                         
-!   6. |   22 - 22    |   A1    | Chain identifier code                         
-!   7. |   23 - 26    |   I4    | Residue sequence number                       
-!   8. |   27 - 27    |   A1    | Insertion code (if any)                       
-!   -  |   28 - 30    |   3X    | Blank                                         
-!   9. |   31 - 38    |  F8.3   | Atom's x-coordinate                         
-!  10. |   39 - 46    |  F8.3   | Atom's y-coordinate                         
-!  11. |   47 - 54    |  F8.3   | Atom's z-coordinate                         
-!  12. |   55 - 60    |  F6.2   | Occupancy value for atom                      
-!  13. |   61 - 66    |  F6.2   | B-value (thermal factor)                   
-!
 
-!Old format line  10    FORMAT(13x,a4,a4,i5,4x,3f8.3)
-!Format if all is read  10      format(a6,i5,1x,a4,a1,a3,1x,a1,i4,a1,3x,3f8.3)
-10      format(12x,a5,a3,2x,i4,4x,3f8.3)
+  write( *, * )
+  call get_string_arg(pdb_file, '-----> Name of PDB file: ')
+  if(openit(3, pdb_file, 'old', 'formatted', 'read') /= 0) return
+  rewind(3)
+  !   PDB format(we need only atom name, res. name, number and coords):
+  !   The format is
+  !   1. |    1 -  6    |   A6    | Record ID (eg ATOM, HETATM)
+  !   2. |    7 - 11    |   I5    | Atom serial number
+  !   -  |   12 - 12    |   1X    | Blank
+  !   3. |   13 - 16    |   A4    | Atom name (eg " CA " , " ND1")
+  !   4. |   17 - 17    |   A1    | Alternative location code (if any)
+  !   5. |   18 - 20    |   A3    | Standard 3-letter amino acid code for residue
+  !   -  |   21 - 21    |   1X    | Blank
+  !   6. |   22 - 22    |   A1    | Chain identifier code
+  !   7. |   23 - 26    |   I4    | Residue sequence number
+  !   8. |   27 - 27    |   A1    | Insertion code (if any)
+  !   -  |   28 - 30    |   3X    | Blank
+  !   9. |   31 - 38    |  F8.3   | Atom's x-coordinate
+  !  10. |   39 - 46    |  F8.3   | Atom's y-coordinate
+  !  11. |   47 - 54    |  F8.3   | Atom's z-coordinate
+  !  12. |   55 - 60    |  F6.2   | Occupancy value for atom
+  !  13. |   61 - 66    |  F6.2   | B-value (thermal factor)
+  !
 
-!       progress output formats
-20      format('molecule ',i4,': ',a4,i5)
-21      format(' - ',a4,i5)
+  !Old format line  10    FORMAT(13x,a4,a4,i5,4x,3f8.3)
+  !Format if all is read  10      format(a6,i5,1x,a4,a1,a3,1x,a1,i4,a1,3x,3f8.3)
 
-22      format('>>>>> ERROR: The check of the PDB file failed.')
-23      format('>>> WARNING: Multiple GAP lines at line',i5)
-        oldnum = 0
+! Sometimes as pointed out by Geir Isaksen it becomes absolutely necessary to
+! read residue names with four letters. Luckily column 21 in the pdb
+! specification is a blank, so 2x in the previous expression can be easily
+! changed to 1x
+10 format(12x,a5,a4,1x,i4,4x,3f8.3)
 
-        !get rid of old topology but not FF params
-        call topo_deallocate(keep_ff=.true.)
+  !       progress output formats
+20 format('molecule ',i4,': ',a4,i5)
+21 format(' - ',a4,i5)
 
-        if(.not. countpdb(3, atoms, residues, molecules)) then
-                write(*,22) 
-                close(3)
-                return
-        end if
+22 format('>>>>> ERROR: The check of the PDB file failed.')
+23 format('>>> WARNING: Multiple GAP lines at line',i5)
+  oldnum = 0
 
-        CALL clearpdb !get rid of old PDB data.
-        call allocate_for_pdb(atoms, residues, molecules) !make space for new topology
-        !clear hydrogen make flags
-        makeH(:) = .false.
-        !reset molecule counter
-        nmol = 1
-        istart_mol(1) = 1
+  !get rid of old topology but not FF params
+  call topo_deallocate(keep_ff=.true.)
+
+  if(.not. countpdb(3, atoms, residues, molecules)) then
+    write(*,22)
+    close(3)
+    return
+  end if
+
+  CALL clearpdb !get rid of old PDB data.
+  call allocate_for_pdb(atoms, residues, molecules) !make space for new topology
+  !clear hydrogen make flags
+  makeH(:) = .false.
+  !reset molecule counter
+  nmol = 1
+  istart_mol(1) = 1
         
-        irec = 0
-        do 
-                read(3,'(a)', end=100) line
-                irec = irec + 1
-                if(adjustl(line) == 'GAP' .or. line(1:6) == 'TER   ') then
-                        if(last_line_was_gap) then
-                                write(*, 23) irec
-                        else
-                                !set gap flag - new molecule will be recognised later
-                                last_line_was_gap = .true.
-                        end if
-                else if(line(1:6) /= 'HETATM' .and. line(1:6) /= 'ATOM  ') then
-                        !do nothing
-                else
-                        READ(line, 10, end = 100, err = 200) atnam_tmp, resnam_tmp, &
-                                resnum_tmp, xtmp(1:3)
+  irec = 0
+  do
+    read(3,'(a)', end=100) line
+    irec = irec + 1
+    if(adjustl(line) == 'GAP' .or. line(1:6) == 'TER   ') then
+      if(last_line_was_gap) then
+        write(*, 23) irec
+      else
+        !set gap flag - new molecule will be recognised later
+        last_line_was_gap = .true.
+      end if
+    else if(line(1:6) /= 'HETATM' .and. line(1:6) /= 'ATOM  ') then
+            !do nothing
+    else
+      READ(line, 10, end = 100, err = 200) atnam_tmp, resnam_tmp, &
+        resnum_tmp, xtmp(1:3)
 
-                ! ---   New residue ?
-                        if(resnum_tmp/=oldnum) then
-                ! ---      Check if old residue was OK...
-                                if(nres/=0) then
-                                        do i = 1, lib(res(nres)%irc)%nat
-                                                if(lib(res(nres)%irc)%atnam(i)(1:1) /='H') then !heavy
-                                                        heavy(res(nres)%start - 1 + i) = .true.
-                                                        makeH(res(nres)%start - 1 + i) = .false.
-                                                        if(atom_id(i) == 0) then !not found
-                                                                write(*, '(/,a,a,a,i5,/)') '>>> Heavy atom ',&
-                                                                        lib(res(nres)%irc )%atnam(i), &
-                                                                        ' missing in residue ', oldnum
-                                                                goto 210
-                                                        end if
-                                                else !hydrogen
-                                                        heavy(res(nres)%start - 1 + i) = .false.
-                                                        !flag hydrogens to be generated
-                                                        if(atom_id(i) == 0) then 
-                                                                !it was not in the file and needs to be made
-                                                                makeH(res(nres)%start - 1 + i) = .true.
-                                                        end if
-                                                end if
-                                        enddo
-                                endif
+      ! ---   New residue ?
+      if(resnum_tmp/=oldnum) then
+        ! ---      Check if old residue was OK...
+        if(nres/=0) then
+          do i = 1, lib(res(nres)%irc)%nat
+            if(lib(res(nres)%irc)%atnam(i)(1:1) /='H') then !heavy
+              heavy(res(nres)%start - 1 + i) = .true.
+              makeH(res(nres)%start - 1 + i) = .false.
+              if(atom_id(i) == 0) then !not found
+                write(*, '(/,a,a,a,i5,/)') '>>> Heavy atom ',&
+                  lib(res(nres)%irc )%atnam(i), &
+                  ' missing in residue ', oldnum
+                goto 210
+              end if
+            else !hydrogen
+              heavy(res(nres)%start - 1 + i) = .false.
+              !flag hydrogens to be generated
+              if(atom_id(i) == 0) then
+                !it was not in the file and needs to be made
+                makeH(res(nres)%start - 1 + i) = .true.
+              end if
+            end if
+          enddo
+        endif
 
-                                !look up new residue in library
-                                res_found = .false.
-                                nres = nres + 1
-                                res(nres)%start = nat_pro + 1
-                                do i = 1, nlibres
-                                        if(resnam_tmp==lib(i)%nam ) then
-                                                res_found = .true.
-                                                res(nres)%name = lib(i)%nam
-                                                res(nres)%irc = i
-                                                exit
-                                        endif
-                                enddo
-                                if(.not.res_found) then
-                                        write( * , '(/,a,a,/)') '>>> Residue not found in library: ', &
-                                                resnam_tmp
-                                        goto 210
-                                endif
-                                !clear atom read flags
-                                do i = 1, lib(res(nres)%irc )%nat
-                                        atom_id(i) = 0
-                                enddo
-
-                                !check for implicit GAP, i.e. this residue and previous
-                                !have no tail or head connections, respectively.
-                                !Do this unless this is the first residue
-                                !Don't do it if previous line was gap (already done)
-                                if(nres > 1) then
-                                        if(last_line_was_gap .or. &
-                                                lib(res(nres-1)%irc)%tail == 0 .or. &
-                                                lib(res(nres)%irc)%head == 0) then
-                                                nmol = nmol + 1
-                                                istart_mol(nmol) = nat_pro + 1
-                                                if(first_res_of_mol /= oldnum) then
-                                                        write(*,21) res(nres-1)%name, oldnum
-                                                else
-                                                        write(*,*)
-                                                end if
-                                        end if
-                                end if
-                                last_line_was_gap = .false.
-                                !if new molecule write output
-                                if(nat_pro + 1 == istart_mol(nmol)) then
-                                        write(*,20,advance='no') nmol, resnam_tmp, resnum_tmp
-                                        first_res_of_mol = resnum_tmp
-                                end if
-                                nat_pro = nat_pro + lib(res(nres)%irc )%nat
-                                !set nat_solute = nat_pro unless residue is water
-                                if(index(solvent_names, trim(resnam_tmp)) == 0) then
-                                        nat_solute = nat_pro
-                                        nres_solute = nres 
-                                end if
-
-                                oldnum = resnum_tmp
-
-                        endif !new residue
-
-                        at_found = .false.
-                        do i = 1, lib(res(nres)%irc )%nat
-                                if(atnam_tmp==lib(res(nres)%irc)%atnam(i)) then
-                                        at_found = .true.
-                                        atom_id(i) = 1
-                                        j = res(nres)%start - 1 + i
-                                        xtop(j * 3 - 2) = xtmp(1)
-                                        xtop(j * 3 - 1) = xtmp(2)
-                                        xtop(j * 3) = xtmp(3)
-                                        exit
-                                endif
-                        enddo !i
-
-                        if(.not.at_found) then
-                                write( * , '(/,a,a,a,i5,a,a,/)') '>>> Atom ', atnam_tmp, &
-                                ' in residue no. ', resnum_tmp, ' not found in library entry for ', &
-                                lib(res(nres)%irc)%nam
-                                goto 210
-                        endif !.not.at_found
-                end if !line type
+        !look up new residue in library
+        res_found = .false.
+        nres = nres + 1
+        res(nres)%start = nat_pro + 1
+        do i = 1, nlibres
+          if(resnam_tmp==lib(i)%nam ) then
+            res_found = .true.
+            res(nres)%name = lib(i)%nam
+            res(nres)%irc = i
+            exit
+          endif
+        enddo
+        if(.not.res_found) then
+          write( * , '(/,a,a,/)') '>>> Residue not found in library: ', &
+            resnam_tmp
+          goto 210
+        endif
+        !clear atom read flags
+        do i = 1, lib(res(nres)%irc )%nat
+          atom_id(i) = 0
         enddo
 
-!branch here at EOF
-100     close(3)
-        if(last_line_was_gap) then
-                write(*,'(a)') '>>> Warning: PDB file ends with GAP line.'
-                nmol = nmol - 1 !correct molecule count
-        else
-                !print last residue of last molecule if more than one
-                if(first_res_of_mol /= oldnum) then
-                        write(*,21) resnam_tmp, oldnum
-                else
-                        write(*,*)
-                end if
+        !check for implicit GAP, i.e. this residue and previous
+        !have no tail or head connections, respectively.
+        !Do this unless this is the first residue
+        !Don't do it if previous line was gap (already done)
+        if(nres > 1) then
+          if(last_line_was_gap .or. &
+            lib(res(nres-1)%irc)%tail == 0 .or. &
+            lib(res(nres)%irc)%head == 0) then
+            nmol = nmol + 1
+            istart_mol(nmol) = nat_pro + 1
+            if(first_res_of_mol /= oldnum) then
+              write(*,21) res(nres-1)%name, oldnum
+            else
+              write(*,*)
+            end if
+          end if
+        end if
+        last_line_was_gap = .false.
+        !if new molecule write output
+        if(nat_pro + 1 == istart_mol(nmol)) then
+          write(*,20,advance='no') nmol, resnam_tmp, resnum_tmp
+          first_res_of_mol = resnum_tmp
+        end if
+        nat_pro = nat_pro + lib(res(nres)%irc )%nat
+        !set nat_solute = nat_pro unless residue is water
+        if(index(solvent_names, trim(resnam_tmp)) == 0) then
+          nat_solute = nat_pro
+          nres_solute = nres
         end if
 
-! --- Check if last residue was OK...
-        if(nres > 0) then !avoid crashing when reading empty file
-                do i = 1, lib(res(nres)%irc )%nat
-                        if(lib(res(nres)%irc )%atnam(i)(1:1) /='H') then
-                                !it is a heavy (non-H) atom
-                                heavy(res(nres)%start - 1 + i) = .true.
-                                makeH(res(nres)%start - 1 + i) = .false.
-                                if(atom_id(i) == 0) then !it was not found
-                                        write( * , '(/,a,a,a,i5,/)') '>>> Heavy atom ', &
-                                        lib(res(nres)%irc )%atnam(i),' missing in residue ',oldnum
-                                        goto 210
-                                end if
-                        else !it is a hydrogen
-                                heavy(res(nres)%start - 1 + i) = .false.
-                                if(atom_id(i) == 0) then 
-                                        !it was not read from the file and should be gerenated
-                                        makeH(res(nres)%start - 1 + i) = .true.
-                                end if
-                        end if
-                enddo
-        end if  
+        oldnum = resnum_tmp
 
-        nwat = (nat_pro - nat_solute) / 3
-        write(*,110) nmol,nres, nres_solute, nat_pro, nat_solute
-110     format(/,'Successfully read PDB file with', i5,' molecules,',/,&
-                i5,' residues total (',i5,' in solute).',/,&
-                i5,' atoms total (',i5,' in solute).')
+      endif !new residue
 
-        write( * , '(/,a,/)') 'Sequence listing:'
-        write( * , '(16(a4,1x))') res(1:nres)%name
-        write( *, * )
+      at_found = .false.
+      do i = 1, lib(res(nres)%irc )%nat
+        if(atnam_tmp==lib(res(nres)%irc)%atnam(i)) then
+          at_found = .true.
+          atom_id(i) = 1
+          j = res(nres)%start - 1 + i
+          xtop(j * 3 - 2) = xtmp(1)
+          xtop(j * 3 - 1) = xtmp(2)
+          xtop(j * 3) = xtmp(3)
+          exit
+        endif
+      enddo !i
 
-        return
+      if(.not.at_found) then
+        write( * , '(/,a,a,a,i5,a,a,/)') '>>> Atom ', atnam_tmp, &
+          ' in residue no. ', resnum_tmp, ' not found in library entry for ', &
+          lib(res(nres)%irc)%nam
+        goto 210
+      endif !.not.at_found
+    end if !line type
+  enddo
 
-!       error handling
-  200 write( * , '(/,a,i5,/)') '>>> Read error on line ', irec
-  210 write( * , '(a)') 'Correct the PDB file and try readpdb again!'
-        write( * , '(a)') 'If the problem is in the library you need to correct it and do',&
-                'clearlib and readlib before trying readpdb again.'
-        close(3)
-        CALL clearpdb
-        pdb_file = ''
+  !branch here at EOF
+100 close(3)
+  if(last_line_was_gap) then
+    write(*,'(a)') '>>> Warning: PDB file ends with GAP line.'
+    nmol = nmol - 1 !correct molecule count
+  else
+    !print last residue of last molecule if more than one
+    if(first_res_of_mol /= oldnum) then
+      write(*,21) resnam_tmp, oldnum
+    else
+      write(*,*)
+    end if
+  end if
+
+  ! --- Check if last residue was OK...
+  if(nres > 0) then !avoid crashing when reading empty file
+    do i = 1, lib(res(nres)%irc )%nat
+      if(lib(res(nres)%irc )%atnam(i)(1:1) /='H') then
+        !it is a heavy (non-H) atom
+        heavy(res(nres)%start - 1 + i) = .true.
+        makeH(res(nres)%start - 1 + i) = .false.
+        if(atom_id(i) == 0) then !it was not found
+          write( * , '(/,a,a,a,i5,/)') '>>> Heavy atom ', &
+            lib(res(nres)%irc )%atnam(i),' missing in residue ',oldnum
+          goto 210
+        end if
+      else !it is a hydrogen
+        heavy(res(nres)%start - 1 + i) = .false.
+        if(atom_id(i) == 0) then
+          !it was not read from the file and should be gerenated
+          makeH(res(nres)%start - 1 + i) = .true.
+        end if
+      end if
+    enddo
+  end if
+
+  nwat = (nat_pro - nat_solute) / 3
+  write(*,110) nmol,nres, nres_solute, nat_pro, nat_solute
+110 format(/,'Successfully read PDB file with', i5,' molecules,',/,&
+    i5,' residues total (',i5,' in solute).',/,&
+    i5,' atoms total (',i5,' in solute).')
+
+  write( * , '(/,a,/)') 'Sequence listing:'
+  write( * , '(16(a4,1x))') res(1:nres)%name
+  write( *, * )
+
+  return
+
+  !       error handling
+200 write( * , '(/,a,i5,/)') '>>> Read error on line ', irec
+210 write( * , '(a)') 'Correct the PDB file and try readpdb again!'
+  write( * , '(a)') 'If the problem is in the library you need to correct it and do',&
+    'clearlib and readlib before trying readpdb again.'
+  close(3)
+  CALL clearpdb
+  pdb_file = ''
 end subroutine readpdb
 
 
@@ -6115,14 +6134,42 @@ subroutine writepdb
           iwrite_g = 0
   end select      
 
+
+!   PDB format(we need only atom name, res. name, number and coords):
+!   The format is
+!   1. |    1 -  6    |   A6    | Record ID (eg ATOM, HETATM)
+!   2. |    7 - 11    |   I5    | Atom serial number
+!   -  |   12 - 12    |   1X    | Blank
+!   3. |   13 - 16    |   A4    | Atom name (eg " CA " , " ND1")
+!   4. |   17 - 17    |   A1    | Alternative location code (if any)
+!   5. |   18 - 20    |   A3    | Standard 3-letter amino acid code for residue
+!   -  |   21 - 21    |   1X    | Blank
+!   6. |   22 - 22    |   A1    | Chain identifier code
+!   7. |   23 - 26    |   I4    | Residue sequence number
+!   8. |   27 - 27    |   A1    | Insertion code (if any)
+!   -  |   28 - 30    |   3X    | Blank
+!   9. |   31 - 38    |  F8.3   | Atom's x-coordinate
+!  10. |   39 - 46    |  F8.3   | Atom's y-coordinate
+!  11. |   47 - 54    |  F8.3   | Atom's z-coordinate
+!  12. |   55 - 60    |  F6.2   | Occupancy value for atom
+!  13. |   61 - 66    |  F6.2   | B-value (thermal factor)
+!
+! Sometimes as pointed out by Geir Isaksen it becomes absolutely necessary to
+! read residue names with four letters. Luckily column 21 in the pdb
+! specification is a blank, so 2x in the previous expression can be easily
+! changed to 1x
+!10 format(12x,a5,a4,1x,i4,4x,3f8.3)
+
+
 ! PDB standard minus B-factors 10
 ! format(a6,i5,1x,a4,a1,a3,1x,a1,i4,a1,3x,3f8.3)
 ! See the readpdb subroutine for specification of the format
 ! Old format  10 format(a6,i5,2x,a4,a4,i5,4x,3f8.3)      
 ! TODO: Fix writing of chainID, requires chain info in topology.
 ! (PDBtype,atomNr,atomName,resName,resNr,coords)
-10      format(a6,i5,1x,a5,a3,2x,i4,4x,3f8.3)  
-11      format(a6,11x,a3,2x,i4) !For TER cards  
+!10      format(a6,i5,1x,a5,a3,2x,i4,4x,3f8.3)  pre-Geir Isaksen suggestion.
+10      format(a6,i5,1x,a5,a4,1x,i4,4x,3f8.3) ! four letter residue names
+11      format(a6,11x,a4,1x,i4) !For TER cards
   iat = 0
   imol = 1
   wrote_atom_in_molecule = .false.
@@ -6189,7 +6236,7 @@ end subroutine writepdb
 !>
 !------------------------------------------------------------------------------!
 subroutine writemol2
-! *** local variables
+  ! *** local variables
   character filnam*80, reply*1
   character                        :: mol_name*16, ti*1, tj*1
   integer                          :: i, cnt, j, iat
@@ -6203,138 +6250,137 @@ subroutine writemol2
   integer                          :: dict_type
 
   if(.not. check_residues()) then
-          call parse_reset()
-          return
+    call parse_reset()
+    return
   end if
 
   if(mask%included == 0) then
-          write(*,900)
-900             format('>>>>> ERROR: The mask is empty - no atoms to write!')
-                return
-        end if
+    write(*,900)
+900 format('>>>>> ERROR: The mask is empty - no atoms to write!')
+    return
+  end if
 
-        call get_string_arg(filnam, '-----> Name of Mol2 file (or auto): ')
+  call get_string_arg(filnam, '-----> Name of Mol2 file (or auto): ')
 
-5       format('#       Mol2 file written by Qprep version 5',/,&
-                   '#       Title of topology: ',a,/,&
-                   '#       Coordinate source: ',a)
-! atom records
-10      format(i6,1x,a4,4x,3f10.3,2x,a,t55,i6,2x,a4,2x,f6.3) !atom record
-!              #    nam    xyz     atyp  res# rnam    q
-!bond record
-20      format(i6,1x,i6,1x,i6,4x,a3) 
-        !          #     i      j    typ
-!molecule record : name,atoms, bonds, substr., features, sets, mol_type, charge_type
-30      format(/,'@<TRIPOS>MOLECULE',/,'MOLECULE',/,5(i6,1x),/,a,/,a,/) 
-!substructure record
-40      format(i6,1x,a3,a,t18,i6,1x,a,t34,i1,1x,a1,1x,a4) !substructure record
-!           #    name#    start kind  dict chain, restyp
+5 format('#       Mol2 file written by Qprep version 5',/,&
+    '#       Title of topology: ',a,/,&
+    '#       Coordinate source: ',a)
+  ! atom records
+10 format(i6,1x,a4,4x,3f10.3,2x,a,t55,i6,2x,a4,2x,f6.3) !atom record
+  !              #    nam    xyz     atyp  res# rnam    q
+  !bond record
+20 format(i6,1x,i6,1x,i6,4x,a3)
+  !          #     i      j    typ
+  !molecule record : name,atoms, bonds, substr., features, sets, mol_type, charge_type
+30 format(/,'@<TRIPOS>MOLECULE',/,'MOLECULE',/,5(i6,1x),/,a,/,a,/)
+  !substructure record
+40 format(i6,1x,a3,a,t18,i6,1x,a,t34,i1,1x,a1,1x,a4) !substructure record
+  !           #    name#    start kind  dict chain, restyp
 
-        !get new atom numbers
-        new_num(:) = 0 !reset
-        j = 0
-        do i = 1, nat_pro
-                if(mask%mask(i)) then
-                        j = j + 1
-                        new_num(i) = j
-                end if
-        end do
+  !get new atom numbers
+  new_num(:) = 0 !reset
+  j = 0
+  do i = 1, nat_pro
+    if(mask%mask(i)) then
+      j = j + 1
+      new_num(i) = j
+    end if
+  end do
 
-        !count atoms in residues
-        do i = 1, nres-1
-                res_atoms(i) = count(mask%mask(res(i)%start:res(i+1)%start-1))
-        end do
-        res_atoms(nres) = count(mask%mask(res(nres)%start:nat_pro))
+  !count atoms in residues
+  do i = 1, nres-1
+    res_atoms(i) = count(mask%mask(res(i)%start:res(i+1)%start-1))
+  end do
+  res_atoms(nres) = count(mask%mask(res(nres)%start:nat_pro))
 
-        !renumber residues
-        nres_mol = 0
-        do i = 1, nres
-                if(res_atoms(i) > 0) then
-                        nres_mol = nres_mol + 1
-                        new_resnum(i) = nres_mol
-                end if
-        end do
+  !renumber residues
+  nres_mol = 0
+  do i = 1, nres
+    if(res_atoms(i) > 0) then
+      nres_mol = nres_mol + 1
+      new_resnum(i) = nres_mol
+    end if
+  end do
 
-        !count bonds
-        nbnd_mol = 0
-        do i = 1, nbonds
-                if(mask%mask(bnd(i)%i) .and. mask%mask(bnd(i)%j)) then
-                        !both atoms are in mask
-                        nbnd_mol = nbnd_mol + 1
-                end if
-        end do
+  !count bonds
+  nbnd_mol = 0
+  do i = 1, nbonds
+    if(mask%mask(bnd(i)%i) .and. mask%mask(bnd(i)%j)) then
+      !both atoms are in mask
+      nbnd_mol = nbnd_mol + 1
+    end if
+  end do
 
 
-        !name & open file
-        if(filnam == 'auto' .or. filnam == 'AUTO') then !generate name
-                write(filnam, 110) trim(auto_name), trim(adjustl(mol_name))
-        end if
+  !name & open file
+  if(filnam == 'auto' .or. filnam == 'AUTO') then !generate name
+    write(filnam, 110) trim(auto_name), trim(adjustl(mol_name))
+  end if
 110 format(a,a,'.mol2')
-        u = freefile()
-        if(openit(u, filnam, 'unknown', 'formatted', 'write') /= 0) then
-                call parse_reset()
-                return
-        end if
+  u = freefile()
+  if(openit(u, filnam, 'unknown', 'formatted', 'write') /= 0) then
+    call parse_reset()
+    return
+  end if
                 
-        !write header
-        write(u,5) title, coord_source
+  !write header
+  write(u,5) title, coord_source
 
-        !write molecule record
-        write(u,30) mask%included, nbnd_mol, nres_mol, 0, 0,'SMALL', 'USER_CHARGES'
+  !write molecule record
+  write(u,30) mask%included, nbnd_mol, nres_mol, 0, 0,'SMALL', 'USER_CHARGES'
 
-        iat = 0
-        new_res = 0
-        write(u,'(a)') '@<TRIPOS>ATOM'
-        do i = 1, nres
-                do j = 1, lib(res(i)%irc)%nat
-                        iat = iat + 1
-                        if(mask%mask(iat)) then
-                                write(u, 10) new_num(iat), lib(res(i)%irc )%atnam(j), &
-                                        xtop(iat*3-2:iat*3), SYBYL_atom_type(iac(iat)), &
-                                        new_resnum(i), res(i)%name, crg(iat)
-                        end if
-                enddo
-        enddo
+  iat = 0
+  new_res = 0
+  write(u,'(a)') '@<TRIPOS>ATOM'
+  do i = 1, nres
+    do j = 1, lib(res(i)%irc)%nat
+      iat = iat + 1
+      if(mask%mask(iat)) then
+        write(u, 10) new_num(iat), lib(res(i)%irc )%atnam(j), &
+          xtop(iat*3-2:iat*3), SYBYL_atom_type(iac(iat)), &
+          new_resnum(i), res(i)%name, crg(iat)
+      end if
+    enddo
+  enddo
 
-        !Write bond records
-        write(u,'(a)') '@<TRIPOS>BOND'
-        iat = 0
-        do i = 1, nbonds
-                if(mask%mask(bnd(i)%i) .and. mask%mask(bnd(i)%j)) then
-                        !both atoms are in mask
-                        iat = iat + 1   
-                        if(SYBYL_bond_type(bnd(i)%cod) == '') then
-                                write(u,20) iat, new_num(bnd(i)%i), new_num(bnd(i)%j),"1"
-                        else
-                                write(u,20) iat, new_num(bnd(i)%i), new_num(bnd(i)%j), &
-                                 SYBYL_bond_type(bnd(i)%cod)
-                        end if
-                end if
-        end do
+  !Write bond records
+  write(u,'(a)') '@<TRIPOS>BOND'
+  iat = 0
+  do i = 1, nbonds
+    if(mask%mask(bnd(i)%i) .and. mask%mask(bnd(i)%j)) then
+      !both atoms are in mask
+      iat = iat + 1
+      if(SYBYL_bond_type(bnd(i)%cod) == '') then
+        write(u,20) iat, new_num(bnd(i)%i), new_num(bnd(i)%j),"1"
+      else
+        write(u,20) iat, new_num(bnd(i)%i), new_num(bnd(i)%j), &
+          SYBYL_bond_type(bnd(i)%cod)
+      end if
+    end if
+  end do
 
-        !write substructure records
-        write(u,'(a)') '@<TRIPOS>SUBSTRUCTURE'
-        new_res = 0
-        do i = 1, nres
-                if(res_atoms(i) > 0) then
-                        new_res = new_res + 1
-                        at_start = res(i)%start
-                        !if no hydrogens then skip forward to first heavy atom
-                        do while(.not. mask%mask(at_start))
-                                at_start = at_start + 1
-                        end do
-                        dict_type = 0
-                        if(lib(res(i)%irc)%SYBYLTYPE == 'RESIDUE') dict_type = 1
-                        write(mol_name, '(i6)') i
-                        write(u,40) new_resnum(i), res(i)%name,adjustl(mol_name), new_num(at_start),&
-                                lib(res(i)%irc)%SYBYLTYPE, dict_type, 'A', res(i)%name
-                end if
-        end do
+  !write substructure records
+  write(u,'(a)') '@<TRIPOS>SUBSTRUCTURE'
+  new_res = 0
+  do i = 1, nres
+    if(res_atoms(i) > 0) then
+      new_res = new_res + 1
+      at_start = res(i)%start
+      !if no hydrogens then skip forward to first heavy atom
+      do while(.not. mask%mask(at_start))
+        at_start = at_start + 1
+      end do
+      dict_type = 0
+      if(lib(res(i)%irc)%SYBYLTYPE == 'RESIDUE') dict_type = 1
+      write(mol_name, '(i6)') i
+      write(u,40) new_resnum(i), res(i)%name,adjustl(mol_name), new_num(at_start),&
+        lib(res(i)%irc)%SYBYLTYPE, dict_type, 'A', res(i)%name
+    end if
+  end do
 
-        close(u)
+  close(u)
 
-        write( * , '(/,a,/)') 'Mol2 file successfully written.'
-
+  write( * , '(/,a,/)') 'Mol2 file successfully written.'
 
 end subroutine writemol2
 
@@ -6345,28 +6391,28 @@ end subroutine writemol2
 !
 !------------------------------------------------------------------------------!
 subroutine writetop
-! *** local variables
-        CHARACTER filnam * 80
-        integer i, j, ig
-        CHARACTER answer * 10
+  ! *** local variables
+  CHARACTER filnam * 80
+  integer i, j, ig
+  CHARACTER answer * 10
 
-! --- Warn if missing parameters were found by maketop
-        if(.not. topo_ok) then
-                write( * ,  * ) 'WARNING: The topology is incomplete due to missing parameters!'
-                write( * ,  * ) 'Do you realLY want to write this erronenous topology?'
-                write( * ,  * ) 'Enter yes to proceed, anything else to cancel.'
-                call parse_reset
-                CALL get_string_arg(answer, '-----> Write _ERRONENOUS_ topology [yes/NO] ? ')
-                if(answer/='yes') then
-                        return
-                endif
-        endif
+  ! --- Warn if missing parameters were found by maketop
+  if(.not. topo_ok) then
+    write( * ,  * ) 'WARNING: The topology is incomplete due to missing parameters!'
+    write( * ,  * ) 'Do you realLY want to write this erronenous topology?'
+    write( * ,  * ) 'Enter yes to proceed, anything else to cancel.'
+    call parse_reset
+    CALL get_string_arg(answer, '-----> Write _ERRONENOUS_ topology [yes/NO] ? ')
+    if(answer/='yes') then
+      return
+    endif
+  endif
 
-        write( *, * )
+  write( *, * )
 
-        CALL get_string_arg(filnam, '-----> Give name of new topology file: ')
+  CALL get_string_arg(filnam, '-----> Give name of new topology file: ')
 
-        call topo_save(filnam)
+  call topo_save(filnam)
 
 end subroutine writetop
 
@@ -6377,7 +6423,7 @@ end subroutine writetop
 !>
 !------------------------------------------------------------------------------!
 subroutine listprefs
-        call pref_list('Preferences (use set command to change):')
+  call pref_list('Preferences (use set command to change):')
 end subroutine listprefs
 
 

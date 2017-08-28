@@ -24,7 +24,7 @@ module parse
   integer, parameter                :: MAX_ARGS = 10
 
   type substring
-          integer                   :: istart, iend
+   integer                          :: istart, iend
   end type substring
 
   character(200)                    :: inbuf
@@ -37,13 +37,19 @@ module parse
 
 contains
 
+!------------------------------------------------------------------------------!
+!>  function: parse_startup
+!>
+!------------------------------------------------------------------------------!
 subroutine parse_startup()
   argc = 0
   argp = 1
 end subroutine parse_startup
 
-!--------------------------------------------------------------------------
-
+!------------------------------------------------------------------------------!
+!>  function: parse_open_file
+!>
+!------------------------------------------------------------------------------!
 logical function parse_open_file(filename)
 character(*)    :: filename
 integer         :: stat
