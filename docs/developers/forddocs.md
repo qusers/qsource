@@ -1,6 +1,6 @@
 ---
 project: Q-FEP-MD
-summary: Developers docs for Q
+summary: Developer docs for Q
 author: John Marelius, Johan Aqvist, and others.
 author_description: Research group at Uppsala
 project_dir: ../../../src 

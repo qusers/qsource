@@ -4,8 +4,8 @@
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
 !  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
 !  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Kazemi, Paul Bauer,     !
-!  Miha Purg, Irek Szeler                                                      !
-!  latest update: March 29, 2017                                               !
+!  Miha Purg, Irek Szeler, Mauricio Esguerra                                   !
+!  latest update: August 29, 2017                                              !
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
@@ -15,43 +15,43 @@
 !  atom mask manipulation functions
 !------------------------------------------------------------------------------!
 module maskmanip
-        use atom_mask
-        use misc
-        use parse
-        implicit none
+  use atom_mask
+  use misc
+  use parse
+  implicit none
 
 contains
 
-!*******************************************************
+  !*******************************************************
 
-integer function maskmanip_make(mask)
-        !arguments
-        type(MASK_TYPE)                         ::      mask
+  integer function maskmanip_make(mask)
+    !arguments
+    type(MASK_TYPE)                         ::      mask
 
-        !locals
-        character(len=200)                      ::      line
-        integer                                         ::      included, inthis
+    !locals
+    character(len=200)                      ::      line
+    integer                                         ::      included, inthis
         
+    call mask_clear(mask)
+
+    do
+      call getlin(line, 'Mask:')
+      call upcase(line)
+      if(line == 'END' .or. line == '.') exit
+      if(line == 'CLEAR') then
         call mask_clear(mask)
+        cycle
+      elseif(line == 'HELP' .or. line == '?') then
+        call  maskmanip_help
+        cycle
+      end if
+      inthis=mask_add(mask, line)
+      write(*,110) inthis, mask%included
+110   format('Added',i5,' atoms to the mask which now contains',i5,' atoms.')
+    end do
 
-        do
-                call getlin(line, 'Mask:')
-                call upcase(line)
-                if(line == 'END' .or. line == '.') exit
-                if(line == 'CLEAR') then
-                        call mask_clear(mask)
-                        cycle
-                elseif(line == 'HELP' .or. line == '?') then
-                        call  maskmanip_help
-                        cycle
-                end if
-                inthis=mask_add(mask, line)
-                write(*,110) inthis, mask%included
-110             format('Added',i5,' atoms to the mask which now contains',i5,' atoms.')
-        end do
-
-        maskmanip_make = mask%included
-end function maskmanip_make
+    maskmanip_make = mask%included
+  end function maskmanip_make
 
 !*******************************************************
 

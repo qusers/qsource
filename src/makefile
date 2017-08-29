@@ -5,7 +5,7 @@
 #  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          #
 #  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Kazemi, Paul Bauer      #
 #  Miha Purg, Irek Szeler, Mauricio Esguerra                                   #
-#  Latest update: March 29, 2017                                               #
+#  Latest update: August 29, 2017                                              #
 #  make [option] [COMP=compiler]                                               #
 ################################################################################
 

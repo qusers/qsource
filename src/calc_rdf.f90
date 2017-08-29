@@ -5,7 +5,7 @@
 !  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
 !  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Kazemi, Paul Bauer,     !
 !  Miha Purg, Irek Szeler, Mauricio Esguerra                                   !
-!  latest update: August 4, 2017                                               !
+!  latest update: August 29, 2017                                              !
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!

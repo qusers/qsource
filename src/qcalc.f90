@@ -5,7 +5,7 @@
 !  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
 !  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Kazemi, Paul Bauer,     !
 !  Miha Purg, Irek Szeler, Mauricio Esguerra                                   !
-!  latest update: March 29, 2017                                               !
+!  latest update: August 29, 2017                                              !
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
@@ -66,21 +66,21 @@ program qcalc
 
 
   !register the calculation kinds
-  call add_kind(desc='RMS coord. deviation',              key='rmsd', output=.true.)
-  call add_kind(desc='Least squares fit',                         key='fit', output=.false.)
-  call add_kind(desc='Distance, bond energy',             key='dist', output=.true.)
-  call add_kind(desc='Angle, angle energy',                       key='angle', output=.true.)
-  call add_kind(desc='Torsion, torsion energy', key='torsion', output=.true.)
-  call add_kind(desc='Entropy [Schlitters formula]', key='entropy', output=.true.) 
-  call add_kind(desc='Nonbonded monitor',                         key='nonbond', output=.true.)
-  call add_kind(desc='Residue nonbond monitor', key='nb_prot_qatom', output=.true.)
-  call add_kind(desc='ChemScore',                                                         key='chemscore', output=.true.)
-  call add_kind(desc='X-Score',                                                                   key = 'xscore', output=.true.)
-  call add_kind(desc='PMF-Score',                                                         key = 'pmfscore', output=.true.)
-  call add_kind(desc='RDF',                                                               key = 'rdf', output=.true.)
-  call add_kind(desc='RMSF',                                                              key = 'rmsf', output=.true.)
-  call add_kind(desc='Center of mass Kinetic Energy',             key = 'com_ke', output=.true.)
-  call add_kind(desc='Center of mass position',           key = 'com', output=.true.)
+  call add_kind(desc='RMS coord. deviation',          key = 'rmsd', output=.true.)
+  call add_kind(desc='Least squares fit',             key = 'fit', output=.false.)
+  call add_kind(desc='Distance, bond energy',         key = 'dist', output=.true.)
+  call add_kind(desc='Angle, angle energy',           key = 'angle', output=.true.)
+  call add_kind(desc='Torsion, torsion energy',       key = 'torsion', output=.true.)
+  call add_kind(desc='Entropy [Schlitters formula]',  key = 'entropy', output=.true.) 
+  call add_kind(desc='Nonbonded monitor',             key = 'nonbond', output=.true.)
+  call add_kind(desc='Residue nonbond monitor',       key = 'nb_prot_qatom', output=.true.)
+  call add_kind(desc='ChemScore',                     key = 'chemscore', output=.true.)
+  call add_kind(desc='X-Score',                       key = 'xscore', output=.true.)
+  call add_kind(desc='PMF-Score',                     key = 'pmfscore', output=.true.)
+  call add_kind(desc='RDF',                           key = 'rdf', output=.true.)
+  call add_kind(desc='RMSF',                          key = 'rmsf', output=.true.)
+  call add_kind(desc='Center of mass Kinetic Energy', key = 'com_ke', output=.true.)
+  call add_kind(desc='Center of mass position',       key = 'com', output=.true.)
   !add more calc. kind registrations here...
 
   
@@ -149,6 +149,11 @@ subroutine shutdown
   call trj_shutdown
 end subroutine shutdown
 
+
+  !----------------------------------------------------------------------------!
+  !!  function: get_topology
+  !!
+  !----------------------------------------------------------------------------!
 logical function get_topology()
   !locals
   character(len=200)                      :: topfile

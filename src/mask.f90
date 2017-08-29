@@ -4,8 +4,8 @@
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
 !  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
 !  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Kazemi, Paul Bauer,     !
-!  Miha Purg, Irek Szeler                                                      !
-!  latest update: March 29, 2017                                               !
+!  Miha Purg, Irek Szeler, Mauricio Esguerra                                   !
+!  latest update: August 29, 2017                                              !
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
@@ -41,10 +41,10 @@ module atom_mask
     character(5)                   :: sybylcode
   end type set
 
-  type, public :: MASK_TYPE
+  type, public :: mask_type
     integer                        :: included
     logical(1), pointer            :: mask(:)
-  end type MASK_TYPE
+  end type mask_type
 
 contains
 

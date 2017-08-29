@@ -4,8 +4,8 @@
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
 !  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
 !  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Kazemi, Paul Bauer,     !
-!  Miha Purg, Irek Szeler                                                      !
-!  latest update: March 29, 2017                                               !
+!  Miha Purg, Irek Szeler, Mauricio Esguerra                                   !
+!  latest update: August 29, 2017                                              !
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
@@ -14,590 +14,590 @@
 !  by Peter Hanspers & Martin Nervall
 !  Qcalc trajectory analysis main program
 !------------------------------------------------------------------------------!
-module CALC_XSCORE
-! v.2003.11, Structure-Based Drug Design Toolkits, developed by Dr. Renxiao Wang
-! F90 implementation and QCalc5 integration by Peter Hanspers
-! Most of the structure from the original xscore source code is ported to f90.
-! Before scoring, protein and ligand data structures are translated to xscore format.
-  
-        use CALC_BASE
-        use MASKMANIP
-        use TRJ
-        use TOPO
-        use PRMFILE
-        use INDEXER
-        use QATOM
-        use MISC
+module calc_xscore
+  ! v.2003.11, Structure-Based Drug Design Toolkits, developed by Dr. Renxiao Wang
+  ! F90 implementation and qcalc integration by Peter Hanspers
+  ! Most of the structure from the original xscore source code is ported to f90.
+  ! Before scoring, protein and ligand data structures are translated to xscore format.
 
-        implicit none
+  use CALC_BASE
+  use MASKMANIP
+  use TRJ
+  use TOPO
+  use PRMFILE
+  use INDEXER
+  use QATOM
+  use MISC
 
-        type tXMolecule
-                integer ::  xtool_format
-                integer ::  id
-                integer ::  valid
-                character(len=256) :: name
-                character(len=256) :: formula
-                real ::  weight
-                integer ::  num_hb_atom
-                integer(2) ::  num_rotor
-                real ::  logp
-                real ::  surface,nsur,psur
-                real ::  volume
+  implicit none
 
-                integer ::  num_atom
-                type(tXAtom),pointer :: atom(:)
+  type tXMolecule
+    integer ::  xtool_format
+    integer ::  id
+    integer ::  valid
+    character(len=256) :: name
+    character(len=256) :: formula
+    real ::  weight
+    integer ::  num_hb_atom
+    integer(2) ::  num_rotor
+    real ::  logp
+    real ::  surface,nsur,psur
+    real ::  volume
 
-                integer ::  num_bond
-                type(tXBond),pointer ::  bond(:)
+    integer ::  num_atom
+    type(tXAtom),pointer :: atom(:)
 
-                integer ::  num_subst
-                integer ::  num_feature
-                integer ::  num_set
-                character(len=256) :: mol_type
-                character(len=256) :: charge_type
+    integer ::  num_bond
+    type(tXBond),pointer ::  bond(:)
 
-                integer ::  num_ring
-                type(tXRing),pointer             :: ring(:)                     
-                integer                                                                  :: ring_count  ! actual count
+    integer ::  num_subst
+    integer ::  num_feature
+    integer ::  num_set
+    character(len=256) :: mol_type
+    character(len=256) :: charge_type
 
-                type(tXDot),pointer             :: vol_dot(:)
-                integer                                                         :: num_vol_dot
-                type(tXDot),pointer             :: sur_dot(:)
-                integer                                                         :: num_sur_dot
-        end type
+    integer ::  num_ring
+    type(tXRing),pointer             :: ring(:)
+    integer                                                                  :: ring_count  ! actual count
 
-        type tXProtein  ! full version
-                integer :: xtool_format
-                character(len=256)      :: name
-                real ::  surface,bnsur,bpsur
+    type(tXDot),pointer             :: vol_dot(:)
+    integer                                                         :: num_vol_dot
+    type(tXDot),pointer             :: sur_dot(:)
+    integer                                                         :: num_sur_dot
+  end type
 
-                integer ::  num_atom
-                type(tXAtom),pointer :: atom(:)
-                integer ::  num_bond
-                type(tXBond),pointer ::  bond(:)
+  type tXProtein  ! full version
+    integer :: xtool_format
+    character(len=256)      :: name
+    real ::  surface,bnsur,bpsur
 
-                integer :: num_chain
+    integer ::  num_atom
+    type(tXAtom),pointer :: atom(:)
+    integer ::  num_bond
+    type(tXBond),pointer ::  bond(:)
 
-                integer :: num_ring
-                type(tXRing), pointer   :: ring(:)
-        end type tXProtein
+    integer :: num_chain
 
-        ! ATOMIC BINDING SCORE
-        type tABS    
-                 real ::  pkd1,pkd2,pkd3
-                 real ::  vdw,hb,hm,hp,hs,rt
-                 real ::  score
-        end type tABS
+    integer :: num_ring
+    type(tXRing), pointer   :: ring(:)
+  end type tXProtein
 
-        type tXLigand
-                real ::  bind_score,chem_score
-                real ::  vdw,sb,hb,hp,hm,hs,ar,rt,pmf,uhb,bnsur,bpsur
-                real ::  pkd1,pkd2,pkd3
+  ! ATOMIC BINDING SCORE
+  type tABS
+    real ::  pkd1,pkd2,pkd3
+    real ::  vdw,hb,hm,hp,hs,rt
+    real ::  score
+  end type tABS
+
+  type tXLigand
+    real ::  bind_score,chem_score
+    real ::  vdw,sb,hb,hp,hm,hs,ar,rt,pmf,uhb,bnsur,bpsur
+    real ::  pkd1,pkd2,pkd3
         
-                integer :: cofactor_offset      ! index of first cofactor atom in protein
+    integer :: cofactor_offset      ! index of first cofactor atom in protein
         
-                type(tABS), pointer ::  abs_inf(:)
+    type(tABS), pointer ::  abs_inf(:)
 
-                type(tXMolecule)        :: mol          ! member inherited from molecule class
-        end type tXLigand
+    type(tXMolecule)        :: mol          ! member inherited from molecule class
+  end type tXLigand
 
-        type bond_pointer                                                                       !pointer to the datatype q_bond
-                type(q_bond),pointer            ::      qb                              !needed for array of q_bonds in type q_atom
-        end type bond_pointer
+  type bond_pointer                                                                       !pointer to the datatype q_bond
+    type(q_bond),pointer            ::      qb                              !needed for array of q_bonds in type q_atom
+  end type bond_pointer
 
-        type q_atom                     
-                integer                                         ::      top_nr                                                                  ! atom number in topology               
-                integer                                         ::      n                                                                                               !number of bonds                                                                
-                type(bond_pointer),dimension(1:6)               ::      bd              !pointers to the bonds
-                logical                                         ::      contact                         !if     closer than r to any receptor atom 
-                integer                                         ::      at_type                         !if lipophilic 2, if other heavy 1, if hydrogen 0 
-                integer                                         ::      hybrid                          !if included sp3 then 3, if included sp2 then 2, others 0
-                logical                                         ::      been_there              !flag used in recursive routines, to avoid eternal loops
-                logical,pointer         ::      cyclic(:)                       !array of logicals, one for each ring, 1 if part of that ring
-                logical                                         ::      active                          !same as been_there
-        end type q_atom                                                                         
+  type q_atom
+    integer                                         ::      top_nr                                                                  ! atom number in topology
+    integer                                         ::      n                                                                                               !number of bonds
+    type(bond_pointer),dimension(1:6)               ::      bd              !pointers to the bonds
+    logical                                         ::      contact                         !if     closer than r to any receptor atom
+    integer                                         ::      at_type                         !if lipophilic 2, if other heavy 1, if hydrogen 0
+    integer                                         ::      hybrid                          !if included sp3 then 3, if included sp2 then 2, others 0
+    logical                                         ::      been_there              !flag used in recursive routines, to avoid eternal loops
+    logical,pointer         ::      cyclic(:)                       !array of logicals, one for each ring, 1 if part of that ring
+    logical                                         ::      active                          !same as been_there
+  end type q_atom
 
-        type q_bond
-                type(q_atom),pointer            ::      a,b                                     !pointers to two bonded atoms
-                logical                                         ::      rotatable                       !if not part of ring and sp3-sp3 or sp3-sp2 bond
-                logical                                         ::      acontact,bcontact       !if a and b in contact with receptor, only used if rotatable
-                logical                                         ::      been_there
-                integer                                         ::      a_nonlip,b_nonlip       !number of non-lipophilic heavy atoms on a-side and b-side of bond
-                integer                                         ::      a_lip,b_lip                     !number of lipophilic heavy atoms on a-side and b-side of bond
-                logical,pointer         ::      cyclic(:)                       
-                logical                                         ::      active
+  type q_bond
+    type(q_atom),pointer            ::      a,b                                     !pointers to two bonded atoms
+    logical                                         ::      rotatable                       !if not part of ring and sp3-sp3 or sp3-sp2 bond
+    logical                                         ::      acontact,bcontact       !if a and b in contact with receptor, only used if rotatable
+    logical                                         ::      been_there
+    integer                                         ::      a_nonlip,b_nonlip       !number of non-lipophilic heavy atoms on a-side and b-side of bond
+    integer                                         ::      a_lip,b_lip                     !number of lipophilic heavy atoms on a-side and b-side of bond
+    logical,pointer         ::      cyclic(:)
+    logical                                         ::      active
 
-                integer                                         :: cod
-        end type q_bond
+    integer                                         :: cod
+  end type q_bond
 
-        type tAtomStruct
-                character(len=10)::  name
-                character(len=10)::  ttype
-                character(len=10)::  xtype
-                real ::  r
-                real ::  eps
-                real ::  q
-                character(len=3)::  hb
-                real ::  logp
-                real ::  solv
-                integer ::  ring
-                character(len=3)::  pmftype
-        end type tAtomStruct
+  type tAtomStruct
+    character(len=10)::  name
+    character(len=10)::  ttype
+    character(len=10)::  xtype
+    real ::  r
+    real ::  eps
+    real ::  q
+    character(len=3)::  hb
+    real ::  logp
+    real ::  solv
+    integer ::  ring
+    character(len=3)::  pmftype
+  end type tAtomStruct
 
-        type tBondStruct
-                 character(len=10)::  atom1
-                 character(len=10)::  atom2
-                 character(len=3)::  ttype
-        end type tBondStruct 
+  type tBondStruct
+    character(len=10)::  atom1
+    character(len=10)::  atom2
+    character(len=3)::  ttype
+  end type tBondStruct
         
-        type tAtom_Def
-                 character(len=10)::  ttype
-                 real ::  weight
-                 real ::  r
-                 real ::  eps
-                 real ::  q
-                 character(len=3)::  hb
-        end type tAtom_Def
+  type tAtom_Def
+    character(len=10)::  ttype
+    real ::  weight
+    real ::  r
+    real ::  eps
+    real ::  q
+    character(len=3)::  hb
+  end type tAtom_Def
         
-        type tXatom_Def
-                 character(len=20) ::  ttype
-                 real ::  logp
-        end type tXatom_Def
+  type tXatom_Def
+    character(len=20) ::  ttype
+    real ::  logp
+  end type tXatom_Def
         
-        type tBond_Def
-                 character(len=10)::  atom_1
-                 character(len=10)::  atom_2
-                 character(len=3)::  ttype
-                 real ::  length
-        end type tBond_Def
+  type tBond_Def
+    character(len=10)::  atom_1
+    character(len=10)::  atom_2
+    character(len=3)::  ttype
+    real ::  length
+  end type tBond_Def
         
-        type tTors_Def
-                 character(len=10)::  atom_1
-                 character(len=10)::  atom_2
-                 character(len=10)::  atom_3
-                 character(len=10)::  atom_4
-                 character(len=3)::  ttype
-                 real ::  V         ! twisting force constant
-                 integer ::  n     ! periodicity
-                 integer ::  S     ! sign of torsion angle type
-        end type tTors_Def
+  type tTors_Def
+    character(len=10)::  atom_1
+    character(len=10)::  atom_2
+    character(len=10)::  atom_3
+    character(len=10)::  atom_4
+    character(len=3)::  ttype
+    real ::  V         ! twisting force constant
+    integer ::  n     ! periodicity
+    integer ::  S     ! sign of torsion angle type
+  end type tTors_Def
         
-        type tPMF_Def
-                 character(len=3)::  ltype
-                 character(len=3)::  ptype
-                 real,dimension(0:59) ::  d             ! distance
-                 real,dimension(0:59) ::  p             ! PMF potential
-        end type tPMF_Def
+  type tPMF_Def
+    character(len=3)::  ltype
+    character(len=3)::  ptype
+    real,dimension(0:59) ::  d             ! distance
+    real,dimension(0:59) ::  p             ! PMF potential
+  end type tPMF_Def
         
-        type tHB_Def
-                 character(len=10)::  ttype
-                 real ::  low_cutoff_d, high_cutoff_d, step_d
-                 real ::  low_cutoff_a1, high_cutoff_a1, step_a1
-                 real ::  low_cutoff_a2, high_cutoff_a2, step_a2
-                 integer ::  num_bin_d, num_bin_a1, num_bin_a2, num_bin_total
-                 real, pointer :: pmf(:)
-        end type
+  type tHB_Def
+    character(len=10)::  ttype
+    real ::  low_cutoff_d, high_cutoff_d, step_d
+    real ::  low_cutoff_a1, high_cutoff_a1, step_a1
+    real ::  low_cutoff_a2, high_cutoff_a2, step_a2
+    integer ::  num_bin_d, num_bin_a1, num_bin_a2, num_bin_total
+    real, pointer :: pmf(:)
+  end type
         
-        type tWPMF_Def
-                 character(len=10)::  ttype
-                 real ::  low_cutoff, high_cutoff, step
-                 integer ::  num_bin
-                 real,pointer :: pmf(:)
-        end type
+  type tWPMF_Def
+    character(len=10)::  ttype
+    real ::  low_cutoff, high_cutoff, step
+    integer ::  num_bin
+    real,pointer :: pmf(:)
+  end type
         
-        type tResidue_Def
-                character(len=10)::  name
-                integer ::  num_atom, num_bond
-                type(tAtomStruct),dimension(0:49) :: atom
+  type tResidue_Def
+    character(len=10)::  name
+    integer ::  num_atom, num_bond
+    type(tAtomStruct),dimension(0:49) :: atom
                                 
-                type(tBondStruct),dimension(0:49) :: bond
-        end type tResidue_Def
+    type(tBondStruct),dimension(0:49) :: bond
+  end type tResidue_Def
 
-        type tXFF       ! full version
-                integer ::  num_restype
-                type(tResidue_Def),pointer :: residue(:)
+  type tXFF       ! full version
+    integer ::  num_restype
+    type(tResidue_Def),pointer :: residue(:)
 
-                integer ::  num_atomtype
-                type(tAtom_Def),pointer :: atom(:)
+    integer ::  num_atomtype
+    type(tAtom_Def),pointer :: atom(:)
 
-                integer ::  num_xatomtype
-                type(tXatom_Def),pointer :: xatom(:)
+    integer ::  num_xatomtype
+    type(tXatom_Def),pointer :: xatom(:)
 
-                integer ::  num_bondtype
-                type(tBond_Def),pointer :: bond(:)
+    integer ::  num_bondtype
+    type(tBond_Def),pointer :: bond(:)
 
-                integer ::  num_torstype
-                type(tTors_Def),pointer :: torsion(:)
+    integer ::  num_torstype
+    type(tTors_Def),pointer :: torsion(:)
 
-                integer ::  num_pmftype
-                type(tPMF_Def),pointer :: pmf(:)
+    integer ::  num_pmftype
+    type(tPMF_Def),pointer :: pmf(:)
 
-                integer ::  num_sdot_type               ! pre-calculated surface dots
-                type(tXDotSet),pointer :: sdot(:)
+    integer ::  num_sdot_type               ! pre-calculated surface dots
+    type(tXDotSet),pointer :: sdot(:)
 
-                integer ::  num_vdot_type               ! pre-calculated volume dots
+    integer ::  num_vdot_type               ! pre-calculated volume dots
 
-                integer ::  num_hbtype
-                type(tHB_Def),pointer :: hb_pmf(:)
+    integer ::  num_hbtype
+    type(tHB_Def),pointer :: hb_pmf(:)
 
-                integer ::  num_wpmftype
-                type(tWPMF_Def),pointer :: wpmf(:)
-        end type tXFF
+    integer ::  num_wpmftype
+    type(tWPMF_Def),pointer :: wpmf(:)
+  end type tXFF
 
-        type tXInput
-                integer                                         ::      num_method
-                character(len=10) ::  apply_hpscore
-                character(len=10) ::  apply_hmscore
-                character(len=10) ::  apply_hsscore
-                character(len=10) ::  apply_pmfscore
-                character(len=20) ::  show_abs
-                character(len=10)       ::      show_total
+  type tXInput
+    integer                                         ::      num_method
+    character(len=10) ::  apply_hpscore
+    character(len=10) ::  apply_hmscore
+    character(len=10) ::  apply_hsscore
+    character(len=10) ::  apply_pmfscore
+    character(len=20) ::  show_abs
+    character(len=10)       ::      show_total
 
-                character(len=3)        ::      show_ligand
-                character(len=3)        ::      show_protein
-                character(len=3)        ::      show_cofactor
-                character(len=3)        ::  show_bonds
+    character(len=3)        ::      show_ligand
+    character(len=3)        ::      show_protein
+    character(len=3)        ::      show_cofactor
+    character(len=3)        ::  show_bonds
 
-                character(len=256)      :: residue_def
-                character(len=256)      :: atom_def
-                character(len=256)      :: logp_def
-                character(len=256)      :: surface_def
-                character(len=256)      :: atom_translations
+    character(len=256)      :: residue_def
+    character(len=256)      :: atom_def
+    character(len=256)      :: logp_def
+    character(len=256)      :: surface_def
+    character(len=256)      :: atom_translations
 
-                integer                                         ::      qatom
+    integer                                         ::      qatom
 
-                real ::  hpscore_cvdw
-                real ::  hpscore_chb
-                real ::  hpscore_chp
-                real ::  hpscore_crt
-                real ::  hpscore_c0
+    real ::  hpscore_cvdw
+    real ::  hpscore_chb
+    real ::  hpscore_chp
+    real ::  hpscore_crt
+    real ::  hpscore_c0
 
-                real ::  hmscore_cvdw
-                real ::  hmscore_chb
-                real ::  hmscore_chm
-                real ::  hmscore_crt
-                real ::  hmscore_c0
+    real ::  hmscore_cvdw
+    real ::  hmscore_chb
+    real ::  hmscore_chm
+    real ::  hmscore_crt
+    real ::  hmscore_c0
 
-                real ::  hsscore_cvdw
-                real ::  hsscore_chb
-                real ::  hsscore_chs
-                real ::  hsscore_crt
-                real ::  hsscore_c0
-        end type tXInput
+    real ::  hsscore_cvdw
+    real ::  hsscore_chb
+    real ::  hsscore_chs
+    real ::  hsscore_crt
+    real ::  hsscore_c0
+  end type tXInput
 
-        type tLogPFactor
-                character(len=30) :: symbol
-                real ::  num 
-                real ::  coeff 
-        end type tLogPFactor
+  type tLogPFactor
+    character(len=30) :: symbol
+    real ::  num
+    real ::  coeff
+  end type tLogPFactor
 
-        type tXAtom
-                integer                                                 :: topindex                     !  topology index
-                integer                                                 :: id           !* atom id 
-                integer                                                 :: valid                                !* valid indicator
-                integer                                                 :: mask                                 !  mask flag
-                character(len=10)               :: name         !  atom name
-                character(len=10)               :: ttype                                !* basic atom type
-                character(len=10)               :: xtype        !* xtool atom type
-                character(len=10)               :: type2        !  another atom type when necessary
-                character(len=10)               :: residue      !* residue name
-                character(len=10)               :: old_residue  !  old residue name, helps debugging force field translations
-                character(len=10)               :: res_id       !  residue id: must be a string for PDB
-                integer                                                 :: atom_res_id  !        atom number within residue
-                integer                                                 :: iscofactor           !  flag indicating if atom is part of a cofactor (1) or not (0)
-                character                                               :: chain        !  chain label
-                real,dimension(0:2)     :: coor                                 !* coordinates
-                real,dimension(0:2)     :: root                                 !* HB root's coordinates 
-                real                                                            :: weight       !* atomic weight
-                real                                                            :: r            !* vdw radius
-                real                                                            :: eps          !* vdw epsilon value
-                real                                                            :: q                                            !* partial atomic charge
-                real                                                            :: XR                                           !  X radius
-                real                                                            :: logp         !* atomic hydrophobic scale
-                real                                                            :: solv                                 !* atomic solvation parameter
-                character(len=3)                :: hb           !* HB property
-                real                                                            :: occupancy            !  occupancy probability, for protein atoms
-                real                                                            :: bfactor                      !  B-factor, for protein atoms
-                real                                                            :: score        !  atomic binding score
-                integer                                                 :: ring                                 !  ring indicator: 1=normal 2=aromatic
-                integer                                                 :: origin                               !  atom origin indicator: 1=ligand 2=protein 
-                integer                                                 :: part                                 !  component indicator: 
-                                                                                                                                                                !        for protein atoms: 1=ATOM 2=HETATM
-                integer                                                 :: num_neib                     !  number of neighboring atoms
-                integer                                                 :: num_nonh                     !  number of non-H neighboring atoms
-                integer,dimension(0:6) :: neib                  !  ID of neighboring atoms
-                integer,dimension(0:6) :: bond                  !  ID of neighboring bonds
-                integer                                                 :: temp                                 !  for misc uses, e.g. cofactor merge
-        end type tXAtom
+  type tXAtom
+    integer                                                 :: topindex                     !  topology index
+    integer                                                 :: id           !* atom id
+    integer                                                 :: valid                                !* valid indicator
+    integer                                                 :: mask                                 !  mask flag
+    character(len=10)               :: name         !  atom name
+    character(len=10)               :: ttype                                !* basic atom type
+    character(len=10)               :: xtype        !* xtool atom type
+    character(len=10)               :: type2        !  another atom type when necessary
+    character(len=10)               :: residue      !* residue name
+    character(len=10)               :: old_residue  !  old residue name, helps debugging force field translations
+    character(len=10)               :: res_id       !  residue id: must be a string for PDB
+    integer                                                 :: atom_res_id  !        atom number within residue
+    integer                                                 :: iscofactor           !  flag indicating if atom is part of a cofactor (1) or not (0)
+    character                                               :: chain        !  chain label
+    real,dimension(0:2)     :: coor                                 !* coordinates
+    real,dimension(0:2)     :: root                                 !* HB root's coordinates
+    real                                                            :: weight       !* atomic weight
+    real                                                            :: r            !* vdw radius
+    real                                                            :: eps          !* vdw epsilon value
+    real                                                            :: q                                            !* partial atomic charge
+    real                                                            :: XR                                           !  X radius
+    real                                                            :: logp         !* atomic hydrophobic scale
+    real                                                            :: solv                                 !* atomic solvation parameter
+    character(len=3)                :: hb           !* HB property
+    real                                                            :: occupancy            !  occupancy probability, for protein atoms
+    real                                                            :: bfactor                      !  B-factor, for protein atoms
+    real                                                            :: score        !  atomic binding score
+    integer                                                 :: ring                                 !  ring indicator: 1=normal 2=aromatic
+    integer                                                 :: origin                               !  atom origin indicator: 1=ligand 2=protein
+    integer                                                 :: part                                 !  component indicator:
+                                                                                                                                                    !        for protein atoms: 1=ATOM 2=HETATM
+    integer                                                 :: num_neib                     !  number of neighboring atoms
+    integer                                                 :: num_nonh                     !  number of non-H neighboring atoms
+    integer,dimension(0:6) :: neib                  !  ID of neighboring atoms
+    integer,dimension(0:6) :: bond                  !  ID of neighboring bonds
+    integer                                                 :: temp                                 !  for misc uses, e.g. cofactor merge
+  end type tXAtom
 
-        type tXWater
-                integer                                                 :: id           !  atom id
-                integer                                                 :: valid  !  valid indicator
-                character(len=10)               :: name    !  atom name
-                character(len=10)               :: type                         !       atom type
-                character(len=10)               :: xtype        !  another atom type
-                character(len=10)               :: residue       !  residue name
-                real,dimension(0:3) :: coor    !  coordinates
-                real                                                            :: r    !  vdw radius
-                real                                                            :: eps        !  vdw epsilon value
-                real                                                            :: q    !  partial atomic charge
-                real                                                            :: logp       !  atomic hydrophobic scale
-                character(len=3)                :: hb       !  HB property
-                real                                                            :: depth                !  buried depth
-                real                                                            :: score                !  score value
-        end type
+  type tXWater
+    integer                                                 :: id           !  atom id
+    integer                                                 :: valid  !  valid indicator
+    character(len=10)               :: name    !  atom name
+    character(len=10)               :: type                         !       atom type
+    character(len=10)               :: xtype        !  another atom type
+    character(len=10)               :: residue       !  residue name
+    real,dimension(0:3) :: coor    !  coordinates
+    real                                                            :: r    !  vdw radius
+    real                                                            :: eps        !  vdw epsilon value
+    real                                                            :: q    !  partial atomic charge
+    real                                                            :: logp       !  atomic hydrophobic scale
+    character(len=3)                :: hb       !  HB property
+    real                                                            :: depth                !  buried depth
+    real                                                            :: score                !  score value
+  end type
 
-        type tXBond     !  full version
-                integer :: id
-                integer :: valid  !  valid indicator
-                integer :: atom_1       !  ID of the atom_1
-                integer :: atom_2       !  ID of the atom_2
-                character(len=3) :: ttype     !  bond type
-                integer :: part   !  ID of the component
-                integer :: ring   !  ring indicator
-                real :: length     !  bond length
-                integer :: num_neib     !  number of neighboring bonds
-                integer,dimension(0:5) :: neib     !  ID of neighboring bonds
-        end type
+  type tXBond     !  full version
+    integer :: id
+    integer :: valid  !  valid indicator
+    integer :: atom_1       !  ID of the atom_1
+    integer :: atom_2       !  ID of the atom_2
+    character(len=3) :: ttype     !  bond type
+    integer :: part   !  ID of the component
+    integer :: ring   !  ring indicator
+    real :: length     !  bond length
+    integer :: num_neib     !  number of neighboring bonds
+    integer,dimension(0:5) :: neib     !  ID of neighboring bonds
+  end type
 
-        type tXTorsion  !  full version
-                type(tXAtom) atom_1
-                type(tXAtom) atom_2
-                type(tXAtom) atom_3
-                type(tXAtom) atom_4
-                character(len=3) :: ttype     !  type of the torsion between 2-3
-                integer :: angle  !  torsion angle, in degree
-                real :: V    !  potential barrier
-                integer :: n      !  periodicity
-                integer :: S      !  sign
-                real :: e    !  torsion energy
-        end type
+  type tXTorsion  !  full version
+    type(tXAtom) atom_1
+    type(tXAtom) atom_2
+    type(tXAtom) atom_3
+    type(tXAtom) atom_4
+    character(len=3) :: ttype     !  type of the torsion between 2-3
+    integer :: angle  !  torsion angle, in degree
+    real :: V    !  potential barrier
+    integer :: n      !  periodicity
+    integer :: S      !  sign
+    real :: e    !  torsion energy
+  end type
 
-        type tXGroup    !  full version
-                integer :: valid
-                integer :: num_neib     !  number of neighboring atoms
-                integer :: num_nonh     !  number of neighboring non-h atoms
-                integer :: num_h        !  number of neighboring hydrogen atoms
-                integer :: num_hetero   !  number of neighboring heteroatoms
-                integer :: num_pi       !  number of neighboring pi atoms
-                integer :: num_car      !  number of neighboring C.ar
-                integer :: num_nar      !  number of neighboring N.ar
-                integer :: num_db       !  number of double bonds
-                integer :: num_tb       !  number of triple bonds
-                integer :: db_type      !  double bond type
-                integer :: amide        !  indicator for amide group
-                type(tXAtom) center      !  center atom of the group
-                type(tXAtom),dimension(0:6) :: neib   !  neighboring atoms
-                type(tXBond),dimension(0:6) :: bond   !  bonds
-        end type
+  type tXGroup    !  full version
+    integer :: valid
+    integer :: num_neib     !  number of neighboring atoms
+    integer :: num_nonh     !  number of neighboring non-h atoms
+    integer :: num_h        !  number of neighboring hydrogen atoms
+    integer :: num_hetero   !  number of neighboring heteroatoms
+    integer :: num_pi       !  number of neighboring pi atoms
+    integer :: num_car      !  number of neighboring C.ar
+    integer :: num_nar      !  number of neighboring N.ar
+    integer :: num_db       !  number of double bonds
+    integer :: num_tb       !  number of triple bonds
+    integer :: db_type      !  double bond type
+    integer :: amide        !  indicator for amide group
+    type(tXAtom) center      !  center atom of the group
+    type(tXAtom),dimension(0:6) :: neib   !  neighboring atoms
+    type(tXBond),dimension(0:6) :: bond   !  bonds
+  end type
 
-        type tXHBond
-                integer :: valid
-                integer :: ttype        !  1: donor=latom, acceptor=patom
-                                                                                        !  2: donor=patom, acceptor=latom
-                                                                                        !  3: donor=metal, acceptor=latom/patom
-                                                                                        !  4: donor=latom, acceptor=latom
-                                                                                        !  5: donor=patom, acceptor=patom
-                                                                                        !  0: invalid, no H-bond
-                integer :: d_type       !  donor type: 1=straight 2=angled
-                integer :: a_type       !  acceptor type: 1=straight 2=angled
-                integer :: sb                   !  flag for neutral HB or SB
+  type tXHBond
+    integer :: valid
+    integer :: ttype        !  1: donor=latom, acceptor=patom
+                                                                            !  2: donor=patom, acceptor=latom
+                                                                            !  3: donor=metal, acceptor=latom/patom
+                                                                            !  4: donor=latom, acceptor=latom
+                                                                            !  5: donor=patom, acceptor=patom
+                                                                            !  0: invalid, no H-bond
+    integer :: d_type       !  donor type: 1=straight 2=angled
+    integer :: a_type       !  acceptor type: 1=straight 2=angled
+    integer :: sb                   !  flag for neutral HB or SB
 
-                integer :: latom        !  id of the ligand atom
-                integer :: patom        !  id of the protein atom
+    integer :: latom        !  id of the ligand atom
+    integer :: patom        !  id of the protein atom
 
-                type(tXAtom) H,D,A              ! not pointers to atoms but real atoms
+    type(tXAtom) H,D,A              ! not pointers to atoms but real atoms
 
-                real :: dd      !  D-A distance
-                real :: a0      !  D-H-A angle
-                real :: a1      !  DR-D-A angle
-                real :: a2      !  D-A-AR angle
+    real :: dd      !  D-A distance
+    real :: a0      !  D-H-A angle
+    real :: a1      !  DR-D-A angle
+    real :: a2      !  D-A-AR angle
 
-                real :: score   !  strength of this HBond
-        end type
+    real :: score   !  strength of this HBond
+  end type
 
-        type tXRing
-                integer :: valid        !  0 = invalid 1 = valid
-                integer :: ttype        !  1 = normal 2 = aromatic
+  type tXRing
+    integer :: valid        !  0 = invalid 1 = valid
+    integer :: ttype        !  1 = normal 2 = aromatic
 
-                integer :: num_member
-                integer, pointer                                        :: atom_id(:)                   ! worst case
-                integer                                                                         :: atom_count = 0       ! actual count
-                integer                                                                         :: atom_max = 0         ! size of allocated mem
-                integer, pointer                                        :: bond_id(:)                   ! worst case
-                integer                                                                         :: bond_count = 0       ! actual count
-                integer                                                                         :: bond_max = 0         ! size of allocated mem
+    integer :: num_member
+    integer, pointer                                        :: atom_id(:)                   ! worst case
+    integer                                                                         :: atom_count = 0       ! actual count
+    integer                                                                         :: atom_max = 0         ! size of allocated mem
+    integer, pointer                                        :: bond_id(:)                   ! worst case
+    integer                                                                         :: bond_count = 0       ! actual count
+    integer                                                                         :: bond_max = 0         ! size of allocated mem
 
-                real,dimension(0:3) :: centroid
-        end type
+    real,dimension(0:3) :: centroid
+  end type
 
-        type tXDot
-                integer                                                 :: valid                !  status indicator
-                character(len=10)               :: ttype                !  type
-                real,dimension(0:3) :: coor                     !  coordinates
-                real                                                            :: unit                 !  contribution, in either A^2 or A^3
-                real                                                            :: score                !  score on this dot
-        end type
+  type tXDot
+    integer                                                 :: valid                !  status indicator
+    character(len=10)               :: ttype                !  type
+    real,dimension(0:3) :: coor                     !  coordinates
+    real                                                            :: unit                 !  contribution, in either A^2 or A^3
+    real                                                            :: score                !  score on this dot
+  end type
 
-        type tXDotSet 
-                integer                                                 :: num_dot = 0  ! current number of dots
-                integer                                                 :: max_dot = 0  ! number of dots for which mem is allocated
-                type(tXDot),pointer     :: dot(:)                               ! array of dots
-                real                                                            :: r
-                character(len=10)               :: ttype
-                real                                                            :: unit                                 !  default contribution of each dot to total
-                real                                                            :: total                                !  total volume or surface
-        end type
+  type tXDotSet
+    integer                                                 :: num_dot = 0  ! current number of dots
+    integer                                                 :: max_dot = 0  ! number of dots for which mem is allocated
+    type(tXDot),pointer     :: dot(:)                               ! array of dots
+    real                                                            :: r
+    character(len=10)               :: ttype
+    real                                                            :: unit                                 !  default contribution of each dot to total
+    real                                                            :: total                                !  total volume or surface
+  end type
 
-        type tXResidue
-                integer valid
-                character(len=10) :: name               !  for PDB files it is a 3-letter string
-                character :: chain
-                character(len=10) :: id
+  type tXResidue
+    integer valid
+    character(len=10) :: name               !  for PDB files it is a 3-letter string
+    character :: chain
+    character(len=10) :: id
 
-                integer :: num_atom
-        end type
+    integer :: num_atom
+  end type
 
-        type tXChain
-                integer valid
-                character :: label
+  type tXChain
+    integer valid
+    character :: label
 
-                integer :: length
-        end type
+    integer :: length
+  end type
 
-        type tXScore
-                integer :: frame
-                real            :: total
-                real            :: vdw
-                real            :: hb
-                real            :: rt
-                real            :: hp
-                real            :: hs
-                real            :: hm
-                real            :: score
-        end type tXScore
+  type tXScore
+    integer :: frame
+    real            :: total
+    real            :: vdw
+    real            :: hb
+    real            :: rt
+    real            :: hp
+    real            :: hs
+    real            :: hm
+    real            :: score
+  end type tXScore
 
-        type donor
-                integer(AI)                     ::      heavy,hydr              !topology numbers for atoms in H-bond donor
-        end type donor
+  type donor
+    integer(AI)                     ::      heavy,hydr              !topology numbers for atoms in H-bond donor
+  end type donor
 
-        type wat
-                integer(AI)                     ::      O, H1, H2               !topology numbers
-                real                                            ::      score                   !H-bond score with receptor
-        end type wat
+  type wat
+    integer(AI)                     ::      O, H1, H2               !topology numbers
+    real                                            ::      score                   !H-bond score with receptor
+  end type wat
 
-        type ATOM_DATA_TYPE
-                real                                            ::      radius
-        end type ATOM_DATA_TYPE
-        type(ATOM_DATA_TYPE), allocatable ::atom_data(:)
+  type ATOM_DATA_TYPE
+    real                                            ::      radius
+  end type ATOM_DATA_TYPE
+  type(ATOM_DATA_TYPE), allocatable ::atom_data(:)
 
-        type ATOM_TYPE_CONVERSION
-                character(len=20)       :: xscore, other
-        end type
+  type ATOM_TYPE_CONVERSION
+    character(len=20)       :: xscore, other
+  end type
 
-        type RESIDUE_NAME_CONVERSION
-                character(len=8)        :: xscore, other
-        end type
+  type RESIDUE_NAME_CONVERSION
+    character(len=8)        :: xscore, other
+  end type
 
-        type PATOM_NAME_CONVERSION
-                character(len=20)                                       :: res                                                                  ! residue name
-                character(len=20),pointer       :: qname(:), xname(:)           ! atom name table
-                integer                                                                         :: natom                                                                ! #atoms in residue
-        end type
+  type PATOM_NAME_CONVERSION
+    character(len=20)                                       :: res                                                                  ! residue name
+    character(len=20),pointer       :: qname(:), xname(:)           ! atom name table
+    integer                                                                         :: natom                                                                ! #atoms in residue
+  end type
 
-        type heavybond
-                integer                                         :: a,b                                  ! topology indecies of bond atoms
-        end type heavybond
+  type heavybond
+    integer                                         :: a,b                                  ! topology indecies of bond atoms
+  end type heavybond
 
-        character*80            :: top_file, fep_file
-        character*80            :: atom_data_file
-        character*80            :: coord_file   
+  character*80            :: top_file, fep_file
+  character*80            :: atom_data_file
+  character*80            :: coord_file
 
-        type(q_atom),private,allocatable,target ::      q_atoms(:)              ! atoms in ligand
-        type(q_bond),private,allocatable,target ::      q_bonds(:)              ! bonds in ligand
-        integer, allocatable                                    ::      iqatom(:)               !one element per atom, 0 if not Q-atom, 
+  type(q_atom),private,allocatable,target ::      q_atoms(:)              ! atoms in ligand
+  type(q_bond),private,allocatable,target ::      q_bonds(:)              ! bonds in ligand
+  integer, allocatable                                    ::      iqatom(:)               !one element per atom, 0 if not Q-atom,
         
-        type(q_atom),private,allocatable,target ::      aHQ(:)                  ! heavy atoms in ligand
-        type(q_bond),private,allocatable,target ::      aHB(:)                  ! heavy bonds in ligand
-                                                                                                                                !else number in iqseq (ligand)
-        integer :: nHQ          ! number of heavy q-atoms
-        integer :: nHB          ! number of bonds between heavy q-atoms
+  type(q_atom),private,allocatable,target ::      aHQ(:)                  ! heavy atoms in ligand
+  type(q_bond),private,allocatable,target ::      aHB(:)                  ! heavy bonds in ligand
+                                                                                                                          !else number in iqseq (ligand)
+  integer :: nHQ          ! number of heavy q-atoms
+  integer :: nHB          ! number of bonds between heavy q-atoms
 
-        integer(AI), allocatable        ::      lph_r(:)        !topology number for all lipophilic atoms in the receptor
-        integer(AI), allocatable        ::      lph_l(:)        !                               ''                                                   the ligand
-        type(donor), allocatable        ::      hbd_r(:)        !H-bond donor in receptor
-        type(donor), allocatable        ::      hbd_l(:)        !  ''            ligand
-        integer(AI), allocatable        ::      hba_r(:)        !H-bond acceptor atoms in receptor 
-        integer(AI), allocatable        ::      hba_l(:)        !      ''                 ligand
-        integer(AI), allocatable        ::      met_r(:)        !metal atoms in the receptor
-        type(wat), allocatable          ::      waters(:)       !water molecules
+  integer(AI), allocatable        ::      lph_r(:)        !topology number for all lipophilic atoms in the receptor
+  integer(AI), allocatable        ::      lph_l(:)        !                               ''                                                   the ligand
+  type(donor), allocatable        ::      hbd_r(:)        !H-bond donor in receptor
+  type(donor), allocatable        ::      hbd_l(:)        !  ''            ligand
+  integer(AI), allocatable        ::      hba_r(:)        !H-bond acceptor atoms in receptor
+  integer(AI), allocatable        ::      hba_l(:)        !      ''                 ligand
+  integer(AI), allocatable        ::      met_r(:)        !metal atoms in the receptor
+  type(wat), allocatable          ::      waters(:)       !water molecules
         
-        integer, allocatable                    ::      pol_con(:)!connections for potentially polar atoms
+  integer, allocatable                    ::      pol_con(:)!connections for potentially polar atoms
 
-        !numbers of each of the atom types
-        integer                                         ::      nlph_r, nlph_l, nhbd_r, nhbd_l
-        integer                                         ::      nhba_r, nhba_l, nmet_r, nwaters,nqbonds
-        integer                                         ::      nhbd_prot, nhba_prot
-        integer                                         ::      nrings          !number of rings in the ligand
+  !numbers of each of the atom types
+  integer                                         ::      nlph_r, nlph_l, nhbd_r, nhbd_l
+  integer                                         ::      nhba_r, nhba_l, nmet_r, nwaters,nqbonds
+  integer                                         ::      nhbd_prot, nhba_prot
+  integer                                         ::      nrings          !number of rings in the ligand
 
-        ! System
-        type(tXProtein),public                                                  :: protein
-        type(tXLigand), public                                                  :: ligand
-        type(tXLigand), public,allocatable      :: cofactor(:)
-        type(tXFF),public                                                                               :: ff
-        integer,pointer                                                                                 :: top2prot(:)                          ! topology atom index -> protein atom index translation matrix, used in bond translations
+  ! System
+  type(tXProtein),public                                                  :: protein
+  type(tXLigand), public                                                  :: ligand
+  type(tXLigand), public,allocatable      :: cofactor(:)
+  type(tXFF),public                                                                               :: ff
+  integer,pointer                                                                                 :: top2prot(:)                          ! topology atom index -> protein atom index translation matrix, used in bond translations
 
-        ! Mask
-        integer, public,parameter                                               ::      MAX_MASKS = 10
-        type(MASK_TYPE), public, target                 ::      masks(MAX_MASKS)
-        integer, public                                                                                 ::      Nmasks = 0
+  ! Mask
+  integer, public,parameter                                               ::      MAX_MASKS = 10
+  type(MASK_TYPE), public, target                 ::      masks(MAX_MASKS)
+  integer, public                                                                                 ::      Nmasks = 0
 
-        ! Results
-        type(tXScore), pointer                  :: xscores(:)           ! xscoring stats for each frame
-        integer                                                                                 :: nXScores, maxXScores
+  ! Results
+  type(tXScore), pointer                  :: xscores(:)           ! xscoring stats for each frame
+  integer                                                                                 :: nXScores, maxXScores
 
-        ! Input 
-        integer                                         :: bDoTopCalc           ! flag to indicate whether to score initial topology or not
-        type(tXInput)                   :: input
-        character(len=20)       :: chTranslationKey
-        character(len=80)       :: chInput
-        character(len=80),allocatable   :: cofactor_def(:)
-        integer                                                                                         :: num_cofactor
+  ! Input
+  integer                                         :: bDoTopCalc           ! flag to indicate whether to score initial topology or not
+  type(tXInput)                   :: input
+  character(len=20)       :: chTranslationKey
+  character(len=80)       :: chInput
+  character(len=80),allocatable   :: cofactor_def(:)
+  integer                                                                                         :: num_cofactor
 
-        ! Conversion
-        type(ATOM_TYPE_CONVERSION), allocatable :: atomtypetable(:)
-        integer                                                                                                                                 :: num_atomtype
-        type(PATOM_NAME_CONVERSION), pointer            :: patomnametable(:)
-        integer                                                                                                                                 :: num_patomrestype
-        type(RESIDUE_NAME_CONVERSION), pointer  :: residuetable(:)
-        integer                                                                                                                                 :: num_residue
+  ! Conversion
+  type(ATOM_TYPE_CONVERSION), allocatable :: atomtypetable(:)
+  integer                                                                                                                                 :: num_atomtype
+  type(PATOM_NAME_CONVERSION), pointer            :: patomnametable(:)
+  integer                                                                                                                                 :: num_patomrestype
+  type(RESIDUE_NAME_CONVERSION), pointer  :: residuetable(:)
+  integer                                                                                                                                 :: num_residue
 
-        ! Consts, params and misc
-        integer :: MAX_BOND_NEIB = 10
-        integer :: MAX_ATOM_NEIB = 6
+  ! Consts, params and misc
+  integer :: MAX_BOND_NEIB = 10
+  integer :: MAX_ATOM_NEIB = 6
 
-        real ::  LOGP_HYDROPHOBIC_CARBON = 0.211
-        real ::  LOGP_INTERNAL_HBOND = 0.429
-        real ::  LOGP_HALOGEN_PAIR = 0.137
-        real ::  LOGP_NAR_PAIR = 0.485
-        real ::  LOGP_O3_PAIR = -0.268
-        real ::  LOGP_ACCEPTOR_PAIR = 0.580
-        real ::  LOGP_AMINO_ACID = -2.166
-        real ::  LOGP_SALICYLIC_ACID = 0.554
-        real ::  LOGP_SULFONIC_ACID = -0.501
-        type(tLogPFactor), dimension(0:9),public        ::      logp_factor
+  real ::  LOGP_HYDROPHOBIC_CARBON = 0.211
+  real ::  LOGP_INTERNAL_HBOND = 0.429
+  real ::  LOGP_HALOGEN_PAIR = 0.137
+  real ::  LOGP_NAR_PAIR = 0.485
+  real ::  LOGP_O3_PAIR = -0.268
+  real ::  LOGP_ACCEPTOR_PAIR = 0.580
+  real ::  LOGP_AMINO_ACID = -2.166
+  real ::  LOGP_SALICYLIC_ACID = 0.554
+  real ::  LOGP_SULFONIC_ACID = -0.501
+  type(tLogPFactor), dimension(0:9),public        ::      logp_factor
 
-        real ::  LARGE = 1.0e+6
-        real ::  DIST_CUTOFF = 8.00
-        real ::  WATER_R = 1.40
-        real ::  POCKET_DEPTH = 4.00
-        real ::  LAYER_DEPTH = 3.00
+  real ::  LARGE = 1.0e+6
+  real ::  DIST_CUTOFF = 8.00
+  real ::  WATER_R = 1.40
+  real ::  POCKET_DEPTH = 4.00
+  real ::  LAYER_DEPTH = 3.00
 
-        integer, parameter              ::      max_atlib = 500
-        real                                                                    ::  PI = 3.1416
+  integer, parameter              ::      max_atlib = 500
+  real                                                                    ::  PI = 3.1416
 
-        integer,public                          :: err                                                          ! public allocation error indicator
-        integer, private                        :: warn                                                         ! flag to inidacte if warnings were displayd
+  integer,public                          :: err                                                          ! public allocation error indicator
+  integer, private                        :: warn                                                         ! flag to inidacte if warnings were displayd
 
 contains
 

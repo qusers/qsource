@@ -4,8 +4,8 @@
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
 !  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
 !  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Kazemi, Paul Bauer,     !
-!  Miha Purg, Irek Szeler                                                      !
-!  latest update: March 29, 2017                                               !
+!  Miha Purg, Irek Szeler, Mauricio Esguerra                                   !
+!  latest update: August 29, 2017                                              !
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
@@ -13,277 +13,277 @@
 !  calc_pmfscore.f90
 ! Implementation by Peter Hanspers
 !------------------------------------------------------------------------------!
-module CALC_PMF
-        use CALC_BASE
-        use MASKMANIP
-        use TRJ
-        use     TOPO
-        use PRMFILE
-        use INDEXER
-        use QATOM
-        use MISC
+module calc_pmf
+  use CALC_BASE
+  use MASKMANIP
+  use TRJ
+  use TOPO
+  use PRMFILE
+  use INDEXER
+  use QATOM
+  use MISC
 
-        implicit none
+  implicit none
 
-        type tPMFEdge
-                integer                                                 :: valid
-                integer,pointer                 :: p(:)                   ! connectivity path, 0..n-1
-        end type
+  type tPMFEdge
+    integer                                                 :: valid
+    integer,pointer                 :: p(:)                   ! connectivity path, 0..n-1
+  end type
 
-        type tPMFVertex
-                integer                                                 :: valid
-                integer                                                 :: id   ! ids are 0..n-1
-                integer                                                 :: num_conn       ! number of connections
-        end type
+  type tPMFVertex
+    integer                                                 :: valid
+    integer                                                 :: id   ! ids are 0..n-1
+    integer                                                 :: num_conn       ! number of connections
+  end type
 
-        type bond_pointer                                                                       !pointer to the datatype q_bond
-                type(q_bond),pointer            ::      qb                              !needed for array of q_bonds in type q_atom
-        end type bond_pointer
+  type bond_pointer                                                                       !pointer to the datatype q_bond
+    type(q_bond),pointer            ::      qb                              !needed for array of q_bonds in type q_atom
+  end type bond_pointer
 
-        type q_atom                     
-                integer                                         ::      top_nr                                                                  ! atom number in topology               
-                integer                                         ::      n                                                                                               !number of bonds                                                                
-                type(bond_pointer),dimension(1:6)               ::      bd              !pointers to the bonds
-                logical                                         ::      contact                         !if     closer than r to any receptor atom 
-                integer                                         ::      at_type                         !if lipophilic 2, if other heavy 1, if hydrogen 0 
-                integer                                         ::      hybrid                          !if included sp3 then 3, if included sp2 then 2, others 0
-                logical                                         ::      been_there              !flag used in recursive routines, to avoid eternal loops
-                logical,pointer         ::      cyclic(:)                       !array of logicals, one for each ring, 1 if part of that ring
-                logical                                         ::      active                          !same as been_there
-        end type q_atom                                                                         
+  type q_atom
+    integer                                         ::      top_nr                                                                  ! atom number in topology
+    integer                                         ::      n                                                                                               !number of bonds
+    type(bond_pointer),dimension(1:6)               ::      bd              !pointers to the bonds
+    logical                                         ::      contact                         !if     closer than r to any receptor atom
+    integer                                         ::      at_type                         !if lipophilic 2, if other heavy 1, if hydrogen 0
+    integer                                         ::      hybrid                          !if included sp3 then 3, if included sp2 then 2, others 0
+    logical                                         ::      been_there              !flag used in recursive routines, to avoid eternal loops
+    logical,pointer         ::      cyclic(:)                       !array of logicals, one for each ring, 1 if part of that ring
+    logical                                         ::      active                          !same as been_there
+  end type q_atom
 
-        type q_bond
-                type(q_atom),pointer            ::      a,b                                     !pointers to two bonded atoms
-                logical                                         ::      rotatable                       !if not part of ring and sp3-sp3 or sp3-sp2 bond
-                logical                                         ::      acontact,bcontact       !if a and b in contact with receptor, only used if rotatable
-                logical                                         ::      been_there
-                integer                                         ::      a_nonlip,b_nonlip       !number of non-lipophilic heavy atoms on a-side and b-side of bond
-                integer                                         ::      a_lip,b_lip                     !number of lipophilic heavy atoms on a-side and b-side of bond
-                logical,pointer         ::      cyclic(:)                       
-                logical                                         ::      active
+  type q_bond
+    type(q_atom),pointer            ::      a,b                                     !pointers to two bonded atoms
+    logical                                         ::      rotatable                       !if not part of ring and sp3-sp3 or sp3-sp2 bond
+    logical                                         ::      acontact,bcontact       !if a and b in contact with receptor, only used if rotatable
+    logical                                         ::      been_there
+    integer                                         ::      a_nonlip,b_nonlip       !number of non-lipophilic heavy atoms on a-side and b-side of bond
+    integer                                         ::      a_lip,b_lip                     !number of lipophilic heavy atoms on a-side and b-side of bond
+    logical,pointer         ::      cyclic(:)
+    logical                                         ::      active
 
-                integer                                         :: cod
-        end type q_bond
+    integer                                         :: cod
+  end type q_bond
 
-        type tABSDetail
-                real                                                                            :: score,r
-                integer                                                                 :: atom_id,m
-                character(len=3)                                :: k,l
-        end type
+  type tABSDetail
+    real                                                                            :: score,r
+    integer                                                                 :: atom_id,m
+    character(len=3)                                :: k,l
+  end type
 
-        type tPMFAtom
-                integer                                                                 :: topindex                     ! topology index of this atom
-                character(len=3)                                :: ttype                                ! PMF type, two letter code
-                character(len=8)                                :: qtype                                ! Q type atom type short version
-                character(len=8)                                :: qtype_long     ! Q type atom type long version
-                character(len=8)                                :: mol2type                     ! MOL2 type atom type
-                real(8),dimension(0:2)  :: coor                                 ! coordinates
+  type tPMFAtom
+    integer                                                                 :: topindex                     ! topology index of this atom
+    character(len=3)                                :: ttype                                ! PMF type, two letter code
+    character(len=8)                                :: qtype                                ! Q type atom type short version
+    character(len=8)                                :: qtype_long     ! Q type atom type long version
+    character(len=8)                                :: mol2type                     ! MOL2 type atom type
+    real(8),dimension(0:2)  :: coor                                 ! coordinates
 
-                integer                                                                 :: polar                                ! 1 if atom is polar, 0 otherwise
-                character(len=1)                                :: hb                                           ! D if atom is h-bond donor, A if acceptor
-                integer                                                                 :: aromatic                     ! 1 if atom is aromatic, 0 if aliphatic
-                integer                                                                 :: charge                               ! -1/0/1 if atom is negatively/un/positively charged
-                character(len=3)                                :: hybr                                 ! hybridizing state
-                integer                                                                 :: planar                               ! 1 if in planar ring, otherwise 0
+    integer                                                                 :: polar                                ! 1 if atom is polar, 0 otherwise
+    character(len=1)                                :: hb                                           ! D if atom is h-bond donor, A if acceptor
+    integer                                                                 :: aromatic                     ! 1 if atom is aromatic, 0 if aliphatic
+    integer                                                                 :: charge                               ! -1/0/1 if atom is negatively/un/positively charged
+    character(len=3)                                :: hybr                                 ! hybridizing state
+    integer                                                                 :: planar                               ! 1 if in planar ring, otherwise 0
 
-                integer                                                                 :: ring                                 ! ring indicator: 1=normal 2=aromatic
-                integer,dimension(3)            :: ring_id                      ! id's of what rings this atom is part of
-                integer                                                                 :: ring_count           ! number of rings this atom is part of
+    integer                                                                 :: ring                                 ! ring indicator: 1=normal 2=aromatic
+    integer,dimension(3)            :: ring_id                      ! id's of what rings this atom is part of
+    integer                                                                 :: ring_count           ! number of rings this atom is part of
 
-                integer                                                                 :: bSecondPass  ! flag inidicating if atom needs a second pass in assigning types
+    integer                                                                 :: bSecondPass  ! flag inidicating if atom needs a second pass in assigning types
 
-                real                                                                            :: abs                                  ! atomic binding score
-                type(tABSDetail),pointer:: absdetail(:) ! array of binding scores for each counter-atom considered
-                integer                                                                 :: abscount                     ! count for absdetail(:)
-                integer                                                                 :: nonzero_score        ! flag indicating if atom ever got a non zero score
+    real                                                                            :: abs                                  ! atomic binding score
+    type(tABSDetail),pointer:: absdetail(:) ! array of binding scores for each counter-atom considered
+    integer                                                                 :: abscount                     ! count for absdetail(:)
+    integer                                                                 :: nonzero_score        ! flag indicating if atom ever got a non zero score
                 
-                ! XScore members
-                integer                                                                 :: id           !* atom id 
-                integer                                                                 :: valid                                !* valid indicator
-                integer                                                                 :: mask                                 !  mask flag
-                character(len=10)                               :: residue      !* residue name
-                character(len=10)                               :: res_id       !  residue id: must be a string for PDB
-                integer                                                                 :: atom_res_id  !        atom number within residue
-                integer                                                                 :: iscofactor           !  flag indicating if atom is part of a cofactor (1) or not (0)
-                character                                                               :: chain        !  chain label
-                real                                                                            :: q                                            !* partial atomic charge
-                real                                                                            :: weight
-                integer                                                                 :: origin                               !  atom origin indicator: 1=ligand 2=protein 
-                integer                                                                 :: part                                 !  component indicator: for protein atoms: 1=ATOM 2=HETATM
-                integer                                                                 :: num_neib                     !  number of neighboring atoms
-                integer                                                                 :: num_nonh                     !  number of non-H neighboring atoms
-                integer,dimension(0:6)  :: neib                                 !  ID of neighboring atoms
-                integer,dimension(0:6)  :: bond                                 !  ID of bonds
-                integer                                                                 :: num_bond                     !        number of bonds to/from this atom
-        end type
+    ! XScore members
+    integer                                                                 :: id           !* atom id
+    integer                                                                 :: valid                                !* valid indicator
+    integer                                                                 :: mask                                 !  mask flag
+    character(len=10)                               :: residue      !* residue name
+    character(len=10)                               :: res_id       !  residue id: must be a string for PDB
+    integer                                                                 :: atom_res_id  !        atom number within residue
+    integer                                                                 :: iscofactor           !  flag indicating if atom is part of a cofactor (1) or not (0)
+    character                                                               :: chain        !  chain label
+    real                                                                            :: q                                            !* partial atomic charge
+    real                                                                            :: weight
+    integer                                                                 :: origin                               !  atom origin indicator: 1=ligand 2=protein
+    integer                                                                 :: part                                 !  component indicator: for protein atoms: 1=ATOM 2=HETATM
+    integer                                                                 :: num_neib                     !  number of neighboring atoms
+    integer                                                                 :: num_nonh                     !  number of non-H neighboring atoms
+    integer,dimension(0:6)  :: neib                                 !  ID of neighboring atoms
+    integer,dimension(0:6)  :: bond                                 !  ID of bonds
+    integer                                                                 :: num_bond                     !        number of bonds to/from this atom
+  end type
 
-        type tPMFBond
-                character(len=3)                                :: ttype                                !  bond type
-                integer                                                                 :: id
-                integer                                                                 :: valid                                !  valid indicator
-                integer                                                                 :: atom_1       !  ID of the atom_1
-                integer                                                                 :: atom_2       !  ID of the atom_2
-                integer                                                                 :: part                                 !  ID of the component
-                integer                                                                 :: ring                                 !  ring indicator
-                integer                                                                 :: num_neib     !  number of neighboring bonds
-                integer,dimension(0:5)  :: neib                                 !        ID of neighboring bonds
-        end type
+  type tPMFBond
+    character(len=3)                                :: ttype                                !  bond type
+    integer                                                                 :: id
+    integer                                                                 :: valid                                !  valid indicator
+    integer                                                                 :: atom_1       !  ID of the atom_1
+    integer                                                                 :: atom_2       !  ID of the atom_2
+    integer                                                                 :: part                                 !  ID of the component
+    integer                                                                 :: ring                                 !  ring indicator
+    integer                                                                 :: num_neib     !  number of neighboring bonds
+    integer,dimension(0:5)  :: neib                                 !        ID of neighboring bonds
+  end type
 
-        type tPMFRing
-                integer,pointer                                 :: path(:)
-                integer                                                                 :: aromatic
-                integer                                                                 :: planar
-        end type
+  type tPMFRing
+    integer,pointer                                 :: path(:)
+    integer                                                                 :: aromatic
+    integer                                                                 :: planar
+  end type
 
-        type tPMFMolecule
-                character(len=64)                               :: name
-                real                                                                            :: score
+  type tPMFMolecule
+    character(len=64)                               :: name
+    real                                                                            :: score
 
-                integer                                                                 :: num_subst
+    integer                                                                 :: num_subst
 
-                integer                                                                 :: num_atom
-                type(tPMFAtom),pointer  :: atom(:)
+    integer                                                                 :: num_atom
+    type(tPMFAtom),pointer  :: atom(:)
 
-                integer                                                                 :: num_bond
-                type(tPMFBond),pointer  :: bond(:)
+    integer                                                                 :: num_bond
+    type(tPMFBond),pointer  :: bond(:)
 
 
-                type(tPMFRing),pointer  :: ring(:)              
-                integer                                                                 :: num_ring
-        end type tPMFMolecule
+    type(tPMFRing),pointer  :: ring(:)
+    integer                                                                 :: num_ring
+  end type tPMFMolecule
 
-        type tPMFInput
-                character(len=256)                      :: ff                                           ! force field used
-                character(len=20)                               :: show_abs
-                character(len=20)                               :: show_detailed_abs
-                character(len=10)                               :: show_total
-                character(len=3)                                :: show_ligand
-                character(len=3)                                :: show_protein
-                character(len=3)                                :: show_bonds
-                character(len=3)                                :: show_hydrogens
-                character(len=3)                                :: show_masked
+  type tPMFInput
+    character(len=256)                      :: ff                                           ! force field used
+    character(len=20)                               :: show_abs
+    character(len=20)                               :: show_detailed_abs
+    character(len=10)                               :: show_total
+    character(len=3)                                :: show_ligand
+    character(len=3)                                :: show_protein
+    character(len=3)                                :: show_bonds
+    character(len=3)                                :: show_hydrogens
+    character(len=3)                                :: show_masked
 
-                character(len=3)                                :: ignore_waters
-                integer                                                                 :: maximum_ring_size
-                character(len=3)                                :: aromatic_require_ring
+    character(len=3)                                :: ignore_waters
+    integer                                                                 :: maximum_ring_size
+    character(len=3)                                :: aromatic_require_ring
 
-                integer                                                                 :: qatom
+    integer                                                                 :: qatom
 
-                character(len=256)                      :: pmfs
-                character(len=256)                      :: pmf_names
-                character(len=256)                      :: rules
-                character(len=256)                      :: atom_translations
-        end type
+    character(len=256)                      :: pmfs
+    character(len=256)                      :: pmf_names
+    character(len=256)                      :: rules
+    character(len=256)                      :: atom_translations
+  end type
 
-        type tPMFRule
-                character(len=2)                                                                        :: ttype                ! atom type that this rule applies to
-                character(len=48),dimension(1:24) :: rule
-                integer                                                                                                         :: count
-        end type
+  type tPMFRule
+    character(len=2)                                                                        :: ttype                ! atom type that this rule applies to
+    character(len=48),dimension(1:24) :: rule
+    integer                                                                                                         :: count
+  end type
 
-        type donor
-                integer(AI)                                                     ::      heavy,hydr                              ! topology numbers for atoms in H-bond donor
-        end type donor
+  type donor
+    integer(AI)                                                     ::      heavy,hydr                              ! topology numbers for atoms in H-bond donor
+  end type donor
 
-        type tPMFScore
-                integer :: frame
-                real            :: score
-        end type tPMFScore
+  type tPMFScore
+    integer :: frame
+    real            :: score
+  end type tPMFScore
 
-        type(tPMFRule), pointer                                                 :: protRule(:)
-        integer                                                                                                                 :: prot_num_rule
-        type(tPMFRule), pointer                                                 :: ligRule(:)
-        integer                                                                                                                 :: lig_num_rule
+  type(tPMFRule), pointer                                                 :: protRule(:)
+  integer                                                                                                                 :: prot_num_rule
+  type(tPMFRule), pointer                                                 :: ligRule(:)
+  integer                                                                                                                 :: lig_num_rule
 
-        type ATOM_TYPE_CONVERSION
-                character(len=20)       :: mol2, other
-        end type
+  type ATOM_TYPE_CONVERSION
+    character(len=20)       :: mol2, other
+  end type
 
-        integer, public                                         :: SINGLE               = 1
-        integer, public                                         :: DOUBLE               = 2
-        integer, public                                         :: AROMATIC = 3
-        integer, public                                         :: AMIDE                = 4
+  integer, public                                         :: SINGLE               = 1
+  integer, public                                         :: DOUBLE               = 2
+  integer, public                                         :: AROMATIC = 3
+  integer, public                                         :: AMIDE                = 4
 
-        character*80            :: top_file, fep_file
-        character*80            :: atom_data_file
-        character*80            :: coord_file   
+  character*80            :: top_file, fep_file
+  character*80            :: atom_data_file
+  character*80            :: coord_file
 
-        type(q_atom),private,allocatable,target ::      q_atoms(:)              ! atoms in ligand
-        type(q_bond),private,allocatable,target ::      q_bonds(:)              ! bonds in ligand
-        integer, allocatable                                    ::      iqatom(:)               !one element per atom, 0 if not Q-atom, 
+  type(q_atom),private,allocatable,target ::      q_atoms(:)              ! atoms in ligand
+  type(q_bond),private,allocatable,target ::      q_bonds(:)              ! bonds in ligand
+  integer, allocatable                                    ::      iqatom(:)               !one element per atom, 0 if not Q-atom,
         
-        type(q_atom),private,allocatable,target ::      aHQ(:)                  ! heavy atoms in ligand
-        type(q_bond),private,allocatable,target ::      aHB(:)                  ! heavy bonds in ligand
-                                                                                                                                !else number in iqseq (ligand)
-        integer :: nHQ          ! number of heavy q-atoms
-        integer :: nHB          ! number of bonds between heavy q-atoms
+  type(q_atom),private,allocatable,target ::      aHQ(:)                  ! heavy atoms in ligand
+  type(q_bond),private,allocatable,target ::      aHB(:)                  ! heavy bonds in ligand
+                                                                                                                          !else number in iqseq (ligand)
+  integer :: nHQ          ! number of heavy q-atoms
+  integer :: nHB          ! number of bonds between heavy q-atoms
 
-        integer(AI), allocatable        ::      lph_r(:)        !topology number for all lipophilic atoms in the receptor
-        integer(AI), allocatable        ::      lph_l(:)        !                               ''                                                   the ligand
-        type(donor), allocatable        ::      hbd_r(:)        !H-bond donor in receptor
-        type(donor), allocatable        ::      hbd_l(:)        !  ''            ligand
-        integer(AI), allocatable        ::      hba_r(:)        !H-bond acceptor atoms in receptor 
-        integer(AI), allocatable        ::      hba_l(:)        !      ''                 ligand
-        integer(AI), allocatable        ::      met_r(:)        !metal atoms in the receptor
-!       type(wat), allocatable          ::      waters(:)       !water molecules
+  integer(AI), allocatable        ::      lph_r(:)        !topology number for all lipophilic atoms in the receptor
+  integer(AI), allocatable        ::      lph_l(:)        !                               ''                                                   the ligand
+  type(donor), allocatable        ::      hbd_r(:)        !H-bond donor in receptor
+  type(donor), allocatable        ::      hbd_l(:)        !  ''            ligand
+  integer(AI), allocatable        ::      hba_r(:)        !H-bond acceptor atoms in receptor
+  integer(AI), allocatable        ::      hba_l(:)        !      ''                 ligand
+  integer(AI), allocatable        ::      met_r(:)        !metal atoms in the receptor
+  !       type(wat), allocatable          ::      waters(:)       !water molecules
 
-        !numbers of each of the atom types
-        integer                                         ::      nlph_r, nlph_l, nhbd_r, nhbd_l
-        integer                                         ::      nhba_r, nhba_l, nmet_r, nwaters,nqbonds
-        integer                                         ::      nhbd_prot, nhba_prot
-        integer                                         ::      nrings          !number of rings in the ligand
+  !numbers of each of the atom types
+  integer                                         ::      nlph_r, nlph_l, nhbd_r, nhbd_l
+  integer                                         ::      nhba_r, nhba_l, nmet_r, nwaters,nqbonds
+  integer                                         ::      nhbd_prot, nhba_prot
+  integer                                         ::      nrings          !number of rings in the ligand
         
-        integer, allocatable                                                    ::      pol_con(:)      !connections for potentially polar atoms
+  integer, allocatable                                                    ::      pol_con(:)      !connections for potentially polar atoms
 
-        integer, parameter                                                              ::      MAX_MASKS = 10
-        type(MASK_TYPE), private, target        ::      masks(MAX_MASKS)
-        integer, private                                                                        ::      Nmasks = 0
+  integer, parameter                                                              ::      MAX_MASKS = 10
+  type(MASK_TYPE), private, target        ::      masks(MAX_MASKS)
+  integer, private                                                                        ::      Nmasks = 0
 
 
-        integer                                                                                                         :: bDoTopCalc
-        integer                                                                                                         :: bSecondPass
+  integer                                                                                                         :: bDoTopCalc
+  integer                                                                                                         :: bSecondPass
 
-        ! System
-        type(tPMFMolecule), public                                                      :: protein
-        type(tPMFMolecule), public                                                      :: ligand
-        type(tPMFMolecule), public,allocatable  :: cofactor(:)
-        integer,pointer                                                                                                 :: top2prot(:)                          ! topology atom index -> protein atom index translation matrix, used in bond translations
+  ! System
+  type(tPMFMolecule), public                                                      :: protein
+  type(tPMFMolecule), public                                                      :: ligand
+  type(tPMFMolecule), public,allocatable  :: cofactor(:)
+  integer,pointer                                                                                                 :: top2prot(:)                          ! topology atom index -> protein atom index translation matrix, used in bond translations
 
-        ! Input
-        type(tPMFInput),public                                                                  :: input
-        character(len=256)                                                                                      :: chInput
-        type tPMFNames
-                character(len=8)                                                                                        :: pmfname, qname
-        end type
-        type(tPMFNames),pointer                                                                 :: pmf_names(:)
-        type(ATOM_TYPE_CONVERSION), allocatable :: atomtypetable(:)
-        integer                                                                                                                                 :: num_atomtype
+  ! Input
+  type(tPMFInput),public                                                                  :: input
+  character(len=256)                                                                                      :: chInput
+  type tPMFNames
+    character(len=8)                                                                                        :: pmfname, qname
+  end type
+  type(tPMFNames),pointer                                                                 :: pmf_names(:)
+  type(ATOM_TYPE_CONVERSION), allocatable :: atomtypetable(:)
+  integer                                                                                                                                 :: num_atomtype
 
-        ! Data
-        real, dimension(34,16,60)                                                               :: pmfdata                                                                                                                              ! (ligand type, protein type, bin)
-        character(len=2),dimension(2,34)                                :: pmftype
+  ! Data
+  real, dimension(34,16,60)                                                               :: pmfdata                                                                                                                              ! (ligand type, protein type, bin)
+  character(len=2),dimension(2,34)                                :: pmftype
 
-        integer, parameter :: nProt = 16, nLig = 34
+  integer, parameter :: nProt = 16, nLig = 34
 
   data pmftype(1,:) / 'CF','CP','cF','cP','C3','CW','CO','CN','NC','NP', &                                      ! ligand atom types
-                                                                                        'NA','ND','NR','N0','NS','OC','OA','OE','OR','OS', &
-                                                                                        'OD','P ','SA','SD','HL','Zn','CL','Mn','Mg','F ', &
-                                                                                        'Fe','Br','V ','C0'/
+    'NA','ND','NR','N0','NS','OC','OA','OE','OR','OS', &
+    'OD','P ','SA','SD','HL','Zn','CL','Mn','Mg','F ', &
+    'Fe','Br','V ','C0'/
 
-        data pmftype(2,:) / 'CF','CP','cF','cP','CO','CN','NC','ND','NR','OC', &                                        ! protein atom types
-                                                                                        'OA','OD','OW','SA','SD','HH','--','--','--','--', &
-                                                                                        '--','--','--','--','--','--','--','--','--','--', &
-                                                                                        '--','--','--','--'/
+  data pmftype(2,:) / 'CF','CP','cF','cP','CO','CN','NC','ND','NR','OC', &                                        ! protein atom types
+    'OA','OD','OW','SA','SD','HH','--','--','--','--', &
+    '--','--','--','--','--','--','--','--','--','--', &
+    '--','--','--','--'/
 
-        ! Results
-        type(tPMFScore), pointer                :: pmfscores(:)         ! pmfscoring stats for each frame
-        integer                                                                                 :: nPMFScores, maxPMFScores
+  ! Results
+  type(tPMFScore), pointer                :: pmfscores(:)         ! pmfscoring stats for each frame
+  integer                                                                                 :: nPMFScores, maxPMFScores
 
 
-        integer :: MAX_BOND_NEIB = 10
-        integer :: MAX_ATOM_NEIB = 6
-        integer,public                          :: err                                                                  ! public allocation error indicator
-        integer,public                          :: warn,waterwarn
+  integer :: MAX_BOND_NEIB = 10
+  integer :: MAX_ATOM_NEIB = 6
+  integer,public                          :: err                                                                  ! public allocation error indicator
+  integer,public                          :: warn,waterwarn
 
 contains
 
@@ -2920,7 +2920,7 @@ real function pmfAngle_of_Two_Vectors(v1, v2)
   real angle
   real l1,l2,tmp1,tmp2
 
-        if((v1(0).eq.v2(0)).and.(v1(1).eq.v2(1)).and.(v1(2).eq.v2(2))) then                                     ! need to treat this case
+        if((v1(0).eq.v2(0)).and.(v1(1).eq.v2(1)).and.(v1(2).eq.v2(2))) then     ! need to treat this case
                 pmfAngle_of_Two_Vectors = 0
                 return
         end if
@@ -2951,4 +2951,4 @@ real function pmfAngle(a,b,c)
         pmfAngle=pmfAngle_of_Two_Vectors(v1,v2)
 end function pmfAngle
 
-end module
+end module calc_pmf

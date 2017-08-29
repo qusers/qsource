@@ -4,15 +4,15 @@
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
 !  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
 !  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Kazemi, Paul Bauer,     !
-!  Miha Purg, Irek Szeler                                                      !
-!  latest update: March 29, 2017                                               !
+!  Miha Purg, Irek Szeler, Mauricio Esguerra                                   !
+!  latest update: August 29, 2017                                              !
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
 !  (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
 !  mpiglob.f90
 !  by John Marelius & Anders Kaplan
-!  global variables for MPI parallell Qdyn
+!  global variables for MPI parallell qdyn
 !------------------------------------------------------------------------------!
 module  mpiglob
 

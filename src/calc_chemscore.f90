@@ -4,8 +4,8 @@
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
 !  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
 !  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Kazemi, Paul Bauer,     !
-!  Miha Purg, Irek Szeler                                                      !
-!  latest update: March 29, 2017                                               !
+!  Miha Purg, Irek Szeler, Mauricio Esguerra                                   !
+!  latest update: August 29, 2017                                              !
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
@@ -14,7 +14,7 @@
 !  Kajsa Ljungberg 1998-06-11
 !  Implementation of a scoring function by Eldridge et al.
 !  JCAMD 11 (1997) 425-445.
-!  Integration into QCalc5 by Peter Hanspers
+!  Integration into qcalc by Peter Hanspers
 !------------------------------------------------------------------------------!
 module calc_chemscore
 

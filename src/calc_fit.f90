@@ -4,8 +4,8 @@
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
 !  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
 !  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Kazemi, Paul Bauer,     !
-!  Miha Purg, Irek Szeler                                                      !
-!  latest update: March 29, 2017                                               !
+!  Miha Purg, Irek Szeler, Mauricio Esguerra                                   !
+!  latest update: August 29, 2017                                              !
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
@@ -26,12 +26,12 @@ module calc_fit
   type(MASK_TYPE), private, target        :: masks(MAX_MASKS)
   integer, private                        :: Nmasks = 0
 
-  type FIT_COORD_TYPE
+  type fit_coord_type
     real(8), pointer                :: xr(:)
     real(8)                         :: xrcm(3)
-  end type FIT_COORD_TYPE
+  end type fit_coord_type
   
-  type(FIT_COORD_TYPE), private     :: coords(MAX_MASKS)
+  type(fit_coord_type), private     :: coords(MAX_MASKS)
 
 contains
 
@@ -156,125 +156,123 @@ subroutine fit_make_ref(i)
 end subroutine fit_make_ref
 
 
-integer function LSQSTR (NR,W,XP,X,E,U)
+integer function lsqstr (NR,W,XP,X,E,U)
+  !CCCCC W.F. VAN GUNSTEREN, CAMBRIDGE, JULY 1979 CCCCCCCCCCCCCCCCCCCCCCCC
+  !                                                                      C
+  !         SUBROUTINE LSQSTR (NR,W,XP,X,E,IROT)                         C
+  !                                                                      C
+  !OMMENT   LSQSTR ROTATES THE ATOMS WITH COORDINATES X ABOUT THE ORIGIN C
+  !         SUCH THAT THE FUNCTION E = 0.5 * SUM OVER ALL NR ATOMS OF        C
+  !         W*(X-XP)**2 HAS A MINIMUM. HERE W DENOTES THE WEIGHT FACTORS AND C
+  !         XP ARE THE REFERENCE COORDINATES. FOR A DESCRIPTION OF THE       C
+  !         METHOD SEE A.D. MCLACHLAN, J. MOL. BIOL. 128 (1979) 49.          C
+  !         IF THE SUBROUTINE FAILS, IT IS RETURNED WITH A MESSAGE AND       C
+  !         IROT=0.                                                          C
+  !                                                                          C
+  !         NR = NUMBER OF ATOMS                                             C
+  !         W(1..NR) = ATOMIC WEIGHT FACTORS                                 C
+  !         XP(1..3*NR) = REFERENCE ATOM COORDINATES                         C
+  !         X(1..3*NR) = ATOM COORDINATES; DELIVERED WITH THE ROTATED ONES   C
+  !         If present,
+  !         E is DELIVERED WITH THE MINIMUM VALUE OF THE FUNCTION E          C
+  !                                                                          C
+  !         LSQSTR USES SUBR. EIGEN.                                         C
+  !                                                                          C
+  !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+  !
+  !       converted to F90 function by John Marelius, July 2000
+  !       returns 0 on success, 1 if Det(U) < 1e-9, 2 if Det(U) < 0 and Omega has
+  !       degenerate eigenvalues
+  !       Weight vector W has been made logical
 
-
-!CCCCC W.F. VAN GUNSTEREN, CAMBRIDGE, JULY 1979 CCCCCCCCCCCCCCCCCCCCCCCC
-!                                                                      C
-!         SUBROUTINE LSQSTR (NR,W,XP,X,E,IROT)                         C
-!                                                                      C
-!OMMENT   LSQSTR ROTATES THE ATOMS WITH COORDINATES X ABOUT THE ORIGIN C
-!         SUCH THAT THE FUNCTION E = 0.5 * SUM OVER ALL NR ATOMS OF        C
-!         W*(X-XP)**2 HAS A MINIMUM. HERE W DENOTES THE WEIGHT FACTORS AND C
-!         XP ARE THE REFERENCE COORDINATES. FOR A DESCRIPTION OF THE       C
-!         METHOD SEE A.D. MCLACHLAN, J. MOL. BIOL. 128 (1979) 49.          C
-!         IF THE SUBROUTINE FAILS, IT IS RETURNED WITH A MESSAGE AND       C
-!         IROT=0.                                                          C
-!                                                                          C
-!         NR = NUMBER OF ATOMS                                             C
-!         W(1..NR) = ATOMIC WEIGHT FACTORS                                 C
-!         XP(1..3*NR) = REFERENCE ATOM COORDINATES                         C
-!         X(1..3*NR) = ATOM COORDINATES; DELIVERED WITH THE ROTATED ONES   C
-!         If present,
-!         E is DELIVERED WITH THE MINIMUM VALUE OF THE FUNCTION E          C
-!                                                                          C
-!         LSQSTR USES SUBR. EIGEN.                                         C
-!                                                                          C
-!CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-!
-!       converted to F90 function by John Marelius, July 2000
-!       returns 0 on success, 1 if Det(U) < 1e-9, 2 if Det(U) < 0 and Omega has
-!       degenerate eigenvalues
-!       Weight vector W has been made logical
-
-        implicit none
-!arguments
-        integer, intent(in)                     ::      NR
-        logical(1), intent(in)          ::      W(:)
-        real(8), intent(in)                     ::      XP(:)
-        real(8), intent(inout)          ::      X(:)
-        real(8), optional, intent(out)::        E
+  implicit none
+  !arguments
+  integer, intent(in)              ::      NR
+  logical(1), intent(in)           ::      W(:)
+  real(8), intent(in)              ::      XP(:)
+  real(8), intent(inout)           ::      X(:)
+  real(8), optional, intent(out)   ::      E
    
-!locals
-        real(8), optional           ::  U(3,3)  
-        real(8)                                         ::      COM(21), OM(6,6)
-        real(8)                                         ::      VH(3,3), VK(3,3)
-        real(8)                                         ::      DU
-        real(8)                                         ::      SIG
-        integer                                         ::      I, J, M, M1, M2
+  !locals
+  real(8), optional           ::  U(3,3)
+  real(8)                                         ::      COM(21), OM(6,6)
+  real(8)                                         ::      VH(3,3), VK(3,3)
+  real(8)                                         ::      DU
+  real(8)                                         ::      SIG
+  integer                                         ::      I, J, M, M1, M2
 
 
-!
-!*****CALCULATE THE MATRIX U AND ITS DETERMINANT
-        U(:,:) = 0.
-        DO J=1,NR
-                if(W(J)) then
-                        U(:,:) = U(:,:) + matmul(reshape(X(3*J-2:3*J),(/3,1/)), &
-                                reshape(XP(3*J-2:3*J),(/1,3/)))
-                end if
-        END DO
-!
-        DU= U(1,1)*U(2,2)*U(3,3)+U(1,3)*U(2,1)*U(3,2) &
-                +U(1,2)*U(2,3)*U(3,1)-U(3,1)*U(2,2)*U(1,3) &
-                -U(3,3)*U(2,1)*U(1,2)-U(3,2)*U(2,3)*U(1,1)
-        IF ( ABS(DU) < 1.E-9) then
-                LSQSTR = 1
-                return
-        end if
+  !
+  !*****CALCULATE THE MATRIX U AND ITS DETERMINANT
+  U(:,:) = 0.
+  DO J=1,NR
+    if(W(J)) then
+      U(:,:) = U(:,:) + matmul(reshape(X(3*J-2:3*J),(/3,1/)), &
+        reshape(XP(3*J-2:3*J),(/1,3/)))
+    end if
+  END DO
+  !
+  DU= U(1,1)*U(2,2)*U(3,3)+U(1,3)*U(2,1)*U(3,2) &
+    +U(1,2)*U(2,3)*U(3,1)-U(3,1)*U(2,2)*U(1,3) &
+    -U(3,3)*U(2,1)*U(1,2)-U(3,2)*U(2,3)*U(1,1)
+  IF ( ABS(DU) < 1.E-9) then
+    LSQSTR = 1
+    return
+  end if
 
-!*****CONSTRUCT OMEGA, DIAGONALIZE IT AND DETERMINE H AND K
-        M=0
-        DO M1=1,6
-                DO M2=1,M1
-                        M=M+1
-                        IF(M1 > 3 .AND. M2 <= 3) then
-                                COM(M)=U(M2,M1-3)
-                        else
-                                COM(M)=0.
-                        end if
-                END DO
-        END DO
-!
-        CALL EIGEN (COM,OM,6,0)
-        IF (DU < 0. .AND. ABS(COM(3)-COM(6)) < 1.E-5) then
-                LSQSTR = 2
-                return
-        end if
-!
-        VH(:,:) = sqrt(2.) * OM(1:3, 1:3)
-        VK(:,:) = sqrt(2.) * OM(4:6, 1:3)
+  !*****CONSTRUCT OMEGA, DIAGONALIZE IT AND DETERMINE H AND K
+  M=0
+  DO M1=1,6
+    DO M2=1,M1
+      M=M+1
+      IF(M1 > 3 .AND. M2 <= 3) then
+        COM(M)=U(M2,M1-3)
+      else
+        COM(M)=0.
+      end if
+    END DO
+  END DO
+  !
+  CALL EIGEN (COM,OM,6,0)
+  IF (DU < 0. .AND. ABS(COM(3)-COM(6)) < 1.E-5) then
+    LSQSTR = 2
+    return
+  end if
+  !
+  VH(:,:) = sqrt(2.) * OM(1:3, 1:3)
+  VK(:,:) = sqrt(2.) * OM(4:6, 1:3)
 
-        SIG= (VH(2,1)*VH(3,2)-VH(3,1)*VH(2,2))*VH(1,3) &
-                +(VH(3,1)*VH(1,2)-VH(1,1)*VH(3,2))*VH(2,3) &
-                +(VH(1,1)*VH(2,2)-VH(2,1)*VH(1,2))*VH(3,3)
-        IF(SIG <= 0.) then
-                VH(:,3) = -VH(:,3)
-                VK(:,3) = -VK(:,3)
-        end if
-!
-!*****DETERMINE R AND ROTATE X
-        DO M2=1,3
-                DO M1=1,3
-                        U(M1,M2)=VK(M1,1)*VH(M2,1)+VK(M1,2)*VH(M2,2) &
-                                +sign(1._8,DU)*VK(M1,3)*VH(M2,3)
-                end do
-        END DO
-!
-        DO J=1,NR
-                X(3*J-2:3*J) = matmul(U,X(3*J-2:3*J))
-        END DO
-        LSQSTR = 0 !OK
-!
-!*****CALCULATE E, WHEN REQUIRED
-        if(present(E)) then
-                E=0.
-                DO J=1,NR
-                        if(W(J)) E=E+sum((X(3*J-2:3*J)-XP(3*J-2:3*J))**2)
-                end do
-                E=E/2.
-        end if
+  SIG= (VH(2,1)*VH(3,2)-VH(3,1)*VH(2,2))*VH(1,3) &
+    +(VH(3,1)*VH(1,2)-VH(1,1)*VH(3,2))*VH(2,3) &
+    +(VH(1,1)*VH(2,2)-VH(2,1)*VH(1,2))*VH(3,3)
+  IF(SIG <= 0.) then
+    VH(:,3) = -VH(:,3)
+    VK(:,3) = -VK(:,3)
+  end if
+  !
+  !*****DETERMINE R AND ROTATE X
+  DO M2=1,3
+    DO M1=1,3
+      U(M1,M2)=VK(M1,1)*VH(M2,1)+VK(M1,2)*VH(M2,2) &
+        +sign(1._8,DU)*VK(M1,3)*VH(M2,3)
+    end do
+  END DO
+  !
+  DO J=1,NR
+    X(3*J-2:3*J) = matmul(U,X(3*J-2:3*J))
+  END DO
+  LSQSTR = 0 !OK
+  !
+  !*****CALCULATE E, WHEN REQUIRED
+  if(present(E)) then
+    E=0.
+    DO J=1,NR
+      if(W(J)) E=E+sum((X(3*J-2:3*J)-XP(3*J-2:3*J))**2)
+    end do
+    E=E/2.
+  end if
 
-END function LSQSTR
+end function lsqstr
 
 
 end module calc_fit

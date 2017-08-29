@@ -4,15 +4,15 @@
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
 !  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
 !  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Kazemi, Paul Bauer,     !
-!  Miha Purg, Irek Szeler                                                      !
-!  latest update: March 29, 2017                                               !
+!  Miha Purg, Irek Szeler, Mauricio Esguerra                                   !
+!  latest update: August 29, 2017                                              !
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
-!>  (c) 2015 Uppsala Molekylmekaniska HB, Uppsala, Sweden
-!>  module: prep.f90
-!>  by Johan Aqvist & John Marelius
-!>  topology preparation, solvation, validation and PDB I/O
+!!  (c) 2015 Uppsala Molekylmekaniska HB, Uppsala, Sweden
+!!  module: prep.f90
+!!  by Johan Aqvist & John Marelius
+!!  topology preparation, solvation, validation and PDB I/O
 !------------------------------------------------------------------------------!
 module prep
   use trj
@@ -208,8 +208,8 @@ module prep
 contains
 
 !------------------------------------------------------------------------------!
-!>  subroutine: prep_startup
-!>
+!!  subroutine: prep_startup
+!!
 !------------------------------------------------------------------------------!
 subroutine prep_startup
   logical                         :: l
@@ -239,7 +239,7 @@ end subroutine prep_startup
 
 
 !------------------------------------------------------------------------------!
-!>  subroutine: allocate_for_pdb
+!!  subroutine: allocate_for_pdb
 !
 !------------------------------------------------------------------------------!
 subroutine allocate_for_pdb(atoms, residues, molecules)
@@ -258,7 +258,7 @@ end subroutine allocate_for_pdb
 
 
 !------------------------------------------------------------------------------!
-!>  subroutine: prep_shutdown
+!!  subroutine: prep_shutdown
 !
 !------------------------------------------------------------------------------!
 subroutine prep_shutdown
@@ -270,7 +270,7 @@ end subroutine prep_shutdown
 
 
 !------------------------------------------------------------------------------!
-!>  subroutine: clearlib
+!!  subroutine: clearlib
 !
 !------------------------------------------------------------------------------!
 subroutine clearlib
@@ -280,7 +280,7 @@ end subroutine clearlib
 
 
 !------------------------------------------------------------------------------!
-!>  subroutine: check_alloc
+!!  subroutine: check_alloc
 !
 !------------------------------------------------------------------------------!
 subroutine check_alloc(message)
@@ -297,7 +297,7 @@ end subroutine check_alloc
 
 
 !------------------------------------------------------------------------------!
-!>  subroutine: addbond
+!!  subroutine: addbond
 !
 !------------------------------------------------------------------------------!
 subroutine addbond
@@ -374,7 +374,7 @@ end subroutine addbond
 
 
 !------------------------------------------------------------------------------!
-!>  subroutine: clearbond
+!!  subroutine: clearbond
 !
 !------------------------------------------------------------------------------!
 subroutine clearbond
@@ -385,7 +385,7 @@ end subroutine clearbond
 
 
 !------------------------------------------------------------------------------!
-!>  subroutine: angle_ene
+!!  subroutine: angle_ene
 !
 !------------------------------------------------------------------------------!
 subroutine angle_ene(emax, nlarge, av_ene)
@@ -445,7 +445,7 @@ end subroutine angle_ene
 
 
 !------------------------------------------------------------------------------!
-!>  function: anglecode
+!!  function: anglecode
 !
 !------------------------------------------------------------------------------!
 integer function anglecode(taci, tacj, tack)
@@ -636,7 +636,7 @@ end subroutine changeimp
 
 
 !------------------------------------------------------------------------------!
-!>  subroutine: checkangs
+!!  subroutine: checkangs
 !
 !------------------------------------------------------------------------------!
 subroutine checkangs
@@ -662,7 +662,7 @@ end subroutine checkangs
 
 
 !------------------------------------------------------------------------------!
-!>  subroutine: checkbonds
+!!  subroutine: checkbonds
 !
 !------------------------------------------------------------------------------!
 subroutine checkbonds
@@ -688,7 +688,7 @@ end subroutine checkbonds
 
 
 !------------------------------------------------------------------------------!
-!>  subroutine: checkimps
+!!  subroutine: checkimps
 !
 !------------------------------------------------------------------------------!
 subroutine checkimps
@@ -717,7 +717,7 @@ end subroutine checkimps
 
 
 !------------------------------------------------------------------------------!
-!>  subroutine: checktors
+!!  subroutine: checktors
 !
 !------------------------------------------------------------------------------!
 subroutine checktors
@@ -745,7 +745,7 @@ end subroutine checktors
 
 
 !------------------------------------------------------------------------------!
-!>  function: cross_product 
+!!  function: cross_product 
 !
 !------------------------------------------------------------------------------!
 function cross_product(a,b)
@@ -758,7 +758,7 @@ end function cross_product
 
 
 !------------------------------------------------------------------------------!
-!>  subroutine: xlink
+!!  subroutine: xlink
 !
 !------------------------------------------------------------------------------!
 subroutine xlink
@@ -2660,8 +2660,8 @@ end subroutine oldreadlib
 
 
 !------------------------------------------------------------------------------!
-!>  subroutine: readlib
-!>
+!!  subroutine: readlib
+!!
 !------------------------------------------------------------------------------!
 subroutine readlib(file)
   ! arguments
@@ -3021,8 +3021,8 @@ end subroutine readlib
 
 
 !------------------------------------------------------------------------------!
-!>  subroutine: check_overload
-!>
+!!  subroutine: check_overload
+!!
 !------------------------------------------------------------------------------!
 subroutine check_overload(resnam)
   ! arguments
@@ -3042,8 +3042,8 @@ end subroutine check_overload
 
 
 !------------------------------------------------------------------------------!
-!>  subroutine: oldreadparm
-!>
+!!  subroutine: oldreadparm
+!!
 !------------------------------------------------------------------------------!
 subroutine oldreadparm(flag)
 !  arguments
@@ -3226,7 +3226,7 @@ end subroutine oldreadparm
 
 
 !------------------------------------------------------------------------------!
-!>  subroutine: readff
+!!  subroutine: readff
 !
 !------------------------------------------------------------------------------!
 subroutine readff
@@ -3255,7 +3255,7 @@ end subroutine readff
 
 
 !------------------------------------------------------------------------------!
-!>  subroutine: readparm
+!!  subroutine: readparm
 !
 !------------------------------------------------------------------------------!
 subroutine readparm(filnam) 
@@ -3750,7 +3750,7 @@ end subroutine readparm
 
 
 !------------------------------------------------------------------------------!
-!>  subroutine: clearpdb
+!!  subroutine: clearpdb
 !
 !------------------------------------------------------------------------------!
 subroutine clearpdb
@@ -3779,8 +3779,8 @@ end subroutine cleartop
 
 
 !------------------------------------------------------------------------------!
-!>  function: countpdb
-!>
+!!  function: countpdb
+!!
 !------------------------------------------------------------------------------!
 logical function countpdb(pdb_fileno, atoms, residues, molecules)
   !count atoms, residues and molecules in a pdb file
@@ -3892,8 +3892,8 @@ end function countpdb
 
 
 !------------------------------------------------------------------------------!
-!>  subroutine: readpdb
-!>
+!!  subroutine: readpdb
+!!
 !------------------------------------------------------------------------------!
 subroutine readpdb()
 
@@ -4588,8 +4588,8 @@ end subroutine set_solvent_type
 
 
 !------------------------------------------------------------------------------!
-!>  function: get_atom_from_descriptor
-!>
+!!  function: get_atom_from_descriptor
+!!
 !------------------------------------------------------------------------------!
 integer function get_atom_from_descriptor(aid)
         !arguments
@@ -4670,8 +4670,8 @@ end function set_boundary_condition
 
 
 !------------------------------------------------------------------------------!
-!>  subroutine: set_simulation_sphere
-!>
+!!  subroutine: set_simulation_sphere
+!!
 !------------------------------------------------------------------------------!
 logical function set_simulation_sphere()
                 
@@ -4730,8 +4730,8 @@ end function set_simulation_sphere
 
 
 !------------------------------------------------------------------------------!
-!>  subroutine: set_solvent_box
-!>
+!!  subroutine: set_solvent_box
+!!
 !------------------------------------------------------------------------------!
 logical function set_solvent_box()
 
@@ -4802,8 +4802,8 @@ end function set_solvent_box
 
 
 !------------------------------------------------------------------------------!
-!>  subroutine: solvate
-!>
+!!  subroutine: solvate
+!!
 !------------------------------------------------------------------------------!
 subroutine solvate
   ! Make sure boundary condition is set.
@@ -4823,7 +4823,7 @@ end subroutine solvate
 
 
 !------------------------------------------------------------------------------!
-!>  subroutine: solvate_box
+!!  subroutine: solvate_box
 !
 !------------------------------------------------------------------------------!
 subroutine solvate_box
@@ -4860,8 +4860,8 @@ end subroutine solvate_box
 
 
 !------------------------------------------------------------------------------!
-!>  subroutine: solvate_box_grid
-!>  solvate box using grid
+!!  subroutine: solvate_box_grid
+!!  solvate box using grid
 !------------------------------------------------------------------------------!
 subroutine solvate_box_grid
   !locals
@@ -4943,7 +4943,7 @@ end subroutine solvate_box_grid
 
 
 !------------------------------------------------------------------------------!
-!>  subroutine: solvate_box_file
+!!  subroutine: solvate_box_file
 !
 !------------------------------------------------------------------------------!
 subroutine solvate_box_file
@@ -5155,7 +5155,7 @@ end subroutine solvate_box_file
 
 
 !------------------------------------------------------------------------------!
-!>  subroutine: solvate_sphere
+!!  subroutine: solvate_sphere
 !
 !------------------------------------------------------------------------------!
 subroutine solvate_sphere
@@ -5188,7 +5188,7 @@ subroutine solvate_sphere
 end subroutine solvate_sphere
 
 !------------------------------------------------------------------------------!
-!>  function: set_solvent_sphere
+!!  function: set_solvent_sphere
 !
 !------------------------------------------------------------------------------!
 logical function set_solvent_sphere()
@@ -5255,8 +5255,8 @@ end function set_solvent_sphere
 
 
 !------------------------------------------------------------------------------!
-!>  subroutine: solvate_sphere_grid
-!>  solvate sphere using grid
+!!  subroutine: solvate_sphere_grid
+!!  solvate sphere using grid
 !------------------------------------------------------------------------------!
 subroutine solvate_sphere_grid
   !locals
@@ -5335,7 +5335,7 @@ end subroutine solvate_sphere_grid
 
 
 !------------------------------------------------------------------------------!
-!>  subroutine: solvate_sphere_file
+!!  subroutine: solvate_sphere_file
 !
 !------------------------------------------------------------------------------!
 subroutine solvate_sphere_file(shift)
@@ -5541,7 +5541,7 @@ end subroutine solvate_sphere_file
 
 
 !------------------------------------------------------------------------------!
-!>  subroutine: solvate_restart
+!!  subroutine: solvate_restart
 !
 !------------------------------------------------------------------------------!
 subroutine solvate_restart
@@ -5603,7 +5603,7 @@ end subroutine solvate_restart
 
 
 !------------------------------------------------------------------------------!
-!>  subroutine: add_solvent_to_topology
+!!  subroutine: add_solvent_to_topology
 !
 !------------------------------------------------------------------------------!
 subroutine add_solvent_to_topology(waters_in_sphere, max_waters, make_hydrogens, pack)
@@ -5737,7 +5737,7 @@ end subroutine add_solvent_to_topology
 
 
 !------------------------------------------------------------------------------!
-!>  subroutine: grow_arrays_for_solvent
+!!  subroutine: grow_arrays_for_solvent
 !
 !------------------------------------------------------------------------------!
 subroutine grow_arrays_for_solvent(nmore, atoms_per_molecule)
@@ -5823,7 +5823,7 @@ end subroutine grow_arrays_for_solvent
 
 
 !------------------------------------------------------------------------------!
-!>  function: rwat_eff
+!!  function: rwat_eff
 !
 !------------------------------------------------------------------------------!
 real function rwat_eff()
@@ -5879,7 +5879,7 @@ end function rwat_eff
 
 
 !------------------------------------------------------------------------------!
-!>  function: torcode
+!!  function: torcode
 !
 !------------------------------------------------------------------------------!
 type(TOR_CODES) function torcode(taci, tacj, tack, tacl)
@@ -5979,7 +5979,7 @@ end function torcode
 
 
 !------------------------------------------------------------------------------!
-!>  subroutine: tors_ene
+!!  subroutine: tors_ene
 !
 !------------------------------------------------------------------------------!
 subroutine tors_ene(emax, nlarge, av_ene)
@@ -6058,8 +6058,8 @@ end subroutine tors_ene
 
 
 !------------------------------------------------------------------------------!
-!>  function: check_residues
-!>
+!!  function: check_residues
+!!
 !------------------------------------------------------------------------------!
 logical function check_residues()
 !locals
@@ -6090,8 +6090,8 @@ end function check_residues
 
 
 !------------------------------------------------------------------------------!
-!>  subroutine: writepdb
-!>
+!!  subroutine: writepdb
+!!
 !------------------------------------------------------------------------------!
 subroutine writepdb
 ! *** local variables
@@ -6232,8 +6232,8 @@ end subroutine writepdb
 
 
 !------------------------------------------------------------------------------!
-!>  subroutine: writemol2
-!>
+!!  subroutine: writemol2
+!!
 !------------------------------------------------------------------------------!
 subroutine writemol2
   ! *** local variables
@@ -6387,7 +6387,7 @@ end subroutine writemol2
 
 
 !------------------------------------------------------------------------------!
-!>  subroutine: writetop
+!!  subroutine: writetop
 !
 !------------------------------------------------------------------------------!
 subroutine writetop
@@ -6419,8 +6419,8 @@ end subroutine writetop
 
 
 !------------------------------------------------------------------------------!
-!>  subroutine: listprefs
-!>
+!!  subroutine: listprefs
+!!
 !------------------------------------------------------------------------------!
 subroutine listprefs
   call pref_list('Preferences (use set command to change):')
@@ -6429,8 +6429,8 @@ end subroutine listprefs
 
 
 !------------------------------------------------------------------------------!
-!>  subroutine: set
-!>
+!!  subroutine: set
+!!
 !------------------------------------------------------------------------------!
 subroutine set
   !locals
@@ -6445,11 +6445,11 @@ end subroutine set
 
 
 !------------------------------------------------------------------------------!
-!>  subroutine: make_shell2
+!!  subroutine: make_shell2
 !
-!>  Sort out atoms in restrained shell. Use protein center to calculate distance.
-!>  Use coordinates from topology unless 'implicit_rstr_from_file' is specified
-!>  Swiped from md.f90, needed when using atom masks "not restrained"
+!!  Sort out atoms in restrained shell. Use protein center to calculate distance.
+!!  Use coordinates from topology unless 'implicit_rstr_from_file' is specified
+!!  Swiped from md.f90, needed when using atom masks "not restrained"
 !------------------------------------------------------------------------------!
 subroutine make_shell2
 ! *** Local variables
@@ -6489,10 +6489,10 @@ end subroutine make_shell2
 
 
 !------------------------------------------------------------------------------!
-!>  function: get_center_by_mass
+!!  function: get_center_by_mass
 !
-!>  Returns true if center of mass can be assigned
-!>  and returns center of mass for a mask of atoms in the vector 'center'
+!!  Returns true if center of mass can be assigned
+!!  and returns center of mass for a mask of atoms in the vector 'center'
 !------------------------------------------------------------------------------!
 logical function get_center_by_mass(center)
   real(8), intent(out)             :: center(3)

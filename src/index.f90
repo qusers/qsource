@@ -4,8 +4,8 @@
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
 !  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
 !  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Kazemi, Paul Bauer,     !
-!  Miha Purg, Irek Szeler                                                      !
-!  latest update: March 29, 2017                                               !
+!  Miha Purg, Irek Szeler, Mauricio Esguerra                                   !
+!  latest update: August 29, 2017                                              !
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
@@ -55,6 +55,7 @@ contains
     allocate(ndx(top))
   end subroutine index_create
 
+
   subroutine index_clear
 
     count = 0
@@ -63,12 +64,15 @@ contains
 
   end subroutine index_clear
 
+
   subroutine index_shutdown
     call index_clear
   end subroutine index_shutdown
 
+
   subroutine index_startup
   end subroutine index_startup
+
 
   subroutine index_resize(size)
     !arguments
@@ -91,12 +95,13 @@ contains
        ndx => new_ndx
        top = size
     end if
-
   end subroutine index_resize
+
 
   subroutine grow
     call index_resize(top+RESIZE_INCREMENT)
   end subroutine grow
+
 
   logical function index_add(key, index)
     !arguments
@@ -127,6 +132,7 @@ contains
     index_add = .true.
   end function index_add
 
+
   logical function index_alias(alias, key)
     !arguments
     character(*)                            ::      alias, key
@@ -138,8 +144,8 @@ contains
           index_alias = .true.
        end if
     end if
-
   end function index_alias
+
 
   logical function index_get(key, i, allow_wildcard)
     !arguments
@@ -174,7 +180,7 @@ contains
           lo = mid + 1
        end if
     end do
-
   end function index_get
+
 
 end module indexer

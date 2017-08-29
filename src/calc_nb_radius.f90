@@ -4,8 +4,8 @@
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
 !  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
 !  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Kazemi, Paul Bauer,     !
-!  Miha Purg, Irek Szeler                                                      !
-!  latest update: March 29, 2017                                               !
+!  Miha Purg, Irek Szeler, Mauricio Esguerra                                   !
+!  latest update: August 29, 2017                                              !
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
@@ -16,41 +16,41 @@
 !  calculation of nb interactions between 'q-atoms' and
 !  protein residues
 !------------------------------------------------------------------------------!
-module CALC_NB
-        use CALC_BASE
-        use MASKMANIP
-        use PARSE
-        use ATOM_MASK
-        implicit none
+module calc_nb
+  use calc_base
+  use maskmanip
+  use parse
+  use atom_mask
+  implicit none
 
-!constants
-        integer, parameter                                      :: MAX_LISTS = 20
-        integer, parameter                                      :: MAX_NB_QP = 1
-!module variables
-        type(MASK_TYPE), private, target        :: masks(2)
-        integer, private                                        :: Nlists = 0
-        integer, private                    ::  N_nb_qp = 0
-        type NB_LIST_TYPE
-                integer                                                 ::  number_of_NB
-                integer, pointer                                ::      atom1(:), atom2(:)
-                real, pointer                                   ::  AA(:), BB(:), qq(:)
-        end type NB_LIST_TYPE
-        type(NB_LIST_TYPE), private, allocatable::  nb_listan(:)
-        type(NB_LIST_TYPE), private, allocatable::  nb_list_res(:)
-        type AVERAGES
-                real                                                    :: lj, el
-        end type AVERAGES
-        type(AVERAGES),allocatable                      ::  aves(:)
-        type(AVERAGES),allocatable                      ::  qp_aves(:)
-        integer,allocatable                                     ::      total_frames(:)
-        integer                                                         ::  total_qp_frames = 0 
+  !constants
+  integer, parameter                                      :: MAX_LISTS = 20
+  integer, parameter                                      :: MAX_NB_QP = 1
+  !module variables
+  type(MASK_TYPE), private, target        :: masks(2)
+  integer, private                                        :: Nlists = 0
+  integer, private                    ::  N_nb_qp = 0
+  type nb_list_type
+    integer                                                 ::  number_of_NB
+    integer, pointer                                ::      atom1(:), atom2(:)
+    real, pointer                                   ::  AA(:), BB(:), qq(:)
+  end type nb_list_type
+  type(nb_list_type), private, allocatable::  nb_listan(:)
+  type(nb_list_type), private, allocatable::  nb_list_res(:)
+  type averages
+    real                                                    :: lj, el
+  end type averages
+  type(averages),allocatable                      ::  aves(:)
+  type(averages),allocatable                      ::  qp_aves(:)
+  integer,allocatable                                     ::      total_frames(:)
+  integer                                                         ::  total_qp_frames = 0
 
-        type NB_QP_TYPE
-        integer                                                         :: p_first, p_last,q_first, q_last
-        end type NB_QP_TYPE
-        type(NB_QP_TYPE), private                                       :: qp_calc
+  type nb_qp_type
+    integer                                                         :: p_first, p_last,q_first, q_last
+  end type nb_qp_type
+  type(nb_qp_type), private                                       :: qp_calc
 
-        real                                                            :: center_mask1(3), ave_Elj_r(10,100), Elj_r(100)
+  real                                                            :: center_mask1(3), ave_Elj_r(10,100), Elj_r(100)
 
 contains
 
@@ -568,4 +568,4 @@ end subroutine nb_qp_finalize
 
 !*******************************************************************
 
-end module CALC_NB
+end module calc_nb

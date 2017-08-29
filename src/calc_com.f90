@@ -4,8 +4,8 @@
 !  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          !
 !  Petra Wennerstrom, Kajsa Ljunjberg, John Marelius, Martin Nervall,          !
 !  Johan Sund, Ake Sandgren, Alexandre Barrozo, Masoud Kazemi, Paul Bauer,     !
-!  Miha Purg, Irek Szeler                                                      !
-!  latest update: March 29, 2017                                               !
+!  Miha Purg, Irek Szeler, Mauricio Esguerra                                   !
+!  latest update: August 29, 2017                                              !
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
@@ -16,31 +16,31 @@
 !------------------------------------------------------------------------------!
 module calc_com
   use calc_base
-  use MASKMANIP
+  use maskmanip
   implicit none
 
-!constants
-        integer, parameter                      ::      MAX_MASKS = 10
-!module variables
-        type(MASK_TYPE), private, target        ::      masks(MAX_MASKS)
-        integer, private                        ::      Nmasks = 0
-        type COM_COORD_TYPE
-                real, pointer           ::      x(:), y(:), z(:), mass(:)
-        end type COM_COORD_TYPE
-        type(COM_COORD_TYPE), private   ::      coords_mass(MAX_MASKS)
+  !constants
+  integer, parameter                      ::      MAX_MASKS = 10
+  !module variables
+  type(MASK_TYPE), private, target        ::      masks(MAX_MASKS)
+  integer, private                        ::      Nmasks = 0
+  type COM_COORD_TYPE
+    real, pointer           ::      x(:), y(:), z(:), mass(:)
+  end type COM_COORD_TYPE
+  type(COM_COORD_TYPE), private   ::      coords_mass(MAX_MASKS)
         
-        type COORD_TYPE
-                real, pointer           ::      xyz(:)
-        end type COORD_TYPE
-        type(COORD_TYPE), private       ::      coords(MAX_MASKS)
+  type COORD_TYPE
+    real, pointer           ::      xyz(:)
+  end type COORD_TYPE
+  type(COORD_TYPE), private       ::      coords(MAX_MASKS)
 
 
-        type MASS_AVE_TYPE
-                real            ::      x,y,z
-        end type MASS_AVE_TYPE
-        type(MASS_AVE_TYPE), private    ::      mass_ave(MAX_MASKS)
+  type MASS_AVE_TYPE
+    real            ::      x,y,z
+  end type MASS_AVE_TYPE
+  type(MASS_AVE_TYPE), private    ::      mass_ave(MAX_MASKS)
         
-        real,private                    :: tot_mass(MAX_MASKS)
+  real,private                    :: tot_mass(MAX_MASKS)
         
 contains
 
@@ -48,51 +48,50 @@ subroutine COM_initialize
 end subroutine COM_initialize
 
 subroutine COM_finalize(i)
-        integer                                         ::      i
-
-        call mask_finalize(masks(i))
+  integer                                         ::      i
+  call mask_finalize(masks(i))
 end subroutine COM_finalize
 
 integer function COM_add(desc)
-        !arguments
-        character(*)                            ::      desc
-        character(len=80)                       ::      line
-        integer                                         ::      readstat
-        integer                                         ::      ats,j
-        if(Nmasks == MAX_MASKS) then
-                write(*,10) MAX_MASKS
-                return
-        end if
-10      format('Sorry, the maximum number of COM calculations is ',i2)
+  !arguments
+  character(*)                            ::      desc
+  character(len=80)                       ::      line
+  integer                                         ::      readstat
+  integer                                         ::      ats,j
+  if(Nmasks == MAX_MASKS) then
+    write(*,10) MAX_MASKS
+    return
+  end if
+10 format('Sorry, the maximum number of COM calculations is ',i2)
 
 
 
-        !add a new COM mask
-        Nmasks = Nmasks + 1
-        call mask_initialize(masks(Nmasks))
-        ats =  maskmanip_make(masks(Nmasks))
-        !discard if no atoms in mask
-        if(ats == 0) then
-                call mask_finalize(masks(Nmasks))
-                Nmasks = Nmasks - 1
-                COM_add = 0
-                return
-        end if
+  !add a new COM mask
+  Nmasks = Nmasks + 1
+  call mask_initialize(masks(Nmasks))
+  ats =  maskmanip_make(masks(Nmasks))
+  !discard if no atoms in mask
+  if(ats == 0) then
+    call mask_finalize(masks(Nmasks))
+    Nmasks = Nmasks - 1
+    COM_add = 0
+    return
+  end if
 
-        allocate(coords(Nmasks)%xyz(3*ats))
-        allocate(coords_mass(Nmasks)%x(ats), coords_mass(Nmasks)%y(ats), coords_mass(Nmasks)%z(ats), coords_mass(Nmasks)%mass(ats))
+  allocate(coords(Nmasks)%xyz(3*ats))
+  allocate(coords_mass(Nmasks)%x(ats), coords_mass(Nmasks)%y(ats), coords_mass(Nmasks)%z(ats), coords_mass(Nmasks)%mass(ats))
 
-        coords_mass(Nmasks)%x(:) = 0
-        coords_mass(Nmasks)%y(:) = 0
-        coords_mass(Nmasks)%z(:) = 0
-        coords_mass(Nmasks)%mass(:) = 0
-        coords(Nmasks)%xyz(:) = 0
+  coords_mass(Nmasks)%x(:) = 0
+  coords_mass(Nmasks)%y(:) = 0
+  coords_mass(Nmasks)%z(:) = 0
+  coords_mass(Nmasks)%mass(:) = 0
+  coords(Nmasks)%xyz(:) = 0
         
-        call COM_put_mass(Nmasks)
-        COM_add = Nmasks
-        write(desc, 20) masks(Nmasks)%included
-20      format('Center of mass position ',i6,' atoms')
- end function COM_add
+  call COM_put_mass(Nmasks)
+  COM_add = Nmasks
+  write(desc, 20) masks(Nmasks)%included
+20 format('Center of mass position ',i6,' atoms')
+end function COM_add
 
 
 subroutine COM_calc(i)
