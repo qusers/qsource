@@ -203,8 +203,6 @@ module prep
   private                         :: check_alloc 
 
 
-
-
 contains
 
 !------------------------------------------------------------------------------!
@@ -589,49 +587,41 @@ end function bondcode
 !
 !------------------------------------------------------------------------------!
 subroutine changeimp
-! *** local variables
-        integer ii, ip, i, j, k, l, noptimp, nchange, nlarge
-        real emax, av_ene
+  ! *** local variables
+  integer ii, ip, i, j, k, l, noptimp, nchange, nlarge
+  real emax, av_ene
 
-!.......................................................................
+  write( * , '(/,a)') '      Two options:  1. change specified impropers'
+  write( * , '(a)') '                                      2. change all with E > Emax(k <---> l)'
+  CALL prompt('-----> Which option [1/2]: ')
+  read( *, * ) noptimp
 
-        write( * , '(/,a)') '      Two options:  1. change specified impropers'
-        write( * , '(a)') '                                      2. change all with E > Emax(k <---> l)'
-        CALL prompt('-----> Which option [1/2]: ')
-        READ( *, * ) noptimp
+  if(noptimp==1) then
+    call prompt('-----> No. of impropers to be changed = ')
+    read( *, * ) nchange
+    do ii = 1, nchange
+      call prompt('-----> Give: Impr-no., i, j, k, l : ')
+      read( *, * ) ip, i, j, k, l
+      imp(ip)%i = i
+      imp(ip)%j = j
+      imp(ip)%k = k
+      imp(ip)%l = l
+    enddo
+  endif
 
-        if(noptimp==1) then
-                CALL prompt('-----> No. of impropers to be changed = ')
-                READ( *, * ) nchange
-                do ii = 1, nchange
-                CALL prompt('-----> Give: Impr-no., i, j, k, l : ')
-                READ( *, * ) ip, i, j, k, l
-                imp(ip)%i = i
-                imp(ip)%j = j
-                imp(ip)%k = k
-                imp(ip)%l = l
-                enddo
-        endif
-
-        if(noptimp==2) then
-                CALL prompt('-----> Give an energy threshold [kcal/mol] = ')
-                READ( *, * ) emax
-                nchange = 0
-                CALL impr_ene(emax, nchange, av_ene, 1)
-
-                write( * , '(a,f8.2)') '< impr. tors energy > = ', av_ene
-        write( * , '(a,i5)') 'No. of changed imps   = ', nchange
-
-                CALL impr_ene(emax, nlarge, av_ene, 0)
-
-        write( * , '(a,i5)') 'No. above Emax now        = ', nlarge
-                write( * , '(a,f8.2)') '< impr. tors energy > = ', av_ene
-        endif
-
-        write( *, * )
-
-        return
-!.......................................................................
+  if(noptimp==2) then
+    call prompt('-----> Give an energy threshold [kcal/mol] = ')
+    read( *, * ) emax
+    nchange = 0
+    call impr_ene(emax, nchange, av_ene, 1)
+    write( * , '(a,f8.2)') '< impr. tors energy > = ', av_ene
+    write( * , '(a,i5)') 'No. of changed imps   = ', nchange
+    call impr_ene(emax, nlarge, av_ene, 0)
+    write( * , '(a,i5)') 'No. above Emax now        = ', nlarge
+    write( * , '(a,f8.2)') '< impr. tors energy > = ', av_ene
+  endif
+  write( *, * )
+  return
 end subroutine changeimp
 
 
@@ -640,24 +630,17 @@ end subroutine changeimp
 !
 !------------------------------------------------------------------------------!
 subroutine checkangs
-! *** local variables
-        integer nlarge
-        real emax, av_ene
+  ! *** local variables
+  integer nlarge
+  real emax, av_ene
 
-!.......................................................................
-
-        write( *, * )
-        emax = get_real_arg('-----> Give an energy threshold [kcal/mol] = ')
-
-        write( * , '(/,a)') 'angle  atoms i--j--k code force-k   ang_0   angle  energy'
-
-        CALL angle_ene(emax, nlarge, av_ene)
-
-        write( * , '(a,i5)') 'No. above Emax   = ', nlarge
-        write( * , '(a,f8.2)') '< angle energy > = ', av_ene
-
-        write( *, * )
-
+  write( *, * )
+  emax = get_real_arg('-----> Give an energy threshold [kcal/mol] = ')
+  write( * , '(/,a)') 'angle  atoms i--j--k code force-k   ang_0   angle  energy'
+  call angle_ene(emax, nlarge, av_ene)
+  write( * , '(a,i5)') 'No. above Emax   = ', nlarge
+  write( * , '(a,f8.2)') '< angle energy > = ', av_ene
+  write( *, * )
 end subroutine checkangs
 
 
@@ -666,24 +649,17 @@ end subroutine checkangs
 !
 !------------------------------------------------------------------------------!
 subroutine checkbonds
-! *** local variables
-        integer nlarge
-        real emax, av_ene
+  ! *** local variables
+  integer nlarge
+  real emax, av_ene
 
-!.......................................................................
-
-        write( *, * )
-        emax = get_real_arg('-----> Give an energy threshold [kcal/mol] = ')
-
-        write( * , '(/,a)') ' bond atoms i-j code force-k  bond_0   dist.  energy'
-
-        CALL bond_ene(emax, nlarge, av_ene)
-
-        write( * , '(a,i5)') 'No. above Emax   = ', nlarge
-        write( * , '(a,f8.2)') '< bond energy >  = ', av_ene
-
-        write( *, * )
-
+  write( *, * )
+  emax = get_real_arg('-----> Give an energy threshold [kcal/mol] = ')
+  write( * , '(/,a)') ' bond atoms i-j code force-k  bond_0   dist.  energy'
+  call bond_ene(emax, nlarge, av_ene)
+  write( * , '(a,i5)') 'No. above Emax   = ', nlarge
+  write( * , '(a,f8.2)') '< bond energy >  = ', av_ene
+  write( *, * )
 end subroutine checkbonds
 
 
@@ -692,27 +668,19 @@ end subroutine checkbonds
 !
 !------------------------------------------------------------------------------!
 subroutine checkimps
-! *** local variables
-        integer nlarge
-        real emax, av_ene
+  ! *** local variables
+  integer nlarge
+  real emax, av_ene
 
-!.......................................................................
-
-        write( *, * )
-        emax = get_real_arg('-----> Give an energy threshold [kcal/mol] = ')
-
-        write( * , '(/,a)') &
-                'impr atoms i--j--k--l    code force-k   imp_0     phi  energy'
-
-        CALL impr_ene(emax, nlarge, av_ene, 0)
-
-        write( * , '(a,i5)') 'No. above Emax            = ', nlarge
-        write( * , '(a,f8.2)') '< impr. tors energy > = ', av_ene
-
-        write( *, * )
-
-        return
-!.......................................................................
+  write( *, * )
+  emax = get_real_arg('-----> Give an energy threshold [kcal/mol] = ')
+  write( * , '(/,a)') &
+    'impr atoms i--j--k--l    code force-k   imp_0     phi  energy'
+  call impr_ene(emax, nlarge, av_ene, 0)
+  write( * , '(a,i5)') 'No. above Emax            = ', nlarge
+  write( * , '(a,f8.2)') '< impr. tors energy > = ', av_ene
+  write( *, * )
+  return
 end subroutine checkimps
 
 
@@ -721,31 +689,23 @@ end subroutine checkimps
 !
 !------------------------------------------------------------------------------!
 subroutine checktors
-! *** local variables
-        integer nlarge
-        real emax, av_ene
+  ! *** local variables
+  integer nlarge
+  real emax, av_ene
 
-!.......................................................................
-
-        write( *, * )
-        emax = get_real_arg('-----> Give an energy threshold [kcal/mol] = ')
-
-        write( * , '(/,a,a)') ' tors    atoms i--j--k--l code force-k   mult.   delta', '        phi  energy'
-
-        CALL tors_ene(emax, nlarge, av_ene)
-
-        write( * , '(a,i5)') 'No. above Emax     = ', nlarge
-        write( * , '(a,f8.2)') '< torsion energy > = ', av_ene
-
-        write( *, * )
-
-        return
-!.......................................................................
+  write( *, * )
+  emax = get_real_arg('-----> Give an energy threshold [kcal/mol] = ')
+  write( * , '(/,a,a)') ' tors    atoms i--j--k--l code force-k   mult.   delta', '        phi  energy'
+  CALL tors_ene(emax, nlarge, av_ene)
+  write( * , '(a,i5)') 'No. above Emax     = ', nlarge
+  write( * , '(a,f8.2)') '< torsion energy > = ', av_ene
+  write( *, * )
+  return
 end subroutine checktors
 
 
 !------------------------------------------------------------------------------!
-!!  function: cross_product 
+!!  function: cross_product
 !
 !------------------------------------------------------------------------------!
 function cross_product(a,b)
@@ -762,83 +722,82 @@ end function cross_product
 !
 !------------------------------------------------------------------------------!
 subroutine xlink
-!add cross-linking bonds like SS-bridges 
-!locals
-        integer                                         :: ires, jres, iat, jat, i, j, b
-        integer                                         :: irc, jrc
-        real                                            :: d2
-        character(len=1)                        :: reply
+  !add cross-linking bonds like SS-bridges
+  !locals
+  integer                                         :: ires, jres, iat, jat, i, j, b
+  integer                                         :: irc, jrc
+  real                                            :: d2
+  character(len=1)                        :: reply
 
-        if(.not. check_residues()) then
-                return
-        end if
+  if(.not. check_residues()) then
+    return
+  end if
 
-        if(.not. topo_ok) then
-                write(*,90) 
-90              format('Making solute bond list.')
-                call make_solute_bonds
-        end if
+  if(.not. topo_ok) then
+    write(*,90)
+90  format('Making solute bond list.')
+    call make_solute_bonds
+  end if
 
         
-        write(*,92) max_xlink
-92      format('Searching for non-bonded heavy atom pairs closer than', f6.2,' A.')
+  write(*,92) max_xlink
+92 format('Searching for non-bonded heavy atom pairs closer than', f6.2,' A.')
 
-        !loop over all residue pairs
-        do ires = 1, (nres_solute-1)
-                irc = res(ires)%irc
-                do jres = ires+1, nres_solute
-                jrc = res(jres)%irc
-                        do iat=1, lib(irc)%nat
-                                i = iat + res(ires)%start-1
-                                if(.not. heavy(i)) cycle !skip hydrogens
-jloop:                  do jat=1, lib(jrc)%nat-1
-                                        j = jat+res(jres)%start-1
-                                        if(.not. heavy(j)) cycle !skip hydrogens
-                                        !check distance
-                                        d2=(xtop(3*i-2)-xtop(3*j-2))**2+ &
-                                                (xtop(3*i-1)-xtop(3*j-1))**2+(xtop(3*i)-xtop(3*j))**2
-                                        if(d2 < max_xlink**2) then
-                                                !found atom pair within limit �, loop over all bonds
-                                                do b=1, nbonds
-                                                        if(bnd(b)%i == i .and. bnd(b)%j == j) cycle jloop
-                                                        if(bnd(b)%i == j .and. bnd(b)%j == i) cycle jloop
-                                                end do
-                                                !By now we know the atoms are not bonded
-                                                write(*,100, advance='no') i, trim(lib(irc)%nam), &
-                                                        ires, trim(lib(irc)%atnam(iat)), &
-                                                        j, trim(lib(jrc)%nam), jres, &
-                                                        trim(lib(jrc)%atnam(jat)), sqrt(d2)
-                                                !add
-                                                read(*,*) reply
-                                                if(reply=='N' .or. reply=='n') cycle
-                                                if(nextrabnd < max_extrabnd) then
-                                                        nextrabnd = nextrabnd+1
-                                                        extrabnd(nextrabnd)%i = i
-                                                        extrabnd(nextrabnd)%j = j
-                                                else
-                                                        write(*,900) max_extrabnd
-900             format('>>>>> ERROR: Too many extra bonds. (Max ',i5,')')
-                                                end if
+  !loop over all residue pairs
+  do ires = 1, (nres_solute-1)
+    irc = res(ires)%irc
+    do jres = ires+1, nres_solute
+      jrc = res(jres)%irc
+      do iat=1, lib(irc)%nat
+        i = iat + res(ires)%start-1
+        if(.not. heavy(i)) cycle !skip hydrogens
+        jloop:                  do jat=1, lib(jrc)%nat-1
+          j = jat+res(jres)%start-1
+          if(.not. heavy(j)) cycle !skip hydrogens
+          !check distance
+          d2=(xtop(3*i-2)-xtop(3*j-2))**2+ &
+            (xtop(3*i-1)-xtop(3*j-1))**2+(xtop(3*i)-xtop(3*j))**2
+          if(d2 < max_xlink**2) then
+            !found atom pair within limit �, loop over all bonds
+            do b=1, nbonds
+              if(bnd(b)%i == i .and. bnd(b)%j == j) cycle jloop
+              if(bnd(b)%i == j .and. bnd(b)%j == i) cycle jloop
+            end do
+            !By now we know the atoms are not bonded
+            write(*,100, advance='no') i, trim(lib(irc)%nam), &
+              ires, trim(lib(irc)%atnam(iat)), &
+              j, trim(lib(jrc)%nam), jres, &
+              trim(lib(jrc)%atnam(jat)), sqrt(d2)
+            !add
+            read(*,*) reply
+            if(reply=='N' .or. reply=='n') cycle
+            if(nextrabnd < max_extrabnd) then
+              nextrabnd = nextrabnd+1
+              extrabnd(nextrabnd)%i = i
+              extrabnd(nextrabnd)%j = j
+            else
+              write(*,900) max_extrabnd
+900           format('>>>>> ERROR: Too many extra bonds. (Max ',i5,')')
+            end if
 
-                                        end if
-                                end do jloop
-                        end do 
-                end do
-        end do
+          end if
+        end do jloop
+      end do
+    end do
+  end do
 
-        !issue a warning if the topology was already made.
-        if(nextrabnd > 0) then
-                write(*,110) nextrabnd
-110             format(i3,' bonds were added.')
-                if(topo_ok) then
-                        write(*,120) 
-                end if
-120             format('You need to regenerate the topology with the added bonds.')
-        end if
+  !issue a warning if the topology was already made.
+  if(nextrabnd > 0) then
+    write(*,110) nextrabnd
+110 format(i3,' bonds were added.')
+    if(topo_ok) then
+      write(*,120)
+    end if
+120 format('You need to regenerate the topology with the added bonds.')
+  end if
 
-100     format('Atoms',i6,1x,a,1x,i5,':',a,' and',i6,1x,a,1x,i5,':',a,' are',f5.2,' A apart. Connect [Y/n]?')                                                                   
+100 format('Atoms',i6,1x,a,1x,i5,':',a,' and',i6,1x,a,1x,i5,':',a,' are',f5.2,' A apart. Connect [Y/n]?')
 end subroutine xlink
-
 
 
 integer function impcode(taci, tacj, tack, tacl)
@@ -852,11 +811,7 @@ integer function impcode(taci, tacj, tack, tacl)
         tj = wildcard_tac(tacj)
         tk = wildcard_tac(tack)
         tl = wildcard_tac(tacl)
-
-
-
 !.......................................................................
-
         !find a match with four types (i and j and k and l)
 !       do i = 1, nimp_prm
 !               if( (ti == imp_prm(i)%taci .or. &
@@ -1252,109 +1207,103 @@ subroutine impr_ene(emax, nlarge, av_ene, mode)
 end subroutine impr_ene
 
 
-
+!------------------------------------------------------------------------------!
+!!  subroutine: listres
+!!  Shows the atom name and atom types corresponding to a residue number
+!------------------------------------------------------------------------------!
 subroutine listres
-! *** local variables
-        integer i, iat, ires
-        type(LIB_ENTRY_TYPE), pointer:: lp
-!.......................................................................
+  ! *** local variables
+  integer i, iat, ires
+  type(lib_entry_type), pointer:: lp
 
-        ires = get_int_arg('-----> Residue number: ')
-        if(ires > nres .or. ires == 0) then
-                write(*,*) 'Out of range!'
-                return
-        end if
-        if(.not. check_residues()) return
-        lp => lib(res(ires)%irc )
-        write( * , '(a,i5,a,a)') 'Residue ', ires, ' is ', res(ires)%name
 
-        write( * , '(a)') 'Atom name  tac     charge '
-        do i = 1, lp%nat
-                iat = res(ires)%start - 1 + i
-                write( * , '(i5,1x,a4,a8,f8.4)') iat, lp%atnam(i),&
-                        lp%tac_lib(i), lp%crg_lib(i)
-        enddo
-
-        write( *, * )
-
+  ires = get_int_arg('-----> Residue number: ')
+  if(ires > nres .or. ires == 0) then
+    write(*,*) 'Out of range!'
+    return
+  end if
+  if(.not. check_residues()) return
+  lp => lib(res(ires)%irc )
+  write( * , '(a,i5,a,a)') 'Residue ', ires, ' is ', res(ires)%name
+  write( * , '(a)') 'Atom name  tac     charge '
+  do i = 1, lp%nat
+    iat = res(ires)%start - 1 + i
+    write( * , '(i5,1x,a4,a8,f8.4)') iat, lp%atnam(i),&
+      lp%tac_lib(i), lp%crg_lib(i)
+  enddo
+  write( *, * )
 end subroutine listres
 
 
-
+!------------------------------------------------------------------------------!
+!!  subroutine: listseq
+!
+!------------------------------------------------------------------------------!
 subroutine listseq
 ! *** local variables
         integer i
-
-!.......................................................................
 
         write( * , '(a,/)') 'Sequence listing:'
         write( *, 100) (i, res(i)%name, i = 1, nres)
   100 format(9(i4,'-',a4))
         write( *, * )
-
 end subroutine listseq
 
 
-
 subroutine make14list
-! *** local variables
-        integer                                         :: it, i, j, ioff, l
+  ! *** local variables
+  integer                          :: it, i, j, ioff, l
+  n14nbrs = 0
+  n14long = 0
+  list14(:, :) = .false.
 
-        n14nbrs = 0
-        n14long = 0
-        list14(:, :) = .false.
+  itloop: do it = 1, ntors
+    i = tor(it)%i
+    j = tor(it)%l
+    if(i<j) then
+      ioff = j - i
+      if(ioff<=max_nbr_range) then
+        if(.not. list14(ioff, i)) then
+          n14nbrs = n14nbrs + 1
+          list14(ioff, i) = .true.
+        end if
+      ELSE
+        do l = 1, n14long
+          if(list14long(1,l) == i .and. list14long(2,l) == j) then
+            !it's already in here
+            cycle itloop
+          end if
+        end do
+        n14long = n14long + 1
+        list14long(1, n14long) = i
+        list14long(2, n14long) = j
+      endif
+    ELSE
+      ioff = i - j
+      if(ioff<=max_nbr_range) then
+        if(.not. list14(ioff, j)) then
+          n14nbrs = n14nbrs + 1
+          list14(ioff, j) = .true.
+        end if
+      ELSE
+        do l = 1, n14long
+          if(list14long(1,l) == j .and. list14long(2,l) == i) then
+            !it's already in here
+            cycle itloop
+          end if
+        end do
+        n14long = n14long + 1
+        list14long(1, n14long) = j
+        list14long(2, n14long) = i
+      endif
+    endif
+  enddo itloop
 
-itloop: do it = 1, ntors
+  write(*, 100) n14nbrs
+  write(*, 110) n14long
+100 format('Made    ',i6,' entries in the 1-4 neighbour list.')
+110 format('Made    ',i6,' entries in the long-range 1-4 neighbour list.')
 
-
-
-                i = tor(it)%i
-                j = tor(it)%l
-                if(i<j) then
-                        ioff = j - i
-                        if(ioff<=max_nbr_range) then
-                                if(.not. list14(ioff, i)) then
-                                        n14nbrs = n14nbrs + 1
-                                        list14(ioff, i) = .true.
-                                end if
-                        ELSE
-                                do l = 1, n14long
-                                        if(list14long(1,l) == i .and. list14long(2,l) == j) then
-                                                !it's already in here
-                                                cycle itloop
-                                        end if
-                                end do
-                                n14long = n14long + 1
-                                list14long(1, n14long) = i
-                                list14long(2, n14long) = j
-                        endif
-                ELSE
-                        ioff = i - j
-                        if(ioff<=max_nbr_range) then
-                                if(.not. list14(ioff, j)) then
-                                        n14nbrs = n14nbrs + 1
-                                        list14(ioff, j) = .true.
-                                end if
-                        ELSE
-                                do l = 1, n14long
-                                        if(list14long(1,l) == j .and. list14long(2,l) == i) then
-                                                !it's already in here
-                                                cycle itloop
-                                        end if
-                                end do
-                                n14long = n14long + 1
-                                list14long(1, n14long) = j
-                                list14long(2, n14long) = i
-                        endif
-                endif
-        enddo itloop
-
-        write(*, 100) n14nbrs
-        write(*, 110) n14long
-100     format('Made    ',i6,' entries in the 1-4 neighbour list.')
-110     format('Made    ',i6,' entries in the long-range 1-4 neighbour list.')
-
-!.......................................................................
 end subroutine make14list
 
 
@@ -1596,921 +1545,887 @@ subroutine set_bondcodes
 end subroutine set_bondcodes
 
 
-
 integer function makesomebonds(startres, endres)
-!arguments
-        integer                                         :: startres, endres
+  !arguments
+  integer                                         :: startres, endres
 
-! *** local variables
-        integer                                         :: i, ib, ires, imol
+  ! *** local variables
+  integer                                         :: i, ib, ires, imol
 
-        makesomebonds = 0
+  makesomebonds = 0
 
-        if(startres > endres) return !if no solvent
+  if(startres > endres) return !if no solvent
 
-        !determine starting molecule
-        imol = 0
-        do i = 1,nmol
-                if(istart_mol(i) == res(startres)%start) exit
-                imol = imol+1
-        end do
-        if(imol >= nmol) then
-                write(*,'(a)') '>>>>> ERROR: Inconsistent molecule/residue start atoms'
-                return
-        end if
+  !determine starting molecule
+  imol = 0
+  do i = 1,nmol
+    if(istart_mol(i) == res(startres)%start) exit
+    imol = imol+1
+  end do
+  if(imol >= nmol) then
+    write(*,'(a)') '>>>>> ERROR: Inconsistent molecule/residue start atoms'
+    return
+  end if
 
-        do ires = startres, endres
-
-! ---   start new molecule or attach to chain
-                if(nmol>imol .and. res(ires)%start==istart_mol(imol + 1) )      then
-                        !it is a new molecule
-                        imol = imol + 1
-                elseif(lib(res(ires-1)%irc)%tail > 0 .and. &
-                        lib(res(ires)%irc)%head > 0) then
-                        !make tail-to-head bond
-                        nbonds = nbonds + 1
-                        makesomebonds = makesomebonds + 1
-                        bnd(nbonds)%i = res(ires-1)%start - 1 + lib(res(ires-1)%irc)%tail
-                        bnd(nbonds)%j = res(ires)%start - 1 + lib(res(ires)%irc)%head
-                endif
-
-        ! ---   Build bonds in the residue
-
-                do i = 1, lib(res(ires)%irc)%nbnd
-
-                        nbonds = nbonds + 1
-                        makesomebonds = makesomebonds + 1
-                        bnd(nbonds)%i = res(ires)%start - 1 + lib(res(ires)%irc)%bnd(i)%i
-                        bnd(nbonds)%j = res(ires)%start - 1 + lib(res(ires)%irc)%bnd(i)%j
-                enddo
-        enddo
-!.......................................................................
+  do ires = startres, endres
+    ! ---   start new molecule or attach to chain
+    if(nmol>imol .and. res(ires)%start==istart_mol(imol + 1) )      then
+      !it is a new molecule
+      imol = imol + 1
+    elseif(lib(res(ires-1)%irc)%tail > 0 .and. &
+      lib(res(ires)%irc)%head > 0) then
+      !make tail-to-head bond
+      nbonds = nbonds + 1
+      makesomebonds = makesomebonds + 1
+      bnd(nbonds)%i = res(ires-1)%start - 1 + lib(res(ires-1)%irc)%tail
+      bnd(nbonds)%j = res(ires)%start - 1 + lib(res(ires)%irc)%head
+    endif
+    ! ---   Build bonds in the residue
+    do i = 1, lib(res(ires)%irc)%nbnd
+      nbonds = nbonds + 1
+      makesomebonds = makesomebonds + 1
+      bnd(nbonds)%i = res(ires)%start - 1 + lib(res(ires)%irc)%bnd(i)%i
+      bnd(nbonds)%j = res(ires)%start - 1 + lib(res(ires)%irc)%bnd(i)%j
+    enddo
+  enddo
 end function makesomebonds
 
 
-
 subroutine makeexlist
-! *** local variables
-        integer ib, ia, i, j, ioff
+  ! *** local variables
+  integer ib, ia, i, j, ioff
 
-!.......................................................................
+  nexnbrs = 0
+  nexlong = 0
+  listex(:, :) = .false.
 
-        nexnbrs = 0
-        nexlong = 0
-        listex(:, :) = .false.
+  do ib = 1, nbonds
+    i = bnd(ib)%i
+    j = bnd(ib)%j
+    if(i<j) then
+      ioff = j - i
+      if(ioff<=max_nbr_range) then
+        nexnbrs = nexnbrs + 1
+        listex(ioff, i) = .true.
+      else
+        nexlong = nexlong + 1
+        listexlong(1, nexlong) = i
+        listexlong(2, nexlong) = j
+      endif
+    else
+      ioff = i - j
+      if(ioff<=max_nbr_range) then
+        nexnbrs = nexnbrs + 1
+        listex(ioff, j) = .true.
+      else
+        nexlong = nexlong + 1
+        listexlong(1, nexlong) = j
+        listexlong(2, nexlong) = i
+      endif
+    endif
+  enddo
 
-        do ib = 1, nbonds
+  do ia = 1, nangles
+    i = ang(ia)%i
+    j = ang(ia)%k
+    if(i<j) then
+      ioff = j - i
+      if(ioff<=max_nbr_range) then
+        nexnbrs = nexnbrs + 1
+        listex(ioff, i) = .true.
+      else
+        nexlong = nexlong + 1
+        listexlong(1, nexlong) = i
+        listexlong(2, nexlong) = j
+      endif
+    else
+      ioff = i - j
+      if(ioff<=max_nbr_range) then
+        nexnbrs = nexnbrs + 1
+        listex(ioff, j) = .true.
+      else
+        nexlong = nexlong + 1
+        listexlong(1, nexlong) = j
+        listexlong(2, nexlong) = i
+      endif
+    endif
+  enddo
 
-        i = bnd(ib)%i
-        j = bnd(ib)%j
-        if(i<j) then
-                ioff = j - i
-                if(ioff<=max_nbr_range) then
-                        nexnbrs = nexnbrs + 1
-                        listex(ioff, i) = .true.
-                ELSE
-                        nexlong = nexlong + 1
-                        listexlong(1, nexlong) = i
-                        listexlong(2, nexlong) = j
-                endif
-        ELSE
-                ioff = i - j
-                if(ioff<=max_nbr_range) then
-                        nexnbrs = nexnbrs + 1
-                        listex(ioff, j) = .true.
-                ELSE
-                        nexlong = nexlong + 1
-                        listexlong(1, nexlong) = j
-                        listexlong(2, nexlong) = i
-                endif
-        endif
+  write(*, 100) nexnbrs
+  write(*, 110) nexlong
+100 format('Made    ',i6,' entries in list of excluded neighbours.')
+110 format('Made    ',i6,' entries in list of long-range excluded neighbours.')
 
-        enddo
-
-        do ia = 1, nangles
-
-        i = ang(ia)%i
-        j = ang(ia)%k
-        if(i<j) then
-                ioff = j - i
-                if(ioff<=max_nbr_range) then
-                        nexnbrs = nexnbrs + 1
-                        listex(ioff, i) = .true.
-                ELSE
-                        nexlong = nexlong + 1
-                        listexlong(1, nexlong) = i
-                        listexlong(2, nexlong) = j
-                endif
-        ELSE
-                ioff = i - j
-                if(ioff<=max_nbr_range) then
-                        nexnbrs = nexnbrs + 1
-                        listex(ioff, j) = .true.
-                ELSE
-                        nexlong = nexlong + 1
-                        listexlong(1, nexlong) = j
-                        listexlong(2, nexlong) = i
-                endif
-        endif
-
-        enddo
-
-
-        write(*, 100) nexnbrs
-        write(*, 110) nexlong
-100     format('Made    ',i6,' entries in list of excluded neighbours.')
-110     format('Made    ',i6,' entries in list of long-range excluded neighbours.')
-
-        return
-!.......................................................................
+  return
 end subroutine makeexlist
 
 
-
 subroutine makehyds
-!local variables
-        integer                                         :: i, nH_solute, nH_solvent, nH_required
-        real                                            :: r
-        integer                                         :: atom, residue
+  !local variables
+  integer                                         :: i, nH_solute, nH_solvent, nH_required
+  real                                            :: r
+  integer                                         :: atom, residue
 
-        nH_required = 0
+  nH_required = 0
         
-        !reassign heavy atom flag based on masses from parameter file
-        do i = 1, nat_pro
-                heavy(i) = .false.
-                if(iaclib(iac(i))%mass >=4.0) heavy(i) = .true.
-                if(makeH(i)) nH_required = nH_required+1
-        enddo
+  !reassign heavy atom flag based on masses from parameter file
+  do i = 1, nat_pro
+    heavy(i) = .false.
+    if(iaclib(iac(i))%mass >=4.0) heavy(i) = .true.
+    if(makeH(i)) nH_required = nH_required+1
+  enddo
                 
-        r=randm(random_seed_solute, seed_only=.true.)
-        nH_solute = 0
-        do residue = 1, nres_solute
-                do atom = res(residue)%start, &
-                        res(residue)%start+lib(res(residue)%irc)%nat-1
-                        nH_solute = nH_solute + genH(atom, residue)
-                end do
-        end do
-        write(*, 100) nH_solute, 'solute'
-100     format('Made    ',i6,1x,a,' hydrogens.')
+  r=randm(random_seed_solute, seed_only=.true.)
+  nH_solute = 0
+  do residue = 1, nres_solute
+    do atom = res(residue)%start, &
+      res(residue)%start+lib(res(residue)%irc)%nat-1
+      nH_solute = nH_solute + genH(atom, residue)
+    end do
+  end do
+  write(*, 100) nH_solute, 'solute'
+100 format('Made    ',i6,1x,a,' hydrogens.')
 
-        !use a separate random number sequence for solvent
-        r=randm(random_seed_solvent, seed_only=.true.)
-        nH_solvent = 0
-        do residue = nres_solute+1, nres
-                do atom = res(residue)%start, &
-                        res(residue)%start+lib(res(residue)%irc)%nat - 1
-                        nH_solvent = nH_solvent + genH(atom, residue)
-                end do
-        end do
-        write(*, 100) nH_solvent, 'solvent'
-        if(nH_solute+nH_solvent/=nH_required) write( * , '(a,i5,/)') &
-                '>>> Warning, no. of hydrogens required = ', nH_required
-        makeH(:) = .false. !don't need to redo when making topology
+  !use a separate random number sequence for solvent
+  r=randm(random_seed_solvent, seed_only=.true.)
+  nH_solvent = 0
+  do residue = nres_solute+1, nres
+    do atom = res(residue)%start, &
+      res(residue)%start+lib(res(residue)%irc)%nat - 1
+      nH_solvent = nH_solvent + genH(atom, residue)
+    end do
+  end do
+  write(*, 100) nH_solvent, 'solvent'
+  if(nH_solute+nH_solvent/=nH_required) write( * , '(a,i5,/)') &
+    '>>> Warning, no. of hydrogens required = ', nH_required
+  makeH(:) = .false. !don't need to redo when making topology
 end subroutine makehyds
 
 
 
-integer function genH(j, residue)
-!arguments
-        integer, intent(in)                     :: j, residue
-!locals
-        real(8)                                         :: xj(3), xk(3)
-        integer                                         :: ligand, H, kt, lt
-        real(8)                                         :: old_xH(3), xH(3), V, Vtot, dV(3), dvLast(3), gamma, dVtot(3)
-        real(8)                                         :: VtotLast
-        real(8)                                         :: dx(3), dx_line, rms_dV
-        real(8),parameter                       :: convergence_criterum = 0.1
-        real(8),parameter                       :: dV_scale = 0.025
-        real(8),parameter                       :: max_dx = 1. !max_dx is max distance of line search step in first CG iteration (�)
-        real(8)                                         :: local_min = 30
-        real(8)                                         :: tors_fk = 10.
-        integer, parameter                      :: max_cg_iterations = 100, max_line_iterations = 35
-        integer                                         :: cgiter, lineiter
-        real(8)                                         :: bnd0
-        integer                                         :: nHang, Hang_atom(max_conn)
-        integer                                         :: Hang_code(max_conn)
-        integer                                         :: rule
-        type(LIB_ENTRY_TYPE), pointer:: lp
-        integer                                         :: a, b, axis
-        real(8)                                         :: bond_length, db
-        real(8)                                         :: rjH(3), rjk(3), bjHinv, bjkinv
-        real(8)                                         :: scp, angle, angle_deg, dVangle, da, f1
-        real(8)                                         :: xkt(3), xlt(3), rjkt(3), rktlt(3)
-        real(8)                                         :: rnj(3), rnk(3), bj, bk
-        real(8)                                         :: phi, phi_deg, sgn, dVtors, arg, dH(3)
-        logical                                         :: flipped
-        integer                     :: setH
-        integer, parameter          :: nsetH = 5   !number of times to flip, if local min, and retry
+integer function genh(j, residue)
+  !arguments
+  integer, intent(in)                     :: j, residue
+  !locals
+  real(8)                                         :: xj(3), xk(3)
+  integer                                         :: ligand, H, kt, lt
+  real(8)                                         :: old_xH(3), xH(3), V, Vtot, dV(3), dvLast(3), gamma, dVtot(3)
+  real(8)                                         :: VtotLast
+  real(8)                                         :: dx(3), dx_line, rms_dV
+  real(8),parameter                       :: convergence_criterum = 0.1
+  real(8),parameter                       :: dV_scale = 0.025
+  real(8),parameter                       :: max_dx = 1. !max_dx is max distance of line search step in first CG iteration (�)
+  real(8)                                         :: local_min = 30
+  real(8)                                         :: tors_fk = 10.
+  integer, parameter                      :: max_cg_iterations = 100, max_line_iterations = 35
+  integer                                         :: cgiter, lineiter
+  real(8)                                         :: bnd0
+  integer                                         :: nHang, Hang_atom(max_conn)
+  integer                                         :: Hang_code(max_conn)
+  integer                                         :: rule
+  type(LIB_ENTRY_TYPE), pointer:: lp
+  integer                                         :: a, b, axis
+  real(8)                                         :: bond_length, db
+  real(8)                                         :: rjH(3), rjk(3), bjHinv, bjkinv
+  real(8)                                         :: scp, angle, angle_deg, dVangle, da, f1
+  real(8)                                         :: xkt(3), xlt(3), rjkt(3), rktlt(3)
+  real(8)                                         :: rnj(3), rnk(3), bj, bk
+  real(8)                                         :: phi, phi_deg, sgn, dVtors, arg, dH(3)
+  logical                                         :: flipped
+  integer                     :: setH
+  integer, parameter          :: nsetH = 5   !number of times to flip, if local min, and retry
         
-        genH = 0
-        xj(:) = xtop(3*j-2:3*j)
+  genH = 0
+  xj(:) = xtop(3*j-2:3*j)
         
-        !First find the bond, angle and torsion parameters to use
+  !First find the bond, angle and torsion parameters to use
 
-        !loop over connected atoms
-        do ligand = 1, nconn(j)
+  !loop over connected atoms
+  do ligand = 1, nconn(j)
                 
-                H = iconn(ligand, j)
-                !is it an unmade H?
-                if(makeH(H)) then
-                        !make this H
-                        !find the bond potential
-                        do b = 1, nbonds
-                                if((bnd(b)%i == j .and. bnd(b)%j == H) .or. &
-                                   (bnd(b)%j == j .and. bnd(b)%i == H)) then
-                                        if(bnd(b)%cod > 0) then
-                                                bnd0 = bondlib(bnd(b)%cod)%bnd0
-                                        else
-                                                bnd0 = 1. !default when missing parameters
-                                        endif
-                                        exit
-                                end if
-                        end do
-                        !a unique Hbond_code will always be found
-                        !because list of connections is based on bond list
+    H = iconn(ligand, j)
+    !is it an unmade H?
+    if(makeH(H)) then
+      !make this H
+      !find the bond potential
+      do b = 1, nbonds
+        if((bnd(b)%i == j .and. bnd(b)%j == H) .or. &
+          (bnd(b)%j == j .and. bnd(b)%i == H)) then
+          if(bnd(b)%cod > 0) then
+            bnd0 = bondlib(bnd(b)%cod)%bnd0
+          else
+            bnd0 = 1. !default when missing parameters
+          endif
+          exit
+        end if
+      end do
+      !a unique Hbond_code will always be found
+      !because list of connections is based on bond list
 
-                        !find all the angles
-                        nHang = 0
-                        do a = 1, nangles
-                                if(ang(a)%j == j .and. ang(a)%cod > 0) then
-                                        if(ang(a)%i == H .and. .not. makeH(ang(a)%k)) then
-                                                nHang = nHang + 1
-                                                Hang_atom(nHang) = ang(a)%k
-                                                Hang_code(nHang) = ang(a)%cod
-                                        elseif(ang(a)%k == H .and. .not. makeH(ang(a)%i)) then
-                                                nHang = nHang + 1
-                                                Hang_atom(nHang) = ang(a)%i
-                                                Hang_code(nHang) = ang(a)%cod
-                                        end if
-                                end if
-                        end do
-                        !look up build rule
-                        lp => lib(res(residue)%irc)
-                        do rule = lp%nrules, 1, -1
-                                if(lp%rules(rule)%kind == BUILD_RULE_TORSION) then
-                                        if(lp%rules(rule)%atom(1) == H - res(residue)%start + 1 .and. &
-                                                lp%rules(rule)%atom(2) == j - res(residue)%start + 1) then
-                                                exit
-                                        end if
-                                end if
-                        end do
+      !find all the angles
+      nHang = 0
+      do a = 1, nangles
+        if(ang(a)%j == j .and. ang(a)%cod > 0) then
+          if(ang(a)%i == H .and. .not. makeH(ang(a)%k)) then
+            nHang = nHang + 1
+            Hang_atom(nHang) = ang(a)%k
+            Hang_code(nHang) = ang(a)%cod
+          elseif(ang(a)%k == H .and. .not. makeH(ang(a)%i)) then
+            nHang = nHang + 1
+            Hang_atom(nHang) = ang(a)%i
+            Hang_code(nHang) = ang(a)%cod
+          end if
+        end if
+      end do
+      !look up build rule
+      lp => lib(res(residue)%irc)
+      do rule = lp%nrules, 1, -1
+        if(lp%rules(rule)%kind == BUILD_RULE_TORSION) then
+          if(lp%rules(rule)%atom(1) == H - res(residue)%start + 1 .and. &
+            lp%rules(rule)%atom(2) == j - res(residue)%start + 1) then
+            exit
+          end if
+        end if
+      end do
 
-                        !find the torsion rule defined in the library, if any
-                        if(rule > 0) then
-                                kt = lp%rules(rule)%atom(3) + res(residue)%start - 1
-                                lt = lp%rules(rule)%atom(4) + res(residue)%start - 1
-                                xkt(:) = xtop(3*kt-2:3*kt)
-                                xlt(:) = xtop(3*lt-2:3*lt)
-                                rjkt(:) = xkt(:) - xj(:)
-                                rktlt(:) = xlt(:) - xkt(:)
-                                rnk(:) = -cross_product(rjkt, rktlt)
-                                bk = sqrt(dot_product(rnk, rnk))
-                        end if
-                        !generate initial coordinates for H
-                        !random vector
-                        do axis = 1,3
-                                xH(axis) = randm() - .5
-                        end do
-                        !normalise to unit length and scale by bond length from lib.
-                        bond_length = sqrt(dot_product(xH,xH))
-                        xH(:) = xH(:) / bond_length * bnd0
-                        !place near atom j
-                        xH(:) = xH(:) + xj(:)
-!                       write(*,800) 0,H,xH(:)
-                        !conjugate gradient minimisation
-                        do setH = 1,nsetH
-                        do cgiter = 1, max_cg_iterations
-!                               write(*,9, advance='no') cgiter
-9       format('cg step',i3,':')
-                                !do line search
-                                dx_line = max_dx*2.**(-cgiter)
-                                flipped = .false.
-                                do lineiter = 1, max_line_iterations
-                                        Vtot = 0
-                                        dVtot(:) = 0
-                                        !calc. potential & gradient
-                                        !angles
-                                        rjH(:) = xH(:) - xj(:)
-                                        do a = 1, nHang
-                                                xk(:) = xtop(3*Hang_atom(a)-2:3*Hang_atom(a))
-                                                rjk(:) = xk(:) - xj(:)
-                                                bjHinv = 1./sqrt(dot_product(rjH, rjH))
-                                                bjkinv = 1./sqrt(dot_product(rjk, rjk))
-                                                ! calculate scp and angv
-                                                scp = dot_product(rjH, rjk) * bjHinv*bjkinv
-                                                if(scp >  1.) then
-                                                        scp =  1.
-                                                else if(scp < -1.) then
-                                                        scp = -1.0
-                                                end if
-                                                angle = acos(scp)
-                                                angle_deg = angle / deg2rad
-                                                ! calculate da and dv
-                                                da = angle - anglib(Hang_code(a))%ang0*deg2rad
-                                                V = 0.5*anglib(Hang_code(a))%fk*da**2
-                                                Vtot = Vtot + V
-                                                dVangle = anglib(Hang_code(a))%fk*da
-                                                ! calculate f1
-                                                f1 = sin ( angle ) 
-                                                ! avoid division by zero
-                                                if ( abs(f1) < 1.e-12 ) then
-                                                        f1 = -1.e12
-                                                else
-                                                        f1 =  -1.0 / f1
-                                                end if
-                                                dV(:) = dVangle &
-                                                        * (f1*(rjk(:)*bjHinv*bjkinv - scp*rjH(:)*bjHinv*bjHinv))
-                                                dVtot(:) = dVtot(:) + dV(:)
-                                        end do
+      !find the torsion rule defined in the library, if any
+      if(rule > 0) then
+        kt = lp%rules(rule)%atom(3) + res(residue)%start - 1
+        lt = lp%rules(rule)%atom(4) + res(residue)%start - 1
+        xkt(:) = xtop(3*kt-2:3*kt)
+        xlt(:) = xtop(3*lt-2:3*lt)
+        rjkt(:) = xkt(:) - xj(:)
+        rktlt(:) = xlt(:) - xkt(:)
+        rnk(:) = -cross_product(rjkt, rktlt)
+        bk = sqrt(dot_product(rnk, rnk))
+      end if
+      !generate initial coordinates for H
+      !random vector
+      do axis = 1,3
+        xH(axis) = randm() - .5
+      end do
+      !normalise to unit length and scale by bond length from lib.
+      bond_length = sqrt(dot_product(xH,xH))
+      xH(:) = xH(:) / bond_length * bnd0
+      !place near atom j
+      xH(:) = xH(:) + xj(:)
+      !                       write(*,800) 0,H,xH(:)
+      !conjugate gradient minimisation
+      do setH = 1,nsetH
+        do cgiter = 1, max_cg_iterations
+          !                               write(*,9, advance='no') cgiter
+9         format('cg step',i3,':')
+          !do line search
+          dx_line = max_dx*2.**(-cgiter)
+          flipped = .false.
+          do lineiter = 1, max_line_iterations
+            Vtot = 0
+            dVtot(:) = 0
+            !calc. potential & gradient
+            !angles
+            rjH(:) = xH(:) - xj(:)
+            do a = 1, nHang
+              xk(:) = xtop(3*Hang_atom(a)-2:3*Hang_atom(a))
+              rjk(:) = xk(:) - xj(:)
+              bjHinv = 1./sqrt(dot_product(rjH, rjH))
+              bjkinv = 1./sqrt(dot_product(rjk, rjk))
+              ! calculate scp and angv
+              scp = dot_product(rjH, rjk) * bjHinv*bjkinv
+              if(scp >  1.) then
+                scp =  1.
+              else if(scp < -1.) then
+                scp = -1.0
+              end if
+              angle = acos(scp)
+              angle_deg = angle / deg2rad
+              ! calculate da and dv
+              da = angle - anglib(Hang_code(a))%ang0*deg2rad
+              V = 0.5*anglib(Hang_code(a))%fk*da**2
+              Vtot = Vtot + V
+              dVangle = anglib(Hang_code(a))%fk*da
+              ! calculate f1
+              f1 = sin ( angle )
+              ! avoid division by zero
+              if ( abs(f1) < 1.e-12 ) then
+                f1 = -1.e12
+              else
+                f1 =  -1.0 / f1
+              end if
+              dV(:) = dVangle &
+                * (f1*(rjk(:)*bjHinv*bjkinv - scp*rjH(:)*bjHinv*bjHinv))
+              dVtot(:) = dVtot(:) + dV(:)
+            end do
 
-                                        !torsion
-                                        if(rule > 0) then
-                                                rnj(1) = rjH(2) * rjkt(3) - rjH(3) * rjkt(2)
-                                                rnj(2) = rjH(3) * rjkt(1) - rjH(1) * rjkt(3)
-                                                rnj(3) = rjH(1) * rjkt(2) - rjH(2) * rjkt(1)
-                                                bj = sqrt(dot_product(rnj, rnj))
-                                                scp =dot_product(rnj, rnk)/(bj * bk)
-                                                if(scp>1.0) scp = 1.0
-                                                if(scp< - 1.0) scp = - 1.0
-                                                phi = acos(scp)
-                                                phi_deg = phi / deg2rad
-                                                sgn = rjkt(1) *(rnj(2) * rnk(3) - rnj(3) * rnk(2) ) &
-                                                        + rjkt(2) *(rnj(3) * rnk(1) - rnj(1) * rnk(3) ) &
-                                                        + rjkt(3) *(rnj(1) * rnk(2) - rnj(2) * rnk(1) )
-                                                if(sgn<0) phi = - phi
-                                                arg = phi-lp%rules(rule)%value*deg2rad
-                                                V = tors_fk*(1.0+cos(arg))
-                                                !note changed sign of dVtors to get min (not max) at rule value
-                                                dVtors = +tors_fk*sin(arg)
+            !torsion
+            if(rule > 0) then
+              rnj(1) = rjH(2) * rjkt(3) - rjH(3) * rjkt(2)
+              rnj(2) = rjH(3) * rjkt(1) - rjH(1) * rjkt(3)
+              rnj(3) = rjH(1) * rjkt(2) - rjH(2) * rjkt(1)
+              bj = sqrt(dot_product(rnj, rnj))
+              scp =dot_product(rnj, rnk)/(bj * bk)
+              if(scp>1.0) scp = 1.0
+              if(scp< - 1.0) scp = - 1.0
+              phi = acos(scp)
+              phi_deg = phi / deg2rad
+              sgn = rjkt(1) *(rnj(2) * rnk(3) - rnj(3) * rnk(2) ) &
+                + rjkt(2) *(rnj(3) * rnk(1) - rnj(1) * rnk(3) ) &
+                + rjkt(3) *(rnj(1) * rnk(2) - rnj(2) * rnk(1) )
+              if(sgn<0) phi = - phi
+              arg = phi-lp%rules(rule)%value*deg2rad
+              V = tors_fk*(1.0+cos(arg))
+              !note changed sign of dVtors to get min (not max) at rule value
+              dVtors = +tors_fk*sin(arg)
 
-                                                ! ---       forces
+              ! ---       forces
 
-                                                f1 = sin ( phi ) 
-                                                if ( abs(f1) .lt. 1.e-12 ) f1 = 1.e-12
-                                                f1 =  -1.0 / f1
-                                                dH(:) = f1*(rnk(:)/(bj*bk) - scp*rnj(:)/(bj*bj))
-                                                dV(:) = dVtors*cross_product(rjk, dH)
-                                                dVtot(:) = dVtot(:) + dV(:)
-                                        end if
-                                        if(cgiter == 1 .and. lineiter == 1) then
-                                                !its the start of the search, use the gradient vector
-                                                dvLast(:) = dVtot(:)
-                                        elseif(VtotLast < Vtot) then
-                                                dx_line = -dx_line !next step back
-                                                flipped = .true.
-                                        endif
-                                        rms_dV = sqrt(abs(dot_product(dVtot, dVLast)))
-                                        if(rms_dV < convergence_criterum / 10) then
-                                                exit !reached a potential minimum along the search line
-                                        endif
+              f1 = sin ( phi )
+              if ( abs(f1) .lt. 1.e-12 ) f1 = 1.e-12
+              f1 =  -1.0 / f1
+              dH(:) = f1*(rnk(:)/(bj*bk) - scp*rnj(:)/(bj*bj))
+              dV(:) = dVtors*cross_product(rjk, dH)
+              dVtot(:) = dVtot(:) + dV(:)
+            end if
+            if(cgiter == 1 .and. lineiter == 1) then
+              !its the start of the search, use the gradient vector
+              dvLast(:) = dVtot(:)
+            elseif(VtotLast < Vtot) then
+              dx_line = -dx_line !next step back
+              flipped = .true.
+            endif
+            rms_dV = sqrt(abs(dot_product(dVtot, dVLast)))
+            if(rms_dV < convergence_criterum / 10) then
+              exit !reached a potential minimum along the search line
+            endif
 
-                                        !update position in line search
-                                        dx(:) = -dVLast(:) / sqrt(dot_product(dVlast, dVLast)) * dx_line
-                                        if(flipped) dx_line = 0.5 * dx_line !reduce step size only after first change of direction
-                                        VtotLast = Vtot
-                                        xH(:) = xH(:) + dx(:)
-                                end do !lineiter
+            !update position in line search
+            dx(:) = -dVLast(:) / sqrt(dot_product(dVlast, dVLast)) * dx_line
+            if(flipped) dx_line = 0.5 * dx_line !reduce step size only after first change of direction
+            VtotLast = Vtot
+            xH(:) = xH(:) + dx(:)
+          end do !lineiter
         
-!                               write(*,*) lineiter
+          !                               write(*,*) lineiter
                                 
-                                rjH(:) = xH(:) - xj(:)
-                                bond_length = sqrt(dot_product(rjH, rjH))
-                                rjH(:) = rjH(:) / bond_length * bnd0      !adjust bond length
-                                xH(:) = xj(:) + rjH(:)
-                                rms_dV = sqrt(dot_product(dVtot,dVtot))
-                                if(rms_dV <  convergence_criterum) then
-                                        if(Vtot < local_min) then
-                                                !found global min
-                                                exit
-                                        else
-                                                !it's a local min - flip 180 deg.
-                                                dVlast(:) = -dVlast(:)
-                                                xH(:) = xj(:) - rjH(:)
-                                        end if
-                                end if
+          rjH(:) = xH(:) - xj(:)
+          bond_length = sqrt(dot_product(rjH, rjH))
+          rjH(:) = rjH(:) / bond_length * bnd0      !adjust bond length
+          xH(:) = xj(:) + rjH(:)
+          rms_dV = sqrt(dot_product(dVtot,dVtot))
+          if(rms_dV <  convergence_criterum) then
+            if(Vtot < local_min) then
+              !found global min
+              exit
+            else
+              !it's a local min - flip 180 deg.
+              dVlast(:) = -dVlast(:)
+              xH(:) = xj(:) - rjH(:)
+            end if
+          end if
 
-                                !get new gradient search direction
-                                gamma = dot_product(dVtot, dVlast) / dot_product(dVlast, dVlast)
-                                !use conjugate gradient
-                                dVlast(:) = dVtot(:) - gamma*dVlast(:)
+          !get new gradient search direction
+          gamma = dot_product(dVtot, dVlast) / dot_product(dVlast, dVlast)
+          !use conjugate gradient
+          dVlast(:) = dVtot(:) - gamma*dVlast(:)
                                 
-                        end do  !cgiter
+        end do  !cgiter
 
-                                !Check if local min -> restart iteration ; problem with conversion
-                                        if(Vtot > local_min) then
-                                                !it's a local min - flip 180 deg.
-                                                dVlast(:) = -dVlast(:)
-                                                xH(:) = xj(:) - rjH(:)
-                                        else
-                                        exit
-                                        end if
-                        end do !setH
-                        !check if not converged
-                        if(cgiter >= max_cg_iterations .and. Vtot > 3.0) then
-                                !display warning
-                                write(*,900) H, j, Vtot
-900                             format('>>> WARNING: Positioning of hydrogen',i6,&
-                                        ' bound to atom',i6,' didn''t converge.',/, &
-                                        'Potential is ',f8.3,' kcal/mol.')
-                        end if
-                        !copy coordinates to topology
-                        xtop(3*H-2:3*H) = xH(:)
-                        !clear makeH flag
-                        makeH(H) = .false.
-                        genH = genH + 1
-                end if
-        end do !hydrogens to make
+        !Check if local min -> restart iteration ; problem with conversion
+        if(Vtot > local_min) then
+          !it's a local min - flip 180 deg.
+          dVlast(:) = -dVlast(:)
+          xH(:) = xj(:) - rjH(:)
+        else
+          exit
+        end if
+      end do !setH
+      !check if not converged
+      if(cgiter >= max_cg_iterations .and. Vtot > 3.0) then
+        !display warning
+        write(*,900) H, j, Vtot
+900     format('>>> WARNING: Positioning of hydrogen',i6,&
+          ' bound to atom',i6,' didn''t converge.',/, &
+          'Potential is ',f8.3,' kcal/mol.')
+      end if
+      !copy coordinates to topology
+      xtop(3*H-2:3*H) = xH(:)
+      !clear makeH flag
+      makeH(H) = .false.
+      genH = genH + 1
+    end if
+  end do !hydrogens to make
 end function genh
 
 
-
 subroutine makeimps
-! *** local variables
-        integer                                         :: i
+  ! *** local variables
+  integer                                         :: i
 
-!.......................................................................
 
-        nimps = 0
-        nimps_solute = 0
+  nimps = 0
+  nimps_solute = 0
 
-        do i = 1, nat_pro
-                if(nconn(i) ==3) then
-                        nimps = nimps + 1
-                        if(i <= nat_solute) nimps_solute = nimps_solute + 1
-                        imp(nimps)%i = iconn(1, i)
-                        imp(nimps)%j = i
-                        imp(nimps)%k = iconn(2, i)
-                        imp(nimps)%l = iconn(3,i)
-                end if
-        enddo
+  do i = 1, nat_pro
+    if(nconn(i) ==3) then
+      nimps = nimps + 1
+      if(i <= nat_solute) nimps_solute = nimps_solute + 1
+      imp(nimps)%i = iconn(1, i)
+      imp(nimps)%j = i
+      imp(nimps)%k = iconn(2, i)
+      imp(nimps)%l = iconn(3,i)
+    end if
+  enddo
 
 end subroutine makeimps
 
 
-
 subroutine imp_params
-! *** local variables
-        integer i, ii, iaci, iacj, iack, iacl
-        integer iused(nimp_prm+max_extrabnd), itrans(nimp_prm+max_extrabnd)
+  ! *** local variables
+  integer i, ii, iaci, iacj, iack, iacl
+  integer iused(nimp_prm+max_extrabnd), itrans(nimp_prm+max_extrabnd)
 
 
-        do i = 1, nimps
-                iaci = iac(imp(i)%i )
-                iacj = iac(imp(i)%j )
-                iack = iac(imp(i)%k )
-                iacl = iac(imp(i)%l )
+  do i = 1, nimps
+    iaci = iac(imp(i)%i )
+    iacj = iac(imp(i)%j )
+    iack = iac(imp(i)%k )
+    iacl = iac(imp(i)%l )
 
-                imp(i)%cod = impcode(tac(iaci), tac(iacj), tac(iack), tac(iacl))
+    imp(i)%cod = impcode(tac(iaci), tac(iacj), tac(iack), tac(iacl))
 
-                if(imp(i)%cod == 0) then
-                        write(*,20) imp(i)%i, imp(i)%j, imp(i)%k, imp(i)%l
-                end if
-        enddo
-20      format('Atoms of missing improper:',4i5)
+    if(imp(i)%cod == 0) then
+      write(*,20) imp(i)%i, imp(i)%j, imp(i)%k, imp(i)%l
+    end if
+  enddo
+20 format('Atoms of missing improper:',4i5)
 
-! --- Make a list of actual angle types to be used
+  ! --- Make a list of actual angle types to be used
 
-        iused(:) = 0
+  iused(:) = 0
 
-        nimpcod = 0
+  nimpcod = 0
 
-        do i = 1, nimps
-!       workaround to permit missing param's
-                if(imp(i)%cod /=0) then
-                        if(iused(imp(i)%cod ) ==0) then
-                                iused(imp(i)%cod ) = 1
-                                nimpcod = nimpcod+1
-                                itrans(imp(i)%cod ) = nimpcod
-                                implib(nimpcod) = imp_prm(imp(i)%cod)%prm
-                                imp(i)%cod = nimpcod
-                        ELSE
-                                imp(i)%cod = itrans(imp(i)%cod )
-                        endif
-                endif
-        enddo
+  do i = 1, nimps
+    !       workaround to permit missing param's
+    if(imp(i)%cod /=0) then
+      if(iused(imp(i)%cod ) ==0) then
+        iused(imp(i)%cod ) = 1
+        nimpcod = nimpcod+1
+        itrans(imp(i)%cod ) = nimpcod
+        implib(nimpcod) = imp_prm(imp(i)%cod)%prm
+        imp(i)%cod = nimpcod
+      else
+        imp(i)%cod = itrans(imp(i)%cod )
+      endif
+    endif
+  enddo
 
-        write(*, 100) nimps_solute, 'solute'
-        write(*, 100) nimps-nimps_solute, 'solvent'
-100     format('Made    ',i6,1x,a,' impropers.')
-!.......................................................................
+  write(*, 100) nimps_solute, 'solute'
+  write(*, 100) nimps-nimps_solute, 'solvent'
+100 format('Made    ',i6,1x,a,' impropers.')
+
 end subroutine imp_params
 
 
-
 integer function find_atom(ires, atom)
-!arguments
-        integer                                         :: ires
-        character(len=5)                        :: atom
-!locals
-        integer                                         :: my_res, iat, irc
-        character(len=4)                        :: my_atom
-        integer                                         :: mol1, mol2
+  !arguments
+  integer                                         :: ires
+  character(len=5)                        :: atom
+  !locals
+  integer                                         :: my_res, iat, irc
+  character(len=4)                        :: my_atom
+  integer                                         :: mol1, mol2
 
-        if(atom(1:1) == '-') then 
-                my_res = ires - 1
-                my_atom = atom(2:5)
-        elseif(atom(1:1) == '+') then 
-                my_res = ires + 1
-                my_atom = atom(2:5)
-        else
-                my_res = ires
-                my_atom = atom(1:4)
-        end if
+  if(atom(1:1) == '-') then
+    my_res = ires - 1
+    my_atom = atom(2:5)
+  elseif(atom(1:1) == '+') then
+    my_res = ires + 1
+    my_atom = atom(2:5)
+  else
+    my_res = ires
+    my_atom = atom(1:4)
+  end if
 
-        find_atom = 0
+  find_atom = 0
 
-        !first may not refer backwards and last may not refer ahead
-        if(my_res < 1 .or. my_res > nres) then
-                !can't move outside terminal residues - skip
-                return
-        end if
+  !first may not refer backwards and last may not refer ahead
+  if(my_res < 1 .or. my_res > nres) then
+    !can't move outside terminal residues - skip
+    return
+  end if
         
-        !check if moving outside molecule
-        if(ires /= my_res) then
-                do mol1 = 1, nmol
-                        if(res(ires)%start < istart_mol(mol1+1)) exit
-                end do
-                do mol2 = 1, nmol
-                        if(res(my_res)%start < istart_mol(mol2+1)) exit
-                end do
-                if(mol1 /= mol2) return !crossed molecule boundary
-        end if
+  !check if moving outside molecule
+  if(ires /= my_res) then
+    do mol1 = 1, nmol
+      if(res(ires)%start < istart_mol(mol1+1)) exit
+    end do
+    do mol2 = 1, nmol
+      if(res(my_res)%start < istart_mol(mol2+1)) exit
+    end do
+    if(mol1 /= mol2) return !crossed molecule boundary
+  end if
 
-        irc = res(my_res)%irc !get residue code
+  irc = res(my_res)%irc !get residue code
 
-        do iat = 1, lib(irc)%nat
-                if(lib(irc)%atnam(iat) == my_atom) then
-                        find_atom = res(my_res)%start + iat - 1
-                        exit
-                end if
-        end do
+  do iat = 1, lib(irc)%nat
+    if(lib(irc)%atnam(iat) == my_atom) then
+      find_atom = res(my_res)%start + iat - 1
+      exit
+    end if
+  end do
         
-        if(ires == my_res .and. find_atom == 0) then
-                !we have an error: an atom in _this_ residue was not found
-                topo_ok = .false.
-                write(*, 120) my_atom, lib(irc)%nam, ires
-        end if
+  if(ires == my_res .and. find_atom == 0) then
+    !we have an error: an atom in _this_ residue was not found
+    topo_ok = .false.
+    write(*, 120) my_atom, lib(irc)%nam, ires
+  end if
 
-120     format('>>>>> ERROR: There is no atom named ',a4,' in residue ',a4,i5,'.')
+120 format('>>>>> ERROR: There is no atom named ',a4,' in residue ',a4,i5,'.')
 
 end function find_atom
 
 
-
 subroutine makeimps_explicit
-!generate impropers using definitions in library file
-! *** local variables
-        integer                                         :: ires, irc, iimp, i
+  !generate impropers using definitions in library file
+  ! *** local variables
+  integer                         :: ires, irc, iimp, i
 
-        nimps = 0
-        nimps_solute = 0
+  nimps = 0
+  nimps_solute = 0
                 
-        do ires = 1, nres !loop over residues
-                irc = res(ires)%irc
-                do iimp = 1, lib(irc)%nimp !loop over improper defs
-                        nimps = nimps+1
-                        if(ires <= nres_solute) nimps_solute = nimps_solute + 1
-                        imp(nimps)%i = find_atom(ires, lib(irc)%imp(iimp)%i)
-                        imp(nimps)%j = find_atom(ires, lib(irc)%imp(iimp)%j)
-                        imp(nimps)%k = find_atom(ires, lib(irc)%imp(iimp)%k)
-                        imp(nimps)%l = find_atom(ires, lib(irc)%imp(iimp)%l)
-                        if(imp(nimps)%i == 0 .or. imp(nimps)%j == 0 .or. &
-                                imp(nimps)%k == 0 .or. imp(nimps)%l == 0) then 
-                                !not found
-                                nimps = nimps - 1 !take a step back, discard this one
-                                if(ires <= nres_solute) nimps_solute = nimps_solute - 1
-                        end if 
-                end do
-        end do
+  do ires = 1, nres !loop over residues
+    irc = res(ires)%irc
+    do iimp = 1, lib(irc)%nimp !loop over improper defs
+      nimps = nimps+1
+      if(ires <= nres_solute) nimps_solute = nimps_solute + 1
+      imp(nimps)%i = find_atom(ires, lib(irc)%imp(iimp)%i)
+      imp(nimps)%j = find_atom(ires, lib(irc)%imp(iimp)%j)
+      imp(nimps)%k = find_atom(ires, lib(irc)%imp(iimp)%k)
+      imp(nimps)%l = find_atom(ires, lib(irc)%imp(iimp)%l)
+      if(imp(nimps)%i == 0 .or. imp(nimps)%j == 0 .or. &
+        imp(nimps)%k == 0 .or. imp(nimps)%l == 0) then
+        !not found
+        nimps = nimps - 1 !take a step back, discard this one
+        if(ires <= nres_solute) nimps_solute = nimps_solute - 1
+      end if
+    end do
+  end do
 
 end subroutine makeimps_explicit
 
 
-
 subroutine maketop
+  !check if library is loaded
+  if(.not. check_residues()) return
 
-        !check if library is loaded
-        if(.not. check_residues()) return
-
-!       bail out if readparm failed
-        if(.not.ff_ok) then
-                write(*,900)
-900             format('>>>>> ERROR: Force field parameters not loaded.')
-                return
-        end if
-        topo_ok = .false. 
+  !       bail out if readparm failed
+  if(.not.ff_ok) then
+    write(*,900)
+900 format('>>>>> ERROR: Force field parameters not loaded.')
+    return
+  end if
+  topo_ok = .false.
         
-        !check if boundaries are set
+      !check if boundaries are set
 
-    if(.not. boundary_set) then
-                write(*,910)
-910             format('>>>>> ERROR: Boundary has not been set.')
-                return
-        end if
+  if(.not. boundary_set) then
+    write(*,910)
+910 format('>>>>> ERROR: Boundary has not been set.')
+    return
+  end if
 
-        if( .not. have_solvent_boundary) then
-        xwcent(:) = xpcent(:)
-                write(*,911)
-                write(*,912)
-911             format('>>>>> WARNING: System has not been solvated.')
-912             format('Using boundary center as solvent center.')
-        end if
+  if( .not. have_solvent_boundary) then
+    xwcent(:) = xpcent(:)
+    write(*,911)
+    write(*,912)
+911 format('>>>>> WARNING: System has not been solvated.')
+912 format('Using boundary center as solvent center.')
+  end if
 
-        if(.not. have_title) then
-                CALL get_line_arg(title, '-----> Give this topology a title: ')
-                have_title = .true.
-        end if
-        topo_ok = .true. !now hope for the best
+  if(.not. have_title) then
+    CALL get_line_arg(title, '-----> Give this topology a title: ')
+    have_title = .true.
+  end if
+  topo_ok = .true. !now hope for the best
 
-        !deallocate old topology if any
-        if(allocated(iac)) deallocate(iac)
-        if(allocated(crg)) deallocate(crg)
-        if(allocated(cgpatom)) deallocate(cgpatom)
-        if(allocated(list14)) deallocate(list14)
-        if(allocated(listex)) deallocate(listex)
-        if(allocated(nconn)) deallocate(nconn)
-        if(allocated(iconn)) deallocate(iconn)
-        if(allocated(bnd)) deallocate(bnd)
-        if(allocated(bondlib)) deallocate(bondlib)
-        if(allocated(SYBYL_bond_type)) deallocate(SYBYL_bond_type)
-        if(allocated(ang)) deallocate(ang)
-        if(allocated(anglib)) deallocate(anglib)
-        if(allocated(tor)) deallocate(tor)
-        if(allocated(torlib)) deallocate(torlib)
-        if(allocated(imp)) deallocate(imp)
-        if(allocated(implib)) deallocate(implib)
-        if(allocated(list14long)) deallocate(list14long)
-        if(associated(listexlong)) deallocate(listexlong)
-        if(allocated(cgp)) deallocate(cgp)
-        if(allocated(nconn)) deallocate(nconn)
-        if(allocated(iconn)) deallocate(iconn)
-        if(allocated(excl)) deallocate(excl)
-        if(allocated(shell)) deallocate(shell)
+  !deallocate old topology if any
+  if(allocated(iac)) deallocate(iac)
+  if(allocated(crg)) deallocate(crg)
+  if(allocated(cgpatom)) deallocate(cgpatom)
+  if(allocated(list14)) deallocate(list14)
+  if(allocated(listex)) deallocate(listex)
+  if(allocated(nconn)) deallocate(nconn)
+  if(allocated(iconn)) deallocate(iconn)
+  if(allocated(bnd)) deallocate(bnd)
+  if(allocated(bondlib)) deallocate(bondlib)
+  if(allocated(SYBYL_bond_type)) deallocate(SYBYL_bond_type)
+  if(allocated(ang)) deallocate(ang)
+  if(allocated(anglib)) deallocate(anglib)
+  if(allocated(tor)) deallocate(tor)
+  if(allocated(torlib)) deallocate(torlib)
+  if(allocated(imp)) deallocate(imp)
+  if(allocated(implib)) deallocate(implib)
+  if(allocated(list14long)) deallocate(list14long)
+  if(associated(listexlong)) deallocate(listexlong)
+  if(allocated(cgp)) deallocate(cgp)
+  if(allocated(nconn)) deallocate(nconn)
+  if(allocated(iconn)) deallocate(iconn)
+  if(allocated(excl)) deallocate(excl)
+  if(allocated(shell)) deallocate(shell)
 
-        !allocate topology arrays (set max_atom etc
-        call topo_set_max(nat_pro, max_lib, max_long) !make space for new topology
-        allocate(iac(max_atom), &
-                crg(max_atom), &
-                cgpatom(max_atom), &
-                list14(max_nbr_range, max_atom), &
-                listex(max_nbr_range, max_atom), &
-                nconn(max_atom), iconn(max_conn, max_atom), &
-                stat=alloc_status)
-        if(alloc_status /= 0) then
-                write(*,*) 'ERROR: Out of memory when allocating topology arrays'
-                stop 255
-        end if
+  !allocate topology arrays (set max_atom etc
+  call topo_set_max(nat_pro, max_lib, max_long) !make space for new topology
+  allocate(iac(max_atom), &
+    crg(max_atom), &
+    cgpatom(max_atom), &
+    list14(max_nbr_range, max_atom), &
+    listex(max_nbr_range, max_atom), &
+    nconn(max_atom), iconn(max_conn, max_atom), &
+    stat=alloc_status)
+  if(alloc_status /= 0) then
+    write(*,*) 'ERROR: Out of memory when allocating topology arrays'
+    stop 255
+  end if
 
-        if( .not. use_PBC ) then
-                allocate(excl(max_atom), shell(max_atom), stat=alloc_status)
-                if(alloc_status /= 0) then
-                        write(*,*) 'ERROR: Out of memory when allocating topology arrays'
-                        stop 255
-                end if
-        end if
+  if( .not. use_PBC ) then
+    allocate(excl(max_atom), shell(max_atom), stat=alloc_status)
+    if(alloc_status /= 0) then
+      write(*,*) 'ERROR: Out of memory when allocating topology arrays'
+      stop 255
+    end if
+  end if
 
-        allocate(bnd(max_bonds), &
-                bondlib(max_bondlib), &
-                SYBYL_bond_type(max_bondlib), &
-                ang(max_angles), &
-                anglib(max_anglib), &
-                tor(max_tors), &
-                torlib(max_torlib), &
-                imp(max_imps), &
-                implib(max_implib), &
-                stat=alloc_status)
-        if(alloc_status /= 0) then
-                write(*,*) 'ERROR: Out of memory when allocating topology arrays'
-                stop 255
-        end if
+  allocate(bnd(max_bonds), &
+    bondlib(max_bondlib), &
+    SYBYL_bond_type(max_bondlib), &
+    ang(max_angles), &
+    anglib(max_anglib), &
+    tor(max_tors), &
+    torlib(max_torlib), &
+    imp(max_imps), &
+    implib(max_implib), &
+    stat=alloc_status)
+  if(alloc_status /= 0) then
+    write(*,*) 'ERROR: Out of memory when allocating topology arrays'
+    stop 255
+  end if
 
-        allocate(list14long(2, max_14long), &
-                listexlong(2, max_exlong), &
-                cgp(max_cgp), &
-                stat=alloc_status)
-        if(alloc_status /= 0) then
-                write(*,*) 'ERROR: Out of memory when allocating topology arrays'
-                stop 255
-        end if
+  allocate(list14long(2, max_14long), &
+    listexlong(2, max_exlong), &
+    cgp(max_cgp), &
+    stat=alloc_status)
+  if(alloc_status /= 0) then
+    write(*,*) 'ERROR: Out of memory when allocating topology arrays'
+    stop 255
+  end if
 
-        !set date of creation
-        call date_and_time(creation_date)
+  !set date of creation
+  call date_and_time(creation_date)
 
-        !set atom types, charges, charge groups
-        CALL set_iac
-        if(.not. topo_ok) return
+  !set atom types, charges, charge groups
+  call set_iac
+  if(.not. topo_ok) return
         
-        call set_solvent_type
-        CALL set_crg
-        CALL makebonds
-        call set_bondcodes
-        call makeconn
-        CALL makeangles
-        CALL maketors
-        if(imp_explicit) then
-                call makeimps_explicit !explicit (from lib.) generation
-        else
-                CALL makeimps !automatic generation
-        end if
-        call imp_params !set codes & filter out unused types
-        CALL make14list
-        CALL makeexlist
-        CALL makehyds   !generate hydrogens
-        CALL set_cgp    !assigns all cgp() within exclusion radius 
+  call set_solvent_type
+  call set_crg
+  call makebonds
+  call set_bondcodes
+  call makeconn
+  call makeangles
+  call maketors
+  if(imp_explicit) then
+    call makeimps_explicit !explicit (from lib.) generation
+  else
+    call makeimps !automatic generation
+  end if
+  call imp_params !set codes & filter out unused types
+  call make14list
+  call makeexlist
+  call makehyds   !generate hydrogens
+  call set_cgp    !assigns all cgp() within exclusion radius
         
-        call set_default_mask
+  call set_default_mask
 
-!       Now check if we have missing parameters
-        if(topo_ok) then
-                write(*,'(a)') 'Topology successfully generated.'
-        else
-                write(*, '(/,a,/)') 'ERROR: There are missing parameters!'
-                write(*, '(a)') 'You need to add parameters and do readprm + maketop again.'
-                write(*, 100) trim(prm_file)
-        endif
-  100 format('parameter file: ', a)
+  !       Now check if we have missing parameters
+  if(topo_ok) then
+    write(*,'(a)') 'Topology successfully generated.'
+  else
+    write(*, '(/,a,/)') 'ERROR: There are missing parameters!'
+    write(*, '(a)') 'You need to add parameters and do readprm + maketop again.'
+    write(*, 100) trim(prm_file)
+  endif
+100 format('parameter file: ', a)
 end subroutine maketop
 
 
 
 subroutine set_default_mask
-
-        !make atom mask including all atoms
-        !first get rid of old mask
-        call mask_finalize(mask)
-        !allocate new mask
-        call mask_initialize(mask)
-        !add all atoms (in_mask is not used)
-        call mask_all(mask)
+  !make atom mask including all atoms
+  !first get rid of old mask
+  call mask_finalize(mask)
+  !allocate new mask
+  call mask_initialize(mask)
+  !add all atoms (in_mask is not used)
+  call mask_all(mask)
 end subroutine set_default_mask
 
 
 subroutine makeconn
-!locals
-        integer                                         :: i, ib
+  !locals
+  integer                         :: i, ib
 
-        nconn(:) = 0
-! --- Make a list of connections to each atom
-
-        do i = 1, nat_pro
-                nconn(i) = 0
-                do ib = 1, nbonds
-                        if(bnd(ib)%i ==i) then
-                                nconn(i) = nconn(i) + 1
-                                iconn(nconn(i), i) = bnd(ib)%j
-                        ELSEif(bnd(ib)%j ==i) then
-                                nconn(i) = nconn(i) + 1
-                                iconn(nconn(i), i) = bnd(ib)%i
-                        endif
-                enddo
-        enddo
+  nconn(:) = 0
+  ! --- Make a list of connections to each atom
+  do i = 1, nat_pro
+    nconn(i) = 0
+    do ib = 1, nbonds
+      if(bnd(ib)%i ==i) then
+        nconn(i) = nconn(i) + 1
+        iconn(nconn(i), i) = bnd(ib)%j
+      elseif(bnd(ib)%j ==i) then
+        nconn(i) = nconn(i) + 1
+        iconn(nconn(i), i) = bnd(ib)%i
+      endif
+    enddo
+  enddo
 end subroutine makeconn
 
 
-
 subroutine maketors
-! *** local variables
-        integer i, j, ic, jc, ib, it, iaci, iacj, iack, iacl
-        integer iused(ntor_prm+max_extrabnd), itrans(ntor_prm+max_extrabnd)
-        type(TOR_CODES)                         :: torcodes
-        integer                                         :: icod
-! --- Make the torsion list
+  ! *** local variables
+  integer i, j, ic, jc, ib, it, iaci, iacj, iack, iacl
+  integer iused(ntor_prm+max_extrabnd), itrans(ntor_prm+max_extrabnd)
+  type(tor_codes)                         :: torcodes
+  integer                                 :: icod
+  ! --- Make the torsion list
 
-        ntors = 0
-        ntors_solute = 0
+  ntors = 0
+  ntors_solute = 0
 
-        do ib = 1, nbonds
+  do ib = 1, nbonds
 
-        do ic = 1, nconn(bnd(ib)%i )
-        i = iconn(ic, bnd(ib)%i )
-        if(i/=bnd(ib)%j ) then
-                do jc = 1, nconn(bnd(ib)%j )
-                j = iconn(jc, bnd(ib)%j )
-                if(j/=bnd(ib)%i ) then
+    do ic = 1, nconn(bnd(ib)%i )
+      i = iconn(ic, bnd(ib)%i )
+      if(i/=bnd(ib)%j ) then
+        do jc = 1, nconn(bnd(ib)%j )
+          j = iconn(jc, bnd(ib)%j )
+          if(j/=bnd(ib)%i ) then
 
-                        if(i/=j) then
+            if(i/=j) then
 
-                                iaci = iac(i)
-                                iacj = iac(bnd(ib)%i)
-                                iack = iac(bnd(ib)%j)
-                                iacl = iac(j)
+              iaci = iac(i)
+              iacj = iac(bnd(ib)%i)
+              iack = iac(bnd(ib)%j)
+              iacl = iac(j)
                                 
-                                torcodes = torcode(tac(iaci), tac(iacj), tac(iack), tac(iacl))
-                                if(torcodes%ncod == 0) then
-                                        write( * , * ) 'atoms: ', i , bnd(ib)%i , bnd(ib)%j, j
-                                endif
+              torcodes = torcode(tac(iaci), tac(iacj), tac(iack), tac(iacl))
+              if(torcodes%ncod == 0) then
+                write( * , * ) 'atoms: ', i , bnd(ib)%i , bnd(ib)%j, j
+              endif
 
-                                do icod = 1, torcodes%ncod
-                                        ntors = ntors + 1
-                                        if(i <= nat_solute) ntors_solute = ntors_solute + 1
-                                        tor(ntors)%i = i
-                                        tor(ntors)%j = bnd(ib)%i
-                                        tor(ntors)%k = bnd(ib)%j
-                                        tor(ntors)%l = j
-                                        tor(ntors)%cod = torcodes%cod(icod)
-                                end do
-!                               tor(ntors)%cod = torcode(tac(iaci), tac(iacj), tac(iack), tac(iacl))
-!                                                  workaround to allow missing param's
-!                               if(tor(ntors)%cod /=0) then
-!                                       if(tor_prm(tor(ntors)%cod)%rmult <= - 1.0) then
-!                                               more_terms = .true.
-!                                               do while(more_terms)
-!                                                       ntors = ntors + 1
-!                                                       if(i <= nat_solute) ntors_solute = ntors_solute + 1
-!                                                       tor(ntors)%i = tor(ntors - 1)%i
-!                                                       tor(ntors)%j = tor(ntors - 1)%j
-!                                                       tor(ntors)%k = tor(ntors - 1)%k
-!                                                       tor(ntors)%l = tor(ntors - 1)%l
-!                                                       tor(ntors)%cod = tor(ntors - 1)%cod + 1
-!                                                       more_terms = .false.
-!                                                       if(tor_prm(tor(ntors)%cod)%rmult <= -1.0)  &
-!                                                               more_terms = .true.
-!                                               enddo
-!                                       endif
-!                               endif
-                        endif
-
-                endif
-                enddo
-        endif
+              do icod = 1, torcodes%ncod
+                ntors = ntors + 1
+                if(i <= nat_solute) ntors_solute = ntors_solute + 1
+                tor(ntors)%i = i
+                tor(ntors)%j = bnd(ib)%i
+                tor(ntors)%k = bnd(ib)%j
+                tor(ntors)%l = j
+                tor(ntors)%cod = torcodes%cod(icod)
+              end do
+            !                               tor(ntors)%cod = torcode(tac(iaci), tac(iacj), tac(iack), tac(iacl))
+            !                                                  workaround to allow missing param's
+            !                               if(tor(ntors)%cod /=0) then
+            !                                       if(tor_prm(tor(ntors)%cod)%rmult <= - 1.0) then
+            !                                               more_terms = .true.
+            !                                               do while(more_terms)
+            !                                                       ntors = ntors + 1
+            !                                                       if(i <= nat_solute) ntors_solute = ntors_solute + 1
+            !                                                       tor(ntors)%i = tor(ntors - 1)%i
+            !                                                       tor(ntors)%j = tor(ntors - 1)%j
+            !                                                       tor(ntors)%k = tor(ntors - 1)%k
+            !                                                       tor(ntors)%l = tor(ntors - 1)%l
+            !                                                       tor(ntors)%cod = tor(ntors - 1)%cod + 1
+            !                                                       more_terms = .false.
+            !                                                       if(tor_prm(tor(ntors)%cod)%rmult <= -1.0)  &
+            !                                                               more_terms = .true.
+            !                                               enddo
+            !                                       endif
+            !                               endif
+            endif
+          endif
         enddo
+      endif
+    enddo
+  enddo
 
-        enddo
 
-! --- Make a list of actual torsion types to be used
+  ! --- Make a list of actual torsion types to be used
+  iused(1:ntor_prm) = 0
+  ntorcod = 0
+  do i = 1, ntors
+    !          workaround to permit missing param's
+    if(tor(i)%cod /=0) then
+      if(iused(tor(i)%cod ) ==0) then
+        iused(tor(i)%cod ) = 1
+        ntorcod = ntorcod+1
+        itrans(tor(i)%cod ) = ntorcod
+        torlib(ntorcod) = tor_prm(tor(i)%cod)
+        tor(i)%cod = ntorcod
+      else
+        tor(i)%cod = itrans(tor(i)%cod)
+      endif
+    endif
+  enddo
 
-        iused(1:ntor_prm) = 0
+  write(*, 100) ntors_solute, 'solute'
+  write(*, 100) ntors-ntors_solute, 'solvent'
+100 format('Made    ',i6,1x,a,' torsions.')
 
-        ntorcod = 0
-
-        do i = 1, ntors
-!          workaround to permit missing param's
-                if(tor(i)%cod /=0) then
-                        if(iused(tor(i)%cod ) ==0) then
-                                iused(tor(i)%cod ) = 1
-                                ntorcod = ntorcod+1
-                                itrans(tor(i)%cod ) = ntorcod
-                                torlib(ntorcod) = tor_prm(tor(i)%cod)
-                                tor(i)%cod = ntorcod
-                        ELSE
-                                tor(i)%cod = itrans(tor(i)%cod)
-                        endif
-                endif
-        enddo
-
-        write(*, 100) ntors_solute, 'solute'
-        write(*, 100) ntors-ntors_solute, 'solvent'
-100     format('Made    ',i6,1x,a,' torsions.')
-!.......................................................................
 end subroutine maketors
 
 
-
 subroutine prompt(outtxt)
-! *** local variables
-        CHARACTER( * ) outtxt
-        write( * , '(a,$)') outtxt
-        return
+  ! *** local variables
+  character( * ) outtxt
+  write( * , '(a,$)') outtxt
+  return
 end subroutine prompt
 
 
+real function randm(seed, seed_only)
+  !arguments
+  integer, intent(in), optional:: seed
+  logical, intent(in), optional:: seed_only
+  ! *** Local variables
+  integer, parameter                      :: m = 100000000, m1 = 10000, mult = 31415821
+  integer, save                           :: irand = 0
+  integer                                 :: irandh, irandl, multh, multl
+  real                                    :: r
 
-real FUNCTION randm(seed, seed_only)
-!arguments
-        integer, intent(in), optional:: seed
-        logical, intent(in), optional:: seed_only
-! *** Local variables
-        integer, parameter                      :: m = 100000000, m1 = 10000, mult = 31415821
-        integer, save                           :: irand = 0
-        integer                                         :: irandh, irandl, multh, multl
-        real                                            :: r
+  if(present(seed)) then
+    irand = mod(iabs(seed), m)
+  end if
+  if(present(seed_only)) return
+  !
+  ! --- multiply irand by mult, but take into account that overflow must
+  ! --- be discarded, and do not generate an error.
+  !
+  irandh = irand / m1
+  irandl = mod(irand, m1)
+  multh = mult / m1
+  multl = mod(mult, m1)
+  !
+  irand = mod(irandh * multl + irandl * multh, m1) * m1 + irandl * &
+    multl
+  irand = mod(irand+1, m)
+  !
+  ! --- convert irand to a real random number between 0 and 1.
+  !
+  r = real(irand / 10) * 10 / real(m)
+  if((r<=0.e0) .or.(r>1.e0) ) r = 0.e0
+  randm = r
 
-        if(present(seed)) then
-                irand = mod(iabs(seed), m)
-        end if
-        if(present(seed_only)) return
-!
-! --- multiply irand by mult, but take into account that overflow must
-! --- be discarded, and do not generate an error.
-!
-        irandh = irand / m1
-        irandl = mod(irand, m1)
-        multh = mult / m1
-        multl = mod(mult, m1)
-!
-        irand = mod(irandh * multl + irandl * multh, m1) * m1 + irandl * &
-        multl
-        irand = mod(irand+1, m)
-!
-! --- convert irand to a real random number between 0 and 1.
-!
-        r = real(irand / 10) * 10 / real(m)
-        if((r<=0.e0) .or.(r>1.e0) ) r = 0.e0
-        randm = r
-
-!.......................................................................
-end FUNCTION randm
-
+end function randm
 
 
 subroutine oldreadlib(filnam)
@@ -2541,127 +2456,126 @@ subroutine oldreadlib(filnam)
 6  format(t31,i3)
 
 
-        if(openit(1, filnam, 'old', 'formatted', 'read') /= 0) then
-                write(*, '(a,a)') '>>>>>ERROR: Could not open library file ', &
-                trim(filnam)
-                return
-        end if
+   if(openit(1, filnam, 'old', 'formatted', 'read') /= 0) then
+     write(*, '(a,a)') '>>>>>ERROR: Could not open library file ', &
+       trim(filnam)
+     return
+   end if
 
-        write( * , '(/,a,a,/)') 'Reading molecular library ',trim(filnam)
-        write(*,1) 'name', 'atoms','net Q', 'bonds', 'Q-grps'
-        do irec = 1, 99999
-                call skip_comments(1)
-                READ(1, '(a80)') line
-                if(line=='end') exit
-                BACKSPACE(1)
-                nlibres = nlibres + 1
-                if(nlibres > max_entry) then
-                        write(*,*) 'ERROR: Too many library entries!'
-                        write(*,*) '(This problem may be solved by increasing max_entry.)'
-                        exit    
-                end if
-                ires = nlibres
+   write( * , '(/,a,a,/)') 'Reading molecular library ',trim(filnam)
+   write(*,1) 'name', 'atoms','net Q', 'bonds', 'Q-grps'
+   do irec = 1, 99999
+     call skip_comments(1)
+     read(1, '(a80)') line
+     if(line=='end') exit
+     backspace(1)
+     nlibres = nlibres + 1
+     if(nlibres > max_entry) then
+       write(*,*) 'ERROR: Too many library entries!'
+       write(*,*) '(This problem may be solved by increasing max_entry.)'
+       exit
+     end if
+     ires = nlibres
 
-! ---      Read entry name
+     ! ---      Read entry name
+     lib(nlibres)%SYBYLTYPE = '****'
+     lib(nlibres)%HETATM =.false. !don't use new feature
+     lib(nlibres)%solvent =.false. !don't use new feature
+     lib(nlibres)%density =0 !don't use new feature
+     read(1, '(a)') line
+     read(line, fmt=*, err=9, end=9) lib(nlibres)%nam, lib(nlibres)%SYBYLTYPE
+9    write( *, 2, advance='no') lib(nlibres)%nam
+     ! ---      Read no. of atoms, at. no., name, iac, charge
 
-                lib(nlibres)%SYBYLTYPE = '****'
-                lib(nlibres)%HETATM =.false. !don't use new feature
-                lib(nlibres)%solvent =.false. !don't use new feature
-                lib(nlibres)%density =0 !don't use new feature
-                read(1, '(a)') line
-                READ(line, fmt=*, err=9, end=9) lib(nlibres)%nam, lib(nlibres)%SYBYLTYPE
-9               write( *, 2, advance='no') lib(nlibres)%nam
-! ---      Read no. of atoms, at. no., name, iac, charge
+     read(1, * , iostat=stat) lib(nlibres)%nat
+     if (stat /= 0) then
+       write(*,*)
+       write(*,*) 'Incorrect input!'
+       return
+     endif
+     write(*,3, advance='no') lib(nlibres)%nat
 
-                READ(1, * , iostat=stat) lib(nlibres)%nat
-                if (stat /= 0) then
-                        write(*,*)
-                        write(*,*) 'Incorrect input!'
-                        return
-                endif
-                write(*,3, advance='no') lib(nlibres)%nat
-
-                allocate(atnam(lib(nlibres)%nat))
-                lib(nlibres)%atnam => atnam
+     allocate(atnam(lib(nlibres)%nat))
+     lib(nlibres)%atnam => atnam
                 
-                allocate(tac_lib(lib(nlibres)%nat))
-                lib(nlibres)%tac_lib => tac_lib
+     allocate(tac_lib(lib(nlibres)%nat))
+     lib(nlibres)%tac_lib => tac_lib
                 
-                allocate(crg_lib(lib(nlibres)%nat))
-                lib(nlibres)%crg_lib => crg_lib
+     allocate(crg_lib(lib(nlibres)%nat))
+     lib(nlibres)%crg_lib => crg_lib
 
-                qtot = 0
-                do i = 1, lib(nlibres)%nat
-                        READ(1, *) iat, lib(nlibres)%atnam(iat), lib(nlibres)%tac_lib(iat), &
-                                lib(nlibres)%crg_lib(iat)
-                        qtot = qtot + lib(nlibres)%crg_lib(iat)
-                enddo
-                write(*, 4, advance='no') qtot
-! ---      Read no. of bonds, bond list, tail/head connections
+     qtot = 0
+     do i = 1, lib(nlibres)%nat
+       read(1, *) iat, lib(nlibres)%atnam(iat), lib(nlibres)%tac_lib(iat), &
+         lib(nlibres)%crg_lib(iat)
+       qtot = qtot + lib(nlibres)%crg_lib(iat)
+     enddo
+     write(*, 4, advance='no') qtot
+     ! ---      Read no. of bonds, bond list, tail/head connections
 
-                READ(1, * ) lib(nlibres)%nbnd
-                allocate(bnd(lib(nlibres)%nbnd), stat=alloc_status)
-                lib(nlibres)%bnd => bnd
-                write(*, 5, advance='no') lib(nlibres)%nbnd
-                do i = 1, lib(nlibres)%nbnd
-                        READ(1, * ) lib(nlibres)%bnd(i)%i, lib(nlibres)%bnd(i)%j
-                enddo
+     read(1, * ) lib(nlibres)%nbnd
+     allocate(bnd(lib(nlibres)%nbnd), stat=alloc_status)
+     lib(nlibres)%bnd => bnd
+     write(*, 5, advance='no') lib(nlibres)%nbnd
+     do i = 1, lib(nlibres)%nbnd
+       read(1, * ) lib(nlibres)%bnd(i)%i, lib(nlibres)%bnd(i)%j
+     enddo
 
-                READ(1, * ) lib(nlibres)%head, lib(nlibres)%tail
+     read(1, * ) lib(nlibres)%head, lib(nlibres)%tail
 
-! ---      Read charge group info
+     ! ---      Read charge group info
 
-                READ(1, * ) lib(nlibres)%ncgp
-                write(*, 6) lib(nlibres)%ncgp
-                allocate(atcgp(max(max_atcgplib, lib(nlibres)%nat), lib(nlibres)%ncgp))
-                lib(nlibres)%atcgp => atcgp
-                allocate(natcgp(lib(nlibres)%ncgp), switch(lib(nlibres)%ncgp))
+     read(1, * ) lib(nlibres)%ncgp
+     write(*, 6) lib(nlibres)%ncgp
+     allocate(atcgp(max(max_atcgplib, lib(nlibres)%nat), lib(nlibres)%ncgp))
+     lib(nlibres)%atcgp => atcgp
+     allocate(natcgp(lib(nlibres)%ncgp), switch(lib(nlibres)%ncgp))
 
-                lib(nlibres)%natcgp => natcgp
-                lib(nlibres)%switch => switch
+     lib(nlibres)%natcgp => natcgp
+     lib(nlibres)%switch => switch
 
-                qtot_grp = 0.
-                ntot = 0
-                do i = 1, lib(nlibres)%ncgp
-                        READ(1, * ) lib(nlibres)%natcgp(i), lib(nlibres)%switch(i)
-                        ntot = ntot + lib(nlibres)%natcgp(i)
-                        READ(1, * )lib(nlibres)%atcgp(1:lib(nlibres)%natcgp(i), i)
-                        qgrp = 0
-                        do j = 1, lib(nlibres)%natcgp(i)
-                                !The Cray compiler doesn't like lib(nlibres)%crg_lib(lib(nlibres)%atcgp(j, i))
-                                igp = lib(nlibres)%atcgp(j, i)
-                                qgrp = qgrp + lib(nlibres)%crg_lib(igp)
-                        enddo
-                        !check fractional charges
-                        if(abs(qgrp - nint(qgrp) ) >0.000001)  then 
-                                write( *, 130) qgrp, i
-                        end if
-                        qtot_grp = qtot_grp + qgrp
-                enddo
-                !check total charge & atom count consistency
-                if(ntot /= lib(nlibres)%nat) then
-                        write(*, 150)
-                endif
-                if(abs(qtot - qtot_grp)  >0.000001) then
-                        write(*,160)
-                end if
-        enddo
-        close(1)
+     qtot_grp = 0.
+     ntot = 0
+     do i = 1, lib(nlibres)%ncgp
+       read(1, * ) lib(nlibres)%natcgp(i), lib(nlibres)%switch(i)
+       ntot = ntot + lib(nlibres)%natcgp(i)
+       read(1, * )lib(nlibres)%atcgp(1:lib(nlibres)%natcgp(i), i)
+       qgrp = 0
+       do j = 1, lib(nlibres)%natcgp(i)
+         !The Cray compiler doesn't like lib(nlibres)%crg_lib(lib(nlibres)%atcgp(j, i))
+         igp = lib(nlibres)%atcgp(j, i)
+         qgrp = qgrp + lib(nlibres)%crg_lib(igp)
+       enddo
+       !check fractional charges
+       if(abs(qgrp - nint(qgrp) ) >0.000001)  then
+         write( *, 130) qgrp, i
+       end if
+       qtot_grp = qtot_grp + qgrp
+     enddo
+     !check total charge & atom count consistency
+     if(ntot /= lib(nlibres)%nat) then
+       write(*, 150)
+     endif
+     if(abs(qtot - qtot_grp)  >0.000001) then
+       write(*,160)
+     end if
+   enddo
+   close(1)
 
-        write( *, 110) nlibres
+   write( *, 110) nlibres
 
 110 format(/,'Accumulated no. of library entries loaded =',i4,/)
 
 130 format('>>> Warning: fractional charge = ',f8.5, ' on group no.',i3)
-150     format('>>> ERROR: charge group atom count does not match total atom count!')
-160     format('>>> ERROR: Sum of charge group charges not equal to sum of all charges!')
+150 format('>>> ERROR: charge group atom count does not match total atom count!')
+160 format('>>> ERROR: Sum of charge group charges not equal to sum of all charges!')
 
-end subroutine oldreadlib
+ end subroutine oldreadlib
 
 
 !------------------------------------------------------------------------------!
 !!  subroutine: readlib
-!!
+!!  Read library files, known as topologies in other MD programs.
 !------------------------------------------------------------------------------!
 subroutine readlib(file)
   ! arguments
@@ -2710,7 +2624,7 @@ subroutine readlib(file)
 3 format(i7)
 4 format(f7.2)
 7 format(4x,a)
-  !.......................................................................
+
 
   res_count = 0
   if(present(file)) then
@@ -2798,12 +2712,12 @@ subroutine readlib(file)
     qtot = 0
     do i = 1, lib(nlibres)%nat
       prm_res = prm_get_line(line)
-      READ(line, *) iat
+      read(line, *) iat
       !Check numbering of atoms
       if (iat>lib(nlibres)%nat) then
         write(*,119) iat
       end if
-      READ(line, *) iat, lib(nlibres)%atnam(iat), lib(nlibres)%tac_lib(iat), &
+      read(line, *) iat, lib(nlibres)%atnam(iat), lib(nlibres)%tac_lib(iat), &
         lib(nlibres)%crg_lib(iat)
       if(.not. index_add(lib(nlibres)%atnam(iat), iat)) then
         !could not add - name duplication?
@@ -2929,7 +2843,7 @@ subroutine readlib(file)
       prm_res = prm_get_line(line)
       !note the order j,i,l,k used to conform with amber and charmm
       !parameter file conventions
-      READ(line, * ) lib(nlibres)%imp(i)%i, lib(nlibres)%imp(i)%j, &
+      read(line, * ) lib(nlibres)%imp(i)%i, lib(nlibres)%imp(i)%j, &
         lib(nlibres)%imp(i)%k, lib(nlibres)%imp(i)%l
     enddo
 
@@ -3046,14 +2960,14 @@ end subroutine check_overload
 !!
 !------------------------------------------------------------------------------!
 subroutine oldreadparm(flag)
-!  arguments
+  !  arguments
   logical flag
-! *** local variables
+  ! *** local variables
   integer i, ityp, filestat
   character(200)                   :: line
   character(len=KEYLENGTH)         :: taci, tacj, tack, tacl
   integer                          :: iaci, iacj, iack, iacl
-!.......................................................................
+
 
   !set default values for options which are not available in old param. file
   iuse_switch_atom = 1 !this is the default. It can be overridden
@@ -3077,10 +2991,10 @@ subroutine oldreadparm(flag)
   allocate(bnd_types(nbnd_prm), stat=alloc_status)
   call check_alloc('bond parameters')
   do i = 1, nbnd_prm
-          READ(2, *, err = 1000) iaci, iacj, bnd_prm(i)%prm%fk, bnd_prm(i)%prm%bnd0
-          bnd_types(i)%taci = tac(iaci)
-          bnd_types(i)%tacj = tac(iacj)
-          bnd_prm(i)%SYBYLtype = '1 ' !set to default
+    READ(2, *, err = 1000) iaci, iacj, bnd_prm(i)%prm%fk, bnd_prm(i)%prm%bnd0
+    bnd_types(i)%taci = tac(iaci)
+    bnd_types(i)%tacj = tac(iacj)
+    bnd_prm(i)%SYBYLtype = '1 ' !set to default
   enddo
   write( * , 110) nbnd_prm, 'bond types'
   CALL skip_comments(2)
@@ -3096,13 +3010,13 @@ subroutine oldreadparm(flag)
   ang_prm(:)%ureyfk = 0.
   ang_prm(:)%ureyr0 = 0.
   do i = 1, nang_prm
-          read(2, '(a80)', err=1010) line
-          read(line, *, iostat=filestat) iaci, iacj, iack, ang_prm(i)
-          ang_types(i)%taci = tac(iaci)
-          ang_types(i)%tacj = tac(iacj)
-          ang_types(i)%tack = tac(iack)
-          !accept missing parameters but not read error
-          if(filestat > 0) goto 1010
+    read(2, '(a80)', err=1010) line
+    read(line, *, iostat=filestat) iaci, iacj, iack, ang_prm(i)
+    ang_types(i)%taci = tac(iaci)
+    ang_types(i)%tacj = tac(iacj)
+    ang_types(i)%tack = tac(iack)
+    !accept missing parameters but not read error
+    if(filestat > 0) goto 1010
   enddo
   write( * , 110) nang_prm, 'angle types'
 
@@ -3116,11 +3030,11 @@ subroutine oldreadparm(flag)
   allocate(tor_types(ntor_prm), stat=alloc_status)
   call check_alloc('torsion parameters')
   do i = 1, ntor_prm
-          READ(2, *, err = 1020) iaci, iacj, iack, iacl, tor_prm(i)
-          tor_types(i)%taci = tac(iaci)
-          tor_types(i)%tacj = tac(iacj)
-          tor_types(i)%tack = tac(iack)
-          tor_types(i)%tacl = tac(iacl)
+    READ(2, *, err = 1020) iaci, iacj, iack, iacl, tor_prm(i)
+    tor_types(i)%taci = tac(iaci)
+    tor_types(i)%tacj = tac(iacj)
+    tor_types(i)%tack = tac(iack)
+    tor_types(i)%tacl = tac(iacl)
   enddo
   write(*, 110) ntor_prm, 'torsion types'
 
@@ -3132,11 +3046,11 @@ subroutine oldreadparm(flag)
   allocate(imp_prm(nimp_prm), stat=alloc_status)
   call check_alloc('improper parameters')
   do i = 1, nimp_prm
-          READ(2, *, err = 1030) iacj, iack, imp_prm(i)%prm
-          imp_prm(i)%taci = '' !not used
-          imp_prm(i)%tacj = tac(iacj)
-          imp_prm(i)%tack = tac(iack)
-          imp_prm(i)%tacl = '' !not used
+    READ(2, *, err = 1030) iacj, iack, imp_prm(i)%prm
+    imp_prm(i)%taci = '' !not used
+    imp_prm(i)%tacj = tac(iacj)
+    imp_prm(i)%tack = tac(iack)
+    imp_prm(i)%tacl = '' !not used
   enddo
   write( * , 110) nimp_prm, 'improper types'
 
@@ -3158,24 +3072,24 @@ subroutine oldreadparm(flag)
   allocate(tac(max_atyps))
   !clear atom type parameters
   do i=1,max_atyps
-          iaclib(i)%avdw(:) = 0.
-          iaclib(i)%bvdw(:) = 0.
-          iaclib(i)%mass = 0.
-          SYBYL_atom_type(i) = '     '
-          tac(i) = ''
+    iaclib(i)%avdw(:) = 0.
+    iaclib(i)%bvdw(:) = 0.
+    iaclib(i)%mass = 0.
+    SYBYL_atom_type(i) = '     '
+    tac(i) = ''
   end do
 
   call index_create(natyps)
   do i = 1, natyps
-          READ(2, *, err = 1040) ityp, iaclib(ityp)%avdw(1), iaclib(ityp)%avdw(2), &
-                  iaclib(ityp)%bvdw(1), iaclib(ityp)%avdw(3), iaclib(ityp)%bvdw(3), &
-                  iaclib(ityp)%mass
-          iaclib(ityp)%bvdw(2) = iaclib(ityp)%bvdw(1)
-          write(taci,'(i4)') ityp
-          tac(ityp) = adjustl(taci)
-          if(.not. index_add(tac(ityp), ityp)) then
-                  write(*,130) tac(i)
-          end if
+    READ(2, *, err = 1040) ityp, iaclib(ityp)%avdw(1), iaclib(ityp)%avdw(2), &
+      iaclib(ityp)%bvdw(1), iaclib(ityp)%avdw(3), iaclib(ityp)%bvdw(3), &
+      iaclib(ityp)%mass
+    iaclib(ityp)%bvdw(2) = iaclib(ityp)%bvdw(1)
+    write(taci,'(i4)') ityp
+    tac(ityp) = adjustl(taci)
+    if(.not. index_add(tac(ityp), ityp)) then
+      write(*,130) tac(i)
+    end if
   enddo
   write( * , 110) natyps, 'atom types'
 
@@ -3186,43 +3100,42 @@ subroutine oldreadparm(flag)
   if(allocated(lj2)) deallocate(lj2)
   allocate(lj2(nlj2)) 
   do i = 1, nlj2
-  READ(2, *, err = 1050) lj2(i)%i, lj2(i)%j
+    READ(2, *, err = 1050) lj2(i)%i, lj2(i)%j
   enddo
   write( * , 110) nlj2, 'LJ type 2 pairs'
 
   write( * , '(a,/)') 'Force field parameters successfully read.'
   return
 
-  110 format ('Read ',i4,' ', a)
-  120 format ('>>> ERROR: Failed to read ',a,' number ',i4)
-  130 format ('>>> ERROR: Could not enumerate atom type ',a, '. Duplicate name?')
+110 format ('Read ',i4,' ', a)
+120 format ('>>> ERROR: Failed to read ',a,' number ',i4)
+130 format ('>>> ERROR: Could not enumerate atom type ',a, '. Duplicate name?')
 
- 1000 write( * , 120) 'bond type', i
-        flag = .false.
-        return
+1000 write( * , 120) 'bond type', i
+  flag = .false.
+  return
 
- 1010 write( * , 120) 'angle type', i
-        flag = .false.
-        return
+1010 write( * , 120) 'angle type', i
+  flag = .false.
+  return
 
- 1020 write( * , 120) 'torsion type', i
-        flag = .false.
-        return
+1020 write( * , 120) 'torsion type', i
+  flag = .false.
+  return
 
- 1030 write( * , 120) 'improper type', i
-        flag = .false.
-        return
+1030 write( * , 120) 'improper type', i
+  flag = .false.
+  return
 
- 1040 write( * , 120) 'atom type', i
-        flag = .false.
-        return
+1040 write( * , 120) 'atom type', i
+  flag = .false.
+  return
 
- 1050 write( * , 120) 'LJ type 2 pair', i
-        flag = .false.
-        return
+1050 write( * , 120) 'LJ type 2 pair', i
+  flag = .false.
+  return
 
 end subroutine oldreadparm
-
 
 
 !------------------------------------------------------------------------------!
@@ -3231,32 +3144,32 @@ end subroutine oldreadparm
 !------------------------------------------------------------------------------!
 subroutine readff
   !read parameters
-        if(.not.have_prm_file_name) then
-                call get_string_arg(prm_file, '-----> Name of FF parameter file: ')
-                have_prm_file_name = .true.
-        endif
-        inquire(file=prm_file, exist=have_prm_file_name)
-        if(.not. have_prm_file_name) then
-                write(*,10) trim(prm_file)
-                return
-        end if
-10      format('>>>>> ERROR: ',a,' does not exist.')
-        if(.not. prm_open(prm_file)) then
-                !if reading fails try old format
-                write(*,'(a)') '>>>>>WARNING: Attempting to read old-style parameter file.'
-                if(openit(2, prm_file, 'old', 'formatted', 'read') /= 0) return
-                CALL oldreadparm(ff_ok)
-                close(2)
-        else
-                call readparm(prm_file) !this will set global flag topo_ok
-                call prm_close
-        end if
+  if(.not.have_prm_file_name) then
+    call get_string_arg(prm_file, '-----> Name of FF parameter file: ')
+    have_prm_file_name = .true.
+  endif
+  inquire(file=prm_file, exist=have_prm_file_name)
+  if(.not. have_prm_file_name) then
+    write(*,10) trim(prm_file)
+    return
+  end if
+10 format('>>>>> ERROR: ',a,' does not exist.')
+  if(.not. prm_open(prm_file)) then
+    !if reading fails try old format
+    write(*,'(a)') '>>>>>WARNING: Attempting to read old-style parameter file.'
+    if(openit(2, prm_file, 'old', 'formatted', 'read') /= 0) return
+    CALL oldreadparm(ff_ok)
+    close(2)
+  else
+    call readparm(prm_file) !this will set global flag topo_ok
+    call prm_close
+  end if
 end subroutine readff
 
 
 !------------------------------------------------------------------------------!
 !!  subroutine: readparm
-!
+!!
 !------------------------------------------------------------------------------!
 subroutine readparm(filnam) 
 ! arguments
@@ -3277,474 +3190,474 @@ subroutine readparm(filnam)
   type(TORLIB_TYPE)                 :: tor_prm_tmp
 !.......................................................................
   ff_ok = .false.
+
+  write(*,10)
+10 format(/,'Reading force field parameter file.')
+  !parameter file is opened by maketop
+  if(.not. prm_open_section('options')) then
+    write(*,*) '>>> WARNING: Options section not found in parameter file.'
+    write(*,*) '    Trying to read old style parameter file:'
+    call prm_close()
+    if(openit(2, filnam, 'old', 'formatted', 'read') /= 0) return
+    CALL oldreadparm(ff_ok)
+    close(2)
+    return
+  end if
+
+  if(prm_get_string_by_key('name', forcefield)) then
+    write(*, 20) trim(forcefield)
+  end if
+20 format('Forcefield name:',t32,a)
+
+  if(.not. prm_get_string_by_key('type', line)) then
+    !also accept the keyword force_field for the same purpose
+    ldummy = prm_get_string_by_key('force_field', line, 'GROMOS')
+  end if
+  call upcase(line)
+  write(*, 22) trim(line)
+  select case (line)
+    case('GROMOS')
+      ff_type = FF_GROMOS
+    case('AMBER')
+      ff_type = FF_AMBER
+    case('CHARMM')
+      ff_type = FF_CHARMM
+    case default
+      write(*,24)
+      return
+  end select
+
+22 format('Forcefield type:',t32,a)
+24 format('>>>>> ERROR: forcefield type must be one of GROMOS, AMBER, CHARMM')
+
+  if(.not. prm_get_string_by_key('vdw_rule', line)) then
+    write(*,*) '>>> ERROR: vdw_rule in options section not found in parameter file.'
+    return
+  end if
         
-    write(*,10) 
-10  format(/,'Reading force field parameter file.')
-!parameter file is opened by maketop 
-        if(.not. prm_open_section('options')) then
-                write(*,*) '>>> WARNING: Options section not found in parameter file.'
-                write(*,*) '    Trying to read old style parameter file:'
-                call prm_close()
-                if(openit(2, filnam, 'old', 'formatted', 'read') /= 0) return
-                CALL oldreadparm(ff_ok)
-                close(2)
-                return
-        end if
+  call upcase(line)
+  write(*,30) trim(line)
+30 format('Lennard-Jones combination rule:',t32,a)
 
-        if(prm_get_string_by_key('name', forcefield)) then
-                write(*, 20) trim(forcefield)
-        end if
-20      format('Forcefield name:',t32,a)
-
-        if(.not. prm_get_string_by_key('type', line)) then
-                !also accept the keyword force_field for the same purpose
-                ldummy = prm_get_string_by_key('force_field', line, 'GROMOS')   
-        end if
-        call upcase(line)
-        write(*, 22) trim(line)
-        select case (line)
-        case('GROMOS')
-                ff_type = FF_GROMOS
-        case('AMBER')
-                ff_type = FF_AMBER
-        case('CHARMM')
-                ff_type = FF_CHARMM
-        case default
-                write(*,24)
-                return
-        end select
-
-22      format('Forcefield type:',t32,a)
-24      format('>>>>> ERROR: forcefield type must be one of GROMOS, AMBER, CHARMM')
-
-        if(.not. prm_get_string_by_key('vdw_rule', line)) then
-                write(*,*) '>>> ERROR: vdw_rule in options section not found in parameter file.'
-                return
-        end if
+  if(line(1:9) == 'GEOMETRIC') then
+    ivdw_rule = 1
+  else if(line(1:10) == 'ARITHMETIC') then
+    ivdw_rule = 2
+  else
+    write(*,*) '>>> ERROR: vdw_rule must be geometric or arithmetic.'
+    return
+  end if
         
-        call upcase(line)
-        write(*,30) trim(line)
-30      format('Lennard-Jones combination rule:',t32,a)
+  if(.not. prm_get_real_by_key('scale_14', rdummy)) then
+    write(*,*) '>>> ERROR: scale_14 in options section not found in parameter file.'
+    return
+  end if
+  el14_scale = real(rdummy,8)
+  write(*,40) el14_scale
+40 format('Scaling of 1-4 electrostatics:',t31,f6.3)
 
-        if(line(1:9) == 'GEOMETRIC') then
-                ivdw_rule = 1
-        else if(line(1:10) == 'ARITHMETIC') then
-                ivdw_rule = 2
-        else
-                write(*,*) '>>> ERROR: vdw_rule must be geometric or arithmetic.'
-                return
-        end if
+  if(prm_get_logical_by_key('switch_atoms', ldummy)) then
+    if(ldummy) then
+      iuse_switch_atom = 1
+      write(*,50) 'switching atoms'
+    else
+      iuse_switch_atom = 0
+      write(*,50) 'any atoms'
+    end if
+  else
+    iuse_switch_atom = 1 !default
+    write(*,50) 'switching atoms'
+  end if
+50 format('Cut-off rule:',t32,a)
+
+  !read improper potential type (harmonic (default) or periodic)
+  ldummy = prm_get_string_by_key('improper_potential', line, 'HARMONIC')
+  call upcase(line)
+  write(*,60) trim(line)
+60 format('Improper potential:',t32,a)
+
+  if(line == 'HARMONIC') then
+    imp_type = 1
+  else if(line == 'PERIODIC') then
+    imp_type = 2
+  else
+    write(*,*) '>>> ERROR: improper_potential must be harmonic or periodic.'
+    return
+  end if
+
+  !read improper definition scheme (automatic (default) or explicit)
+  ldummy = prm_get_string_by_key('improper_definition', line, 'AUTOMATIC')
+  call upcase(line)
+  write(*,70) trim(line)
+70 format('Improper generation:',t32,a)
+  if(line == 'AUTOMATIC') then
+    imp_explicit = .false.
+  else if(line == 'EXPLICIT') then
+    imp_explicit = .true.
+  else
+    write(*,*) '>>> ERROR: improper_definition must be automatic or explicit.'
+    return
+  end if
+
+  if(.not. prm_get_real_by_key('coulomb_constant', rdummy)) then
+    print '(a)', 'Coulomb constant is set to the default value of 332.'
+    !write(*,*) 'Coulomb constant is set to the default value of 332.'
+    coulomb_constant = 332.0
+  else
+    coulomb_constant = real(rdummy,8)
+    write(*,80) coulomb_constant
+  end if
+80 format('Coulomb constant:',t32,f8.4)
+
+  section = 'atom_types'
+  natyps = prm_count(section)
+  if(natyps == 0) then
+    write(*,*) '>>> ERROR: No atom_types defined.'
+    return
+  end if
+  !if no PDB file read (blank topology)
+  if(allocated(iaclib)) deallocate(iaclib)
+  allocate(iaclib(natyps))
+  if(allocated(SYBYL_atom_type)) deallocate(SYBYL_atom_type)
+  allocate(SYBYL_atom_type(natyps))
+  if(allocated(tac)) deallocate(tac)
+  allocate(tac(natyps))
+  !clear atom type parameters
+  do i=1,natyps
+    iaclib(i)%avdw(:) = 0.
+    iaclib(i)%bvdw(:) = 0.
+    iaclib(i)%mass = 0.
+    SYBYL_atom_type(i) = '     '
+    tac(i) = ''
+  end do
+  !change number of atom types in topology
+  max_atyps = natyps
         
-        if(.not. prm_get_real_by_key('scale_14', rdummy)) then
-                write(*,*) '>>> ERROR: scale_14 in options section not found in parameter file.'
-                return
-        end if
-        el14_scale = real(rdummy,8)
-        write(*,40) el14_scale
-40      format('Scaling of 1-4 electrostatics:',t31,f6.3)
+  !initialize atom type lookup table
+  call index_create(natyps)
 
-        if(prm_get_logical_by_key('switch_atoms', ldummy)) then
-                if(ldummy) then 
-                        iuse_switch_atom = 1
-                        write(*,50) 'switching atoms'
-                else
-                        iuse_switch_atom = 0
-                        write(*,50) 'any atoms'
-                end if
-        else
-                iuse_switch_atom = 1 !default
-                write(*,50) 'switching atoms'
-        end if
-50      format('Cut-off rule:',t32,a)   
+  do i = 1, natyps
+    if(.not. prm_get_line(line)) goto 1040
+    !Name Ai Bi Ci ai Ai(1-4) Bi(1-4) Mass
+    ! tac(i)  avdw(1)   avdw(2)  bvdw(1)  avdw(3) bvdw(3) mass SYBYL_atom_type(i)
+    READ(line, *, iostat=j) tac(i), iaclib(i)%avdw(1), iaclib(i)%avdw(2), &
+      iaclib(i)%bvdw(1), iaclib(i)%avdw(3), &
+      iaclib(i)%bvdw(3), iaclib(i)%mass, SYBYL_atom_type(i)
+    iaclib(i)%bvdw(2) = iaclib(i)%bvdw(1)
+    if(j > 0) goto 1040
+    if(j < 0) SYBYL_warn = .true.
+    if(.not. index_add(tac(i), i)) then
+      write(*,130) tac(i)
+    end if
+  enddo
+  write( * , 110) natyps, 'atom types'
+  if(SYBYL_warn) write(*,'(a)') &
+    '>>>>> WARNING: No SYBYL name for one or more atom types.'
+  SYBYL_warn = .false. !reset
 
-        !read improper potential type (harmonic (default) or periodic)
-        ldummy = prm_get_string_by_key('improper_potential', line, 'HARMONIC')
-        call upcase(line)
-        write(*,60) trim(line)
-60      format('Improper potential:',t32,a)
+  section = 'atom_aliases'
+  naliases = prm_count(section)
+  if(naliases > 0) call index_resize(natyps+naliases)
+  do i = 1, naliases
+    if(.not. prm_get_string_string(taci, tacj)) then
+      goto 1060
+    !make tac1 an alias for tac2
+    elseif(.not. index_alias(taci, tacj)) then
+      write(*,140) i, trim(section), tacj
+      goto 1060
+    end if
+  end do
+  write( * , 110) naliases, 'atom type alias names'
 
-        if(line == 'HARMONIC') then
-                imp_type = 1
-        else if(line == 'PERIODIC') then
-                imp_type = 2
-        else
-                write(*,*) '>>> ERROR: improper_potential must be harmonic or periodic.'
-                return
-        end if
+  j = 0
+  do i = 1, natyps
+    if(.not. index_get(tac(i), ityp)) then
+      write(*,'(a,a,a)') 'ERROR: Failed to retrieve atom type ' , tac(i), ' from index.'
+    else
+      j = j + 1
+    end if
+  end do
 
-        !read improper definition scheme (automatic (default) or explicit)
-        ldummy = prm_get_string_by_key('improper_definition', line, 'AUTOMATIC')
-        call upcase(line)
-        write(*,70) trim(line)
-70      format('Improper generation:',t32,a)
-        if(line == 'AUTOMATIC') then
-                imp_explicit = .false.
-        else if(line == 'EXPLICIT') then
-                imp_explicit = .true.
-        else
-                write(*,*) '>>> ERROR: improper_definition must be automatic or explicit.'
-                return
-        end if
+  if(j<natyps) then
+    write(*,*) '>>>>> ERROR: Bug in indexer, not all atom types found.'
+    call prm_close
+    return
+  end if
 
-        if(.not. prm_get_real_by_key('coulomb_constant', rdummy)) then
-          print '(a)', 'Coulomb constant is set to the default value of 332.'
-          !write(*,*) 'Coulomb constant is set to the default value of 332.'
-          coulomb_constant = 332.0
-        else 
-                coulomb_constant = real(rdummy,8)
-                write(*,80) coulomb_constant
-        end if
-80      format('Coulomb constant:',t32,f8.4)
+  section = 'LJ_type2_pairs'
+  nlj2 = prm_count(section)
+  if(allocated(lj2)) deallocate(lj2)
+  allocate(lj2(nlj2))
+  do i = 1, nlj2
+    if(.not. prm_get_string_string(taci, tacj)) goto 1050
+    if(.not. index_get(taci, iaci)) then
+      write(*,140) i, trim(section), taci
+      goto 1050
+    end if
+    lj2(i)%i = iaci
+    if(.not. index_get(tacj, iacj)) then
+      write(*,140) i, trim(section), tacj
+      goto 1050
+    end if
+    lj2(i)%j = iacj
+  enddo
+  write( * , 110) nlj2, 'LJ type 2 pairs'
 
-        section = 'atom_types'
-        natyps = prm_count(section) 
-        if(natyps == 0) then
-                write(*,*) '>>> ERROR: No atom_types defined.'
-                return
-        end if
-        !if no PDB file read (blank topology)
-        if(allocated(iaclib)) deallocate(iaclib) 
-        allocate(iaclib(natyps)) 
-        if(allocated(SYBYL_atom_type)) deallocate(SYBYL_atom_type)
-        allocate(SYBYL_atom_type(natyps)) 
-        if(allocated(tac)) deallocate(tac)
-        allocate(tac(natyps))
-        !clear atom type parameters
-        do i=1,natyps
-                iaclib(i)%avdw(:) = 0.
-                iaclib(i)%bvdw(:) = 0.
-                iaclib(i)%mass = 0.
-                SYBYL_atom_type(i) = '     '
-                tac(i) = ''
-        end do
-        !change number of atom types in topology
-        max_atyps = natyps
+
+  section = 'bonds'
+  nbnd_types = prm_count(section)
+  nbnd_prm = 0 !will accumulate this while reading
+
+  if(allocated(bnd_prm)) deallocate(bnd_prm)
+  if(allocated(bnd_types)) deallocate(bnd_types)
+  allocate(bnd_prm(nbnd_types), stat=alloc_status)
+  allocate(bnd_types(nbnd_types), stat=alloc_status)
+  call check_alloc('bond parameters')
         
-        !initialize atom type lookup table
-        call index_create(natyps)
-
-        do i = 1, natyps
-                if(.not. prm_get_line(line)) goto 1040
-                !Name Ai Bi Ci ai Ai(1-4) Bi(1-4) Mass
-                ! tac(i)  avdw(1)   avdw(2)  bvdw(1)  avdw(3) bvdw(3) mass SYBYL_atom_type(i)
-                READ(line, *, iostat=j) tac(i), iaclib(i)%avdw(1), iaclib(i)%avdw(2), &
-                        iaclib(i)%bvdw(1), iaclib(i)%avdw(3), &
-                        iaclib(i)%bvdw(3), iaclib(i)%mass, SYBYL_atom_type(i)
-                iaclib(i)%bvdw(2) = iaclib(i)%bvdw(1)
-                if(j > 0) goto 1040
-                if(j < 0) SYBYL_warn = .true.
-                if(.not. index_add(tac(i), i)) then
-                        write(*,130) tac(i)
-                end if
-        enddo
-        write( * , 110) natyps, 'atom types'
-        if(SYBYL_warn) write(*,'(a)') &
-                '>>>>> WARNING: No SYBYL name for one or more atom types.'
-        SYBYL_warn = .false. !reset
-
-        section = 'atom_aliases'
-        naliases = prm_count(section)
-        if(naliases > 0) call index_resize(natyps+naliases)
-        do i = 1, naliases
-                if(.not. prm_get_string_string(taci, tacj)) then
-                        goto 1060
-                !make tac1 an alias for tac2
-                elseif(.not. index_alias(taci, tacj)) then
-                        write(*,140) i, trim(section), tacj
-                        goto 1060
-                end if
-        end do
-        write( * , 110) naliases, 'atom type alias names'
-
-        j = 0
-        do i = 1, natyps
-                if(.not. index_get(tac(i), ityp)) then
-                        write(*,'(a,a,a)') 'ERROR: Failed to retrieve atom type ' , tac(i), ' from index.'
-                else
-                        j = j + 1
-                end if
-        end do
-
-        if(j<natyps) then
-                write(*,*) '>>>>> ERROR: Bug in indexer, not all atom types found.'
-                call prm_close
-                return
-        end if
-
-        section = 'LJ_type2_pairs'
-        nlj2 = prm_count(section) 
-        if(allocated(lj2)) deallocate(lj2)
-        allocate(lj2(nlj2)) 
-        do i = 1, nlj2
-                if(.not. prm_get_string_string(taci, tacj)) goto 1050
-                if(.not. index_get(taci, iaci)) then
-                        write(*,140) i, trim(section), taci
-                        goto 1050
-                end if
-                lj2(i)%i = iaci
-                if(.not. index_get(tacj, iacj)) then
-                        write(*,140) i, trim(section), tacj
-                        goto 1050
-                end if
-                lj2(i)%j = iacj
-        enddo
-        write( * , 110) nlj2, 'LJ type 2 pairs'
+  bnd_prm_tmp%SYBYLtype = '   '
 
 
-        section = 'bonds'
-        nbnd_types = prm_count(section) 
-        nbnd_prm = 0 !will accumulate this while reading
 
-        if(allocated(bnd_prm)) deallocate(bnd_prm)
-        if(allocated(bnd_types)) deallocate(bnd_types)
-        allocate(bnd_prm(nbnd_types), stat=alloc_status)
-        allocate(bnd_types(nbnd_types), stat=alloc_status)
-        call check_alloc('bond parameters')
+
+  bondloop: do i = 1, nbnd_types
+
+    if(.not. prm_get_line(line)) goto 1000
+    read(line, *, iostat=j) taci, tacj, bnd_prm_tmp
+    if(j>0) goto 1000
+    if(j<0) SYBYL_warn = .true.
+    if(.not. index_get(taci, iaci)) then
+      write(*,140) i, trim(section), taci
+      goto 1060
+    end if
+    if(.not. index_get(tacj, iacj)) then
+      write(*,140) i, trim(section), tacj
+      goto 1060
+    end if
+    !make sure to expand any aliases
+    bnd_types(i)%taci = tac(iaci)
+    bnd_types(i)%tacj = tac(iacj)
+    do j = 1, nbnd_prm
+      if(bnd_prm(j)%prm%fk == bnd_prm_tmp%prm%fk .and. bnd_prm(j)%prm%bnd0 == bnd_prm_tmp%prm%bnd0) then
+        bnd_types(i)%cod = j
+        cycle bondloop !skip to next
+      endif
+    end do
+    nbnd_prm = nbnd_prm + 1
+    bnd_prm(nbnd_prm) = bnd_prm_tmp
+    bnd_types(i)%cod = nbnd_prm
+  end do bondloop
+  write( * , 110) nbnd_types, 'bond types'
+  write( * , 110) nbnd_prm, 'unique bond parameters'
+  if(SYBYL_warn) write(*,'(a)') &
+    '>>>>> WARNING: No SYBYL bond type for one or more bond types.'
+  SYBYL_warn = .false. !reset
+
+  section = 'angles'
+  nang_types = prm_count(section)
+  nang_prm = 0 !accumulate unique parameters while reading
+  if(nang_types == 0) then
+    write(*,*) '>>> ERROR: Angles section not found in parameter file.'
+    return
+  end if
+  if(allocated(ang_prm)) deallocate(ang_prm)
+  allocate(ang_prm(nang_types), stat=alloc_status)
+  if(allocated(ang_types)) deallocate(ang_types)
+  allocate(ang_types(nang_types), stat=alloc_status)
+  call check_alloc('angle parameters')
+  !set optional parameters to 0.
+  ang_prm(:)%ureyfk = 0.
+  ang_prm(:)%ureyr0 = 0.
+  !need to set optional parameters to 0 in ang_prm_tmp, above has no effect (???)
+  ang_prm_tmp%ureyfk = 0.
+  ang_prm_tmp%ureyr0 = 0.
+
+  angloop:do i = 1, nang_types
+    if(.not. prm_get_line(line)) goto 1010
+    read(line, *, iostat=j) taci, tacj, tack, ang_prm_tmp
+    !accept missing parameters but not read error
+    if(j > 0) goto 1060
+    if(.not. index_get(taci, iaci)) then
+      write(*,140) i, trim(section), taci
+      goto 1060
+    end if
+    if(.not. index_get(tacj, iacj)) then
+      write(*,140) i, trim(section), tacj
+      goto 1060
+    end if
+    if(.not. index_get(tack, iack)) then
+      write(*,140) i, trim(section), tack
+      goto 1060
+    end if
+    !make sure to expand any aliases
+    ang_types(i)%taci = tac(iaci)
+    ang_types(i)%tacj = tac(iacj)
+    ang_types(i)%tack = tac(iack)
+    do j = 1, nang_prm
+      if(ang_prm(j)%fk == ang_prm_tmp%fk .and. &
+        ang_prm(j)%ang0 == ang_prm_tmp%ang0 .and. &
+        ang_prm(j)%ureyfk == ang_prm_tmp%ureyfk .and. &
+        ang_prm(j)%ureyr0 == ang_prm_tmp%ureyr0) then
+        ang_types(i)%cod = j
+        cycle angloop !skip to next
+      endif
+    end do
+    nang_prm = nang_prm + 1
+    ang_prm(nang_prm) = ang_prm_tmp
+    ang_types(i)%cod = nang_prm
+  end do angloop
+  write( * , 110) nang_types, 'angle types'
+  write( * , 110) nang_prm, ' unique angle parameters'
         
-        bnd_prm_tmp%SYBYLtype = '   '
-
-
-
-
-bondloop: do i = 1, nbnd_types
-
-                if(.not. prm_get_line(line)) goto 1000
-                read(line, *, iostat=j) taci, tacj, bnd_prm_tmp
-                if(j>0) goto 1000
-                if(j<0) SYBYL_warn = .true.
-                if(.not. index_get(taci, iaci)) then
-                        write(*,140) i, trim(section), taci
-                        goto 1060
-                end if
-                if(.not. index_get(tacj, iacj)) then
-                        write(*,140) i, trim(section), tacj
-                        goto 1060
-                end if
-                !make sure to expand any aliases
-                bnd_types(i)%taci = tac(iaci)
-                bnd_types(i)%tacj = tac(iacj)
-                do j = 1, nbnd_prm
-                        if(bnd_prm(j)%prm%fk == bnd_prm_tmp%prm%fk .and. bnd_prm(j)%prm%bnd0 == bnd_prm_tmp%prm%bnd0) then
-                                bnd_types(i)%cod = j
-                                cycle bondloop !skip to next
-                        endif
-                end do
-                nbnd_prm = nbnd_prm + 1
-                bnd_prm(nbnd_prm) = bnd_prm_tmp
-                bnd_types(i)%cod = nbnd_prm
-        end do bondloop
-        write( * , 110) nbnd_types, 'bond types'
-        write( * , 110) nbnd_prm, 'unique bond parameters'
-        if(SYBYL_warn) write(*,'(a)') &
-                '>>>>> WARNING: No SYBYL bond type for one or more bond types.'
-        SYBYL_warn = .false. !reset
-
-        section = 'angles'
-        nang_types = prm_count(section) 
-        nang_prm = 0 !accumulate unique parameters while reading
-        if(nang_types == 0) then
-                write(*,*) '>>> ERROR: Angles section not found in parameter file.'
-                return
-        end if
-        if(allocated(ang_prm)) deallocate(ang_prm)
-        allocate(ang_prm(nang_types), stat=alloc_status)
-        if(allocated(ang_types)) deallocate(ang_types)
-        allocate(ang_types(nang_types), stat=alloc_status)
-        call check_alloc('angle parameters')
-        !set optional parameters to 0.
-        ang_prm(:)%ureyfk = 0.
-        ang_prm(:)%ureyr0 = 0.
-        !need to set optional parameters to 0 in ang_prm_tmp, above has no effect (???)
-        ang_prm_tmp%ureyfk = 0.
-        ang_prm_tmp%ureyr0 = 0.
-
-angloop:do i = 1, nang_types
-                if(.not. prm_get_line(line)) goto 1010
-                read(line, *, iostat=j) taci, tacj, tack, ang_prm_tmp
-                !accept missing parameters but not read error
-                if(j > 0) goto 1060
-                if(.not. index_get(taci, iaci)) then
-                        write(*,140) i, trim(section), taci
-                        goto 1060
-                end if
-                if(.not. index_get(tacj, iacj)) then
-                        write(*,140) i, trim(section), tacj
-                        goto 1060
-                end if
-                if(.not. index_get(tack, iack)) then
-                        write(*,140) i, trim(section), tack
-                        goto 1060
-                end if
-                !make sure to expand any aliases
-                ang_types(i)%taci = tac(iaci)
-                ang_types(i)%tacj = tac(iacj)
-                ang_types(i)%tack = tac(iack)
-                do j = 1, nang_prm
-                        if(ang_prm(j)%fk == ang_prm_tmp%fk .and. & 
-                                ang_prm(j)%ang0 == ang_prm_tmp%ang0 .and. &
-                                ang_prm(j)%ureyfk == ang_prm_tmp%ureyfk .and. &
-                                ang_prm(j)%ureyr0 == ang_prm_tmp%ureyr0) then
-                                ang_types(i)%cod = j
-                                cycle angloop !skip to next
-                        endif
-                end do
-                nang_prm = nang_prm + 1
-                ang_prm(nang_prm) = ang_prm_tmp
-                ang_types(i)%cod = nang_prm
-        end do angloop
-        write( * , 110) nang_types, 'angle types'
-        write( * , 110) nang_prm, ' unique angle parameters'
-        
-        section = 'torsions'
-        ntor_types = prm_count(section) 
-        ntor_prm = 0 !accumulate unique parameters while reading
-        if(ntor_types == 0) then
-                write(*,*) '>>> ERROR: Torsions section not found in parameter file.'
-                return
-        end if
-        if(allocated(tor_prm)) deallocate(tor_prm)
-        allocate(tor_prm(ntor_types), stat=alloc_status)
-        if(allocated(tor_types)) deallocate(tor_types)
-        allocate(tor_types(ntor_types), stat=alloc_status)
-        call check_alloc('torsion parameters')
-torloop: do i = 1, ntor_types
-                if(.not. prm_get_line(line)) goto 1020
-                read(line, *, err = 1020) taci, tacj, tack, tacl, tor_prm_tmp
-                if(index_get(taci, iaci, allow_wildcard=.true.)) then
-                        if(iaci > 0) then
-                                tor_types(i)%taci = tac(iaci)
-                        else
-                                !wildcard found
-                                tor_types(i)%taci = ''
-                        endif
-                else
-                        !atom type not found and not a wildcard => error
-                        write(*,140) i, trim(section), taci
-                        goto 1060
-                end if
-                if(index_get(tacj, iacj, allow_wildcard=.true.)) then
-                        if(iacj > 0) then
-                                tor_types(i)%tacj = tac(iacj)
-                        else
-                                tor_types(i)%tacj = ''
-                        endif
-                else
-                        write(*,140) i, trim(section), tacj
-                        goto 1060
-                end if
-                if(index_get(tack, iack, allow_wildcard=.true.)) then
-                        if(iack > 0) then
-                                tor_types(i)%tack = tac(iack)
-                        else
-                                tor_types(i)%tack = ''
-                        endif
-                else
-                        write(*,140) i, trim(section), tack
-                        goto 1060
-                end if
-                if(index_get(tacl, iacl, allow_wildcard=.true.)) then
-                        if(iacl > 0 ) then
-                                tor_types(i)%tacl = tac(iacl)
-                        else
-                                tor_types(i)%tacl = ''
-                        endif
-                else
-                        !this field may be 0
-                        tor_types(i)%tacl = ''
-                end if
-                do j = 1, ntor_prm
-                        if(tor_prm(j)%fk == tor_prm_tmp%fk .and. & 
-                                tor_prm(j)%rmult == tor_prm_tmp%rmult .and. &
-                                tor_prm(j)%deltor == tor_prm_tmp%deltor .and. &
-                                tor_prm(j)%paths == tor_prm_tmp%paths) then
-                                tor_types(i)%cod = j
-                                cycle torloop !skip to next
-                        endif
-                end do
-                ntor_prm = ntor_prm + 1
-                tor_prm(ntor_prm) = tor_prm_tmp
-                tor_types(i)%cod = ntor_prm
+  section = 'torsions'
+  ntor_types = prm_count(section)
+  ntor_prm = 0 !accumulate unique parameters while reading
+  if(ntor_types == 0) then
+    write(*,*) '>>> ERROR: Torsions section not found in parameter file.'
+    return
+  end if
+  if(allocated(tor_prm)) deallocate(tor_prm)
+  allocate(tor_prm(ntor_types), stat=alloc_status)
+  if(allocated(tor_types)) deallocate(tor_types)
+  allocate(tor_types(ntor_types), stat=alloc_status)
+  call check_alloc('torsion parameters')
+  torloop: do i = 1, ntor_types
+    if(.not. prm_get_line(line)) goto 1020
+    read(line, *, err = 1020) taci, tacj, tack, tacl, tor_prm_tmp
+    if(index_get(taci, iaci, allow_wildcard=.true.)) then
+      if(iaci > 0) then
+        tor_types(i)%taci = tac(iaci)
+      else
+        !wildcard found
+        tor_types(i)%taci = ''
+      endif
+    else
+      !atom type not found and not a wildcard => error
+      write(*,140) i, trim(section), taci
+      goto 1060
+    end if
+    if(index_get(tacj, iacj, allow_wildcard=.true.)) then
+      if(iacj > 0) then
+        tor_types(i)%tacj = tac(iacj)
+      else
+        tor_types(i)%tacj = ''
+      endif
+    else
+      write(*,140) i, trim(section), tacj
+      goto 1060
+    end if
+    if(index_get(tack, iack, allow_wildcard=.true.)) then
+      if(iack > 0) then
+        tor_types(i)%tack = tac(iack)
+      else
+        tor_types(i)%tack = ''
+      endif
+    else
+      write(*,140) i, trim(section), tack
+      goto 1060
+    end if
+    if(index_get(tacl, iacl, allow_wildcard=.true.)) then
+      if(iacl > 0 ) then
+        tor_types(i)%tacl = tac(iacl)
+      else
+        tor_types(i)%tacl = ''
+      endif
+    else
+      !this field may be 0
+      tor_types(i)%tacl = ''
+    end if
+    do j = 1, ntor_prm
+      if(tor_prm(j)%fk == tor_prm_tmp%fk .and. &
+        tor_prm(j)%rmult == tor_prm_tmp%rmult .and. &
+        tor_prm(j)%deltor == tor_prm_tmp%deltor .and. &
+        tor_prm(j)%paths == tor_prm_tmp%paths) then
+        tor_types(i)%cod = j
+        cycle torloop !skip to next
+      endif
+    end do
+    ntor_prm = ntor_prm + 1
+    tor_prm(ntor_prm) = tor_prm_tmp
+    tor_types(i)%cod = ntor_prm
                 
-        end do torloop
-        write(*, 110) ntor_types, 'torsion types'
-        write(*, 110) ntor_prm, 'unique torsion parameters'
+  end do torloop
+  write(*, 110) ntor_types, 'torsion types'
+  write(*, 110) ntor_prm, 'unique torsion parameters'
 
-        section = 'impropers'
-        nimp_prm = prm_count(section) 
-        if(ntor_prm == 0) then
-                write(*,*) '>>> ERROR: Impropers section not found in parameter file.'
-                return
-        end if
-        if(allocated(imp_prm)) deallocate(imp_prm)
-        allocate(imp_prm(nimp_prm), stat=alloc_status)
-        call check_alloc('improper parameters')
-        do i = 1, nimp_prm
-                if(.not. prm_get_line(line)) goto 1030
-                read(line, *, err = 1030) taci, tacj, tack, tacl, imp_prm(i)%prm
-                if(index_get(taci, iaci)) then
-                        imp_prm(i)%taci = tac(iaci)
-                else
-                        !this field may be wild-card
-                        imp_prm(i)%taci = ''
-                end if
-                if(index_get(tacj, iacj)) then
-                        imp_prm(i)%tacj = tac(iacj)
-                else
-                        !this field may be wild-card
-                        imp_prm(i)%tacj = ''
-                end if
-                if(index_get(tack, iack)) then
-                        imp_prm(i)%tack = tac(iack)
-                else
-                        !this field may be wild-card
-                        imp_prm(i)%tack = ''
-                end if
-                if(index_get(tacl, iacl)) then
-                        imp_prm(i)%tacl = tac(iacl)
-                else
-                        !this field may be wild-card
-                        imp_prm(i)%tacl = ''
-                end if
-        end do
-        write( * , 110) nimp_prm, 'improper types'
+  section = 'impropers'
+  nimp_prm = prm_count(section)
+  if(ntor_prm == 0) then
+    write(*,*) '>>> ERROR: Impropers section not found in parameter file.'
+    return
+  end if
+  if(allocated(imp_prm)) deallocate(imp_prm)
+  allocate(imp_prm(nimp_prm), stat=alloc_status)
+  call check_alloc('improper parameters')
+  do i = 1, nimp_prm
+    if(.not. prm_get_line(line)) goto 1030
+    read(line, *, err = 1030) taci, tacj, tack, tacl, imp_prm(i)%prm
+    if(index_get(taci, iaci)) then
+      imp_prm(i)%taci = tac(iaci)
+    else
+      !this field may be wild-card
+      imp_prm(i)%taci = ''
+    end if
+    if(index_get(tacj, iacj)) then
+      imp_prm(i)%tacj = tac(iacj)
+    else
+      !this field may be wild-card
+      imp_prm(i)%tacj = ''
+    end if
+    if(index_get(tack, iack)) then
+      imp_prm(i)%tack = tac(iack)
+    else
+      !this field may be wild-card
+      imp_prm(i)%tack = ''
+    end if
+    if(index_get(tacl, iacl)) then
+      imp_prm(i)%tacl = tac(iacl)
+    else
+      !this field may be wild-card
+      imp_prm(i)%tacl = ''
+    end if
+  end do
+  write( * , 110) nimp_prm, 'improper types'
 
 
-        write( * , '(a,/)') 'Force field parameters successfully read.'
-        ff_ok = .true.
-        call prm_close()
-        return
+  write( * , '(a,/)') 'Force field parameters successfully read.'
+  ff_ok = .true.
+  call prm_close()
+  return
 
-  110 format ('Read ',i4,' ', a)
-  120 format ('>>> ERROR: Failed to read ',a,' number ',i4)
-  130 format ('>>> ERROR: Could not enumerate atom type ',a, '. Duplicate name?')
-  140 format ('>>> ERROR at line ',i3,' of section ',a,': Atom type ',a,' not found.')
+110 format ('Read ',i4,' ', a)
+120 format ('>>> ERROR: Failed to read ',a,' number ',i4)
+130 format ('>>> ERROR: Could not enumerate atom type ',a, '. Duplicate name?')
+140 format ('>>> ERROR at line ',i3,' of section ',a,': Atom type ',a,' not found.')
 1000 write( * , 120) 'bond type', i
-        call prm_close()
-        return
+  call prm_close()
+  return
 
 1010 write( * , 120) 'angle type', i
-        call prm_close()
-        return
+  call prm_close()
+  return
 
 1020 write( * , 120) 'torsion type', i
-        call prm_close()
-        return
+  call prm_close()
+  return
 
 1030 write( * , 120) 'improper type', i
-        call prm_close()
-        return
+  call prm_close()
+  return
 
 1040 write( * , 120) 'atom type', i
-        call prm_close()
-        return
+  call prm_close()
+  return
 
 1050 write( * , 120) 'LJ type 2 pair', i
-        call prm_close()
-        return
+  call prm_close()
+  return
 
 1060 write( * , 120) trim(section), i
-        call prm_close()
-        return
+  call prm_close()
+  return
 
 end subroutine readparm
 
@@ -3754,53 +3667,52 @@ end subroutine readparm
 !
 !------------------------------------------------------------------------------!
 subroutine clearpdb
-        nres = 0
-        nres_solute = 0
-        nmol = 0
-        nat_pro = 0
-        nat_solute = 0
-        topo_ok = .false.
-        if(allocated(makeH)) deallocate(makeH)
-        if(allocated(heavy)) deallocate(heavy)
-        if(allocated(xtop)) deallocate(xtop)
-        if(allocated(res)) deallocate(res)
-        if(allocated(istart_mol)) deallocate(istart_mol)
+  nres = 0
+  nres_solute = 0
+  nmol = 0
+  nat_pro = 0
+  nat_solute = 0
+  topo_ok = .false.
+  if(allocated(makeH)) deallocate(makeH)
+  if(allocated(heavy)) deallocate(heavy)
+  if(allocated(xtop)) deallocate(xtop)
+  if(allocated(res)) deallocate(res)
+  if(allocated(istart_mol)) deallocate(istart_mol)
 end subroutine clearpdb
 
 
-
+!------------------------------------------------------------------------------!
+!!  subroutine: cleartop
+!
+!------------------------------------------------------------------------------!
 subroutine cleartop
-        !forget the name of the parameter file
-        have_prm_file_name = .false.
-        have_solute_sphere = .false.
-        have_title = .false.
-        topo_ok = .false.
+  !forget the name of the parameter file
+  have_prm_file_name = .false.
+  have_solute_sphere = .false.
+  have_title = .false.
+  topo_ok = .false.
 end subroutine cleartop
 
 
 !------------------------------------------------------------------------------!
 !!  function: countpdb
-!!
+!!  count atoms, residues and molecules in a pdb file
 !------------------------------------------------------------------------------!
 logical function countpdb(pdb_fileno, atoms, residues, molecules)
-  !count atoms, residues and molecules in a pdb file
-
   !arguments
-  integer                                         :: pdb_fileno, atoms, residues, molecules
-
+  integer                                 :: pdb_fileno, atoms, residues, molecules
   !locals
-  integer                                         :: resno, oldno
+  integer                                 :: resno, oldno
   character(len=4)                        :: resnam, atnam, oldresnam
   character(len=80)                       :: line
-  real                                            :: xtmp(3)
-  integer                                         :: atoms_in_res, atoms_in_file
-  integer                                         :: rescode, oldrescode
+  real                                    :: xtmp(3)
+  integer                                 :: atoms_in_res, atoms_in_file
+  integer                                 :: rescode, oldrescode
         
   ! old 10        format(13x,a4,a4,i5,4x,3f8.3)
-10 format(12x,a5,a3,2x,i4,4x,3f8.3)
-
+!10 format(12x,a5,a3,2x,i4,4x,3f8.3)
+10 format(12x,a5,a4,1x,i4,4x,3f8.3)
   countpdb = .true.
-
   atoms = 0
   residues = 0
   molecules = 1
@@ -3808,6 +3720,7 @@ logical function countpdb(pdb_fileno, atoms, residues, molecules)
   rescode = 0
   oldrescode = 0
   oldno = 0
+
   do
     read(pdb_fileno,'(a)', end=100) line
     if(adjustl(line) == 'GAP' .or. line(1:6) == 'TER   ') then
@@ -3816,7 +3729,7 @@ logical function countpdb(pdb_fileno, atoms, residues, molecules)
     else if(line(1:6) /= 'HETATM' .and. line(1:6) /= 'ATOM  ') then
       write(*,'(a,/,a)') '>>>WARNING: ignoring unrecognised line in PDB file', trim(line)
     else
-      READ(line, 10, end = 100, err = 200) atnam, resnam, resno, xtmp(1:3)
+      read(line, 10, end = 100, err = 200) atnam, resnam, resno, xtmp(1:3)
       if(resno /= oldno) then
         if(rescode /= 0) then
           !check it
@@ -3843,7 +3756,6 @@ logical function countpdb(pdb_fileno, atoms, residues, molecules)
         end if
         !remember previous rescode
         oldrescode = rescode
-
         oldno = resno
         oldresnam = resnam
         atoms_in_res = 0
@@ -3870,7 +3782,6 @@ logical function countpdb(pdb_fileno, atoms, residues, molecules)
     end if
     atoms = atoms + lib(rescode)%nat
   end if
-        
   write(*,15) atoms_in_file, atoms
   rewind(pdb_fileno)
   if(atoms_in_file == 0) countpdb = .false.
@@ -3880,14 +3791,11 @@ logical function countpdb(pdb_fileno, atoms, residues, molecules)
   write(*,16) line
   countpdb = .false.
 16 format('>>>>> ERROR found in line: ', a80)
-
 11 format('>>>>> ERROR: Residue number ',i5,' is of unknown type ',a4)
 12 format('>>>>> ERROR: Too many atoms in residue ',a4,1x,i5)
 13 format('>>>>> ERROR: Two residues with same number: ',a,i5,1x,a)
-
 15 format( 'PDB file contains',i6,' atoms.', /, &
     'The number of atoms in the topology will be',i6)
-
 end function countpdb
 
 
@@ -3899,10 +3807,13 @@ subroutine readpdb()
 
   ! *** local variables
   character(len=256)        :: pdb_file
-  character atnam_tmp * 4, resnam_tmp * 4
+  character(len=4)          :: atnam_tmp
+  character(len=4)          :: resnam_tmp
+!  character atnam_tmp * 4, resnam_tmp * 4
   character(len=80)         :: line
   integer resnum_tmp, oldnum, irec, i, atom_id(max_atlib), j
-  real xtmp(3)
+  real(kind=dp)             :: xtmp(3)
+!  real xtmp(3)
   logical res_found, at_found
   integer                   :: first_res_of_mol
   logical                   :: last_line_was_gap
@@ -3940,6 +3851,7 @@ subroutine readpdb()
 ! read residue names with four letters. Luckily column 21 in the pdb
 ! specification is a blank, so 2x in the previous expression can be easily
 ! changed to 1x
+!10	format(12x,a5,a3,2x,i4,4x,3f8.3)
 10 format(12x,a5,a4,1x,i4,4x,3f8.3)
 
   !       progress output formats
@@ -4296,7 +4208,6 @@ subroutine readframe
 end subroutine readframe
 
 
-
 subroutine trajectory
 !locals
         character(len=80)                       :: reply
@@ -4545,45 +4456,44 @@ logical function set_irc_solvent()
 end function set_irc_solvent
 
 
-
 subroutine set_solvent_type
-        !set solvent type (SPC-like, TIP3P-like or general)
+  !set solvent type (SPC-like, TIP3P-like or general)
 
-        !locals
-        integer                                         :: irc_solvent
-        integer                                         :: i, iac_H1, iac_H2
-        logical                                         :: dummy
+  !locals
+  integer                                         :: irc_solvent
+  integer                                         :: i, iac_H1, iac_H2
+  logical                                         :: dummy
 
-        solvent_type = SOLVENT_GENERAL
+  solvent_type = SOLVENT_GENERAL
 
-        !any solvent at all?
-        if(nwat == 0) return
-        !look up residue code of 1st solvent molecule
-        irc_solvent = res(nres_solute + 1)%irc
-        !is it a 3-atom molecule?
-        if(lib(irc_solvent)%nat /= 3) return
-        !check if all solvent molecules are of same type
-        do i=nres_solute + 2, nres
-                if(res(i)%irc /= irc_solvent) return
-        end do
+  !any solvent at all?
+  if(nwat == 0) return
+  !look up residue code of 1st solvent molecule
+  irc_solvent = res(nres_solute + 1)%irc
+  !is it a 3-atom molecule?
+  if(lib(irc_solvent)%nat /= 3) return
+  !check if all solvent molecules are of same type
+  do i=nres_solute + 2, nres
+    if(res(i)%irc /= irc_solvent) return
+  end do
 
-        !now we know all solvent molecules are the same type of 3-atomic molecules
-        solvent_type = SOLVENT_3ATOM
+  !now we know all solvent molecules are the same type of 3-atomic molecules
+  solvent_type = SOLVENT_3ATOM
         
-        !further checks for SPC water, for which special optimisations can be used
-        !check if atoms 2 and 3 are hydrogens
-        if(lib(irc_solvent)%atnam(2)(1:1) /= 'H' .or.  &
-                lib(irc_solvent)%atnam(3)(1:1) /= 'H') return
-        !check hydrogen atom types
-        dummy = index_get(lib(irc_solvent)%tac_lib(2), iac_H1)
-        !check that both hydrogens are same type
-        dummy = index_get(lib(irc_solvent)%tac_lib(3), iac_H2)
-        if(iac_H1 /= iac_H2) return
-        !check if zero LJ params on H 
-        if(all(iaclib(iac_H1)%avdw(:) == 0.) .and. &
-                all(iaclib(iac_H1)%bvdw(:) == 0.)) then
-                solvent_type = SOLVENT_SPC
-        end if
+  !further checks for SPC water, for which special optimisations can be used
+  !check if atoms 2 and 3 are hydrogens
+  if(lib(irc_solvent)%atnam(2)(1:1) /= 'H' .or.  &
+    lib(irc_solvent)%atnam(3)(1:1) /= 'H') return
+  !check hydrogen atom types
+  dummy = index_get(lib(irc_solvent)%tac_lib(2), iac_H1)
+  !check that both hydrogens are same type
+  dummy = index_get(lib(irc_solvent)%tac_lib(3), iac_H2)
+  if(iac_H1 /= iac_H2) return
+  !check if zero LJ params on H
+  if(all(iaclib(iac_H1)%avdw(:) == 0.) .and. &
+    all(iaclib(iac_H1)%bvdw(:) == 0.)) then
+    solvent_type = SOLVENT_SPC
+  end if
 end subroutine set_solvent_type
 
 
@@ -4812,13 +4722,11 @@ subroutine solvate
     write(*,'(a)') "Use <boundary> to define boundary condition"
     return
   end if
-
   if (use_PBC) then
     call solvate_box
   else
     call solvate_sphere
   end if
-
 end subroutine solvate
 
 
@@ -6168,7 +6076,7 @@ subroutine writepdb
 ! TODO: Fix writing of chainID, requires chain info in topology.
 ! (PDBtype,atomNr,atomName,resName,resNr,coords)
 !10      format(a6,i5,1x,a5,a3,2x,i4,4x,3f8.3)  pre-Geir Isaksen suggestion.
-10      format(a6,i5,1x,a5,a4,1x,i4,4x,3f8.3) ! four letter residue names
+10 format(a6,i5,1x,a5,a4,1x,i4,4x,3f8.3) ! four letter residue names
 11      format(a6,11x,a4,1x,i4) !For TER cards
   iat = 0
   imol = 1
@@ -6237,8 +6145,11 @@ end subroutine writepdb
 !------------------------------------------------------------------------------!
 subroutine writemol2
   ! *** local variables
-  character filnam*80, reply*1
-  character                        :: mol_name*16, ti*1, tj*1
+  character(len=80)                :: filnam
+  character(len=1)                 :: reply
+  character(len=16)                :: mol_name
+  character(len=1)                 :: ti
+  character(len=1)                 :: tj
   integer                          :: i, cnt, j, iat
   integer                          :: u
   integer                          :: mol, mol_start, mol_end, nat_mol, nbnd_mol
@@ -6392,9 +6303,9 @@ end subroutine writemol2
 !------------------------------------------------------------------------------!
 subroutine writetop
   ! *** local variables
-  CHARACTER filnam * 80
+  character(len=80)     :: filnam
+  character(len=10)     :: answer
   integer i, j, ig
-  CHARACTER answer * 10
 
   ! --- Warn if missing parameters were found by maketop
   if(.not. topo_ok) then
@@ -6402,20 +6313,15 @@ subroutine writetop
     write( * ,  * ) 'Do you realLY want to write this erronenous topology?'
     write( * ,  * ) 'Enter yes to proceed, anything else to cancel.'
     call parse_reset
-    CALL get_string_arg(answer, '-----> Write _ERRONENOUS_ topology [yes/NO] ? ')
+    call get_string_arg(answer, '-----> Write _ERRONENOUS_ topology [yes/NO] ? ')
     if(answer/='yes') then
       return
     endif
   endif
-
   write( *, * )
-
-  CALL get_string_arg(filnam, '-----> Give name of new topology file: ')
-
+  call get_string_arg(filnam, '-----> Give name of new topology file: ')
   call topo_save(filnam)
-
 end subroutine writetop
-
 
 
 !------------------------------------------------------------------------------!

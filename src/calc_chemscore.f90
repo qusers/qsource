@@ -18,164 +18,164 @@
 !------------------------------------------------------------------------------!
 module calc_chemscore
 
-use calc_base
-use maskmanip
-use trj
-use prmfile
-use indexer
-use qatom
-implicit none
+  use calc_base
+  use maskmanip
+  use trj
+  use prmfile
+  use indexer
+  use qatom
+  implicit none
 
-real                    :: score
-integer                 :: frame
-integer                 :: stat
-integer                 :: i
-character(len=4)        :: trj_type
-character*80            :: top_file, fep_file
+  real                    :: score
+  integer                 :: frame
+  integer                 :: stat
+  integer                 :: i
+  character(len=4)        :: trj_type
+  character*80            :: top_file, fep_file
 
-type score_precalc_type
-  character(len=80)       :: chFilename           ! name of re file if one is given
-  integer                                         :: iType                                ! 1 = top calculation, 2 = restart calculation
-end type score_precalc_type
+  type score_precalc_type
+    character(len=80)       :: chFilename           ! name of re file if one is given
+    integer                                         :: iType                                ! 1 = top calculation, 2 = restart calculation
+  end type score_precalc_type
 
-type score_type                                                                                 ! structure tp keep track of scoring data
-  character(len=80)               :: chFilename   ! either name of restart file, 'top' or empty if trajectory frame
-  integer                                                 :: frame                        ! empty if chReFilename is present
-  real(8)                                                 :: score
-  real(8)                                                 :: h_bonds
-  real(8)                                                 :: metal
-  real(8)                                                 :: lipophil
-  real(8)                                                 :: rot_bond
-end type score_type
+  type score_type                                                                                 ! structure tp keep track of scoring data
+    character(len=80)               :: chFilename   ! either name of restart file, 'top' or empty if trajectory frame
+    integer                                                 :: frame                        ! empty if chReFilename is present
+    real(8)                                                 :: score
+    real(8)                                                 :: h_bonds
+    real(8)                                                 :: metal
+    real(8)                                                 :: lipophil
+    real(8)                                                 :: rot_bond
+  end type score_type
 
-!constants
+  !constants
   integer, parameter                                              ::      MAX_MASKS = 10
 
-!module variables
-        type(SCORE_PRECALC_TYPE),pointer,private        :: aPrecalc(:)  ! array of pre-calculations
-        integer, private                                      :: iPrecalc             ! current number of pre-calcs added
-        integer, private                                      :: maxPrecalc   ! number of pre-calc elements allocated
+  !module variables
+  type(SCORE_PRECALC_TYPE),pointer,private        :: aPrecalc(:)  ! array of pre-calculations
+  integer, private                                      :: iPrecalc             ! current number of pre-calcs added
+  integer, private                                      :: maxPrecalc   ! number of pre-calc elements allocated
 
-        type(SCORE_TYPE),pointer,private                ::      aScore(:)                               ! framewise scoring info
-        integer                                                                 ::      nScores, maxScores              ! number of elements in aScore, number of allocated elements of aScore
+  type(SCORE_TYPE),pointer,private                ::      aScore(:)                               ! framewise scoring info
+  integer                                                                 ::      nScores, maxScores              ! number of elements in aScore, number of allocated elements of aScore
 
-        type(MASK_TYPE), private, target        ::      masks(MAX_MASKS)
-        integer, private                                        ::      Nmasks = 0
+  type(MASK_TYPE), private, target        ::      masks(MAX_MASKS)
+  integer, private                                        ::      Nmasks = 0
 
-        type SCORE_COORD_TYPE
-                real(8), pointer                                ::      xr(:)
-                real(8)                                                 ::      xrcm(3)
-        end type SCORE_COORD_TYPE
-        type(SCORE_COORD_TYPE), private         ::      coords(MAX_MASKS)
+  type SCORE_COORD_TYPE
+    real(8), pointer                                ::      xr(:)
+    real(8)                                                 ::      xrcm(3)
+  end type SCORE_COORD_TYPE
+  type(SCORE_COORD_TYPE), private         ::      coords(MAX_MASKS)
 
-        type wat
-                integer(AI)                                     ::      O, H1, H2               !topology numbers
-                real                                            ::      score                   !H-bond score with receptor
-        end type wat
+  type wat
+    integer(AI)                                     ::      O, H1, H2               !topology numbers
+    real                                            ::      score                   !H-bond score with receptor
+  end type wat
 
-        type donor
-                integer(AI)                                     ::      heavy,hydr              !topology numbers for atoms in H-bond donor
-        end type donor
+  type donor
+    integer(AI)                                     ::      heavy,hydr              !topology numbers for atoms in H-bond donor
+  end type donor
 
-        type lipos                                                                                      !return type for lip_atom
-                integer                                         ::      n_lip                   !number of lipophilic atoms
-                integer                                         ::      n_nonlip                !number of heavy, non-lipophilic atoms
-        end type lipos
+  type lipos                                                                                      !return type for lip_atom
+    integer                                         ::      n_lip                   !number of lipophilic atoms
+    integer                                         ::      n_nonlip                !number of heavy, non-lipophilic atoms
+  end type lipos
 
-        type bond_pointer                                                                       !pointer to the datatype q_bond
-                type(q_bond),pointer            ::      qb                              !needed for array of q_bonds in type q_atom
-        end type bond_pointer
+  type bond_pointer                                                                       !pointer to the datatype q_bond
+    type(q_bond),pointer            ::      qb                              !needed for array of q_bonds in type q_atom
+  end type bond_pointer
 
-        type q_atom
-                integer                                         ::      top_nr                                                                  ! atom number in topology
-                integer                                         ::      n                                                                                               !number of bonds
-                type(bond_pointer),dimension(1:6)               ::      bd              !pointers to the bonds
-                logical                                         ::      contact                         !if     closer than r to any receptor atom
-                integer                                         ::      at_type                         !if lipophilic 2, if other heavy 1, if hydrogen 0
-                integer                                         ::      hybrid                          !if included sp3 then 3, if included sp2 then 2, others 0
-                logical                                         ::      been_there              !flag used in recursive routines, to avoid eternal loops
-                logical,pointer         ::      cyclic(:)                       !array of logicals, one for each ring, true if part of that ring
-                logical                                         ::      active                          !same as been_there
-        end type q_atom
+  type q_atom
+    integer                                         ::      top_nr                                                                  ! atom number in topology
+    integer                                         ::      n                                                                                               !number of bonds
+    type(bond_pointer),dimension(1:6)               ::      bd              !pointers to the bonds
+    logical                                         ::      contact                         !if     closer than r to any receptor atom
+    integer                                         ::      at_type                         !if lipophilic 2, if other heavy 1, if hydrogen 0
+    integer                                         ::      hybrid                          !if included sp3 then 3, if included sp2 then 2, others 0
+    logical                                         ::      been_there              !flag used in recursive routines, to avoid eternal loops
+    logical,pointer         ::      cyclic(:)                       !array of logicals, one for each ring, true if part of that ring
+    logical                                         ::      active                          !same as been_there
+  end type q_atom
 
-        type q_bond
-                type(q_atom),pointer            ::      a,b                                     !pointers to two bonded atoms
-                logical                                         ::      rotatable                       !if not part of ring and sp3-sp3 or sp3-sp2 bond
-                logical                                         ::      acontact,bcontact       !if a and b in contact with receptor, only used if rotatable
-                logical                                         ::      been_there
-                integer                                         ::      a_nonlip,b_nonlip       !number of non-lipophilic heavy atoms on a-side and b-side of bond
-                integer                                         ::      a_lip,b_lip                     !number of lipophilic heavy atoms on a-side and b-side of bond
-                logical,pointer                         ::      cyclic(:)
-                logical                                         ::      active
-        end type q_bond
+  type q_bond
+    type(q_atom),pointer            ::      a,b                                     !pointers to two bonded atoms
+    logical                                         ::      rotatable                       !if not part of ring and sp3-sp3 or sp3-sp2 bond
+    logical                                         ::      acontact,bcontact       !if a and b in contact with receptor, only used if rotatable
+    logical                                         ::      been_there
+    integer                                         ::      a_nonlip,b_nonlip       !number of non-lipophilic heavy atoms on a-side and b-side of bond
+    integer                                         ::      a_lip,b_lip                     !number of lipophilic heavy atoms on a-side and b-side of bond
+    logical,pointer                         ::      cyclic(:)
+    logical                                         ::      active
+  end type q_bond
 
-        integer(AI), allocatable        ::      lph_r(:)        !topology number for all lipophilic atoms in the receptor
-        integer(AI), allocatable        ::      lph_l(:)        !                               ''                                                   the ligand
-        type(donor), allocatable        ::      hbd_r(:)        !H-bond donor in receptor
-        type(donor), allocatable        ::      hbd_l(:)        !  ''            ligand
-        integer(AI), allocatable        ::      hba_r(:)        !H-bond acceptor atoms in receptor
-        integer(AI), allocatable        ::      hba_l(:)        !      ''                 ligand
-        integer(AI), allocatable        ::      met_r(:)        !metal atoms in the receptor
-        type(wat), allocatable          ::      waters(:)       !water molecules
+  integer(AI), allocatable        ::      lph_r(:)        !topology number for all lipophilic atoms in the receptor
+  integer(AI), allocatable        ::      lph_l(:)        !                               ''                                                   the ligand
+  type(donor), allocatable        ::      hbd_r(:)        !H-bond donor in receptor
+  type(donor), allocatable        ::      hbd_l(:)        !  ''            ligand
+  integer(AI), allocatable        ::      hba_r(:)        !H-bond acceptor atoms in receptor
+  integer(AI), allocatable        ::      hba_l(:)        !      ''                 ligand
+  integer(AI), allocatable        ::      met_r(:)        !metal atoms in the receptor
+  type(wat), allocatable          ::      waters(:)       !water molecules
 
-        integer, allocatable            ::      pol_con(:)      !connections for potentially polar atoms
+  integer, allocatable            ::      pol_con(:)      !connections for potentially polar atoms
 
 
-        type(q_atom),private,allocatable,target ::      q_atoms(:)              ! atoms in ligand
-        type(q_bond),private,allocatable,target ::      q_bonds(:)              ! bonds in ligand
+  type(q_atom),private,allocatable,target ::      q_atoms(:)              ! atoms in ligand
+  type(q_bond),private,allocatable,target ::      q_bonds(:)              ! bonds in ligand
 
-        !numbers of each of the atom types
-        integer                                         ::      nlph_r, nlph_l, nhbd_r, nhbd_l
-        integer                                         ::      nhba_r, nhba_l, nmet_r, nwaters,nqbonds
-        integer                                         ::      nhbd_prot, nhba_prot
-        integer                                         ::      nrings          !number of rings in the ligand
+  !numbers of each of the atom types
+  integer                                         ::      nlph_r, nlph_l, nhbd_r, nhbd_l
+  integer                                         ::      nhba_r, nhba_l, nmet_r, nwaters,nqbonds
+  integer                                         ::      nhbd_prot, nhba_prot
+  integer                                         ::      nrings          !number of rings in the ligand
 
-        !lists of the atom type categories
-        integer, parameter                              ::      LIPO=1, METAL=2, SULPHUR=3, ACCEPTOR=4
-        integer, parameter                              ::      SP3=5, SP2=6, SP3_N=7, PL_N=8
-        integer, parameter                              ::      HYDROGEN=9, OXYGEN=10, CARBON_LIPO=11
-        integer, parameter                              ::      CARBONYL_CARBON=12, CARBONYL_OXYGEN=13
-        integer, parameter                              ::      NPROPS=13
-        character*(*), parameter                ::      file_heading(NPROPS) = [ &
-                'lipophilic     ', &
-                'metal          ', &
-                'sulphur        ', &
-                'acceptor       ', &
-                'sp3            ', &
-                'sp2            ', &
-                'sp3_nitrogen   ', &
-                'planar_nitrogen', &
-                'hydrogen       ', &
-                'oxygen         ', &
-                'carbon_lipo    ', &
-                'carbonyl_carbon', &
-                'carbonyl_oxygen']
+  !lists of the atom type categories
+  integer, parameter                              ::      LIPO=1, METAL=2, SULPHUR=3, ACCEPTOR=4
+  integer, parameter                              ::      SP3=5, SP2=6, SP3_N=7, PL_N=8
+  integer, parameter                              ::      HYDROGEN=9, OXYGEN=10, CARBON_LIPO=11
+  integer, parameter                              ::      CARBONYL_CARBON=12, CARBONYL_OXYGEN=13
+  integer, parameter                              ::      NPROPS=13
+  character*(*), parameter                ::      file_heading(NPROPS) = [ &
+    'lipophilic     ', &
+    'metal          ', &
+    'sulphur        ', &
+    'acceptor       ', &
+    'sp3            ', &
+    'sp2            ', &
+    'sp3_nitrogen   ', &
+    'planar_nitrogen', &
+    'hydrogen       ', &
+    'oxygen         ', &
+    'carbon_lipo    ', &
+    'carbonyl_carbon', &
+    'carbonyl_oxygen']
 
-        type ATOM_DATA_TYPE
-                real                                            ::      radius
-                logical                                         ::      prop(NPROPS)
-        end type ATOM_DATA_TYPE
-        type(ATOM_DATA_TYPE), allocatable ::atom_data(:)
+  type ATOM_DATA_TYPE
+    real                                            ::      radius
+    logical                                         ::      prop(NPROPS)
+  end type ATOM_DATA_TYPE
+  type(ATOM_DATA_TYPE), allocatable ::atom_data(:)
 
-        !No record is kept of polar(non H-bonding) atoms
+  !No record is kept of polar(non H-bonding) atoms
 
-        integer, allocatable            ::      iqatom(:)       !one element per atom, 0 if not Q-atom,
-                                                                                                !else number in iqseq (ligand)
-        real,allocatable                        ::      vdwr(:)         !van der Waals radius of each atom
+  integer, allocatable            ::      iqatom(:)       !one element per atom, 0 if not Q-atom,
+                                                                                          !else number in iqseq (ligand)
+  real,allocatable                        ::      vdwr(:)         !van der Waals radius of each atom
 
-        character*80                            ::      atom_data_file
-        character*80                            ::  coord_file
+  character*80                            ::      atom_data_file
+  character*80                            ::  coord_file
 
-        real                                            ::      hbond_term,metal_term,lipo_term,rot_term        !result from score
-        real, parameter                         ::      dGconst=-5.48, dGhbond=-3.34, dGmetal=-6.03
-        real, parameter                         ::      dGlipo=-0.117, dGrot=2.56
+  real                                            ::      hbond_term,metal_term,lipo_term,rot_term        !result from score
+  real, parameter                         ::      dGconst=-5.48, dGhbond=-3.34, dGmetal=-6.03
+  real, parameter                         ::      dGlipo=-0.117, dGrot=2.56
 
-        integer, private                        ::      bDoTopcalc              ! boolean flag
-        integer, private                        ::      iRestartCalc=-1 ! flag to indicate if doing calcs on restart file or not
+  integer, private                        ::      bDoTopcalc              ! boolean flag
+  integer, private                        ::      iRestartCalc=-1 ! flag to indicate if doing calcs on restart file or not
 
-        logical, private                        ::      bUseXIN = .false.               ! boolean flag to indicate use of xin instead of xtop
+  logical, private                        ::      bUseXIN = .false.               ! boolean flag to indicate use of xin instead of xtop
 
-        integer, private                        :: warn                                         ! flag to indicate if any warnings were displayed
+  integer, private                        :: warn                                         ! flag to indicate if any warnings were displayed
 
 contains
 
