@@ -9,7 +9,8 @@
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
-!>  (c) 2003 Uppsala Molekylmekaniska HB, Uppsala, Sweden                      !
+!!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
+!!  and Paul Bauer
 !!  md.f90                                                                     !
 !!  by Johan Aqvist, John Marelius, Anders Kaplan, Isabella Feierberg,         !
 !!  Martin Nervall & Martin Almlof                                             !

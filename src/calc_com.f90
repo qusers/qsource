@@ -9,7 +9,8 @@
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
-!  (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
+!!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
+!!  and Paul Bauer
 !  calc_kineticenergy.f90
 !  by Martin Almlof
 !  calculates the center of mass coordinates of whatever atom mask is specified

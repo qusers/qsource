@@ -9,7 +9,8 @@
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
-!>  (c) 2017 Uppsala Molekylmekaniska HB, Uppsala, Sweden  
+!!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
+!!  and Paul Bauer
 !!  program: **qcalc**  
 !!  by John Marelius  
 !!  qcalc trajectory analysis main program  

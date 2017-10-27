@@ -9,7 +9,8 @@
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
-!>  (c) 2015 Uppsala Molekylmekaniska HB, Uppsala, Sweden
+!!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
+!!  and Paul Bauer
 !>  trj.f90                                                                    !
 !>  by John Marelius                                                           !
 !>  Q trajectory data, access and DCD format I/O module                        !

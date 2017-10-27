@@ -9,7 +9,8 @@
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
-!>  (c) 2017 Uppsala Molekylmekaniska HB, Uppsala, Sweden  
+!!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
+!!  and Paul Bauer
 !!  program: **qfep**  
 !!  by Johan Aqvist, Karin Kolmodin, John Marelius, Johan Sund  
 !!  qfep free energy analysis program for FEP, EVB & Umbrella Sampling  

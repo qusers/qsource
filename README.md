@@ -1,11 +1,20 @@
 Qsource development.
 ================================================================================
 
-This is a repository to hold clean and readable Q code.  
+This a fork of Q6 with a large amount of differences from that
+original code. Use at your own risk.
+
+The forked code is released under a GNU General Public License, Version 2.0
+(GPLv2), that means that all modifications done here belong to the 
+Public license owners, that is, Paul Bauer, j. marelius, j. aqvist,
+s. c. l. kamerlin.
+
+
+The main idea of this fork is to aim for clean and readable Q code.  
 The code is in the process of being reorganized and cleaned-up
 according to best coding practices.  
 
-We are documenting the code using doxygen and ford.   
+We are starting to document the code using doxygen and ford.   
 To generate the doxygen documentation do:  
 
     cd docs/developers  
@@ -61,14 +70,17 @@ is a good example to draw from.
 
 2. Code constructs
 --------------------------------------------------------------------------------
+*to do*  
 
 
 3. Interfaces
 --------------------------------------------------------------------------------
+*to do*  
 
 
 4. Comments in code
 --------------------------------------------------------------------------------
+*to do*  
 
 
 5. Compilation
@@ -76,7 +88,7 @@ is a good example to draw from.
 
 5.1  gfortran from gcc
 ----------------------
-At the moment Q doesn't include any of the features of the fortran
+At the moment this fork includes a few features of the fortran
 2008 standard. The fortran 2008 standard is the latest fortran
 standard. Work is being done on the fortran 2015 standard but it is
 not yet released. Many features of fortran 2008 are already included
@@ -106,9 +118,9 @@ of mingw64. You will also need make and gcc-fortran.
     pacman -S pacman mingw-w64-x86_64-gcc-fortran
     pacman -S git make
    
-Then just clone this branch:
+Then just clone this fork:
 
-    git clone -b development/esguerra --single-branch https://github.com/qusers/qsource.git qsource
+    git clone https://github.com/esguerra/Q6.git
 
 And compile with:
 
@@ -123,21 +135,22 @@ have not tested Windows MPI yet, nor the openMPI port for cygwin.
 
 6. Allowed Fortran Features
 --------------------------------------------------------------------------------
-
+*to do*  
 
 
 7. Error Handling
 --------------------------------------------------------------------------------
+*to do*  
 
 
 8. Benchmarking
 --------------------------------------------------------------------------------
+*to do*  
 
 
 9. Accuracy Testing
 --------------------------------------------------------------------------------
-
-
+*to do*  
 
 
 

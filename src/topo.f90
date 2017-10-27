@@ -9,7 +9,8 @@
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
-!  (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
+!!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
+!!  and Paul Bauer
 !  topo.f90
 !  by John Marelius & Johan Aqvist
 !  molecular topology data and I/O

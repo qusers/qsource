@@ -9,6 +9,8 @@
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
+!!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
+!!  and Paul Bauer
 !  (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
 !  calc_base.f90
 !  by John Marelius

@@ -9,7 +9,8 @@
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
-!  (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
+!!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
+!!  and Paul Bauer
 !  mpiglob.f90
 !  by John Marelius & Anders Kaplan
 !  global variables for MPI parallell qdyn

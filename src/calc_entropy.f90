@@ -9,6 +9,8 @@
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
+!!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
+!!  and Paul Bauer
 !  calc_entropy.f90
 !  By Jens Carlsson, phd 
 !  Absolute entropies according to Quasiharmonic analysis, Schlitter's formula 

@@ -9,7 +9,8 @@
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
-!  (C) 2000 Uppsala Molekylmekaniska HB, Uppsala, Sweden
+!!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
+!!  and Paul Bauer
 !  calc_xscore.f90
 !  by Peter Hanspers & Martin Nervall
 !  Qcalc trajectory analysis main program

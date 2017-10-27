@@ -9,7 +9,8 @@
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
-!!  (c) 2015 Uppsala Molekylmekaniska HB, Uppsala, Sweden
+!!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
+!!  and Paul Bauer
 !!  module: prep.f90
 !!  by Johan Aqvist & John Marelius
 !!  topology preparation, solvation, validation and PDB I/O
@@ -5538,7 +5539,7 @@ subroutine add_solvent_to_topology(waters_in_sphere, max_waters, make_hydrogens,
 
   !exclude water molecues close to heavy solute atoms
   write(*,120) pack
-120 format('Minimum distance to solute heavy atoms:',f6.2,' A')
+120 format('Minimum distance to solute heavy atoms (solvent_pack):',f6.2,' A')
 
   waters_added = 0
   rpack2 = pack**2

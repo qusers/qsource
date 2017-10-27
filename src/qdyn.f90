@@ -9,7 +9,8 @@
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
-!>  (c) 2017 Uppsala Molekylmekaniska HB, Uppsala, Sweden  
+!!  Copyright (c) 2017 Johan Aqvist, John Marelius, Shina Caroline Lynn Kamerlin
+!!  and Paul Bauer
 !!  program: **qdyn**  
 !!  by Johan Aqvist, John Marelius, Anders Kaplan & Martin Nervall  
 !!  qdyn molecular dynamics main program  
