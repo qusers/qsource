@@ -3,8 +3,8 @@
 #  code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      #
 #  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          #
 #  Kajsa Ljunjberg, John Marelius, Martin Nervall                              #
-#  Maintainers: Paul Bauer Beat Amrein, Alexandre Barrozo, Paul Bauer,         #
-#  Mauricio Esguerra Irek Szeler, Masoud Karemi                                #
+#  Maintainers: Paul Bauer, Beat Amrein, Alexandre Barrozo                     #
+#  Mauricio Esguerra, Irek Szeler, Masoud Karemi                               #
 #  latest update: February 9, 2015                                             #
 #  make [option] [COMP=compiler]                                               #
 ################################################################################
@@ -14,7 +14,7 @@
 ################################################################################
 ifeq ($(COMP),ifort)
 	FC=             ifort
-	FC_OPT=         -O3 -ip -ipo -unroll -i-static
+	FC_OPT=         -O3 -ip -ipo -unroll -fast
 	FFLAGS=         -fstack-protector ${FC_OPT}
 	FPP_FLG=        -fpp
 

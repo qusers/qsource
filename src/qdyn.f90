@@ -154,9 +154,10 @@ contains
   !-----------------------------------------------------------------------
   !interface
   integer(4) function signal(signum, proc, flag)
-    integer(4) signum, flag
+    integer(4) :: signum, flag
     external proc
-  end function
+    signal = 1
+  end function signal
   !end interface
 
 end program qdyn

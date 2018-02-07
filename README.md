@@ -31,8 +31,10 @@ To get this version to compile intel fortran is needed.
 ### At CSB  
 Using the Makefile from Åke  intel fortran is necessary, else gfortran
 does not like the declaration of a signal function in qdyn.f90
+
 This is  overcome by  simply changing the  signal function  from where
-it's invoked and taking it out of the interface declaration. 
+it's invoked and taking it out of the interface declaration. This has
+been done now, and the code compiles both with GCC and Intel fortran.
 
 To get intel fortran into your environment in csb do:  
 
