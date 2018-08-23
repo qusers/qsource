@@ -22,7 +22,7 @@ MODULE PREP
 
 	!library
 	!max number of library entries
-	integer, parameter		::	max_entry = 1000
+	integer, parameter		::	max_entry = 2000
 	!max atoms in a residue (only used when reading PDB file)
 	integer, parameter		::	max_atlib = 500
 	integer, parameter		::	max_cgplib = 100
@@ -35,10 +35,9 @@ MODULE PREP
 	integer, parameter			::	max_extrabnd = 100
 
 	!Topology
-	integer, parameter			::	max_lib = 1000
+	integer, parameter			::	max_lib = 2000
 	integer, parameter			::	max_long = 10000
-
-	integer, parameter			:: max_conn = 10
+	integer, parameter			::      max_conn = 10
 
 !default values for user-settable variables
 	!minimum solvent - solute heavy atom distance for solvation
@@ -2610,7 +2609,7 @@ subroutine readlib(file)
 !arguments
 	character(*), optional		::	file
 ! *** local variables
-	CHARACTER					::	line*80, filnam*80
+	CHARACTER					::	line*200, filnam*200
 	integer						::	irec, i, iat, ires, j, igp, ntot
 	real						::	qtot, qgrp, qtot_grp
 	character(len=80)			::	resnam

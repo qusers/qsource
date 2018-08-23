@@ -12,13 +12,13 @@ program qdyn
   ! version data
   character(10) :: qdyn_version = '5.7'
   character(12) :: qdyn_date = '2015-02-08'
-#if defined (use_mpi)
+#if defined (USE_MPI)
   character(10) :: qdyn_suffix = '_parallel'
 #else
   character(10) :: qdyn_suffix = ''
 #endif
   
-#if defined (use_mpi)
+#if defined (USE_MPI)
   ! mpi error code
   integer :: qdyn_ierr
 #endif
@@ -33,7 +33,7 @@ program qdyn
   external sigkill_handler
   external sigabrt_handler
 
-#if defined (use_mpi)
+#if defined (USE_MPI)
   ! initialize mpi
   call mpi_init(qdyn_ierr)
   if (qdyn_ierr .ne. mpi_success) call die('failure at mpi init')
@@ -76,7 +76,7 @@ program qdyn
     end if
   end if
 
-#if defined (use_mpi)
+#if defined (USE_MPI)
   ! initialize slave nodes
   if (numnodes .gt. 1) call init_nodes
 #endif
@@ -95,7 +95,7 @@ program qdyn
   ! deallocate memory etc.
   call shutdown
 
-#if defined (use_mpi)
+#if defined (USE_MPI)
   ! shut down mpi
   call mpi_finalize(qdyn_ierr)
 #endif

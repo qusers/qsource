@@ -15,7 +15,8 @@ use trj
 use mpiglob
 use qatom
 implicit none
-#if defined (use_mpi)
+
+#if defined (USE_MPI)
 include "mpif.h"
 #endif
 
@@ -327,7 +328,7 @@ end type profiling_var_type
 
 type(profiling_var_type)        :: profile(num_profiling_times)
 
-#if defined (use_mpi)
+#if defined (USE_MPI)
  !vectors for keeping track of node times
 real(8),allocatable                             :: all_node_times(:)
 real(8),allocatable                             :: node_times(:)
@@ -424,7 +425,7 @@ end if
 call md_deallocate
 
 
-#if defined (use_mpi)
+#if defined (USE_MPI)
 ! abort all processes with exit code 255
 call mpi_abort(mpi_comm_world, 255, ierr)
 #else
@@ -478,7 +479,7 @@ call check_alloc('lrf arrays')
 end subroutine allocate_lrf_arrays
 
 !----------------------------------------------------------------------
-#if defined(use_mpi)
+#if defined(USE_MPI)
 subroutine allocate_mpi
 
 if(nodeid .eq. 0) then
@@ -562,7 +563,7 @@ deallocate(rstpos, stat=alloc_status)
 deallocate(rstdis, stat=alloc_status)
 deallocate(rstwal, stat=alloc_status)
 
-#if defined (use_mpi)
+#if defined (USE_MPI)
 !mpi arrays
 deallocate(nbpp_per_cgp ,stat=alloc_status)
 deallocate(nbww_per_cgp ,stat=alloc_status)
@@ -1082,7 +1083,7 @@ calculation_assignment%qw%end = nwat
 calculation_assignment%ww%start = 1
 calculation_assignment%ww%end = nwat
 
-#if defined (use_mpi)
+#if defined (USE_MPI)
 else ! i.e. slave nodes exists
 
 ! a simple solution to avoid parallelising the bonded
@@ -1234,7 +1235,7 @@ end if    !if (numnodes .eq. 1)
 end if   !if (nodeid .eq. 0)
 
 ! distribute assignments to the nodes
-#if defined (use_mpi)
+#if defined (USE_MPI)
 if (numnodes .gt. 1) then
     if (nodeid .ne. 0) then
         ! dummy allocation to avoid runtime errors when using pointer checking
@@ -1282,7 +1283,7 @@ if (numnodes .gt. 1) then
 end if
 end if
 
-#if defined (use_mpi)
+#if defined (USE_MPI)
 call mpi_bcast(totnbpp, 1, mpi_integer, 0, mpi_comm_world, ierr)
 call mpi_bcast(totnbpw, 1, mpi_integer, 0, mpi_comm_world, ierr)
 call mpi_bcast(totnbqp, 1, mpi_integer, 0, mpi_comm_world, ierr)
@@ -1884,7 +1885,7 @@ end function improper2
 
 !-----------------------------------------------------------------------
 
-#if defined (use_mpi)
+#if defined (USE_MPI)
 !defines and allocates variables needed in the md-calculations
 !the node initiation is written for ai = 4. if changes are made to any size in
 ! sizes.f90 the mpi-code must be changed accordingly. it is not dynamically
@@ -3862,7 +3863,7 @@ profile(11)%name = 'update vel. & coords.'
 #endif
 
 #if defined(profiling)
-#if defined(use_mpi)
+#if defined(USE_MPI)
 if (nodeid .eq. 0) then
         allocate(all_node_times(num_profiling_times*numnodes), stat=alloc_status) !vector for storing all node's node_times, used by mpi_gather at end of md_run
         call check_alloc('mpi profiling')
@@ -3952,7 +3953,7 @@ write(*,332) 'solute-solute', 'solute-water', 'water-water', 'q-solute', 'q-wate
 write(*,333) nodeid, 'count', nbpp_pair, nbpw_pair, &
      &  nbww_true_pair, nbqp_pair, 3*nqat*nbqw_pair
 
-#if defined(use_mpi)
+#if defined(USE_MPI)
 !reduce totnxx, i.e. collect # pairs found by slave nodes
 nbxx(1)=nbpp_pair
 nbxx(2)=nbpw_pair
@@ -4061,7 +4062,7 @@ if( use_pbc .and. constant_pressure) then
    end if
 end if
 
-#if defined(use_mpi)
+#if defined(USE_MPI)
 call mpi_bcast(x, nat3, mpi_real8, 0, mpi_comm_world, ierr)
 if (ierr .ne. 0) call die('init_nodes/mpi_bcast x')
 #endif
@@ -4144,7 +4145,7 @@ end if
 #if defined(profiling)
 !print more profiling info
 
-#if defined(use_mpi)
+#if defined(USE_MPI)
 do i=1,num_profiling_times
         node_times(i) = profile(i)%time
 end do
@@ -13165,7 +13166,7 @@ d(:) = 0.
 ! --- calculate the potential energy and derivatives ---
 ! *** nonbonds distribueras
 
-#if defined (use_mpi)
+#if defined (USE_MPI)
 if (nodeid .eq. 0) then
 !first post recieves for gathering data from slaves
 call gather_nonbond
@@ -13235,14 +13236,14 @@ end do
 #if defined (profiling)
 profile(9)%time = profile(9)%time + rtime() - start_loop_time1 - profile(8)%time
 #endif
-#if defined(use_mpi)
+#if defined(USE_MPI)
 else  !slave nodes
 call gather_nonbond
 #endif
 end if
 
 if (nodeid .eq. 0) then 
-#if (use_mpi)
+#if (USE_MPI)
 do i = 1, 3
     call mpi_waitall(numnodes-1,request_recv(1,i),mpi_status,ierr)
 end do
@@ -13506,7 +13507,7 @@ end if
 iqatom(:) = 0
 
 return
-#if defined(use_mpi)
+#if defined(USE_MPI)
 112 call mpi_abort(mpi_comm_world,1,ierr)
 #else
 112 stop 'aborting due to errors reading restart file.'
@@ -15394,7 +15395,7 @@ end if !if(nodeid .eq. 0)
 if (use_lrf) then
 
 !broadcast mvd_mol(:) & x(:)
-#if defined(use_mpi)
+#if defined(USE_MPI)
 call mpi_bcast(mvd_mol, nmol, mpi_integer, 0, mpi_comm_world, ierr)
 if (ierr .ne. 0) call die('init_nodes/mpi_bcast mvd_mol(k)')
 call mpi_bcast(x, nat3, mpi_real8, 0, mpi_comm_world, ierr)
@@ -15453,7 +15454,7 @@ if (use_lrf) then
         old_lrf(:) = lrf(:)
 end if
 
-#if defined(use_mpi)
+#if defined(USE_MPI)
 !update modified coordinates  
 call mpi_bcast(x, natom*3, mpi_real8, 0, mpi_comm_world, ierr)
 if (ierr .ne. 0) call die('init_nodes/mpi_bcast x')
@@ -15555,7 +15556,7 @@ do j=istart_mol(nmol) , natom
 end do
 end if !nodeid .eq. 0
 
-#if defined(use_mpi)
+#if defined(USE_MPI)
 !update modified coordinates and boxlengths 
 call mpi_bcast(x, natom*3, mpi_real8, 0, mpi_comm_world, ierr)
 if (ierr .ne. 0) call die('init_nodes/mpi_bcast x')
@@ -15631,7 +15632,7 @@ write(*,*)
 write(*,'(80a)') '==============================================================================='
 end if !(nodeid .eq. 0)
 
-#if defined(use_mpi)
+#if defined(USE_MPI)
 !make slave nodes put things back if rejected
 call mpi_bcast(acc, 1, mpi_logical, 0, mpi_comm_world, ierr)
 if (.not. acc) then
@@ -15676,7 +15677,7 @@ end do
 !reset derivatives ---
 d(:) = 0.0
 
-#if defined (use_mpi)
+#if defined (USE_MPI)
 !first post recieves for gathering data from slaves
 if (nodeid .eq. 0) then
 call gather_nonbond
@@ -15736,14 +15737,14 @@ if (nodeid .eq. 0) then
  end if
 end if
 
-#if defined(use_mpi)
+#if defined(USE_MPI)
 if (nodeid .ne. 0) then  !slave nodes
 call gather_nonbond
 end if
 #endif
 
 if (nodeid .eq. 0) then 
-#if (use_mpi)
+#if (USE_MPI)
 do i = 1, 3
     call mpi_waitall((numnodes-1),request_recv(1,i),mpi_status,ierr)
 end do
@@ -15786,7 +15787,7 @@ end subroutine new_potential
 
 !----------------------------------------------------------------------------------------
 
-#if defined (use_mpi)
+#if defined (USE_MPI)
 !***********************
 !subroutine handling summation of nonbonded energies from slave nodes.
 !***********************
