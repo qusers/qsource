@@ -27,7 +27,7 @@ module ATOM_MASK
 	implicit none
 
 	! version data
-	character(*), private, parameter  ::	MODULE_VERSION = '5.06'
+	character(*), private, parameter  ::	MODULE_VERSION = '5.6'
 	character(*), private, parameter  ::	MODULE_DATE    = '2014-04-21'
 
 	!private procedures

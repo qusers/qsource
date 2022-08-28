@@ -25,7 +25,7 @@ module indexer
 implicit none
 
 !constants
-	character(*), private, parameter	::	MODULE_VERSION = '5.06'
+	character(*), private, parameter	::	MODULE_VERSION = '5.6'
 	character(*), private, parameter	::	MODULE_DATE = '2014-01-01'
 
 integer, private ::				count = 0, top = 0

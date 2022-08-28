@@ -265,7 +265,7 @@ end if
                         write(*,*) 'Could not read file header! Old energy file?'
 			fileheader%arrays = 1
 			fileheader%totresid = 1
-			fileheader%version=' 5.06'
+			fileheader%version=' 5.6'
 			if(ifile.eq.1) then
 			allocate(fileheader%gcnum(fileheader%arrays),fileheader%types(fileheader%arrays),&
 				fileheader%numres(fileheader%totresid),fileheader%resid(fileheader%totresid))

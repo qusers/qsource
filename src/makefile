@@ -1,5 +1,5 @@
 ################################################################################
-#  Q V.5.06 Makefile                                                           #
+#  Q V.5.6 Makefile                                                           #
 #  code authors: Johan Aqvist, Martin Almlof, Martin Ander, Jens Carlson,      #
 #  Isabella Feierberg, Peter Hanspers, Anders Kaplan, Karin Kolmodin,          #
 #  Kajsa Ljunjberg, John Marelius, Martin Nervall                              #

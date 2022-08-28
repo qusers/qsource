@@ -26,7 +26,7 @@ use SIZES
 
 implicit none
 
-	character(*), parameter	::	NRGY_VERSION = '5.06'
+	character(*), parameter	::	NRGY_VERSION = '5.6'
 	character(*), parameter	::	NRGY_DATE    = '2014-04-21'
 
 	type BONDED_ENERGIES

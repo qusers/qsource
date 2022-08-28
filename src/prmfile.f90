@@ -77,7 +77,7 @@ module PRMFILE
 use MISC
 implicit none
 !constants
-	character(*), private, parameter	:: MODULE_VERSION = '5.06'
+	character(*), private, parameter	:: MODULE_VERSION = '5.6'
 	character(*), private, parameter	:: MODULE_DATE    = '2014-04-21'
 
 !types, NOTE: maximum length of 500 chars per line

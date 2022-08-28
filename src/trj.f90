@@ -27,7 +27,7 @@ use ATOM_MASK
 use MISC
 implicit none
 
-	character(*), private, parameter	:: MODULE_VERSION = '5.06'
+	character(*), private, parameter	:: MODULE_VERSION = '5.6'
 	character(*), private, parameter	:: MODULE_DATE    = '2014-04-21'
 
 	type, private :: REC1
